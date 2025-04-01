@@ -21,9 +21,19 @@ L’application permettra aux utilisateurs d’ajouter des sujets de projet, d�
 L’objectif est de simplifier le suivi de chaque projet en offrant une gestion claire et accessible à toutes les parties prenantes : étudiants, tuteurs et administrateurs. 
 
 
-## Structure Globale du Backend
+## STRUCTURE GLOBALE DU BACKEND
+
+
+### LES MODULES 
+
+
+<p align="left">
+  <img src="assets/backend tree map.png" alt="Les modules" width="1600"/>
+</p>
+
 
 ### Structure du Backend
+
 <details>
   <summary>📂 Cliquez pour afficher la structure</summary>
 
@@ -124,5 +134,7 @@ L’objectif est de simplifier le suivi de chaque projet en offrant une gestion 
 
 
 </details>
+
+
 
 
