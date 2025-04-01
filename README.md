@@ -25,8 +25,10 @@ L’objectif est de simplifier le suivi de chaque projet en offrant une gestion 
 
 ### Structure du Backend
 <details>
-<summary>Cliquez pour afficher la structure</summary>
+  <summary>📂 Cliquez pour afficher la structure</summary>
 
+
+```
 backend/
 ├── .env
 ├── Dockerfile
@@ -116,6 +118,9 @@ backend/
     │   └── validation.util.js
     └── tests/
         └── integration.test.js
+
+```
+
 
 </details>
 
