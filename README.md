@@ -23,7 +23,9 @@ L’objectif est de simplifier le suivi de chaque projet en offrant une gestion 
 
 ## Structure Globale du Backend
 
-### Arborescence du Backend
+### Structure du Backend
+<details>
+<summary>Cliquez pour afficher la structure</summary>
 
 backend/
 ├── .env
@@ -114,4 +116,7 @@ backend/
     │   └── validation.util.js
     └── tests/
         └── integration.test.js
+
+</details>
+
 
