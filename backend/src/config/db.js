@@ -1,17 +1,26 @@
-const mongoose = require('mongoose');
-require('dotenv').config(); // Assurez-vous d'importer dotenv
+require('dotenv').config();
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = process.env.MONGODB_URI;
 
-const connectDB = async () => {
-    try {
-        await mongoose.connect(process.env.MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-        });
-        console.log('Connected to MongoDB Atlas');
-    } catch (error) {
-        console.error('MongoDB connection failed:', error);
-        process.exit(1);
-    }
-};
+// Créer un MongoClient avec un objet MongoClientOptions pour définir la version Stable de l'API
+const client = new MongoClient(uri, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true,
+  }
+});
 
-module.exports = connectDB;
+async function run() {
+  try {
+    // Connecter le client au serveur (optionnel à partir de v4.7)
+    await client.connect();
+    // Envoyer un ping pour confirmer une connexion réussie
+    await client.db("Walid").command({ ping: 1 });
+    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+  } finally {
+    // S'assurer que le client se ferme lorsque vous avez terminé/en cas d'erreur
+    await client.close();
+  }
+}
+run().catch(console.dir);
