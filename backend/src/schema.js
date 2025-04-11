@@ -6,7 +6,7 @@ const Project = require('./modules/project-management/models/project.model');
 const User = require('./modules/user-management/models/user.model');
 const Evaluation = require('./modules/evaluation-system/models/evaluation.model');
 const IaService = require('./services/ia.service');
-const { graphqlCreateProjectSchema } = require('./modules/project-management/validation/project.schema'); // Joi schema
+const { graphqlCreateProjectSchema } = require('./modules/project-management/schema'); // Joi schema
 
 // 📚 Définition des types GraphQL
 const typeDefs = gql`

@@ -1,4 +1,4 @@
-// src/modules/project-management/validation/project.schema.js
+// src/modules/project-management/schema.js
 
 const Joi = require('joi');
 
