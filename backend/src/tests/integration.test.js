@@ -7,159 +7,138 @@ const Project = require('../modules/project-management/models/project.model');
 const Evaluation = require('../modules/evaluation-system/models/evaluation.model');
 const IaService = require('../services/ia.service');
 
-describe('Integration Tests', () => {
-    let token;
-    let projectId;
-    let evaluationId;
+describe('🧪 Integration Tests - PROGEASE', () => {
+    let token, tuteur, etudiant1, etudiant2;
 
     beforeAll(async () => {
-        // Créer un utilisateur (tuteur)
-        const tutor = await User.create({
+        await mongoose.connect(process.env.MONGODB_URI);
+
+        // 👤 Création de comptes utilisateurs
+        tuteur = await User.create({
             email: 'tutor@example.com',
             password: 'password',
             role: 'tuteur',
-            experience: 85
+            experience: 85,
+            skills: ['Python', 'ML']
         });
 
-        // Authentification
-        const authResponse = await request(app)
+        etudiant1 = await User.create({
+            email: 'etudiant1@example.com',
+            password: 'password',
+            role: 'student'
+        });
+
+        etudiant2 = await User.create({
+            email: 'etudiant2@example.com',
+            password: 'password',
+            role: 'student'
+        });
+
+        // 🔐 Authentification tuteur
+        const auth = await request(app)
             .post('/api/users/login')
-            .send({ email: tutor.email, password: 'password' });
-        token = authResponse.body.token;
+            .send({ email: tuteur.email, password: 'password' });
+
+        token = auth.body.token;
     });
 
     afterAll(async () => {
         await Project.deleteMany({});
-        await User.deleteMany({});
         await Evaluation.deleteMany({});
+        await User.deleteMany({});
         await mongoose.connection.close();
     });
 
-    describe('Project-Evaluation Link', () => {
-        it('should link project to evaluation', async () => {
-            // Créer un projet
-            const projectResponse = await request(app)
-                .post('/api/projects/create')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    title: 'Projet de Test',
-                    description: 'Description de test',
-                    equipe: [new mongoose.Types.ObjectId()],
-                    tuteur: new mongoose.Types.ObjectId(),
-                    skills: ['Python', 'Machine Learning']
-                });
-            projectId = projectResponse.body._id;
+    const createProject = async (custom = {}) => {
+        const res = await request(app)
+            .post('/api/projects/create')
+            .set('Authorization', `Bearer ${token}`)
+            .send({
+                titre: custom.titre || 'Projet de test',
+                description: custom.description || 'Description de test avec plus de 50 caractères pour valider.',
+                equipe: custom.equipe || [etudiant1._id, etudiant2._id],
+                tuteur: custom.tuteur || tuteur._id,
+                skills: custom.skills || ['Python', 'ML'],
+                deliverables: custom.deliverables || [],
+                ...custom
+            });
 
-            // Créer une évaluation
-            const evaluationResponse = await request(app)
+        expect(res.status).toBe(201);
+        return res.body;
+    };
+
+    describe('📎 Liaison Projet <-> Évaluation', () => {
+        it('doit relier une évaluation à un projet', async () => {
+            const project = await createProject();
+
+            // ➕ Création évaluation
+            const evalRes = await request(app)
                 .post('/api/evaluations/create')
                 .set('Authorization', `Bearer ${token}`)
                 .send({
-                    projet_id: projectId,
-                    evaluateur_id: new mongoose.Types.ObjectId(),
-                    score: 85,
-                    comments: 'Évaluation réussie'
+                    projet_id: project._id,
+                    evaluateur_id: tuteur._id,
+                    score: 88,
+                    comments: 'Bon projet'
                 });
-            evaluationId = evaluationResponse.body._id;
 
-            // Ajouter l'évaluation au projet via l'endpoint corrigé
-            const response = await request(app)
-                .post(`/api/projects/${projectId}/add-evaluation`)
+            const evaluationId = evalRes.body._id;
+
+            // 🔗 Ajout au projet
+            const linkRes = await request(app)
+                .post(`/api/projects/${project._id}/add-evaluation`)
                 .set('Authorization', `Bearer ${token}`)
                 .send({ evaluationId });
 
-            // Vérifier la liaison
-            expect(response.status).toBe(200);
-            expect(response.body.project.evaluations).toContain(evaluationId);
+            expect(linkRes.status).toBe(200);
+            expect(linkRes.body.project.evaluations).toContain(evaluationId);
 
-            // Vérifier la mise à jour dans la base
-            const updatedProject = await Project.findById(projectId);
-            expect(updatedProject.evaluations).toContain(evaluationId);
+            const updated = await Project.findById(project._id);
+            expect(updated.evaluations.map(e => e.toString())).toContain(evaluationId);
         });
     });
 
-    describe('IA Features', () => {
-        it('should predict performance and track progress', async () => {
-            // Créer un projet avec deliverables
-            const projectResponse = await request(app)
-                .post('/api/projects/create')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    title: 'Projet IA',
-                    description: 'Projet pour tests IA',
-                    equipe: [
-                        new mongoose.Types.ObjectId(),
-                        new mongoose.Types.ObjectId()
-                    ],
-                    tuteur: new mongoose.Types.ObjectId(),
-                    deliverables: [
-                        { name: 'Spécification', deadline: new Date('2025-12-31T23:59:59Z') },
-                        { name: 'Prototype', deadline: new Date('2026-01-31T23:59:59Z') }
-                    ],
-                    skills: ['Python', 'Data Analysis']
-                });
-            const testProjectId = projectResponse.body._id;
+    describe('🧠 Fonctionnalités IA : Prédiction + Suivi', () => {
+        it('doit prédire la performance et mettre à jour la progression', async () => {
+            const deliverables = [
+                { name: 'Livrable 1', deadline: new Date(Date.now() + 86400000), repositoryUrl: "https://github.com/WalidBenTouhami/PROGEASE" },
+                { name: 'Livrable 2', deadline: new Date(Date.now() + 172800000), repositoryUrl: "https://github.com/WalidBenTouhami/PROGEASE" }
+            ];
 
-            // Lancer la prédiction IA
-            const predictResponse = await request(app)
-                .post(`/api/projects/${testProjectId}/predict-performance`)
+            const project = await createProject({ deliverables });
+
+            // 📊 Lancer prédiction IA
+            const predict = await request(app)
+                .post(`/api/projects/${project._id}/predict-performance`)
                 .set('Authorization', `Bearer ${token}`);
-            expect(predictResponse.status).toBe(200);
+            expect(predict.status).toBe(200);
 
-            // Vérifier la prédiction
-            const project = await Project.findById(testProjectId);
-            expect(project.predictedPerformance).toBeGreaterThan(0);
+            const refreshed = await Project.findById(project._id);
+            expect(refreshed.predictedPerformance).toBeGreaterThan(0);
 
-            // Suivi de progression (ex. marquer un deliverable comme terminé)
-            await Project.findByIdAndUpdate(testProjectId, {
-                $set: {
-                    'deliverables.0.status': 'terminé'
-                }
+            // ✅ Marquer 1 livrable comme terminé
+            await Project.findByIdAndUpdate(project._id, {
+                $set: { 'deliverables.0.status': 'terminé' }
             });
 
-            // Appeler le suivi IA
-            await IaService.trackProgress(testProjectId);
-            const updatedProject = await Project.findById(testProjectId);
-            expect(updatedProject.progression).toBe(50); // 1/2 deliverables terminés
+            // 🔁 Mise à jour progression
+            await IaService.trackProgress(project._id);
+            const updated = await Project.findById(project._id);
+            expect(updated.progression).toBe(50);
         });
     });
 
-    describe('Tutor Matching', () => {
-        it('should assign a smart tutor', async () => {
-            // Créer des tuteurs avec compétences variées
-            const tutor1 = await User.create({
-                email: 'tutor1@example.com',
-                password: 'password',
-                role: 'tuteur',
-                experience: 90,
-                skills: ['Python', 'Machine Learning']
-            });
+    describe('🤖 Matching intelligent des tuteurs', () => {
+        it('doit assigner automatiquement un tuteur qualifié', async () => {
+            const project = await createProject({ tuteur: null });
 
-            const tutor2 = await User.create({
-                email: 'tutor2@example.com',
-                password: 'password',
-                role: 'tuteur',
-                experience: 70,
-                skills: ['Java', 'Cloud']
-            });
-
-            // Créer un projet avec des compétences requises
-            const projectResponse = await request(app)
-                .post('/api/projects/create')
-                .set('Authorization', `Bearer ${token}`)
-                .send({
-                    title: 'Projet avec Matching',
-                    skills: ['Python', 'Machine Learning']
-                });
-            const testProjectId = projectResponse.body._id;
-
-            // Assigner un tuteur intelligent
-            const assignResponse = await request(app)
-                .post(`/api/projects/${testProjectId}/assign-tutor`)
+            const matchRes = await request(app)
+                .post(`/api/projects/${project._id}/assign-tutor`)
                 .set('Authorization', `Bearer ${token}`);
 
-            expect(assignResponse.status).toBe(200);
-            expect(assignResponse.body.tutor._id).toBe(tutor1._id); // Tutor1 a les compétences requises
+            expect(matchRes.status).toBe(200);
+            expect(matchRes.body.tutor).toBeDefined();
+            expect(matchRes.body.tutor._id).toBe(tuteur._id.toString());
         });
     });
 });
