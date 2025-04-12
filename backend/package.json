@@ -4,9 +4,9 @@
     "description": "Backend for PROGEASE project management system",
     "main": "src/app.js",
     "scripts": {
-        "start": "node src/app.js",
-        "dev": "nodemon src/app.js",
-        "test:project": "jest src/modules/project-management/tests"
+        "start": "node app.js",
+        "dev": "nodemon app.js",
+        "test:project": "test src/modules/project-management/tests"
     },
     "keywords": [],
     "author": "",
