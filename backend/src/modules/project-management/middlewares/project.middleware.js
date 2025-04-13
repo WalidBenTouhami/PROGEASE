@@ -1,6 +1,6 @@
 // src/modules/project-management/middlewares/project.middleware.js
 const mongoose = require('mongoose');
-const User = require('../../user-management/models/user.model'); // Liaison avec user-management
+const User = require('../../user-management/models/User.js'); // Liaison avec user-management
 
 exports.validateProject = async (req, res, next) => {
     const { title, description, equipe, tuteur, deliverables } = req.body;
@@ -19,7 +19,7 @@ exports.validateProject = async (req, res, next) => {
     try {
         const existingUsers = await User.find({ _id: { $in: equipe } });
         if (existingUsers.length !== equipe.length) {
-            return res.status(400).json({ error: 'Membres d’équipe invalides' });
+            return res.status(400).json({ error: 'Membres d\'équipe invalides' });
         }
     } catch (error) {
         return res.status(500).json({ error: 'Erreur lors de la validation des membres' });

@@ -51,7 +51,7 @@ L’objectif est de simplifier le suivi de chaque projet en offrant une gestion 
     ├── ├── config/
     ├── │   ├── db.js
     ├── │   ├── constants.js
-    ├── │   └── logging.js
+    ├── │   └── performance.js
     ├── ├── core/
     ├── │   └── performance.js
     ├── ├── modules/

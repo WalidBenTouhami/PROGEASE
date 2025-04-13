@@ -3,8 +3,8 @@
 const { gql } = require('apollo-server-express');
 const Joi = require('joi');
 const Project = require('./modules/project-management/models/project.model');
-const User = require('./modules/user-management/models/user.model');
-const Evaluation = require('./modules/evaluation-system/models/evaluation.model');
+const User = require('./modules/user-management/models/User.js');
+const Evaluation = require('./modules/evaluation-system/models/Evaluation.js');
 const IaService = require('./services/ia.service');
 const { graphqlCreateProjectSchema } = require('./modules/project-management/schema'); // Joi schema
 

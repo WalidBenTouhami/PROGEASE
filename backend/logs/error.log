@@ -1,0 +1,5 @@
+{"level":"error","message":"💥 Failed to start: app.use() requires a middleware function","service":"progease-backend","timestamp":"2025-04-13T21:21:39.340Z"}
+{"level":"error","message":"💥 Failed to start: app.use() requires a middleware function","service":"progease-backend","timestamp":"2025-04-13T21:21:44.045Z"}
+{"level":"error","message":"💥 Failed to start: app.use() requires a middleware function","service":"progease-backend","timestamp":"2025-04-13T21:21:46.195Z"}
+{"level":"error","message":"💥 Failed to start: app.use() requires a middleware function","service":"progease-backend","timestamp":"2025-04-13T21:21:50.491Z"}
+{"level":"error","message":"💥 Failed to start: app.use() requires a middleware function","service":"progease-backend","timestamp":"2025-04-13T21:21:52.770Z"}

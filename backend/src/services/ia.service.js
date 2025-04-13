@@ -2,7 +2,7 @@
 
 const mongoose = require('mongoose');
 const Project = require('../modules/project-management/models/project.model');
-const User = require('../modules/user-management/models/user.model');
+const User = require('../modules/user-management/models/User.js');
 const EmailService = require('./email.service');
 const schedule = require('node-schedule');
 const { createBullQueue } = require('../utils/queue'); // Nouveau: système de file d'attente

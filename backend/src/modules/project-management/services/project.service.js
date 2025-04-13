@@ -1,7 +1,7 @@
 //src/modules/project-management/services/project.service.js
 
 const Project = require('../models/project.model');
-const Evaluation = require('../../evaluation-system/models/evaluation.model');
+const Evaluation = require('../../evaluation-system/models/Evaluation.js');
 const IaService = require('../../../services/ia.service');
 const { remindersQueue } = require('../../../utils/queue');
 /**
@@ -137,14 +137,22 @@ exports.deleteDeliverable = async (projectId, deliverableId) => {
     await project.save();
 };
 
-// Ajouter un job
-await remindersQueue.add('sendReminder', {
-    emails: ['user@example.com'],
-    deliverableName: 'Sprint 1',
-    deadline: new Date()
-});
+/**
+ * Ajoute un rappel pour un livrable
+ */
+exports.addReminder = async (emails, deliverableName, deadline) => {
+    await remindersQueue.add('sendReminder', {
+        emails,
+        deliverableName,
+        deadline
+    });
+};
 
-// Surveiller les jobs
-remindersQueue.on('progress', (job) => {
-    console.log(`Job ${job.id} en cours : ${job.progress()}%`);
-});
+/**
+ * Configure les handlers de progression des jobs
+ */
+exports.setupQueueHandlers = () => {
+    remindersQueue.on('progress', (job) => {
+        console.log(`Job ${job.id} en cours : ${job.progress()}%`);
+    });
+};
