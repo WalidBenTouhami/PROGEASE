@@ -25,7 +25,7 @@ const ProjectSchema = new Schema({
         required: [true, 'La date de début est requise'],
         validate: {
             validator: function (date) {
-                return date > new Date(Date.now() - 86400000); // 1 jour en arrière
+                return date > new Date(); // ✅ Correction : Vérifie que la date est future
             },
             message: 'La date de début doit être une date future'
         }
@@ -38,13 +38,13 @@ const ProjectSchema = new Schema({
                 validator: function (date) {
                     if (!this.dateDebut) return false;
                     const oneDay = 24 * 60 * 60 * 1000;
-                    return date > new Date(this.dateDebut.getTime() + oneDay);
+                    return date > new Date(this.dateDebut.getTime() + oneDay); // ✅ Correction : Ajoute 1 jour minimum
                 },
                 message: 'La date de fin doit être postérieure à la date de début + 1 jour'
             },
             {
                 validator: function (date) {
-                    const maxDuration = 90 * 24 * 60 * 60 * 1000;
+                    const maxDuration = 90 * 24 * 60 * 60 * 1000; // Durée maximale de 90 jours
                     return this.dateDebut && (date - this.dateDebut) <= maxDuration;
                 },
                 message: 'La durée maximale du projet est de 90 jours'
@@ -56,8 +56,11 @@ const ProjectSchema = new Schema({
         ref: 'User',
         required: [true, 'L’équipe est requise'],
         validate: {
-            validator: (value) => value.length >= 1,
-            message: 'L’équipe doit contenir au moins un membre'
+            validator: async function (value) {
+                const users = await mongoose.model('User').find({ _id: { $in: value } });
+                return users.length === value.length; // ✅ Correction : Vérifie que tous les membres existent
+            },
+            message: 'L’équipe contient des membres invalides'
         }
     },
     tuteur: {
@@ -67,9 +70,9 @@ const ProjectSchema = new Schema({
         validate: {
             validator: async function (tuteurId) {
                 const tutor = await mongoose.model('User').findById(tuteurId);
-                return tutor?.role === 'tuteur';
+                return tutor?.role === 'tuteur' && tutor?.availability; // ✅ Correction : Disponibilité du tuteur
             },
-            message: 'Le tuteur doit avoir le rôle "tuteur"'
+            message: 'Le tuteur doit avoir le rôle "tuteur" et être disponible'
         }
     },
     status: {

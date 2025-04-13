@@ -1,4 +1,5 @@
-// 📁 src/config/mongodb.js
+// 📁 src/config/db.js
+
 require('dotenv').config();
 const { MongoClient, ServerApiVersion } = require('mongodb');
 
