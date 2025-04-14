@@ -1,8 +1,7 @@
-// src/modules/project-management/middlewares/project.middleware.js
-const mongoose = require('mongoose');
-const User = require('../../user-management/models/user.model'); // Liaison avec user-management
+import mongoose from 'mongoose';
 
-exports.validateProject = async (req, res, next) => {
+
+export const validateProject = async (req, res, next) => {
     const { title, description, equipe, tuteur, deliverables } = req.body;
 
     // 1. Titre requis
@@ -60,3 +59,8 @@ exports.validateProject = async (req, res, next) => {
 
     next();
 };
+
+export const verifyToken = (req, res, next) => {
+    // logique de vérification
+};
+

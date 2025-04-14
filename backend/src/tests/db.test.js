@@ -1,14 +1,38 @@
 // 📁 test/db-test.js
-const { getDatabase } = require('../config/db');
 
-(async () => {
-    try {
-        const db = await getDatabase("Walid");
-        const response = await db.command({ ping: 1 });
-        console.log("📡 Ping MongoDB réussi :", response);
-    } catch (err) {
-        console.error("❌ Erreur MongoDB :", err);
-    } finally {
-        process.exit(0);
-    }
-})();
+import { connectToDatabase, closeDatabase } from '../core/db.js';
+import { mockDatabase } from './mocks/database.mock.js';
+
+beforeAll(async () => {
+    await connectToDatabase();
+    await mockDatabase();
+});
+
+afterAll(async () => {
+    await closeDatabase();
+});
+
+describe('Database Operations', () => {
+    it('should maintain connection pool', async () => {
+        const connection = await connectToDatabase();
+        expect(connection.readyState).toBe(1);
+    });
+
+    it('should handle concurrent queries', async () => {
+        const promises = Array(10).fill().map(() =>
+            Project.find().lean().exec()
+        );
+
+        const results = await Promise.all(promises);
+        expect(results.length).toBe(10);
+    });
+
+    it('should recover from connection loss', async () => {
+        // Simuler une déconnexion
+        await mongoose.connection.close();
+
+        // Tenter une nouvelle requête
+        const projects = await Project.find();
+        expect(Array.isArray(projects)).toBe(true);
+    });
+});

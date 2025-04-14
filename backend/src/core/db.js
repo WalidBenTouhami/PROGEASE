@@ -1,101 +1,45 @@
 // src/core/db.js
-require('dotenv').config({ path: process.env.NODE_ENV === 'test' ? '.env.test' : '.env' });
-const { MongoClient, ServerApiVersion } = require('mongodb');
 
-// Validation de la configuration
-if (!process.env.MONGODB_URI) {
-  throw new Error('MONGODB_URI manquant dans les variables d\'environnement');
-}
+import mongoose from 'mongoose';
+import { logger } from '../utils/logger.js';
 
-const uri = process.env.MONGODB_URI;
-const options = {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  },
-  maxPoolSize: 10,
-  minPoolSize: 2,
-  ssl: true,
-  tlsAllowInvalidCertificates: process.env.NODE_ENV === 'development',
-  connectTimeoutMS: 10000,
-  heartbeatFrequencyMS: 30000,
+const connectionOptions = {
+    maxPoolSize: 15,
+    minPoolSize: 5,
+    connectTimeoutMS: 30000,
+    socketTimeoutMS: 45000,
+    heartbeatFrequencyMS: 10000,
+    retryWrites: true,
+    w: 'majority'
 };
 
-let client;
-let isConnected = false;
+let connection = null;
 
-/**
- * Établit une connexion sécurisée à MongoDB avec gestion de reconnexion
- * @returns {Promise<MongoClient>}
- */
-async function connectToDatabase() {
-  if (isConnected && client) return client;
+export async function connectToDatabase(config = {}) {
+    if (connection) return connection;
 
-  try {
-    client = new MongoClient(uri, options);
+    try {
+        connection = await mongoose.createConnection(process.env.MONGODB_URI, {
+            ...connectionOptions,
+            ...config
+        });
 
-    // Connexion avec timeout
-    await Promise.race([
-      client.connect(),
-      new Promise((_, reject) =>
-          setTimeout(() => reject(new Error('Timeout de connexion MongoDB')), 5000)
-      )
-    ]);
+        connection.on('connected', () =>
+            logger.info('MongoDB connection established')
+        );
 
-    // Configuration des listeners
-    client.on('serverClosed', () => {
-      isConnected = false;
-      console.warn('Connexion MongoDB fermée par le serveur');
-    });
+        connection.on('disconnected', () =>
+            logger.warn('MongoDB connection lost')
+        );
 
-    client.on('topologyClosed', () => {
-      isConnected = false;
-      console.warn('Topologie MongoDB fermée');
-    });
+        connection.on('reconnected', () =>
+            logger.info('MongoDB connection reestablished')
+        );
 
-    isConnected = true;
-    console.log('✅ Connexion MongoDB établie avec succès');
-    return client;
+        return connection;
 
-  } catch (error) {
-    console.error('❌ Échec de la connexion MongoDB:', error.message);
-    await closeDatabase();
-    throw error;
-  }
-}
-
-/**
- * Ferme proprement la connexion
- */
-async function closeDatabase() {
-  try {
-    if (client && isConnected) {
-      await client.close(true);
-      console.log('🔌 Connexion MongoDB fermée intentionnellement');
+    } catch (error) {
+        logger.error(`MongoDB connection failed: ${error.message}`);
+        process.exit(1);
     }
-    isConnected = false;
-  } catch (error) {
-    console.error('⚠️ Erreur lors de la fermeture MongoDB:', error.message);
-  }
 }
-
-/**
- * Vérifie l'état de la connexion
- */
-async function checkConnection() {
-  try {
-    if (!client || !isConnected) return false;
-    await client.db().admin().ping();
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-module.exports = {
-  connectToDatabase,
-  closeDatabase,
-  checkConnection,
-  getClient: () => client,
-};

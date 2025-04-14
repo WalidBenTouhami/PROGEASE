@@ -1,24 +1,24 @@
 // src/modules/project-management/index.js
 
-// 🎭 Contrôleurs
-const projectController = require('./controllers/project.controller');
+    // 🎭 Contrôleurs
+    import * as projectController from './controllers/project.controller.js';
 
-// 🛠️ Services
-const projectService = require('./services/project.service');
+    // 🛠️ Services
+    import * as projectService from './services/project.service.js';
 
-// 🛡️ Middlewares
-const projectMiddleware = require('./middlewares/project.middleware');
+    // 🛡️ Middlewares
+    import * as projectMiddleware from './middlewares/project.middleware.js';
 
-// 🚏 Routes
-const projectRoutes = require('./routes/project.routes');
+    // 🚏 Routes
+    import * as projectRoutes from './routes/project.routes.js';
 
-// 🏛️ Modèles
-const Project = require('./models/project.model');
+    // 🏛️ Modèles
+    import * as Project from './models/project.model.js';
 
-module.exports = {
-    projectController,
-    projectService,
-    projectMiddleware,
-    projectRoutes,
-    Project
-};
+    export {
+        projectController,
+        projectService,
+        projectMiddleware,
+        projectRoutes,
+        Project
+    };

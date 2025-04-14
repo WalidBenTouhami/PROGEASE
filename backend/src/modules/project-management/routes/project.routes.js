@@ -1,8 +1,9 @@
-//src/modules/project-management/routes/project.routes.js
+import { Router } from 'express';
+import * as projectController from '../controllers/project.controller.js';
+import { verifyToken } from '../middlewares/project.middleware.js';
+import { predictPerformance } from '../services/project.service.js';
 
-const router = require('express').Router();
-const projectController = require('../controllers/project.controller');
-const { verifyToken } = require('../../middlewares/auth.middleware');
+const router = Router();
 
 // ─── Projet ───────────────────────────────────────
 
@@ -24,7 +25,7 @@ router.post('/:projectId/assign-tutor', verifyToken, projectController.assignSma
 // 🔮 Prédire la performance (IA)
 router.post('/:projectId/predict-performance', verifyToken, async (req, res) => {
     try {
-        await require('../../services/ia.service').predictPerformance(req.params.projectId);
+        await predictPerformance(req.params.projectId);
         res.json({ message: 'Prédiction mise à jour' });
     } catch (error) {
         res.status(500).json({ error: error.message });
@@ -48,4 +49,4 @@ router.delete('/:projectId/deliverables/:deliverableId', verifyToken, projectCon
 // 🔎 Vérifier un lien GitHub (ping public)
 router.post('/validate-repo', verifyToken, projectController.validateGithubRepo);
 
-module.exports = router;
+export default router;
