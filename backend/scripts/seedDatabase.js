@@ -7,7 +7,7 @@
     import Formation from '../src/modules/formation-certification/models/formation.model.js';
     import Certificat from '../src/modules/formation-certification/models/certification.model.js';
     import Forum from '../src/modules/forum-management/models/forum.model.js';
-    import {RoleEnum} from "../src/config/constants.js";
+    import { RoleEnum } from "../src/config/constants.js";
 
     // Connexion à MongoDB Atlas
     const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/PROGEASE';
@@ -35,14 +35,20 @@
         await Forum.deleteMany({});
         await redis.flushall();
 
-// Insertion des utilisateurs
-const users = await User.insertMany([
-  { email: 'admin@example.com', password: 'admin123', role: RoleEnum.ADMIN, experience: 5, skills: ['Node.js', 'MongoDB'] },
-  { email: 'tutor@example.com', password: 'tutor123', role: RoleEnum.TUTOR, experience: 3, skills: ['GraphQL', 'React'] },
-  { email: 'student@example.com', password: 'student123', role: RoleEnum.STUDENT, experience: 1, skills: ['JavaScript'] },
-]);
+        // Insertion des utilisateurs
+        const users = await User.insertMany([
+          { email: 'admin@example.com', password: 'admin123', role: RoleEnum.ADMIN, experience: 5, skills: ['Node.js', 'MongoDB'] },
+          { email: 'tutor@example.com', password: 'tutor123', role: RoleEnum.TUTOR, experience: 3, skills: ['GraphQL', 'React'] },
+          { email: 'student@example.com', password: 'student123', role: RoleEnum.STUDENT, experience: 1, skills: ['JavaScript'] },
+        ]);
+
+        // Définir une URL GitHub valide
+        const validRepositoryUrl = 'https://github.com/WalidBenTouhami/PROGEASE';
 
         // Insertion des projets
+        const futureDate = new Date();
+        futureDate.setDate(futureDate.getDate() + 2); // Ajoute 2 jours
+
         const projects = await Project.insertMany([
           {
             titre: 'Projet IA',
@@ -51,7 +57,12 @@ const users = await User.insertMany([
             tuteur: users[1]._id,
             status: 'En cours',
             deliverables: [
-              { name: 'Rapport initial', deadline: '2023-12-01', status: 'Terminé', repositoryUrl: 'https://github.com/example/repo1' },
+              {
+                name: 'Rapport initial',
+                deadline: futureDate, // Date valide (au moins 24h dans le futur)
+                status: 'Terminé',
+                repositoryUrl: validRepositoryUrl, // URL GitHub valide
+              },
             ],
             evaluations: [],
             progression: 50,
