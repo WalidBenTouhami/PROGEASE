@@ -10,6 +10,7 @@ import { verifyToken } from './modules/project-management/middlewares/project.mi
 import { projectRoutes } from './modules/project-management/index.js';
 import logger from './utils/logger.js';
 import { typeDefs, resolvers } from './schema.js';
+import { scheduleHealthChecks, healthcheck } from '../../../healthcheck.js';
 import { isAuthenticated, hasRole } from './modules/user-management/middlewares/user.middleware.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -93,7 +94,10 @@ async function initializeApp() {
         res.status(200).json({ message: 'Accès autorisé' });
     });
 
-    // 9. Gestion des erreurs
+    // 9. Healthcheck
+    app.get('/api/health', healthcheck);
+
+    // 10. Gestion des erreurs
     app.use((err, req, res, next) => {
         logger.error(`Error ${err.status || 500}: ${err.message}`, { stack: err.stack });
         res.status(err.status || 500).json({
@@ -104,6 +108,9 @@ async function initializeApp() {
             }
         });
     });
+
+    // 11. Planification des tâches
+    scheduleHealthChecks();
 
     return app;
 }

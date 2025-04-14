@@ -3,9 +3,9 @@
         import mongoose from 'mongoose';
         import bcrypt from 'bcrypt';
         import { SecurityConfig } from '../../../config/constants.js';
-        import { RoleEnum } from '../../../config/constants.js';
+        import { RoleEnum } from '../../../config/enums.js'; // Assurez-vous que RoleEnum est correctement importé
 
-const userSchema = new mongoose.Schema({
+        const userSchema = new mongoose.Schema({
             email: {
                 type: String,
                 required: true,
