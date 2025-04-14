@@ -1,7 +1,7 @@
 // src/modules/formation-certification/controllers/certification.controller.js
 
-const Certificat = require("../models/Certificat");
-const { checkQuizReussis } = require("../utils/certificatLogic");
+import Certificat from "../models/certification.model.js";
+import { checkQuizReussis } from "../utils/certificatLogic";
 
 // Émettre un certificat
 exports.createCertificat = async (req, res) => {
