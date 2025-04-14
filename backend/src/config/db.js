@@ -18,6 +18,12 @@ let cachedClient = null;
 let cachedDb = null;
 
 export async function connectToDatabase() {
+  // ✅ Validation des variables d'environnement
+  if (!process.env.MONGODB_URI || !process.env.DB_NAME) {
+    logger.error('Les variables d\'environnement MONGODB_URI et DB_NAME doivent être définies.');
+    process.exit(1);
+  }
+
   if (cachedClient && cachedDb) {
     return { client: cachedClient, db: cachedDb };
   }
@@ -36,9 +42,10 @@ export async function connectToDatabase() {
     cachedClient = client;
     cachedDb = db;
 
+    logger.info('Connexion à MongoDB réussie.');
     return { client, db };
   } catch (error) {
-    logger.error('MongoDB connection error:', error);
+    logger.error('Erreur lors de la connexion à MongoDB :', error.message);
     process.exit(1);
   }
 }

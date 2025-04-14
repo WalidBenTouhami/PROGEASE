@@ -26,6 +26,16 @@ describe('API Integration Tests', () => {
                 .send({ email: 'test@example.com', password: 'validPassword' });
 
             authToken = res.body.token;
+            expect(authToken).toBeDefined();
+        });
+
+        afterEach(async () => {
+            // Nettoyage des projets créés
+            if (projectId) {
+                await request(app)
+                    .delete(`/api/projects/${projectId}`)
+                    .set('Authorization', `Bearer ${authToken}`);
+            }
         });
 
         test('Full project creation flow', async () => {
@@ -38,10 +48,12 @@ describe('API Integration Tests', () => {
                     description: 'Project for integration testing'
                 });
 
+            expect(createRes.status).toBe(201);
+            expect(createRes.body).toHaveProperty('id');
             projectId = createRes.body.id;
 
             // Ajout de livrable
-            await request(app)
+            const deliverableRes = await request(app)
                 .post(`/api/projects/${projectId}/deliverables`)
                 .set('Authorization', `Bearer ${authToken}`)
                 .send({
@@ -49,11 +61,15 @@ describe('API Integration Tests', () => {
                     deadline: new Date(Date.now() + 86400000)
                 });
 
+            expect(deliverableRes.status).toBe(201);
+            expect(deliverableRes.body).toHaveProperty('id');
+
             // Vérification du statut
             const getRes = await request(app)
                 .get(`/api/projects/${projectId}`)
                 .set('Authorization', `Bearer ${authToken}`);
 
+            expect(getRes.status).toBe(200);
             expect(getRes.body).toMatchObject({
                 status: 'en_cours',
                 deliverables: expect.arrayContaining([
@@ -73,6 +89,7 @@ describe('API Integration Tests', () => {
         test('Unauthorized access should return 401', async () => {
             const res = await request(app).get('/api/projects');
             expect(res.status).toBe(401);
+            expect(res.body).toHaveProperty('error.message', 'Unauthorized');
         });
     });
 });

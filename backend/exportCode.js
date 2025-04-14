@@ -24,7 +24,7 @@ const filesToExport = [
     './src/modules/formation-certification/models/certification.model.js',
     './src/modules/formation-certification/models/formation.model.js',
     './src/modules/formation-certification/routes/certification.routes.js',
-    './src/modules/formation-certification/routes/formationRoutes.js',
+    './src/modules/formation-certification/routes/formation.routes.js',
     './src/modules/formation-certification/services/formation.service.js',
     './src/modules/formation-certification/tests/formation.test.js',
     './src/modules/forum-management/controllers/forum.controller.js',

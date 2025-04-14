@@ -1,14 +1,10 @@
-// src/schema.js
-
 const { gql } = require('apollo-server-express');
-const Joi = require('joi');
 const Project = require('./modules/project-management/models/project.model');
 const User = require('./modules/user-management/models/user.model');
 const Evaluation = require('./modules/evaluation-system/models/evaluation.model');
 const IaService = require('./services/ia.service');
-const { graphqlCreateProjectSchema } = require('./modules/project-management/schema'); // Joi schema
+const { graphqlCreateProjectSchema } = require('./modules/project-management/schema');
 
-// 📚 Définition des types GraphQL
 const typeDefs = gql`
   type User {
     _id: ID!
@@ -52,14 +48,12 @@ const typeDefs = gql`
     users: [User!]!
     user(id: ID!): User
 
-    # 🤖 Requêtes IA
     getProjectProgress(id: ID!): Float
     getPredictedPerformance(id: ID!): Float
     getSmartTutor(id: ID!): User
   }
 
   type Mutation {
-    # 🛠️ Projets
     createProject(
       titre: String!
       description: String
@@ -74,7 +68,6 @@ const typeDefs = gql`
       evaluation: EvaluationInput!
     ): Project
 
-    # 🤖 Mutations IA
     predictPerformance(projectId: ID!): Float
     assignSmartTutor(projectId: ID!): Project
     setupReminders(projectId: ID!): String
@@ -82,7 +75,7 @@ const typeDefs = gql`
 
   input DeliverableInput {
     name: String!
-    deadline: String! # ISO date string
+    deadline: String!
     status: String
     repositoryUrl: String!
   }
@@ -96,74 +89,128 @@ const typeDefs = gql`
 `;
 
 const resolvers = {
-    Query: {
-        projects: async () => await Project.find().populate(['equipe', 'tuteur']),
-        project: async (_, { id }) => await Project.findById(id).populate(['equipe', 'tuteur', 'evaluations']),
-        users: async () => await User.find(),
-        user: async (_, { id }) => await User.findById(id),
-
-        // 🔍 Requêtes IA
-        getProjectProgress: async (_, { id }) => await IaService.trackProgress(id),
-        getPredictedPerformance: async (_, { id }) => await IaService.predictPerformance(id),
-        getSmartTutor: async (_, { id }) => await IaService.matchTutor(id)
+  Query: {
+    projects: async () => {
+      try {
+        return await Project.find().populate(['equipe', 'tuteur']).lean();
+      } catch (error) {
+        throw new Error(`Erreur lors de la récupération des projets : ${error.message}`);
+      }
     },
-
-    Mutation: {
-        createProject: async (_, args) => {
-            // ✅ Validation centralisée avec Joi
-            const { error } = graphqlCreateProjectSchema.validate(args, { abortEarly: false });
-            if (error) {
-                throw new Error('Erreur de validation :\n' + error.details.map(e => e.message).join('\n'));
-            }
-
-            const newProject = new Project(args);
-            await newProject.save();
-
-            // 🤖 Appels IA post-création
-            await IaService.trackProgress(newProject._id);
-            await IaService.predictPerformance(newProject._id);
-            await IaService.setupReminders(newProject._id);
-
-            return newProject;
-        },
-
-        addEvaluation: async (_, { projectId, evaluation }) => {
-            const project = await Project.findById(projectId);
-            if (!project) throw new Error('Projet non trouvé');
-
-            const newEvaluation = await Evaluation.create(evaluation);
-            project.evaluations.push(newEvaluation._id);
-            await project.save();
-
-            return project;
-        },
-
-        predictPerformance: async (_, { projectId }) => {
-            return await IaService.predictPerformance(projectId);
-        },
-
-        assignSmartTutor: async (_, { projectId }) => {
-            const tutor = await IaService.matchTutor(projectId);
-            await Project.findByIdAndUpdate(projectId, { tuteur: tutor._id }, { new: true });
-            return await Project.findById(projectId);
-        },
-
-        setupReminders: async (_, { projectId }) => {
-            await IaService.setupReminders(projectId);
-            return 'Rappels programmés avec succès';
-        }
+    project: async (_, { id }) => {
+      try {
+        return await Project.findById(id).populate(['equipe', 'tuteur', 'evaluations']).lean();
+      } catch (error) {
+        throw new Error(`Erreur lors de la récupération du projet : ${error.message}`);
+      }
     },
-
-    Project: {
-        tuteur: async (project) => await User.findById(project.tuteur),
-        equipe: async (project) => await User.find({ _id: { $in: project.equipe } }),
-        evaluations: async (project) => await Evaluation.find({ _id: { $in: project.evaluations } })
+    users: async () => {
+      try {
+        return await User.find().lean();
+      } catch (error) {
+        throw new Error(`Erreur lors de la récupération des utilisateurs : ${error.message}`);
+      }
     },
-
-    Evaluation: {
-        projet_id: async (evaluation) => await Project.findById(evaluation.projet_id),
-        evaluateur_id: async (evaluation) => await User.findById(evaluation.evaluateur_id)
+    user: async (_, { id }) => {
+      try {
+        return await User.findById(id).lean();
+      } catch (error) {
+        throw new Error(`Erreur lors de la récupération de l'utilisateur : ${error.message}`);
+      }
+    },
+    getProjectProgress: async (_, { id }) => {
+      try {
+        return await IaService.trackProgress(id);
+      } catch (error) {
+        throw new Error(`Erreur lors du suivi de la progression : ${error.message}`);
+      }
+    },
+    getPredictedPerformance: async (_, { id }) => {
+      try {
+        return await IaService.predictPerformance(id);
+      } catch (error) {
+        throw new Error(`Erreur lors de la prédiction des performances : ${error.message}`);
+      }
+    },
+    getSmartTutor: async (_, { id }) => {
+      try {
+        return await IaService.matchTutor(id);
+      } catch (error) {
+        throw new Error(`Erreur lors de la recherche du tuteur intelligent : ${error.message}`);
+      }
     }
+  },
+
+  Mutation: {
+    createProject: async (_, args) => {
+      try {
+        const { error } = graphqlCreateProjectSchema.validate(args, { abortEarly: false });
+        if (error) {
+          throw new Error('Erreur de validation : ' + error.details.map(e => e.message).join(', '));
+        }
+
+        const newProject = new Project(args);
+        await newProject.save();
+
+        await IaService.trackProgress(newProject._id);
+        await IaService.predictPerformance(newProject._id);
+        await IaService.setupReminders(newProject._id);
+
+        return newProject;
+      } catch (error) {
+        throw new Error(`Erreur lors de la création du projet : ${error.message}`);
+      }
+    },
+    addEvaluation: async (_, { projectId, evaluation }) => {
+      try {
+        const project = await Project.findById(projectId);
+        if (!project) throw new Error('Projet non trouvé');
+
+        const newEvaluation = await Evaluation.create(evaluation);
+        project.evaluations.push(newEvaluation._id);
+        await project.save();
+
+        return project;
+      } catch (error) {
+        throw new Error(`Erreur lors de l'ajout de l'évaluation : ${error.message}`);
+      }
+    },
+    predictPerformance: async (_, { projectId }) => {
+      try {
+        return await IaService.predictPerformance(projectId);
+      } catch (error) {
+        throw new Error(`Erreur lors de la prédiction des performances : ${error.message}`);
+      }
+    },
+    assignSmartTutor: async (_, { projectId }) => {
+      try {
+        const tutor = await IaService.matchTutor(projectId);
+        await Project.findByIdAndUpdate(projectId, { tuteur: tutor._id }, { new: true });
+        return await Project.findById(projectId).lean();
+      } catch (error) {
+        throw new Error(`Erreur lors de l'attribution du tuteur : ${error.message}`);
+      }
+    },
+    setupReminders: async (_, { projectId }) => {
+      try {
+        await IaService.setupReminders(projectId);
+        return 'Rappels programmés avec succès';
+      } catch (error) {
+        throw new Error(`Erreur lors de la configuration des rappels : ${error.message}`);
+      }
+    }
+  },
+
+  Project: {
+    tuteur: async (project) => await User.findById(project.tuteur).lean(),
+    equipe: async (project) => await User.find({ _id: { $in: project.equipe } }).lean(),
+    evaluations: async (project) => await Evaluation.find({ _id: { $in: project.evaluations } }).lean()
+  },
+
+  Evaluation: {
+    projet_id: async (evaluation) => await Project.findById(evaluation.projet_id).lean(),
+    evaluateur_id: async (evaluation) => await User.findById(evaluation.evaluateur_id).lean()
+  }
 };
 
 module.exports = { typeDefs, resolvers };

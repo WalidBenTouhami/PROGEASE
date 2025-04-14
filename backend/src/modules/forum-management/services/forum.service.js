@@ -1,7 +1,7 @@
 // src/modules/forum-management/services/forum.service.js
 
-import { Thread } from '../models/forum.model.js';
-import { redisClient } from '../../../utils/redis.js';
+import * as Thread from '../models/forum.model.js';
+import { redisClient } from 'backend/src/utils/redis.js';
 
 export class ForumService {
     static async getTrendingThreads() {

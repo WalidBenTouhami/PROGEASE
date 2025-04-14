@@ -3,12 +3,14 @@
 import { performance } from 'perf_hooks';
 import { logger } from '../utils/logger.js';
 
+// 📌 Initialisation des métriques
 const metrics = {
     requestCount: 0,
     totalResponseTime: 0,
     dbQueryCount: 0
 };
 
+// 📌 Middleware pour suivre les requêtes HTTP
 export const trackRequest = (req, res, next) => {
     const start = performance.now();
 
@@ -23,19 +25,28 @@ export const trackRequest = (req, res, next) => {
     next();
 };
 
+// 📌 Suivi des requêtes MongoDB
 export const trackDBQuery = (query) => {
     metrics.dbQueryCount++;
     const start = performance.now();
 
     query.exec((err, result) => {
         const duration = performance.now() - start;
-        logger.debug(`DB Query [${query.op}] - ${duration.toFixed(2)}ms`);
+
+        if (err) {
+            logger.error(`Erreur dans la requête MongoDB [${query.op}] : ${err.message}`);
+        } else {
+            logger.debug(`DB Query [${query.op}] - ${duration.toFixed(2)}ms`);
+        }
     });
 
     return query;
 };
 
+// 📌 Récupération des métriques
 export const getMetrics = () => ({
     ...metrics,
-    avgResponseTime: metrics.totalResponseTime / metrics.requestCount
+    avgResponseTime: metrics.requestCount > 0
+        ? metrics.totalResponseTime / metrics.requestCount
+        : 0 // Évite une division par zéro
 });

@@ -2,22 +2,17 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user.controller');
-const userMiddleware = require('../middlewares/user.middleware'); // Ajout manquant
 const {
     verifyToken,
     checkRoles,
     validateRequest,
-    sanitizeInput
+    sanitizeInput,
+    attachUser,
+    checkOwnership,
+    preventRoleEscalation
 } = require('../middlewares/user.middleware');
-const {
-    HTTP_STATUS,
-    SECURITY,
-    API
-} = require('../../../config/constants');
+const { SECURITY, API } = require('../../../config/constants');
 const userValidation = require('../validations/user.validation');
-
-// Middleware de versioning API
-router.use(`/api/${API.CURRENT_VERSION}/users`, router);
 
 // ✅ Création utilisateur (public avec limite de taux)
 router.post(
@@ -43,7 +38,7 @@ router.get(
     '/:id',
     sanitizeInput,
     validateRequest(userValidation.userIdSchema),
-    userMiddleware.attachUser, // Déplacé ici
+    attachUser,
     userController.getUserById
 );
 
@@ -52,8 +47,8 @@ router.put(
     '/:id',
     sanitizeInput,
     validateRequest(userValidation.updateUserSchema),
-    userMiddleware.checkOwnership(),
-    userMiddleware.preventRoleEscalation,
+    checkOwnership(),
+    preventRoleEscalation,
     userController.updateUser
 );
 

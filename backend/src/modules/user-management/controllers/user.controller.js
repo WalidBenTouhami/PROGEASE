@@ -1,5 +1,16 @@
 // src/modules/user-management/controllers/user.controller.js
 
+
+import { createLogger } from '../../../utils/logger.js';
+
+const logger = createLogger('UserController');
+
+export const getUser = (req, res) => {
+    const userId = req.params.id;
+    logger.info(`Requête pour l'utilisateur avec l'ID: ${userId}`);
+    // Logique pour gérer la requête
+};
+
 const User = require('../models/user.model');
 const { HTTP_STATUS, ERROR_MESSAGES } = require('../../../config/constants');
 

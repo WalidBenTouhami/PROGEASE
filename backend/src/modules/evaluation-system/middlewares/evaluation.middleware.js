@@ -1,11 +1,13 @@
 // src/modules/evaluation-system/middlewares/evaluation.middleware.js
 
+import mongoose from 'mongoose';
+import Evaluation from '../models/evaluation.model.js';
 import { HTTP_STATUS, ERROR_MESSAGES } from '../../../config/constants.js';
 
 export const validateEvaluationInput = (req, res, next) => {
     const { criteria, projectId } = req.body;
 
-    if (!Object.keys(criteria).length) {
+    if (!criteria || !Object.keys(criteria).length) {
         return res.status(HTTP_STATUS.BAD_REQUEST).json({
             code: 'INVALID_CRITERIA',
             message: ERROR_MESSAGES.EVALUATION.INVALID_CRITERIA

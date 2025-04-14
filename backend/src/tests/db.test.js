@@ -1,7 +1,9 @@
-// 📁 test/db-test.js
+// 📁 src/tests/db.test.js
 
+import mongoose from 'mongoose';
 import { connectToDatabase, closeDatabase } from '../core/db.js';
 import { mockDatabase } from './mocks/database.mock.js';
+import Project from '../models/Project.js'; // Assurez-vous que le modèle est correctement importé
 
 beforeAll(async () => {
     await connectToDatabase();
@@ -14,8 +16,8 @@ afterAll(async () => {
 
 describe('Database Operations', () => {
     it('should maintain connection pool', async () => {
-        const connection = await connectToDatabase();
-        expect(connection.readyState).toBe(1);
+        const connection = mongoose.connection;
+        expect(connection.readyState).toBe(1); // 1 signifie connecté
     });
 
     it('should handle concurrent queries', async () => {
@@ -28,11 +30,20 @@ describe('Database Operations', () => {
     });
 
     it('should recover from connection loss', async () => {
-        // Simuler une déconnexion
-        await mongoose.connection.close();
+        try {
+            // Simuler une déconnexion
+            await mongoose.connection.close();
+            expect(mongoose.connection.readyState).toBe(0); // 0 signifie déconnecté
 
-        // Tenter une nouvelle requête
-        const projects = await Project.find();
-        expect(Array.isArray(projects)).toBe(true);
+            // Tenter une reconnexion
+            await connectToDatabase();
+            expect(mongoose.connection.readyState).toBe(1); // 1 signifie reconnecté
+
+            // Vérifier une requête après reconnexion
+            const projects = await Project.find();
+            expect(Array.isArray(projects)).toBe(true);
+        } catch (error) {
+            throw new Error(`Test failed: ${error.message}`);
+        }
     });
 });

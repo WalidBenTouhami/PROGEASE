@@ -1,4 +1,4 @@
-// src/app.js
+// src/modules/user-management/app.js
 
 const express = require('express');
 const mongoose = require('mongoose');

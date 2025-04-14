@@ -1,7 +1,7 @@
 // src/modules/formation-certification/services/certification.service.js
 
-import { Certificat } from '../models/Certification.js';
-import { Formation } from '../models/Formation.js';
+import { Certificat } from 'backend/src/modules/formation-certification/models/certification.model.js';
+import { Formation } from 'backend/src/modules/formation-certification/models/formation.model.js';
 
 export class CertificationService {
     static async issueCertificate(userId, formationId) {

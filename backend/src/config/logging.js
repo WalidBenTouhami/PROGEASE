@@ -4,8 +4,15 @@ import winston from 'winston';
 import { Logtail } from '@logtail/node';
 import { LogtailTransport } from '@logtail/winston';
 
+// ✅ Validation de la variable d'environnement LOGTAIL_TOKEN
+if (!process.env.LOGTAIL_TOKEN) {
+    console.error('LOGTAIL_TOKEN doit être défini dans les variables d\'environnement.');
+    process.exit(1);
+}
+
 const logtail = new Logtail(process.env.LOGTAIL_TOKEN);
 
+// 📌 Format pour gérer les erreurs
 const enumerateErrorFormat = winston.format(info => {
     if (info instanceof Error) {
         return { ...info, message: info.stack };
@@ -13,6 +20,7 @@ const enumerateErrorFormat = winston.format(info => {
     return info;
 });
 
+// 📌 Configuration du logger principal
 const logger = winston.createLogger({
     level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
     format: winston.format.combine(
@@ -43,6 +51,7 @@ const logger = winston.createLogger({
     ]
 });
 
+// 📌 Middleware pour logger les requêtes HTTP
 export const requestLogger = (req, res, next) => {
     logger.info(`${req.method} ${req.url}`, {
         ip: req.ip,
@@ -52,6 +61,7 @@ export const requestLogger = (req, res, next) => {
     next();
 };
 
+// 📌 Logger pour les requêtes MongoDB
 export const queryLogger = (query) => {
     logger.debug(`MongoDB Query: ${query.collection}.${query.method}`, {
         duration: query.duration,

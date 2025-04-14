@@ -1,5 +1,3 @@
-//
-
 import 'dotenv/config';
 import express from 'express';
 import { ApolloServer } from '@apollo/server';
@@ -13,8 +11,14 @@ import { projectRoutes } from './modules/project-management/index.js';
 import logger from './utils/logger.js';
 import { typeDefs, resolvers } from './schema.js';
 import { scheduleHealthChecks, healthcheck } from '../../../healthcheck.js';
+import { isAuthenticated, hasRole } from './modules/user-management/middlewares/user.middleware.js';
 
 const isProduction = process.env.NODE_ENV === 'production';
+
+if (!process.env.PORT || !process.env.CORS_ORIGINS || !process.env.REDIS_HOST) {
+    logger.error('Les variables d\'environnement critiques ne sont pas définies.');
+    process.exit(1);
+}
 
 async function initializeApp() {
     const app = express();
@@ -39,13 +43,16 @@ async function initializeApp() {
         allowedHeaders: ['Content-Type', 'Authorization']
     }));
 
-    // 3. Connexion à la base de données avec retry
+    // 3. Middleware global
+    app.use(express.json());
+
+    // 4. Connexion à la base de données avec retry
     await connectToDatabase({
         retryCount: 3,
         retryDelay: 5000
     });
 
-    // 4. Configuration Apollo Server
+    // 5. Configuration Apollo Server
     const apolloServer = new ApolloServer({
         typeDefs,
         resolvers,
@@ -61,7 +68,7 @@ async function initializeApp() {
 
     await apolloServer.start();
 
-    // 5. Middleware GraphQL
+    // 6. Middleware GraphQL
     app.use(
         '/graphql',
         express.json({ limit: '10mb' }),
@@ -75,19 +82,24 @@ async function initializeApp() {
         })
     );
 
-    // 6. Middleware REST
+    // 7. Middleware REST
     app.use('/api/v1/projects',
         express.raw({ type: 'application/json' }),
         verifyToken,
         projectRoutes
     );
 
-    // 7. Healthcheck
+    // 8. Exemple de route protégée
+    app.get('/api/protected-route', isAuthenticated, hasRole('admin'), (req, res) => {
+        res.status(200).json({ message: 'Accès autorisé' });
+    });
+
+    // 9. Healthcheck
     app.get('/api/health', healthcheck);
 
-    // 8. Gestion des erreurs
+    // 10. Gestion des erreurs
     app.use((err, req, res, next) => {
-        logger.error(`Error ${err.status || 500}: ${err.message}`);
+        logger.error(`Error ${err.status || 500}: ${err.message}`, { stack: err.stack });
         res.status(err.status || 500).json({
             error: {
                 code: err.code || 'UNKNOWN_ERROR',
@@ -97,7 +109,7 @@ async function initializeApp() {
         });
     });
 
-    // 9. Planification des tâches
+    // 11. Planification des tâches
     scheduleHealthChecks();
 
     return app;

@@ -1,42 +1,66 @@
 // src/datasources/projectAPI.js
 
+import { logger } from '../utils/logger.js';
+import Project from '../models/Project.js'; // Assurez-vous que le modèle est correctement importé
+
+const CACHE_TTL = 60000; // 1 minute
+
 export class ProjectAPI {
     constructor() {
         this.cache = new Map();
-        this.cacheTTL = 60000; // 1 minute
     }
 
     async getProjectWithTeam(projectId) {
+        if (!projectId) {
+            throw new Error('L\'identifiant du projet est requis.');
+        }
+
         const cacheKey = `project-${projectId}`;
         if (this.cache.has(cacheKey)) {
             return this.cache.get(cacheKey);
         }
 
-        const project = await Project.findById(projectId)
-            .populate({
-                path: 'equipe',
-                select: 'name email role',
-                options: { lean: true }
-            })
-            .lean()
-            .cache('1 hour');
+        try {
+            const project = await Project.findById(projectId)
+                .populate({
+                    path: 'equipe',
+                    select: 'name email role',
+                    options: { lean: true }
+                })
+                .lean();
 
-        this.cache.set(cacheKey, project);
-        setTimeout(() => this.cache.delete(cacheKey), this.cacheTTL);
+            if (!project) {
+                throw new Error(`Projet avec l'ID ${projectId} introuvable.`);
+            }
 
-        return project;
+            this.cache.set(cacheKey, project);
+            setTimeout(() => this.cache.delete(cacheKey), CACHE_TTL);
+
+            return project;
+        } catch (error) {
+            logger.error(`Erreur lors de la récupération du projet ${projectId} : ${error.message}`);
+            throw error;
+        }
     }
 
-    // Méthodes optimisées avec cache et pagination
     async getAllProjects(page = 1, limit = 10) {
-        return Project.paginate({}, {
-            page,
-            limit,
-            populate: [
-                { path: 'equipe', select: 'name email' },
-                { path: 'tuteur', select: 'name experience' }
-            ],
-            lean: true
-        });
+        if (page <= 0 || limit <= 0) {
+            throw new Error('Les paramètres de pagination doivent être supérieurs à 0.');
+        }
+
+        try {
+            return await Project.paginate({}, {
+                page,
+                limit,
+                populate: [
+                    { path: 'equipe', select: 'name email' },
+                    { path: 'tuteur', select: 'name experience' }
+                ],
+                lean: true
+            });
+        } catch (error) {
+            logger.error(`Erreur lors de la récupération des projets : ${error.message}`);
+            throw error;
+        }
     }
 }

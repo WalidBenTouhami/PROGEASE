@@ -1,6 +1,6 @@
 // src/modules/formation-certification/services/formation.service.js
 
-import Formation from '../models/formation.model.js';
+import Formation from 'backend/src/modules/formation-certification/models/formation.model.js';
 
 export class FormationService {
     static async createFormation(formationData) {
