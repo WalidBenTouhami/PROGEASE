@@ -1,8 +1,8 @@
 // src/modules/formation-certification/tests/formation.test.js
 
-const request = require("supertest");
-const app = require("../app");
-const mongoose = require("mongoose");
+import request from "supertest";
+import app from "../app";
+import mongoose from "mongoose";
 
 describe("Tests des routes Formation", () => {
   beforeAll(async () => {

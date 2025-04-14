@@ -1,7 +1,9 @@
 // src/datasources/projectAPI.js
 
-import { logger } from '../utils/logger.js';
-import Project from '../modules/project-management/models/project.model.js';
+import * as logger from '../utils/logger.js';
+import Project from './../modules/project-management/models/project.model.js';
+
+
 
 const CACHE_TTL = 60000; // 1 minute
 

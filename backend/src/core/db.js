@@ -1,7 +1,7 @@
 // src/core/db.js
 
 import mongoose from 'mongoose';
-import { logger } from '../utils/logger.js';
+import * as logger from '../utils/logger.js';
 
 // ✅ Options de connexion à MongoDB
 const connectionOptions = {

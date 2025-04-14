@@ -1,7 +1,7 @@
 // src/config/db.js
 
 import { MongoClient } from 'mongodb';
-import { logger } from '../utils/logger.js';
+import * as logger from '../utils/logger.js';
 
 const clientOptions = {
   useNewUrlParser: true,
