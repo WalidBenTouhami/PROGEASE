@@ -8,6 +8,7 @@ import { connectToDatabase } from './core/db.js';
 import { ProjectAPI } from './datasources/projectAPI.js';
 import { verifyToken } from './modules/project-management/middlewares/project.middleware.js';
 import { projectRoutes } from './modules/project-management/index.js';
+import { evaluationRoutes } from './modules/evaluation-system/index.js';
 import logger from './utils/logger.js';
 import { typeDefs, resolvers } from './schema.js';
 import { scheduleHealthChecks, healthcheck } from '../../../healthcheck.js';
@@ -87,6 +88,13 @@ async function initializeApp() {
         express.raw({ type: 'application/json' }),
         verifyToken,
         projectRoutes
+    );
+
+    // Evaluation System Routes
+    app.use('/api/v1/evaluations',
+        express.raw({ type: 'application/json' }),
+        verifyToken,
+        evaluationRoutes
     );
 
     // 8. Exemple de route protégée

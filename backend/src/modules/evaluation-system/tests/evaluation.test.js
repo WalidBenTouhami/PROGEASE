@@ -1,83 +1,129 @@
-// src/modules/evaluation-system/tests/evaluation.test.js
+const mongoose = require('mongoose');
+const Evaluation = require('../models/Evaluation');
+const evaluationService = require('../services/evaluationService');
 
-import request from 'supertest';
-import app from '../../../app.js'; // Assurez-vous que le chemin vers votre app Express est correct
-import mongoose from 'mongoose';
-import Evaluation from '../models/evaluation.model.js';
+// Mock mongoose
+jest.mock('mongoose');
 
-describe('Evaluation System API', () => {
-    let projectId, evaluatorId;
-
-    beforeAll(async () => {
-        // Connectez-vous à une base de données de test
-        await mongoose.connect(process.env.TEST_DATABASE_URL, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
-
-        // Créez des données de test
-        projectId = new mongoose.Types.ObjectId();
-        evaluatorId = new mongoose.Types.ObjectId();
+describe('Evaluation Service', () => {
+    beforeEach(() => {
+        jest.clearAllMocks();
     });
 
-    afterAll(async () => {
-        // Nettoyez la base de données et fermez la connexion
-        await Evaluation.deleteMany({});
-        await mongoose.connection.close();
-    });
+    describe('getEvaluations', () => {
+        it('should return evaluations with pagination', async () => {
+            const mockEvaluations = [
+                { _id: '1', note: 15, projetId: 'p1', tuteurId: 't1' },
+                { _id: '2', note: 18, projetId: 'p2', tuteurId: 't1' }
+            ];
 
-    describe('POST /projects/:projectId/evaluations', () => {
-        it('devrait créer une évaluation avec des données valides', async () => {
-            const response = await request(app)
-                .post(`/projects/${projectId}/evaluations`)
-                .send({
-                    criteria: {
-                        technical: 80,
-                        creativity: 90,
-                        presentation: 85,
-                    },
-                    comments: 'Très bon projet.',
-                })
-                .set('Authorization', `Bearer token-test`); // Remplacez par un token valide si nécessaire
+            Evaluation.find = jest.fn().mockReturnValue({
+                where: jest.fn().mockReturnThis(),
+                sort: jest.fn().mockReturnThis(),
+                skip: jest.fn().mockReturnThis(),
+                limit: jest.fn().mockReturnThis(),
+                populate: jest.fn().mockResolvedValue(mockEvaluations)
+            });
 
-            expect(response.status).toBe(201);
-            expect(response.body).toHaveProperty('_id');
-            expect(response.body.criteria.technical).toBe(80);
-        });
+            Evaluation.countDocuments = jest.fn().mockResolvedValue(2);
 
-        it('devrait retourner une erreur pour des données invalides', async () => {
-            const response = await request(app)
-                .post(`/projects/${projectId}/evaluations`)
-                .send({
-                    criteria: {},
-                })
-                .set('Authorization', `Bearer token-test`);
+            const result = await evaluationService.getEvaluations(
+                { minNote: 10, maxNote: 20, sort: 'note' },
+                { page: 1, limit: 10 }
+            );
 
-            expect(response.status).toBe(400);
-            expect(response.body.code).toBe('INVALID_CRITERIA');
+            expect(result.evaluations).toEqual(mockEvaluations);
+            expect(result.pagination.total).toBe(2);
         });
     });
 
-    describe('GET /projects/:projectId/report', () => {
-        it('devrait retourner un rapport d\'évaluation', async () => {
-            const response = await request(app)
-                .get(`/projects/${projectId}/report`)
-                .set('Authorization', `Bearer token-test`);
+    describe('createEvaluation', () => {
+        it('should create a new evaluation', async () => {
+            const evaluationData = {
+                note: 15,
+                projetId: 'p1',
+                tuteurId: 't1',
+                etudiantId: 'e1'
+            };
 
-            expect(response.status).toBe(200);
-            expect(response.body).toHaveProperty('avgTechnical');
-            expect(response.body).toHaveProperty('avgCreativity');
-            expect(response.body).toHaveProperty('avgPresentation');
+            Evaluation.create = jest.fn().mockResolvedValue(evaluationData);
+
+            const result = await evaluationService.createEvaluation(evaluationData);
+
+            expect(result).toEqual(evaluationData);
+            expect(Evaluation.create).toHaveBeenCalledWith(evaluationData);
+        });
+    });
+
+    describe('updateEvaluation', () => {
+        it('should update an existing evaluation', async () => {
+            const existingEvaluation = {
+                _id: '1',
+                note: 15,
+                commentaires: 'Bon travail',
+                historique: []
+            };
+
+            const updateData = {
+                note: 18,
+                commentaires: 'Excellent travail',
+                modifiePar: 't1'
+            };
+
+            Evaluation.findById = jest.fn().mockResolvedValue(existingEvaluation);
+            Evaluation.findByIdAndUpdate = jest.fn().mockResolvedValue({
+                ...existingEvaluation,
+                ...updateData,
+                historique: [{
+                    note: 15,
+                    commentaires: 'Bon travail',
+                    modifiePar: 't1',
+                    dateModification: expect.any(Date)
+                }]
+            });
+
+            const result = await evaluationService.updateEvaluation('1', updateData);
+
+            expect(result.historique).toHaveLength(1);
+            expect(result.note).toBe(18);
         });
 
-        it('devrait retourner une erreur si le projet n\'existe pas', async () => {
-            const invalidProjectId = new mongoose.Types.ObjectId();
-            const response = await request(app)
-                .get(`/projects/${invalidProjectId}/report`)
-                .set('Authorization', `Bearer token-test`);
+        it('should throw error if evaluation not found', async () => {
+            Evaluation.findById = jest.fn().mockResolvedValue(null);
 
-            expect(response.status).toBe(404);
-            expect(response.body.code).toBe('REPORT_GENERATION_ERROR');
+            await expect(evaluationService.updateEvaluation('1', { note: 18 }))
+                .rejects
+                .toThrow('Evaluation non trouvée');
+        });
+    });
+
+    describe('getStatistics', () => {
+        it('should return evaluation statistics', async () => {
+            const mockStats = [{
+                moyenneGenerale: 16.5,
+                noteMaximum: 20,
+                noteMinimum: 13,
+                nombreEvaluations: 4
+            }];
+
+            Evaluation.aggregate = jest.fn().mockResolvedValue(mockStats);
+
+            const result = await evaluationService.getStatistics();
+
+            expect(result).toEqual(mockStats[0]);
+        });
+
+        it('should return default values when no evaluations exist', async () => {
+            Evaluation.aggregate = jest.fn().mockResolvedValue([]);
+
+            const result = await evaluationService.getStatistics();
+
+            expect(result).toEqual({
+                moyenneGenerale: 0,
+                noteMaximum: 0,
+                noteMinimum: 0,
+                nombreEvaluations: 0
+            });
         });
     });
 });
