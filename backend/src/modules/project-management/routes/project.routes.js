@@ -1,10 +1,13 @@
-//src/modules/project-management/routes/project.routes.js
+// src/modules/project-management/routes/project.routes.js
 
-const router = require('express').Router();
-const projectController = require('../controllers/project.controller');
-const { verifyToken } = require('../../middlewares/auth.middleware');
+import { Router } from 'express';
+import * as projectController from '../controllers/project.controller.js';
+import { verifyToken } from '../middlewares/project.middleware.js';
+import { predictPerformance } from '../services/project.service.js';
 
-// ─── Projet ───────────────────────────────────────
+const router = Router();
+
+// ─── Routes liées aux projets ───────────────────────────────────────
 
 // 🆕 Créer un projet
 router.post('/create', verifyToken, projectController.createProject);
@@ -12,28 +15,28 @@ router.post('/create', verifyToken, projectController.createProject);
 // 🔍 Récupérer tous les projets
 router.get('/all', verifyToken, projectController.getProjects);
 
-// 🔍 Récupérer projets + formations
+// 🔍 Récupérer projets avec formations associées
 router.get('/with-formations', verifyToken, projectController.getProjectsWithFormations);
 
-// 🧠 Ajouter une évaluation
+// 🧠 Ajouter une évaluation à un projet
 router.post('/:projectId/add-evaluation', verifyToken, projectController.addEvaluation);
 
-// 🤖 Appariement automatique d’un tuteur
+// 🤖 Appariement automatique d’un tuteur à un projet
 router.post('/:projectId/assign-tutor', verifyToken, projectController.assignSmartTutor);
 
-// 🔮 Prédire la performance (IA)
+// 🔮 Prédire la performance d’un projet (IA)
 router.post('/:projectId/predict-performance', verifyToken, async (req, res) => {
     try {
-        await require('../../services/ia.service').predictPerformance(req.params.projectId);
+        await predictPerformance(req.params.projectId);
         res.json({ message: 'Prédiction mise à jour' });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 });
 
-// ─── Livrables ────────────────────────────────────
+// ─── Routes liées aux livrables ────────────────────────────────────
 
-// 📥 Ajouter un livrable GitHub
+// 📥 Ajouter un livrable GitHub à un projet
 router.post('/:projectId/deliverables', verifyToken, projectController.addDeliverable);
 
 // 🔍 Récupérer tous les livrables d’un projet
@@ -48,4 +51,4 @@ router.delete('/:projectId/deliverables/:deliverableId', verifyToken, projectCon
 // 🔎 Vérifier un lien GitHub (ping public)
 router.post('/validate-repo', verifyToken, projectController.validateGithubRepo);
 
-module.exports = router;
+export default router;

@@ -1,44 +1,73 @@
-// src/config/performance.js
+// src/config/logging.js
 
-const winston = require('winston');
-require('dotenv').config();
+import winston from 'winston';
+import { Logtail } from '@logtail/node';
+import { LogtailTransport } from '@logtail/winston';
 
-// Configuration du logger
+// ✅ Validation de la variable d'environnement LOGTAIL_TOKEN
+if (!process.env.LOGTAIL_TOKEN) {
+    console.error('LOGTAIL_TOKEN doit être défini dans les variables d\'environnement.');
+    process.exit(1);
+}
+
+const logtail = new Logtail(process.env.LOGTAIL_TOKEN);
+
+// 📌 Format pour gérer les erreurs
+const enumerateErrorFormat = winston.format(info => {
+    if (info instanceof Error) {
+        return { ...info, message: info.stack };
+    }
+    return info;
+});
+
+// 📌 Configuration du logger principal
 const logger = winston.createLogger({
-    level: 'info', // Niveau minimal de log
+    level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
     format: winston.format.combine(
-        winston.format.timestamp(), // Ajoute un timestamp
-        winston.format.json()       // Format JSON pour les logs
+        enumerateErrorFormat(),
+        process.env.NODE_ENV === 'development'
+            ? winston.format.colorize()
+            : winston.format.uncolorize(),
+        winston.format.splat(),
+        winston.format.timestamp(),
+        winston.format.printf(
+            ({ timestamp, level, message }) => `[${timestamp}] ${level}: ${message}`
+        )
     ),
-    defaultMeta: { service: 'progease-backend' }, // Métadonnées par défaut
     transports: [
-        // Logs dans la console (en développement)
-        new winston.transports.Console({ level: process.env.NODE_ENV === 'development' ? 'debug' : 'info' }),
-
-        // Logs dans un fichier (en production)
+        new winston.transports.Console(),
+        new LogtailTransport(logtail),
         new winston.transports.File({
-            filename: 'logs/error.log',
-            level: 'error'
-        }),
-        new winston.transports.File({
-            filename: 'logs/all.log',
-            level: 'info'
+            filename: 'logs/combined.log',
+            maxsize: 10 * 1024 * 1024, // 10MB
+            maxFiles: 5
         })
+    ],
+    exceptionHandlers: [
+        new winston.transports.File({ filename: 'logs/exceptions.log' })
+    ],
+    rejectionHandlers: [
+        new winston.transports.File({ filename: 'logs/rejections.log' })
     ]
 });
 
-// Middleware Morgan pour les requêtes HTTP (optionnel)
-if (process.env.NODE_ENV !== 'test') {
-    const morgan = require('morgan');
-    const express = require('express');
+// 📌 Middleware pour logger les requêtes HTTP
+export const requestLogger = (req, res, next) => {
+    logger.info(`${req.method} ${req.url}`, {
+        ip: req.ip,
+        user: req.user?.id,
+        body: req.body
+    });
+    next();
+};
 
-    module.exports.setupHttpLogging = (app) => {
-        app.use(morgan('combined', {
-            stream: {
-                write: (message) => logger.info(message.trim())
-            }
-        }));
-    };
-}
+// 📌 Logger pour les requêtes MongoDB
+export const queryLogger = (query) => {
+    logger.debug(`MongoDB Query: ${query.collection}.${query.method}`, {
+        duration: query.duration,
+        operation: query.op,
+        criteria: query.conditions
+    });
+};
 
-module.exports = logger;
+export default logger;

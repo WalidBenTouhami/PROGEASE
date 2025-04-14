@@ -1,125 +1,37 @@
 // src/config/constants.js
 
-/**
- * 🔒 Configuration de sécurité
- */
-const SECURITY = Object.freeze({
+// 📌 Statuts des projets
+export const StatusEnum = Object.freeze({
+    DRAFT: 'brouillon',
+    IN_PROGRESS: 'en_cours',
+    COMPLETED: 'termine',
+    ARCHIVED: 'archive'
+});
+
+// 📌 Rôles des utilisateurs
+export const RoleEnum = Object.freeze({
+    STUDENT: 'etudiant',
+    TUTOR: 'tuteur',
+    ADMIN: 'admin'
+});
+
+// 📌 Configuration de sécurité
+export const SecurityConfig = Object.freeze({
     JWT: {
-        EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
-        COOKIE_EXPIRES: 90 * 24 * 60 * 60 * 1000, // 90 jours en ms
-        TOKEN_TYPES: {
-            ACCESS: 'access',
-            REFRESH: 'refresh',
-            RESET_PASSWORD: 'resetPassword'
-        }
+        EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d', // Durée de validité du token JWT
+        COOKIE_NAME: '__progease_token' // Nom du cookie pour le token
     },
-    ROLES: {
-        STUDENT: 'student',
-        TUTOR: 'tutor',
-        ADMIN: 'admin'
+    PASSWORD: {
+        MIN_LENGTH: 10, // Longueur minimale du mot de passe
+        SALT_ROUNDS: 12, // Nombre de tours pour le salage du mot de passe
+        MAX_ATTEMPTS: 5, // Nombre maximum de tentatives de connexion
+        LOCKOUT_MINUTES: 30 // Durée de verrouillage après échec
     }
 });
 
-/**
- * 🚀 Configuration des projets
- */
-const PROJECT = Object.freeze({
-    STATUSES: {
-        DRAFT: 'brouillon',
-        IN_PROGRESS: 'en cours',
-        COMPLETED: 'terminé',
-        ARCHIVED: 'archivé'
-    },
-    VALIDATION: {
-        MAX_DURATION_DAYS: 90,
-        MIN_TEAM_SIZE: 1,
-        MAX_TEAM_SIZE: 5,
-        SKILLS: {
-            MIN: 1,
-            MAX: 10
-        }
-    }
-});
-
-/**
- * 📊 Configuration de pagination
- */
-const PAGINATION = Object.freeze({
-    DEFAULT_PAGE: 1,
-    DEFAULT_LIMIT: 10,
-    MAX_LIMIT: 100
-});
-
-/**
- * 📅 Configuration des tâches planifiées
- */
-const SCHEDULER = Object.freeze({
-    CRON_JOBS: {
-        DAILY: '0 0 * * *',        // Minuit chaque jour
-        WEEKLY: '0 0 * * 0',       // Minuit chaque dimanche
-        HOURLY: '0 * * * *'
-    },
-    RETRY_POLICY: {
-        MAX_ATTEMPTS: 3,
-        BACKOFF_MS: 5000
-    }
-});
-
-/**
- * ⚙️ Configuration générale
- */
-const APP = Object.freeze({
-    ENV: {
-        DEVELOPMENT: 'development',
-        PRODUCTION: 'production',
-        TEST: 'test'
-    },
-    FILE_UPLOAD: {
-        MAX_SIZE: 5 * 1024 * 1024, // 5MB
-        ALLOWED_TYPES: ['image/jpeg', 'image/png', 'application/pdf']
-    }
-});
-
-/**
- * 📨 Messages d'erreur
- */
-const ERROR_MESSAGES = Object.freeze({
-    DB_CONNECTION: 'Échec de connexion à la base de données',
-    UNAUTHORIZED: 'Accès non autorisé',
-    VALIDATION: {
-        DATE: 'La date de fin doit être postérieure à la date de début',
-        SKILLS: `Doit contenir entre ${PROJECT.VALIDATION.SKILLS.MIN} et ${PROJECT.VALIDATION.SKILLS.MAX} compétences`
-    }
-});
-
-/**
- * 🌐 Configuration API
- */
-const API = Object.freeze({
-    VERSIONS: ['v1', 'v2'],
-    CURRENT_VERSION: 'v1',
-    RATE_LIMITING: {
-        WINDOW_MS: 15 * 60 * 1000, // 15 minutes
-        MAX_REQUESTS: 100
-    }
-});
-
-// Exportations regroupées
-module.exports = Object.freeze({
-    SECURITY,
-    PROJECT,
-    PAGINATION,
-    SCHEDULER,
-    APP,
-    ERROR_MESSAGES,
-    API,
-    HTTP_STATUS: {
-        OK: 200,
-        CREATED: 201,
-        BAD_REQUEST: 400,
-        UNAUTHORIZED: 401,
-        FORBIDDEN: 403,
-        NOT_FOUND: 404,
-        INTERNAL_ERROR: 500
-    }
+// 📌 Paramètres de pagination par défaut
+export const PaginationDefaults = Object.freeze({
+    PAGE: 1, // Page par défaut
+    LIMIT: 20, // Limite par défaut
+    MAX_LIMIT: 100 // Limite maximale autorisée
 });

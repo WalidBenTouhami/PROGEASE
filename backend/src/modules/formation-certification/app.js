@@ -1,8 +1,10 @@
+// src/modules/formation-certification/tests/app.js
+
 require("dotenv").config();
 const express = require("express");
-const connectDB = require("./src/config/db");
-const formationRoutes = require("./src/routes/formationRoutes");
-const certificatRoutes = require("./src/routes/certificatRoutes");
+const connectDB = require("../../config/db");
+const formationRoutes = require("backend/src/modules/formation-certification/routes/formation.routes.js");
+const certificatRoutes = require("backend/src/modules/formation-certification/routes/certification.routes.js");
 
 // Initialiser Express
 const app = express();
@@ -15,8 +17,4 @@ connectDB();
 app.use("/api/formations", formationRoutes);
 app.use("/api/certificats", certificatRoutes);
 
-// Démarrer le serveur
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Serveur en écoute sur http://localhost:${PORT}`);
-});
+module.exports = app;

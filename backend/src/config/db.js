@@ -1,48 +1,51 @@
-// 📁 src/config/db.js
+// src/config/db.js
 
-require('dotenv').config();
-const { MongoClient, ServerApiVersion } = require('mongodb');
+import { MongoClient } from 'mongodb';
+import { logger } from '../utils/logger.js';
 
-const uri = process.env.MONGODB_URI;
+const clientOptions = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 15,
+  minPoolSize: 5,
+  socketTimeoutMS: 45000,
+  heartbeatFrequencyMS: 10000,
+  compressors: 'snappy,zlib',
+  zlibCompressionLevel: 7
+};
 
-if (!uri) {
-  throw new Error("❌ MONGODB_URI manquant dans le fichier .env");
-}
+let cachedClient = null;
+let cachedDb = null;
 
-// 🔄 Singleton MongoClient
-let client;
+export async function connectToDatabase() {
+  // ✅ Validation des variables d'environnement
+  if (!process.env.MONGODB_URI || !process.env.DB_NAME) {
+    logger.error('Les variables d\'environnement MONGODB_URI et DB_NAME doivent être définies.');
+    process.exit(1);
+  }
 
-const connectToDatabase = async () => {
-  if (client) return client;
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb };
+  }
 
   try {
-    client = new MongoClient(uri, {
-      serverApi: {
-        version: ServerApiVersion.v1,
-        strict: true,
-        deprecationErrors: true,
-      }
-    });
+    const client = new MongoClient(process.env.MONGODB_URI, clientOptions);
 
     await client.connect();
-    console.log("✅ Connexion réussie à MongoDB Atlas");
-    return client;
+    const db = client.db(process.env.DB_NAME);
+
+    // 🔄 Gestion des événements de connexion
+    client.on('serverDescriptionChanged', event => {
+      logger.info(`MongoDB topology change: ${JSON.stringify(event)}`);
+    });
+
+    cachedClient = client;
+    cachedDb = db;
+
+    logger.info('Connexion à MongoDB réussie.');
+    return { client, db };
   } catch (error) {
-    console.error("❌ Échec de connexion MongoDB :", error.message);
-    process.exit(1); // Stoppe l'app si la BDD est inaccessible
+    logger.error('Erreur lors de la connexion à MongoDB :', error.message);
+    process.exit(1);
   }
-};
-
-/**
- * 📦 Obtenir une instance de base de données
- * @param {string} dbName - PROGEASE
- */
-const getDatabase = async (dbName) => {
-  const client = await connectToDatabase();
-  return client.db(dbName);
-};
-
-module.exports = {
-  connectToDatabase,
-  getDatabase
-};
+}

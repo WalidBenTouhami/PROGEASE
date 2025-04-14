@@ -1,33 +1,51 @@
 // src/utils/github.util.js
 
-const axios = require('axios');
+import axios from 'axios';
+import { logger } from './logger.js';
 
-/**
- * Vérifie si un dépôt GitHub public existe
- * @param {string} url - Lien GitHub du dépôt (ex: https://github.com/user/repo)
- * @returns {Promise<boolean>}
- */
-exports.checkGithubRepoExists = async (url) => {
-    try {
-        if (!/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(url)) {
-            return false; // 🔒 Protection : éviter les faux liens ou injections
-        }
+const GITHUB_API = 'https://api.github.com';
 
-        const cleanUrl = url.replace('https://github.com/', '');
-        const apiUrl = `https://api.github.com/repos/${cleanUrl}`;
-
-        const response = await axios.get(apiUrl, {
+export class GitHubService {
+    constructor(token) {
+        this.client = axios.create({
+            baseURL: GITHUB_API,
             headers: {
-                'Accept': 'application/vnd.github+json',
-                'User-Agent': 'progease-verifier' // GitHub recommande de spécifier un UA
-            },
-            timeout: 4000
+                Authorization: `token ${token}`,
+                Accept: 'application/vnd.github.v3+json'
+            }
         });
-
-        return response.status === 200;
-    } catch (error) {
-        // Log possible pour debug (optionnel)
-        // console.error('GitHub check error:', error.response?.status || error.message);
-        return false;
     }
-};
+
+    async getRepoDetails(repoUrl) {
+        try {
+            const [owner, repo] = this.parseRepoUrl(repoUrl);
+            const { data } = await this.client.get(`/repos/${owner}/${repo}`);
+
+            return {
+                stars: data.stargazers_count,
+                forks: data.forks_count,
+                issues: data.open_issues_count,
+                lastCommit: new Date(data.pushed_at)
+            };
+        } catch (error) {
+            logger.error(`GitHub API Error: ${error.response?.status}`);
+            throw error;
+        }
+    }
+
+    async checkCollaborator(repoUrl, username) {
+        const [owner, repo] = this.parseRepoUrl(repoUrl);
+        try {
+            await this.client.get(`/repos/${owner}/${repo}/collaborators/${username}`);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    parseRepoUrl(url) {
+        const match = url.match(/github.com\/([^/]+)\/([^/]+)/);
+        if (!match) throw new Error('URL GitHub invalide');
+        return [match[1], match[2]];
+    }
+}

@@ -1,3 +1,5 @@
+// src/modules/formation-certification/controllers/certification.controller.js
+
 const Certificat = require("../models/Certificat");
 const { checkQuizReussis } = require("../utils/certificatLogic");
 

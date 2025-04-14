@@ -1,65 +1,82 @@
 // src/services/email.service.js
-const nodemailer = require('nodemailer');
-const dotenv = require('dotenv');
 
-dotenv.config(); // 📦 Charger les variables d'environnement (.env)
+            import nodemailer from 'nodemailer';
+            import { logger } from '../utils/logger.js';
 
-// ✅ Transporteur SMTP pour Microsoft 365 / Outlook
-const transporter = nodemailer.createTransport({
-    host: 'smtp.office365.com',
-    port: 587,
-    secure: false, // 🔓 STARTTLS (ne pas mettre true)
-    auth: {
-        user: process.env.EMAIL_USER, // ex: walid.bentouhami@esprit.tn
-        pass: process.env.EMAIL_PASS  // ⚠️ mot de passe ou mot de passe d'application (si 2FA activé)
-    },
-    tls: {
-        ciphers: 'SSLv3'
-    }
-});
+            class EmailService {
+                constructor() {
+                    // ✅ Validation des variables d'environnement
+                    const requiredEnvVars = ['EMAIL_HOST', 'EMAIL_PORT', 'EMAIL_USER', 'EMAIL_PASS', 'EMAIL_FROM'];
+                    requiredEnvVars.forEach((envVar) => {
+                        if (!process.env[envVar]) {
+                            logger.error(`La variable d'environnement ${envVar} doit être définie.`);
+                            process.exit(1);
+                        }
+                    });
 
-// ✅ Vérification de la connexion SMTP
-transporter.verify((error, success) => {
-    if (error) {
-        console.error('❌ Erreur de configuration SMTP :', error);
-    } else {
-        console.log('✅ Transporteur email Microsoft 365 prêt');
-    }
-});
+                    // 📌 Configuration du transporteur
+                    this.transporter = nodemailer.createTransport({
+                        host: process.env.EMAIL_HOST,
+                        port: parseInt(process.env.EMAIL_PORT, 10),
+                        secure: process.env.EMAIL_USE_TLS === 'true',
+                        auth: {
+                            user: process.env.EMAIL_USER,
+                            pass: process.env.EMAIL_PASS
+                        },
+                        pool: true,
+                        maxConnections: 5,
+                        rateLimit: 10
+                    });
+                }
 
-/**
- * ✉️ Envoie un email de rappel à plusieurs destinataires
- * @param {string[]} emails - Liste des adresses email (ex: ["x@esprit.tn", "y@esprit.tn"])
- * @param {string} subject - Sujet du message
- * @param {string} message - Corps du message (texte brut)
- * @returns {Promise<string>} - ID du message envoyé
- */
-exports.sendReminder = async (emails, subject, message) => {
-    try {
-        // 🔎 Validation des paramètres
-        if (!Array.isArray(emails) || emails.length === 0) {
-            throw new Error('Aucun destinataire fourni.');
-        }
+                // 📌 Envoi d'un email basé sur un template
+                async sendTemplateEmail(templateName, recipient, data) {
+                    const templates = {
+                        welcome: {
+                            subject: 'Bienvenue sur Progease!',
+                            text: `Bonjour ${data.name}, Bienvenue!`,
+                            html: `<h1>Bienvenue ${data.name}!</h1>`
+                        },
+                        resetPassword: {
+                            subject: 'Réinitialisation de mot de passe',
+                            text: `Lien de réinitialisation: ${data.link}`,
+                            html: `<a href="${data.link}">Réinitialiser</a>`
+                        }
+                    };
 
-        if (!subject || !message) {
-            throw new Error('Le sujet et le message sont requis.');
-        }
+                    const template = templates[templateName];
+                    if (!template) {
+                        logger.error(`Template "${templateName}" introuvable.`);
+                        throw new Error('Template introuvable');
+                    }
 
-        // ✉️ Options du mail
-        const mailOptions = {
-            from: `"PROGEASE Notification" <${process.env.EMAIL_USER}>`,
-            to: emails.join(','),
-            subject: subject,
-            text: message
-        };
+                    return this.sendEmail({
+                        to: recipient,
+                        ...template
+                    });
+                }
 
-        // 🚀 Envoi
-        const result = await transporter.sendMail(mailOptions);
-        console.log(`📤 Email envoyé avec succès à ${emails.join(', ')} (ID: ${result.messageId})`);
-        return result.messageId;
+                // 📌 Envoi d'un email générique
+                async sendEmail({ to, subject, text, html }) {
+                    try {
+                        const info = await this.transporter.sendMail({
+                            from: `"Progease" <${process.env.EMAIL_FROM}>`,
+                            to,
+                            subject,
+                            text,
+                            html,
+                            headers: {
+                                'X-Progease-Version': process.env.npm_package_version
+                            }
+                        });
 
-    } catch (err) {
-        console.error('🚨 Erreur lors de l’envoi de l’email :', err.message);
-        throw new Error(`Échec de l'envoi : ${err.message}`);
-    }
-};
+                        logger.info(`Email envoyé avec succès: ${info.messageId}`);
+                        return info;
+                    } catch (error) {
+                        logger.error(`Erreur lors de l'envoi de l'email à ${to}: ${error.message}`);
+                        throw error;
+                    }
+                }
+            }
+
+            export default new EmailService();

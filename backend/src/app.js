@@ -1,112 +1,120 @@
-// src/app.js
-require('dotenv').config();
-const express = require('express');
-const { ApolloServer } = require('apollo-server-express');
-const helmet = require('helmet');
-const cors = require('cors');
-const { scheduleJob } = require('node-schedule');
-const { connectToDatabase, checkConnection, closeDatabase } = require('./core/db');
-const { typeDefs, resolvers } = require('./schema');
-const { verifyToken } = require('./modules/project-management/middlewares/project.middleware');
-const { projectRoutes } = require('./modules/project-management');
-const iaCron = require('./services/iaCron');
-const logger = require('./utils/logger');
+import 'dotenv/config';
+import express from 'express';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import helmet from 'helmet';
+import cors from 'cors';
+import { connectToDatabase } from './core/db.js';
+import { ProjectAPI } from './datasources/projectAPI.js';
+import { verifyToken } from './modules/project-management/middlewares/project.middleware.js';
+import { projectRoutes } from './modules/project-management/index.js';
+import logger from './utils/logger.js';
+import { typeDefs, resolvers } from './schema.js';
+import { isAuthenticated, hasRole } from './modules/user-management/middlewares/user.middleware.js';
 
-// Configuration initiale
-const PORT = process.env.PORT || 4000;
 const isProduction = process.env.NODE_ENV === 'production';
+
+if (!process.env.PORT || !process.env.CORS_ORIGINS || !process.env.REDIS_HOST) {
+    logger.error('Les variables d\'environnement critiques ne sont pas définies.');
+    process.exit(1);
+}
 
 async function initializeApp() {
     const app = express();
 
-    // 1. Sécurité de base
-    app.use(helmet());
-    app.use(cors({
-        origin: isProduction ? process.env.CORS_ORIGINS.split(',') : '*'
+    // 1. Sécurité renforcée
+    app.use(helmet({
+        contentSecurityPolicy: isProduction ? {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'unsafe-inline'"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                imgSrc: ["'self'", "data:", "https://*.github.com"],
+                connectSrc: ["'self'", "https://*.github.com"]
+            }
+        } : false
     }));
-    app.use(express.json({ limit: '10kb' }));
 
-    // 2. Connexion DB
-    await connectToDatabase();
-    if (!(await checkConnection())) {
-        throw new Error('Échec de connexion à la base de données');
-    }
+    // 2. Configuration CORS
+    app.use(cors({
+        origin: isProduction ? process.env.CORS_ORIGINS.split(',') : '*',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization']
+    }));
 
-    // 3. Middlewares personnalisés
-    app.use(verifyToken);
+    // 3. Middleware global
+    app.use(express.json());
 
-    // 4. Configuration Apollo Server
+    // 4. Connexion à la base de données avec retry
+    await connectToDatabase({
+        retryCount: 3,
+        retryDelay: 5000
+    });
+
+    // 5. Configuration Apollo Server
     const apolloServer = new ApolloServer({
         typeDefs,
         resolvers,
-        context: ({ req }) => ({ user: req.user }),
-        subscriptions: {
-            path: '/subscriptions',
-        },
         introspection: !isProduction,
-        playground: !isProduction
+        persistedQueries: false,
+        formatError: (error) => ({
+            message: error.message,
+            code: error.extensions?.code || 'INTERNAL_ERROR',
+            locations: error.locations,
+            path: error.path
+        })
     });
 
-    // 5. Routes
-    app.use('/api/v1/projects', projectRoutes);
-
-    // Endpoint de santé amélioré
-    app.get('/api/health', (req, res) => {
-        res.json({
-            status: 'ok',
-            uptime: process.uptime(),
-            dbStatus: checkConnection() ? 'connected' : 'disconnected',
-            memoryUsage: process.memoryUsage()
-        });
-    });
-
-    // 6. Application du middleware Apollo
     await apolloServer.start();
-    apolloServer.applyMiddleware({
-        app,
-        path: '/graphql',
-        cors: false
+
+    // 6. Middleware GraphQL
+    app.use(
+        '/graphql',
+        express.json({ limit: '10mb' }),
+        expressMiddleware(apolloServer, {
+            context: async ({ req }) => ({
+                user: req.user,
+                dataSources: {
+                    projectAPI: new ProjectAPI()
+                }
+            }),
+        })
+    );
+
+    // 7. Middleware REST
+    app.use('/api/v1/projects',
+        express.raw({ type: 'application/json' }),
+        verifyToken,
+        projectRoutes
+    );
+
+    // 8. Exemple de route protégée
+    app.get('/api/protected-route', isAuthenticated, hasRole('admin'), (req, res) => {
+        res.status(200).json({ message: 'Accès autorisé' });
     });
 
-    // 7. Planification des tâches IA
-    if (process.env.ENABLE_IA_CRON === 'true') {
-        iaCron.initScheduledJobs();
-    }
-
-    return { app, apolloServer };
-}
-
-async function startServer() {
-    try {
-        const { app, apolloServer } = await initializeApp();
-
-        const server = app.listen(PORT, () => {
-            logger.info(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-            logger.info(`📡 GraphQL endpoint: http://localhost:${PORT}${apolloServer.graphqlPath}`);
-            if (apolloServer.subscriptionsPath) {
-                logger.info(`🔔 Subscriptions endpoint: ws://localhost:${PORT}${apolloServer.subscriptionsPath}`);
+    // 9. Gestion des erreurs
+    app.use((err, req, res, next) => {
+        logger.error(`Error ${err.status || 500}: ${err.message}`, { stack: err.stack });
+        res.status(err.status || 500).json({
+            error: {
+                code: err.code || 'UNKNOWN_ERROR',
+                message: isProduction ? 'Internal Server Error' : err.message,
+                ...(!isProduction && { stack: err.stack })
             }
         });
+    });
 
-        // Gestion propre des arrêts
-        process.on('SIGTERM', gracefulShutdown);
-        process.on('SIGINT', gracefulShutdown);
-
-        async function gracefulShutdown() {
-            logger.info('🛑 Shutting down gracefully...');
-            server.close(async () => {
-                await closeDatabase();
-                logger.info('✅ All connections closed');
-                process.exit(0);
-            });
-        }
-
-    } catch (error) {
-        logger.error(`💥 Failed to start: ${error.message}`);
-        await closeDatabase();
-        process.exit(1);
-    }
+    return app;
 }
 
-// Démarrage de l'application
-startServer();
+// Démarrage du serveur
+const PORT = process.env.PORT || 4000;
+initializeApp().then((app) => {
+    app.listen(PORT, () => {
+        logger.info(`Server running on port ${PORT}`);
+    });
+}).catch((error) => {
+    logger.error('Failed to initialize the application', { error });
+    process.exit(1);
+});

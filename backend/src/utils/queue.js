@@ -1,141 +1,54 @@
-// utils/queue.js
-const Bull = require('bull');
-const Redis = require('ioredis');
-const { createLogger } = require('./logger');
-const logger = createLogger('queue');
+// src/utils/queue.js
 
-// 🔧 Configuration via environnement
-const REDIS_CONFIG = {
-    host: process.env.REDIS_HOST || 'localhost',
-    port: process.env.REDIS_PORT || 6379,
-    password: process.env.REDIS_PASSWORD,
-    maxRetriesPerRequest: null,
-    enableReadyCheck: false
-};
+                import Bull from 'bull';
+                import { createLogger } from './logger.js';
 
-class QueueService {
-    constructor() {
-        this.queues = new Map();
-        this.redisClient = new Redis(REDIS_CONFIG);
-        this.setupErrorHandlers();
-    }
+                const logger = createLogger('QueueUtils');
+                const queues = new Map();
 
-    /**
-     * Crée ou récupère une file d'attente
-     * @param {string} name - Nom de la file d'attente
-     * @param {object} options - Options Bull personnalisées
-     * @returns {Bull.Queue}
-     */
-    createQueue(name, options = {}) {
-        if (this.queues.has(name)) {
-            return this.queues.get(name);
-        }
+                export const createQueue = (name, options = {}) => {
+                    if (!process.env.REDIS_HOST || !process.env.REDIS_PORT) {
+                        logger.error('Les variables d\'environnement REDIS_HOST et REDIS_PORT doivent être définies.');
+                        throw new Error('Configuration Redis manquante.');
+                    }
 
-        const queue = new Bull(name, {
-            redis: REDIS_CONFIG,
-            defaultJobOptions: {
-                removeOnComplete: true,
-                removeOnFail: 100,
-                attempts: 3,
-                backoff: {
-                    type: 'exponential',
-                    delay: 5000
-                }
-            },
-            ...options
-        });
+                    if (queues.has(name)) {
+                        logger.info(`La file d'attente "${name}" existe déjà.`);
+                        return queues.get(name);
+                    }
 
-        this.setupQueueHandlers(queue);
-        this.queues.set(name, queue);
+                    try {
+                        const queue = new Bull(name, {
+                            redis: {
+                                host: process.env.REDIS_HOST,
+                                port: parseInt(process.env.REDIS_PORT, 10),
+                                ...(process.env.NODE_ENV === 'production' && { tls: {} })
+                            },
+                            defaultJobOptions: {
+                                removeOnComplete: true,
+                                removeOnFail: 100,
+                                attempts: 3,
+                                backoff: {
+                                    type: 'exponential',
+                                    delay: 5000
+                                }
+                            },
+                            ...options
+                        });
 
-        return queue;
-    }
+                        queue.on('failed', (job, err) => {
+                            logger.error(`Le job ${job.id} a échoué : ${err.message}`, { jobName: job.name, stack: err.stack });
+                        });
 
-    /**
-     * Configure les handlers d'événements pour une queue
-     * @param {Bull.Queue} queue
-     */
-    setupQueueHandlers(queue) {
-        queue
-            .on('completed', (job) => {
-                logger.info(`Job ${job.id} completed in ${queue.name}`);
-                job.remove();
-            })
-            .on('failed', (job, err) => {
-                logger.error(`Job ${job.id} failed in ${queue.name}: ${err.message}`, {
-                    stack: err.stack,
-                    data: job.data
-                });
-            })
-            .on('stalled', (job) => {
-                logger.warn(`Job ${job.id} stalled in ${queue.name}`);
-            });
+                        queue.on('completed', (job) => {
+                            logger.info(`Le job ${job.id} a été complété avec succès.`, { jobName: job.name });
+                        });
 
-        // Monitoring des erreurs Redis
-        queue.on('error', (err) => {
-            logger.error(`Queue ${queue.name} error: ${err.message}`);
-        });
-    }
-
-    setupErrorHandlers() {
-        this.redisClient.on('error', (err) => {
-            logger.error(`Redis error: ${err.message}`);
-        });
-    }
-
-    /**
-     * Middleware de logging pour les jobs
-     */
-    get jobMiddleware() {
-        return (job, done) => {
-            logger.info(`Processing job ${job.id} in ${job.queue.name}`, {
-                data: job.data
-            });
-            done();
-        };
-    }
-
-    /**
-     * Fermeture propre des queues
-     */
-    async gracefulShutdown() {
-        await Promise.all(
-            Array.from(this.queues.values()).map(queue =>
-                queue.close(true)
-            )
-        );
-        await this.redisClient.quit();
-        logger.info('All queues stopped');
-    }
-}
-
-// 🔥 Exemple de configuration pour les rappels
-const queueService = new QueueService();
-
-// File d'attente pour les rappels
-const remindersQueue = queueService.createQueue('reminders', {
-    limiter: {
-        max: 1000,
-        duration: 5000
-    }
-});
-
-// Processeur de jobs pour les rappels
-remindersQueue.process('sendReminder', 5, async (job) => {
-    const { emails, deliverableName, deadline } = job.data;
-
-    await EmailService.sendReminder(
-        emails,
-        `Rappel : ${deliverableName}`,
-        `Date limite : ${new Date(deadline).toLocaleDateString()}`
-    );
-});
-
-// Middleware de sécurité
-remindersQueue.use(queueService.jobMiddleware);
-
-module.exports = {
-    QueueService,
-    createBullQueue: (name) => queueService.createQueue(name),
-    remindersQueue
-};
+                        queues.set(name, queue);
+                        logger.info(`File d'attente "${name}" créée avec succès.`);
+                        return queue;
+                    } catch (error) {
+                        logger.error(`Erreur lors de la création de la file d'attente "${name}" : ${error.message}`, { stack: error.stack });
+                        throw error;
+                    }
+                };

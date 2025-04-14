@@ -1,144 +1,95 @@
 // src/tests/integration.test.js
-const request = require('supertest');
-const app = require('../app');
-const mongoose = require('mongoose');
-const User = require('../modules/user-management/models/user.model');
-const Project = require('../modules/project-management/models/project.model');
-const Evaluation = require('../modules/evaluation-system/models/evaluation.model');
-const IaService = require('../services/ia.service');
 
-describe('🧪 Integration Tests - PROGEASE', () => {
-    let token, tuteur, etudiant1, etudiant2;
+import request from 'supertest';
+import { app } from '../../app.js';
+import { setupTestDB, teardownTestDB } from './testUtils.js';
+import { mockRedis } from './mocks/redis.mock.js';
 
+describe('API Integration Tests', () => {
     beforeAll(async () => {
-        await mongoose.connect(process.env.MONGODB_URI);
-
-        // 👤 Création de comptes utilisateurs
-        tuteur = await User.create({
-            email: 'tutor@example.com',
-            password: 'password',
-            role: 'tuteur',
-            experience: 85,
-            skills: ['Python', 'ML']
-        });
-
-        etudiant1 = await User.create({
-            email: 'etudiant1@example.com',
-            password: 'password',
-            role: 'student'
-        });
-
-        etudiant2 = await User.create({
-            email: 'etudiant2@example.com',
-            password: 'password',
-            role: 'student'
-        });
-
-        // 🔐 Authentification tuteur
-        const auth = await request(app)
-            .post('/api/users/login')
-            .send({ email: tuteur.email, password: 'password' });
-
-        token = auth.body.token;
+        await setupTestDB();
+        mockRedis();
     });
 
     afterAll(async () => {
-        await Project.deleteMany({});
-        await Evaluation.deleteMany({});
-        await User.deleteMany({});
-        await mongoose.connection.close();
+        await teardownTestDB();
     });
 
-    const createProject = async (custom = {}) => {
-        const res = await request(app)
-            .post('/api/projects/create')
-            .set('Authorization', `Bearer ${token}`)
-            .send({
-                titre: custom.titre || 'Projet de test',
-                description: custom.description || 'Description de test avec plus de 50 caractères pour valider.',
-                equipe: custom.equipe || [etudiant1._id, etudiant2._id],
-                tuteur: custom.tuteur || tuteur._id,
-                skills: custom.skills || ['Python', 'ML'],
-                deliverables: custom.deliverables || [],
-                ...custom
-            });
+    describe('Project Lifecycle', () => {
+        let authToken;
+        let projectId;
 
-        expect(res.status).toBe(201);
-        return res.body;
-    };
+        beforeAll(async () => {
+            // Authentification
+            const res = await request(app)
+                .post('/api/auth/login')
+                .send({ email: 'test@example.com', password: 'validPassword' });
 
-    describe('📎 Liaison Projet <-> Évaluation', () => {
-        it('doit relier une évaluation à un projet', async () => {
-            const project = await createProject();
+            authToken = res.body.token;
+            expect(authToken).toBeDefined();
+        });
 
-            // ➕ Création évaluation
-            const evalRes = await request(app)
-                .post('/api/evaluations/create')
-                .set('Authorization', `Bearer ${token}`)
+        afterEach(async () => {
+            // Nettoyage des projets créés
+            if (projectId) {
+                await request(app)
+                    .delete(`/api/projects/${projectId}`)
+                    .set('Authorization', `Bearer ${authToken}`);
+            }
+        });
+
+        test('Full project creation flow', async () => {
+            // Création de projet
+            const createRes = await request(app)
+                .post('/api/projects')
+                .set('Authorization', `Bearer ${authToken}`)
                 .send({
-                    projet_id: project._id,
-                    evaluateur_id: tuteur._id,
-                    score: 88,
-                    comments: 'Bon projet'
+                    title: 'Integration Test Project',
+                    description: 'Project for integration testing'
                 });
 
-            const evaluationId = evalRes.body._id;
+            expect(createRes.status).toBe(201);
+            expect(createRes.body).toHaveProperty('id');
+            projectId = createRes.body.id;
 
-            // 🔗 Ajout au projet
-            const linkRes = await request(app)
-                .post(`/api/projects/${project._id}/add-evaluation`)
-                .set('Authorization', `Bearer ${token}`)
-                .send({ evaluationId });
+            // Ajout de livrable
+            const deliverableRes = await request(app)
+                .post(`/api/projects/${projectId}/deliverables`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    name: 'Initial Setup',
+                    deadline: new Date(Date.now() + 86400000)
+                });
 
-            expect(linkRes.status).toBe(200);
-            expect(linkRes.body.project.evaluations).toContain(evaluationId);
+            expect(deliverableRes.status).toBe(201);
+            expect(deliverableRes.body).toHaveProperty('id');
 
-            const updated = await Project.findById(project._id);
-            expect(updated.evaluations.map(e => e.toString())).toContain(evaluationId);
-        });
-    });
+            // Vérification du statut
+            const getRes = await request(app)
+                .get(`/api/projects/${projectId}`)
+                .set('Authorization', `Bearer ${authToken}`);
 
-    describe('🧠 Fonctionnalités IA : Prédiction + Suivi', () => {
-        it('doit prédire la performance et mettre à jour la progression', async () => {
-            const deliverables = [
-                { name: 'Livrable 1', deadline: new Date(Date.now() + 86400000), repositoryUrl: "https://github.com/WalidBenTouhami/PROGEASE" },
-                { name: 'Livrable 2', deadline: new Date(Date.now() + 172800000), repositoryUrl: "https://github.com/WalidBenTouhami/PROGEASE" }
-            ];
-
-            const project = await createProject({ deliverables });
-
-            // 📊 Lancer prédiction IA
-            const predict = await request(app)
-                .post(`/api/projects/${project._id}/predict-performance`)
-                .set('Authorization', `Bearer ${token}`);
-            expect(predict.status).toBe(200);
-
-            const refreshed = await Project.findById(project._id);
-            expect(refreshed.predictedPerformance).toBeGreaterThan(0);
-
-            // ✅ Marquer 1 livrable comme terminé
-            await Project.findByIdAndUpdate(project._id, {
-                $set: { 'deliverables.0.status': 'terminé' }
+            expect(getRes.status).toBe(200);
+            expect(getRes.body).toMatchObject({
+                status: 'en_cours',
+                deliverables: expect.arrayContaining([
+                    expect.objectContaining({ name: 'Initial Setup' })
+                ])
             });
-
-            // 🔁 Mise à jour progression
-            await IaService.trackProgress(project._id);
-            const updated = await Project.findById(project._id);
-            expect(updated.progression).toBe(50);
         });
     });
 
-    describe('🤖 Matching intelligent des tuteurs', () => {
-        it('doit assigner automatiquement un tuteur qualifié', async () => {
-            const project = await createProject({ tuteur: null });
+    describe('Error Handling', () => {
+        test('Invalid endpoint should return 404', async () => {
+            const res = await request(app).get('/api/invalid-endpoint');
+            expect(res.status).toBe(404);
+            expect(res.body).toHaveProperty('error.code', 'NOT_FOUND');
+        });
 
-            const matchRes = await request(app)
-                .post(`/api/projects/${project._id}/assign-tutor`)
-                .set('Authorization', `Bearer ${token}`);
-
-            expect(matchRes.status).toBe(200);
-            expect(matchRes.body.tutor).toBeDefined();
-            expect(matchRes.body.tutor._id).toBe(tuteur._id.toString());
+        test('Unauthorized access should return 401', async () => {
+            const res = await request(app).get('/api/projects');
+            expect(res.status).toBe(401);
+            expect(res.body).toHaveProperty('error.message', 'Unauthorized');
         });
     });
 });

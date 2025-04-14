@@ -1,3 +1,5 @@
+// src/modules/formation-certification/models/certification.model.js
+
 const mongoose = require("mongoose");
 
 const certificatSchema = new mongoose.Schema({

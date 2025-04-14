@@ -1,0 +1,2812 @@
+
+// ======= Contenu de ./src/app.js =======
+
+//
+
+import 'dotenv/config';
+import express from 'express';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import helmet from 'helmet';
+import cors from 'cors';
+import { connectToDatabase } from './core/db.js';
+import { ProjectAPI } from './datasources/projectAPI.js';
+import { verifyToken } from './modules/project-management/middlewares/project.middleware.js';
+import { projectRoutes } from './modules/project-management/index.js';
+import logger from './utils/logger.js';
+import { typeDefs, resolvers } from './schema.js';
+import { scheduleHealthChecks, healthcheck } from '../../../healthcheck.js';
+
+const isProduction = process.env.NODE_ENV === 'production';
+
+async function initializeApp() {
+    const app = express();
+
+    // 1. Sécurité renforcée
+    app.use(helmet({
+        contentSecurityPolicy: isProduction ? {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'unsafe-inline'"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                imgSrc: ["'self'", "data:", "https://*.github.com"],
+                connectSrc: ["'self'", "https://*.github.com"]
+            }
+        } : false
+    }));
+
+    // 2. Configuration CORS
+    app.use(cors({
+        origin: isProduction ? process.env.CORS_ORIGINS.split(',') : '*',
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        allowedHeaders: ['Content-Type', 'Authorization']
+    }));
+
+    // 3. Connexion à la base de données avec retry
+    await connectToDatabase({
+        retryCount: 3,
+        retryDelay: 5000
+    });
+
+    // 4. Configuration Apollo Server
+    const apolloServer = new ApolloServer({
+        typeDefs,
+        resolvers,
+        introspection: !isProduction,
+        persistedQueries: false,
+        formatError: (error) => ({
+            message: error.message,
+            code: error.extensions?.code || 'INTERNAL_ERROR',
+            locations: error.locations,
+            path: error.path
+        })
+    });
+
+    await apolloServer.start();
+
+    // 5. Middleware GraphQL
+    app.use(
+        '/graphql',
+        express.json({ limit: '10mb' }),
+        expressMiddleware(apolloServer, {
+            context: async ({ req }) => ({
+                user: req.user,
+                dataSources: {
+                    projectAPI: new ProjectAPI()
+                }
+            }),
+        })
+    );
+
+    // 6. Middleware REST
+    app.use('/api/v1/projects',
+        express.raw({ type: 'application/json' }),
+        verifyToken,
+        projectRoutes
+    );
+
+    // 7. Healthcheck
+    app.get('/api/health', healthcheck);
+
+    // 8. Gestion des erreurs
+    app.use((err, req, res, next) => {
+        logger.error(`Error ${err.status || 500}: ${err.message}`);
+        res.status(err.status || 500).json({
+            error: {
+                code: err.code || 'UNKNOWN_ERROR',
+                message: isProduction ? 'Internal Server Error' : err.message,
+                ...(!isProduction && { stack: err.stack })
+            }
+        });
+    });
+
+    // 9. Planification des tâches
+    scheduleHealthChecks();
+
+    return app;
+}
+
+// Démarrage du serveur
+const PORT = process.env.PORT || 4000;
+initializeApp().then((app) => {
+    app.listen(PORT, () => {
+        logger.info(`Server running on port ${PORT}`);
+    });
+}).catch((error) => {
+    logger.error('Failed to initialize the application', { error });
+    process.exit(1);
+});
+
+// ======= Contenu de ./src/config/constants.js =======
+
+// src/config/constants.js
+
+
+export const StatusEnum = Object.freeze({
+    DRAFT: 'brouillon',
+    IN_PROGRESS: 'en_cours',
+    COMPLETED: 'termine',
+    ARCHIVED: 'archive'
+});
+
+export const RoleEnum = Object.freeze({
+    STUDENT: 'etudiant',
+    TUTOR: 'tuteur',
+    ADMIN: 'admin'
+});
+
+export const SecurityConfig = Object.freeze({
+    JWT: {
+        EXPIRES_IN: process.env.JWT_EXPIRES_IN || '7d',
+        COOKIE_NAME: '__progease_token'
+    },
+    PASSWORD: {
+        MIN_LENGTH: 10,
+        SALT_ROUNDS: 12,
+        MAX_ATTEMPTS: 5,
+        LOCKOUT_MINUTES: 30
+    }
+});
+
+export const PaginationDefaults = Object.freeze({
+    PAGE: 1,
+    LIMIT: 20,
+    MAX_LIMIT: 100
+});
+
+// ======= Contenu de ./src/config/db.js =======
+
+// src/config/db.js
+
+import { MongoClient } from 'mongodb';
+import { logger } from '../utils/logger.js';
+
+const clientOptions = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  maxPoolSize: 15,
+  minPoolSize: 5,
+  socketTimeoutMS: 45000,
+  heartbeatFrequencyMS: 10000,
+  compressors: 'snappy,zlib',
+  zlibCompressionLevel: 7
+};
+
+let cachedClient = null;
+let cachedDb = null;
+
+export async function connectToDatabase() {
+  if (cachedClient && cachedDb) {
+    return { client: cachedClient, db: cachedDb };
+  }
+
+  try {
+    const client = new MongoClient(process.env.MONGODB_URI, clientOptions);
+
+    await client.connect();
+    const db = client.db(process.env.DB_NAME);
+
+    // 🔄 Gestion des événements de connexion
+    client.on('serverDescriptionChanged', event => {
+      logger.info(`MongoDB topology change: ${JSON.stringify(event)}`);
+    });
+
+    cachedClient = client;
+    cachedDb = db;
+
+    return { client, db };
+  } catch (error) {
+    logger.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
+}
+
+// ======= Contenu de ./src/config/logging.js =======
+
+// src/config/logging.js
+
+import winston from 'winston';
+import { Logtail } from '@logtail/node';
+import { LogtailTransport } from '@logtail/winston';
+
+const logtail = new Logtail(process.env.LOGTAIL_TOKEN);
+
+const enumerateErrorFormat = winston.format(info => {
+    if (info instanceof Error) {
+        return { ...info, message: info.stack };
+    }
+    return info;
+});
+
+const logger = winston.createLogger({
+    level: process.env.NODE_ENV === 'development' ? 'debug' : 'info',
+    format: winston.format.combine(
+        enumerateErrorFormat(),
+        process.env.NODE_ENV === 'development'
+            ? winston.format.colorize()
+            : winston.format.uncolorize(),
+        winston.format.splat(),
+        winston.format.timestamp(),
+        winston.format.printf(
+            ({ timestamp, level, message }) => `[${timestamp}] ${level}: ${message}`
+        )
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new LogtailTransport(logtail),
+        new winston.transports.File({
+            filename: 'logs/combined.log',
+            maxsize: 10 * 1024 * 1024, // 10MB
+            maxFiles: 5
+        })
+    ],
+    exceptionHandlers: [
+        new winston.transports.File({ filename: 'logs/exceptions.log' })
+    ],
+    rejectionHandlers: [
+        new winston.transports.File({ filename: 'logs/rejections.log' })
+    ]
+});
+
+export const requestLogger = (req, res, next) => {
+    logger.info(`${req.method} ${req.url}`, {
+        ip: req.ip,
+        user: req.user?.id,
+        body: req.body
+    });
+    next();
+};
+
+export const queryLogger = (query) => {
+    logger.debug(`MongoDB Query: ${query.collection}.${query.method}`, {
+        duration: query.duration,
+        operation: query.op,
+        criteria: query.conditions
+    });
+};
+
+export default logger;
+
+// ======= Contenu de ./src/core/db.js =======
+
+// src/core/db.js
+
+import mongoose from 'mongoose';
+import { logger } from '../utils/logger.js';
+
+const connectionOptions = {
+    maxPoolSize: 15,
+    minPoolSize: 5,
+    connectTimeoutMS: 30000,
+    socketTimeoutMS: 45000,
+    heartbeatFrequencyMS: 10000,
+    retryWrites: true,
+    w: 'majority'
+};
+
+let connection = null;
+
+export async function connectToDatabase(config = {}) {
+    if (connection) return connection;
+
+    try {
+        connection = await mongoose.createConnection(process.env.MONGODB_URI, {
+            ...connectionOptions,
+            ...config
+        });
+
+        connection.on('connected', () =>
+            logger.info('MongoDB connection established')
+        );
+
+        connection.on('disconnected', () =>
+            logger.warn('MongoDB connection lost')
+        );
+
+        connection.on('reconnected', () =>
+            logger.info('MongoDB connection reestablished')
+        );
+
+        return connection;
+
+    } catch (error) {
+        logger.error(`MongoDB connection failed: ${error.message}`);
+        process.exit(1);
+    }
+}
+
+// ======= Contenu de ./src/core/performance.js =======
+
+// src/core/performance.js
+
+import { performance } from 'perf_hooks';
+import { logger } from '../utils/logger.js';
+
+const metrics = {
+    requestCount: 0,
+    totalResponseTime: 0,
+    dbQueryCount: 0
+};
+
+export const trackRequest = (req, res, next) => {
+    const start = performance.now();
+
+    res.on('finish', () => {
+        const duration = performance.now() - start;
+        metrics.requestCount++;
+        metrics.totalResponseTime += duration;
+
+        logger.info(`${req.method} ${req.url} - ${res.statusCode} (${duration.toFixed(2)}ms)`);
+    });
+
+    next();
+};
+
+export const trackDBQuery = (query) => {
+    metrics.dbQueryCount++;
+    const start = performance.now();
+
+    query.exec((err, result) => {
+        const duration = performance.now() - start;
+        logger.debug(`DB Query [${query.op}] - ${duration.toFixed(2)}ms`);
+    });
+
+    return query;
+};
+
+export const getMetrics = () => ({
+    ...metrics,
+    avgResponseTime: metrics.totalResponseTime / metrics.requestCount
+});
+
+// ======= Contenu de ./src/datasources/projectAPI.js =======
+
+// src/datasources/projectAPI.js
+
+export class ProjectAPI {
+    constructor() {
+        this.cache = new Map();
+        this.cacheTTL = 60000; // 1 minute
+    }
+
+    async getProjectWithTeam(projectId) {
+        const cacheKey = `project-${projectId}`;
+        if (this.cache.has(cacheKey)) {
+            return this.cache.get(cacheKey);
+        }
+
+        const project = await Project.findById(projectId)
+            .populate({
+                path: 'equipe',
+                select: 'name email role',
+                options: { lean: true }
+            })
+            .lean()
+            .cache('1 hour');
+
+        this.cache.set(cacheKey, project);
+        setTimeout(() => this.cache.delete(cacheKey), this.cacheTTL);
+
+        return project;
+    }
+
+    // Méthodes optimisées avec cache et pagination
+    async getAllProjects(page = 1, limit = 10) {
+        return Project.paginate({}, {
+            page,
+            limit,
+            populate: [
+                { path: 'equipe', select: 'name email' },
+                { path: 'tuteur', select: 'name experience' }
+            ],
+            lean: true
+        });
+    }
+}
+
+// ======= Contenu de ./src/modules/evaluation-system/controllers/evaluation.controller.js =======
+
+// src/modules/evaluation-system/controllers/evaluation.controller.js
+
+import { EvaluationService } from '../services/evaluation.service.js';
+import { HTTP_STATUS, ERROR_MESSAGES } from '../../../config/constants.js';
+
+export class EvaluationController {
+    static async createEvaluation(req, res) {
+        try {
+            const evaluation = await EvaluationService.createEvaluation({
+                ...req.body,
+                evaluatorId: req.user.id
+            });
+            res.status(HTTP_STATUS.CREATED).json(evaluation);
+        } catch (error) {
+            res.status(HTTP_STATUS.INTERNAL_ERROR).json({
+                code: 'EVALUATION_CREATION_FAILED',
+                message: ERROR_MESSAGES.EVALUATION.CREATION_FAILED
+            });
+        }
+    }
+
+    static async getEvaluationReport(req, res) {
+        try {
+            const report = await EvaluationService.generateReport(req.params.projectId);
+            res.status(HTTP_STATUS.OK).json(report);
+        } catch (error) {
+            res.status(HTTP_STATUS.NOT_FOUND).json({
+                code: 'REPORT_GENERATION_ERROR',
+                message: ERROR_MESSAGES.EVALUATION.REPORT_ERROR
+            });
+        }
+    }
+}
+
+// ======= Contenu de ./src/modules/evaluation-system/index.js =======
+
+
+
+// ======= Contenu de ./src/modules/evaluation-system/middlewares/evaluation.middleware.js =======
+
+// src/modules/evaluation-system/middlewares/evaluation.middleware.js
+
+import { HTTP_STATUS, ERROR_MESSAGES } from '../../../config/constants.js';
+
+export const validateEvaluationInput = (req, res, next) => {
+    const { criteria, projectId } = req.body;
+
+    if (!Object.keys(criteria).length) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            code: 'INVALID_CRITERIA',
+            message: ERROR_MESSAGES.EVALUATION.INVALID_CRITERIA
+        });
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            code: 'INVALID_PROJECT',
+            message: ERROR_MESSAGES.PROJECT.INVALID_ID
+        });
+    }
+
+    next();
+};
+
+export const checkEvaluationOwnership = async (req, res, next) => {
+    try {
+        const evaluation = await Evaluation.findById(req.params.id);
+
+        if (!evaluation) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                code: 'EVALUATION_NOT_FOUND',
+                message: ERROR_MESSAGES.EVALUATION.NOT_FOUND
+            });
+        }
+
+        if (evaluation.evaluator.toString() !== req.user.id) {
+            return res.status(HTTP_STATUS.FORBIDDEN).json({
+                code: 'UNAUTHORIZED_ACCESS',
+                message: ERROR_MESSAGES.AUTH.UNAUTHORIZED
+            });
+        }
+
+        req.evaluation = evaluation;
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ======= Contenu de ./src/modules/evaluation-system/models/evaluation.model.js =======
+
+// backend/src/evaluation-system/models/evaluation.model.js
+
+import mongoose from 'mongoose';
+
+const evaluationSchema = new mongoose.Schema({
+    project: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Project',
+        required: true,
+        index: true
+    },
+    evaluator: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    criteria: {
+        technical: { type: Number, min: 0, max: 100 },
+        creativity: { type: Number, min: 0, max: 100 },
+        presentation: { type: Number, min: 0, max: 100 }
+    },
+    comments: {
+        type: String,
+        maxlength: 1000
+    },
+    attachments: [{
+        url: String,
+        type: { type: String, enum: ['image', 'document'] }
+    }]
+}, {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
+});
+
+evaluationSchema.index({ project: 1, evaluator: 1 }, { unique: true });
+
+export default mongoose.model('Evaluation', evaluationSchema);
+
+// ======= Contenu de ./src/modules/evaluation-system/routes/evaluation.routes.js =======
+
+// src/modules/evaluation-system/routes/evaluation.routes.js
+
+import { Router } from 'express';
+import { EvaluationController } from '../controllers/evaluation.controller.js';
+import { validateEvaluationInput } from '../middlewares/evaluation.middleware.js';
+
+const router = Router();
+
+router.post('/projects/:projectId/evaluations',
+    validateEvaluationInput,
+    EvaluationController.createEvaluation
+);
+
+router.get('/projects/:projectId/report',
+    EvaluationController.getEvaluationReport
+);
+
+export default router;
+
+// ======= Contenu de ./src/modules/evaluation-system/services/evaluation.service.js =======
+
+// src/modules/evaluation-system/services/evaluation.service.js
+
+import Evaluation from '../models/evaluation.model.js';
+
+export class EvaluationService {
+    static async createEvaluation(evaluationData) {
+        return Evaluation.create(evaluationData);
+    }
+
+    static async getProjectEvaluations(projectId, page = 1, limit = 10) {
+        return Evaluation.paginate(
+            { project: projectId },
+            {
+                page,
+                limit,
+                populate: 'evaluator',
+                sort: '-createdAt'
+            }
+        );
+    }
+
+    static async generateEvaluationReport(projectId) {
+        const results = await Evaluation.aggregate([
+            { $match: { project: projectId } },
+            {
+                $group: {
+                    _id: null,
+                    avgTechnical: { $avg: '$criteria.technical' },
+                    avgCreativity: { $avg: '$criteria.creativity' },
+                    avgPresentation: { $avg: '$criteria.presentation' },
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        return results[0] || {};
+    }
+
+    static async deleteEvaluation(evaluationId) {
+        return Evaluation.findByIdAndDelete(evaluationId);
+    }
+}
+
+// ======= Contenu de ./src/modules/evaluation-system/tests/evaluation.test.js =======
+
+
+
+// ======= Contenu de ./src/modules/formation-certification/app.js =======
+
+require("dotenv").config();
+const express = require("express");
+const connectDB = require("./src/config/db");
+const formationRoutes = require("./src/routes/formationRoutes");
+const certificatRoutes = require("./src/routes/certificatRoutes");
+
+// Initialiser Express
+const app = express();
+app.use(express.json());
+
+// Connexion à MongoDB
+connectDB();
+
+// Routes
+app.use("/api/formations", formationRoutes);
+app.use("/api/certificats", certificatRoutes);
+
+// Démarrer le serveur
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Serveur en écoute sur http://localhost:${PORT}`);
+});
+
+// ======= Contenu de ./src/modules/formation-certification/controllers/certification.controller.js =======
+
+const Certificat = require("../models/Certificat");
+const { checkQuizReussis } = require("../utils/certificatLogic");
+
+// Émettre un certificat
+exports.createCertificat = async (req, res) => {
+  try {
+    const { utilisateurId, formationsRequises } = req.body;
+
+    // Vérifier si l'utilisateur a réussi les quiz
+    const estEligible = await checkQuizReussis(utilisateurId, formationsRequises);
+    if (!estEligible) return res.status(403).json({ error: "Conditions non remplies" });
+
+    const nouveauCertificat = await Certificat.create(req.body);
+    res.status(201).json(nouveauCertificat);
+  } catch (error) {
+    res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+// ======= Contenu de ./src/modules/formation-certification/controllers/formation.controller.js =======
+
+// src/modules/formation-certification/controllers/formation.controller.js
+
+import { FormationService } from '../services/formation.service.js';
+import { HTTP_STATUS } from '../../../config/constants.js';
+
+export class FormationController {
+  static async createFormation(req, res) {
+    try {
+      const formation = await FormationService.createFormation(req.body);
+      res.status(HTTP_STATUS.CREATED).json(formation);
+    } catch (error) {
+      res.status(HTTP_STATUS.INTERNAL_ERROR).json({
+        code: 'FORMATION_CREATION_FAILED',
+        message: error.message
+      });
+    }
+  }
+
+  static async searchFormations(req, res) {
+    try {
+      const results = await FormationService.searchFormations(req.query.q);
+      res.status(HTTP_STATUS.OK).json(results);
+    } catch (error) {
+      res.status(HTTP_STATUS.INTERNAL_ERROR).json({
+        code: 'SEARCH_FAILED',
+        message: error.message
+      });
+    }
+  }
+}
+
+// ======= Contenu de ./src/modules/formation-certification/middlewares/formation.middleware.js =======
+
+
+
+// ======= Contenu de ./src/modules/formation-certification/models/certification.model.js =======
+
+const mongoose = require("mongoose");
+
+const certificatSchema = new mongoose.Schema({
+  titre: { type: String, required: true },
+  description: String,
+  conditions: {
+    formationsRequises: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Formation",
+      required: true
+    }],
+    scoreMinimum: { type: Number, default: 80 }
+  },
+  duréeValidité: { type: Number, required: true }, // en mois
+  dateÉmission: { type: Date, default: Date.now },
+  utilisateurId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Utilisateur",
+    required: true
+  }
+});
+
+module.exports = mongoose.model("Certificat", certificatSchema);
+
+
+// ======= Contenu de ./src/modules/formation-certification/models/formation.model.js =======
+
+// src/modules/formation-certification/models/formation.model.js
+
+import mongoose from 'mongoose';
+
+const formationSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: 120
+  },
+  description: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 50,
+    maxlength: 2000
+  },
+  category: {
+    type: String,
+    enum: ['development', 'ai', 'project_management'],
+    required: true
+  },
+  duration: {
+    hours: { type: Number, min: 1 },
+    weeks: { type: Number, min: 1 }
+  },
+  content: {
+    videos: [{
+      url: String,
+      duration: Number,
+      title: String
+    }],
+    documents: [{
+      url: String,
+      type: { type: String, enum: ['pdf', 'markdown'] }
+    }],
+    quizzes: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Quiz'
+    }]
+  },
+  certifications: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Certification'
+  }]
+}, {
+  timestamps: true,
+  toJSON: {
+    transform: (doc, ret) => {
+      ret.id = ret._id;
+      delete ret._id;
+      delete ret.__v;
+      return ret;
+    }
+  }
+});
+
+// Indexation pour la recherche full-text
+formationSchema.index({
+  title: 'text',
+  description: 'text',
+  'content.videos.title': 'text'
+});
+
+export default mongoose.model('Formation', formationSchema);
+
+// ======= Contenu de ./src/modules/formation-certification/routes/certification.routes.js =======
+
+const express = require("express");
+const router = express.Router();
+const { authentifier } = require("../middlewares/auth");
+const { createCertificat } = require("../controllers/certificatController");
+
+router.post("/", authentifier, createCertificat);
+
+module.exports = router;
+
+// ======= Contenu de ./src/modules/formation-certification/routes/formation.routes.js =======
+
+const express = require("express");
+const router = express.Router();
+const { authentifier } = require("../middlewares/auth");
+const { validerFormation } = require("../middlewares/validate");
+const { createFormation, getAllFormations } = require("../controllers/formation.controller.js");
+
+router.post("/", authentifier, validerFormation, createFormation);
+router.get("/", getAllFormations);
+
+module.exports = router;
+
+
+// ======= Contenu de ./src/modules/formation-certification/services/formation.service.js =======
+
+// src/modules/formation-certification/services/formation.service.js
+
+import Formation from '../models/formation.model.js';
+
+export class FormationService {
+    static async createFormation(formationData) {
+        return Formation.create(formationData);
+    }
+
+    static async getFormationsWithProgress(userId) {
+        return Formation.aggregate([
+            {
+                $lookup: {
+                    from: 'progresses',
+                    let: { formationId: '$_id' },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $and: [
+                                        { $eq: ['$formation', '$$formationId'] },
+                                        { $eq: ['$user', userId] }
+                                    ]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'userProgress'
+                }
+            },
+            {
+                $addFields: {
+                    progress: {
+                        $ifNull: [{ $arrayElemAt: ['$userProgress.percentage', 0] }, 0]
+                    }
+                }
+            }
+        ]);
+    }
+
+    static async searchFormations(query) {
+        return Formation.find({
+            $text: { $search: query }
+        }).sort({ score: { $meta: 'textScore' } });
+    }
+}
+
+// ======= Contenu de ./src/modules/formation-certification/tests/formation.test.js =======
+
+
+
+// ======= Contenu de ./src/modules/forum-management/controllers/forum.controller.js =======
+
+
+
+// ======= Contenu de ./src/modules/forum-management/index.js =======
+
+
+
+// ======= Contenu de ./src/modules/forum-management/middlewares/forum.middleware.js =======
+
+// src/modules/forum-management/middlewares/forum.middleware.js
+
+import { Thread } from '../models/forum.model.js';
+import { HTTP_STATUS } from '../../../config/constants.js';
+
+export const threadContentValidation = (req, res, next) => {
+    const { content } = req.body;
+    const forbiddenWords = ['spam', 'http://', 'https://'];
+
+    if (forbiddenWords.some(word => content.includes(word))) {
+        return res.status(HTTP_STATUS.BAD_REQUEST).json({
+            code: 'INVALID_CONTENT',
+            message: 'Le contenu contient des éléments non autorisés'
+        });
+    }
+
+    next();
+};
+
+export const threadRateLimiter = (windowMs = 15 * 60 * 1000, max = 5) => {
+    const requests = new Map();
+
+    return (req, res, next) => {
+        const ip = req.ip;
+        const currentTime = Date.now();
+
+        if (!requests.has(ip)) {
+            requests.set(ip, { count: 1, startTime: currentTime });
+        } else {
+            const record = requests.get(ip);
+
+            if (currentTime - record.startTime > windowMs) {
+                requests.set(ip, { count: 1, startTime: currentTime });
+            } else if (record.count >= max) {
+                return res.status(HTTP_STATUS.TOO_MANY_REQUESTS).json({
+                    code: 'RATE_LIMIT_EXCEEDED',
+                    message: 'Trop de requêtes - veuillez réessayer plus tard'
+                });
+            } else {
+                requests.set(ip, { ...record, count: record.count + 1 });
+            }
+        }
+
+        next();
+    };
+};
+
+// ======= Contenu de ./src/modules/forum-management/models/forum.model.js =======
+
+// src/modules/forum-management/models/forum.model.js
+
+import mongoose from 'mongoose';
+
+const threadSchema = new mongoose.Schema({
+    title: {
+        type: String,
+        required: true,
+        trim: true,
+        maxlength: 200
+    },
+    content: {
+        type: String,
+        required: true,
+        minlength: 20,
+        maxlength: 5000
+    },
+    author: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+    tags: [{
+        type: String,
+        enum: ['help', 'discussion', 'bug', 'feature']
+    }],
+    upvotes: {
+        type: Number,
+        default: 0
+    },
+    solutions: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Reply'
+    }],
+    activity: {
+        lastReply: Date,
+        replyCount: Number
+    }
+}, {
+    timestamps: true,
+    toJSON: {
+        virtuals: true,
+        transform: (doc, ret) => {
+            ret.id = ret._id;
+            delete ret._id;
+            return ret;
+        }
+    }
+});
+
+// Indexation pour la recherche
+threadSchema.index({
+    title: 'text',
+    content: 'text',
+    tags: 1
+});
+
+// Virtual pour les statistiques
+threadSchema.virtual('engagement').get(function() {
+    return this.activity.replyCount + this.upvotes * 0.5;
+});
+
+export default mongoose.model('Thread', threadSchema);
+
+// ======= Contenu de ./src/modules/forum-management/routes/forum.routes.js =======
+
+// src/modules/forum-management/routes/forum.routes.js
+
+import { Router } from 'express';
+import { ForumController } from '../controllers/forum.controller.js';
+import { threadRateLimiter, threadContentValidation } from '../middlewares/forum.middleware.js';
+
+const router = Router();
+
+router.post('/threads',
+    threadRateLimiter(),
+    threadContentValidation,
+    ForumController.createThread
+);
+
+router.get('/threads/trending',
+    ForumController.getTrendingThreads
+);
+
+router.get('/threads/search',
+    ForumController.searchThreads
+);
+
+export default router;
+
+// ======= Contenu de ./src/modules/forum-management/services/forum.service.js =======
+
+// src/modules/forum-management/services/forum.service.js
+
+import { Thread } from '../models/forum.model.js';
+import { redisClient } from '../../../utils/redis.js';
+
+export class ForumService {
+    static async getTrendingThreads() {
+        const cacheKey = 'forum:trending';
+        const cached = await redisClient.get(cacheKey);
+
+        if (cached) return JSON.parse(cached);
+
+        const results = await Thread.aggregate([
+            {
+                $project: {
+                    title: 1,
+                    engagement: {
+                        $add: [
+                            { $multiply: ['$upvotes', 2] },
+                            { $size: '$comments' }
+                        ]
+                    }
+                }
+            },
+            { $sort: { engagement: -1 } },
+            { $limit: 10 }
+        ]);
+
+        await redisClient.setEx(cacheKey, 3600, JSON.stringify(results));
+        return results;
+    }
+}
+
+// ======= Contenu de ./src/modules/forum-management/tests/forum.test.js =======
+
+
+
+// ======= Contenu de ./src/modules/project-management/controllers/project.controller.js =======
+
+// src/modules/project-management/controllers/project.controller.js
+import Project from '../models/project.model';
+import User from '../../user-management/models/user.model';
+import Evaluation from '../../evaluation-system/models/evaluation.model';
+import * as IaService from '../../../services/ia.service';
+import { graphqlCreateProjectSchema } from '../schema'; // Joi schema
+
+export const createProject = async (req, res) => {
+    try {
+        const { error } = graphqlCreateProjectSchema.validate(req.body, { abortEarly: false });
+        if (error) return res.status(400).json({ errors: error.details.map(e => e.message) });
+
+        const { titre, description, equipe, tuteur, skills, deliverables } = req.body;
+        const tutor = await User.findById(tuteur);
+        if (!tutor) return res.status(400).json({ error: 'Tuteur invalide.' });
+
+        const teamMembers = await User.find({ _id: { $in: equipe } });
+        if (teamMembers.length !== equipe.length) return res.status(400).json({ error: 'Équipe invalide.' });
+
+        const newProject = new Project({
+            titre,
+            description,
+            equipe,
+            tuteur,
+            skills,
+            deliverables
+        });
+        await newProject.save();
+
+        await Promise.all([
+            IaService.trackProgress(newProject._id),
+            IaService.predictPerformance(newProject._id),
+            IaService.setupReminders(newProject._id)
+        ]);
+
+        res.status(201).json(newProject);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
+// ======= Contenu de ./src/modules/project-management/index.js =======
+
+// src/modules/project-management/index.js
+
+    // 🎭 Contrôleurs
+    import * as projectController from './controllers/project.controller.js';
+
+    // 🛠️ Services
+    import * as projectService from './services/project.service.js';
+
+    // 🛡️ Middlewares
+    import * as projectMiddleware from './middlewares/project.middleware.js';
+
+    // 🚏 Routes
+    import * as projectRoutes from './routes/project.routes.js';
+
+    // 🏛️ Modèles
+    import * as Project from './models/project.model.js';
+
+    export {
+        projectController,
+        projectService,
+        projectMiddleware,
+        projectRoutes,
+        Project
+    };
+
+// ======= Contenu de ./src/modules/project-management/middlewares/project.middleware.js =======
+
+import mongoose from 'mongoose';
+
+
+export const validateProject = async (req, res, next) => {
+    const { title, description, equipe, tuteur, deliverables } = req.body;
+
+    // 1. Titre requis
+    if (!title || title.trim() === '') {
+        return res.status(400).json({ error: 'Titre requis et non vide' });
+    }
+
+    // 2. Équipe valide
+    if (!Array.isArray(equipe) || equipe.length < 1) {
+        return res.status(400).json({ error: 'Équipe doit être un tableau non vide' });
+    }
+
+    // Vérifier que chaque membre de l'équipe existe en base
+    try {
+        const existingUsers = await User.find({ _id: { $in: equipe } });
+        if (existingUsers.length !== equipe.length) {
+            return res.status(400).json({ error: 'Membres d’équipe invalides' });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: 'Erreur lors de la validation des membres' });
+    }
+
+    // 3. Tuteur valide
+    if (!tuteur) {
+        return res.status(400).json({ error: 'Tuteur requis' });
+    }
+
+    // Vérifier que le tuteur existe et a le rôle 'tuteur'
+    try {
+        const tutor = await User.findById(tuteur);
+        if (!tutor || tutor.role !== 'tuteur') {
+            return res.status(400).json({ error: 'Tuteur invalide ou non trouvé' });
+        }
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+
+    // 4. Deliverables optionnelles mais structurées
+    if (deliverables) {
+        if (!Array.isArray(deliverables)) {
+            return res.status(400).json({ error: 'Les deliverables doivent être un tableau' });
+        }
+
+        deliverables.forEach(deliverable => {
+            if (!deliverable.name || !deliverable.deadline) {
+                return res.status(400).json({ error: 'Chaque deliverable doit avoir "name" et "deadline"' });
+            }
+        });
+    }
+
+    // 5. Validation du statut (si envoyé)
+    if (req.body.status && !['en cours', 'soumis', 'évalué', 'terminé'].includes(req.body.status)) {
+        return res.status(400).json({ error: 'Statut invalide' });
+    }
+
+    next();
+};
+
+export const verifyToken = (req, res, next) => {
+    // logique de vérification
+};
+
+
+
+// ======= Contenu de ./src/modules/project-management/models/project.model.js =======
+
+// src/modules/project-management/models/project.model.js
+
+const ProjectSchema = new Schema({
+    // ... autres champs
+    deliverables: {
+        type: [{
+            name: { type: String, required: true },
+            deadline: {
+                type: Date,
+                validate: {
+                    validator: function(v) {
+                        return v > Date.now() + 86400000; // +24h
+                    },
+                    message: 'Deadline doit être au moins 24h dans le futur'
+                }
+            },
+            repositoryUrl: {
+                type: String,
+                validate: {
+                    validator: async function(url) {
+                        const pattern = /^https:\/\/github.com\/[^/]+\/[^/]+$/;
+                        return pattern.test(url) &&
+                            await checkGithubRepoExists(url);
+                    },
+                    message: 'URL GitHub invalide ou repo privé'
+                }
+            }
+        }]
+    }
+}, {
+    timestamps: true,
+    optimisticConcurrency: true,
+    toJSON: {
+        virtuals: true,
+        transform: (doc, ret) => {
+            ret.id = ret._id;
+            delete ret._id;
+            delete ret.__v;
+            return ret;
+        }
+    }
+});
+
+// Indexation stratégique
+ProjectSchema.index({
+    titre: 'text',
+    description: 'text',
+    skills: 1
+});
+
+// Middleware de validation amélioré
+ProjectSchema.pre('save', async function(next) {
+    if (this.isModified('equipe')) {
+        const existingUsers = await User.countDocuments({
+            _id: { $in: this.equipe }
+        });
+
+        if (existingUsers !== this.equipe.length) {
+            throw new Error('Un ou plusieurs membres invalides');
+        }
+    }
+    next();
+});
+
+// ======= Contenu de ./src/modules/project-management/routes/project.routes.js =======
+
+import { Router } from 'express';
+import * as projectController from '../controllers/project.controller.js';
+import { verifyToken } from '../middlewares/project.middleware.js';
+import { predictPerformance } from '../services/project.service.js';
+
+const router = Router();
+
+// ─── Projet ───────────────────────────────────────
+
+// 🆕 Créer un projet
+router.post('/create', verifyToken, projectController.createProject);
+
+// 🔍 Récupérer tous les projets
+router.get('/all', verifyToken, projectController.getProjects);
+
+// 🔍 Récupérer projets + formations
+router.get('/with-formations', verifyToken, projectController.getProjectsWithFormations);
+
+// 🧠 Ajouter une évaluation
+router.post('/:projectId/add-evaluation', verifyToken, projectController.addEvaluation);
+
+// 🤖 Appariement automatique d’un tuteur
+router.post('/:projectId/assign-tutor', verifyToken, projectController.assignSmartTutor);
+
+// 🔮 Prédire la performance (IA)
+router.post('/:projectId/predict-performance', verifyToken, async (req, res) => {
+    try {
+        await predictPerformance(req.params.projectId);
+        res.json({ message: 'Prédiction mise à jour' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// ─── Livrables ────────────────────────────────────
+
+// 📥 Ajouter un livrable GitHub
+router.post('/:projectId/deliverables', verifyToken, projectController.addDeliverable);
+
+// 🔍 Récupérer tous les livrables d’un projet
+router.get('/:projectId/deliverables', verifyToken, projectController.getDeliverables);
+
+// ✏️ Modifier un livrable spécifique
+router.put('/:projectId/deliverables/:deliverableId', verifyToken, projectController.updateDeliverable);
+
+// ❌ Supprimer un livrable spécifique
+router.delete('/:projectId/deliverables/:deliverableId', verifyToken, projectController.deleteDeliverable);
+
+// 🔎 Vérifier un lien GitHub (ping public)
+router.post('/validate-repo', verifyToken, projectController.validateGithubRepo);
+
+export default router;
+
+// ======= Contenu de ./src/modules/project-management/schema.js =======
+
+// src/schema.js
+
+import Joi from 'joi';
+import { User } from './models/user.model.js'; // Assurez-vous que le chemin est correct
+
+// Schéma de validation Joi
+export const graphqlCreateProjectSchema = Joi.object({
+    titre: Joi.string().trim().min(3).required(),
+    description: Joi.string().min(50).required(),
+    equipe: Joi.array().items(Joi.string().hex().length(24)).min(1).required(),
+    tuteur: Joi.string().hex().length(24).required(),
+    skills: Joi.array().items(Joi.string()).min(1).required(),
+    deliverables: Joi.array().items(
+        Joi.object({
+            name: Joi.string().required(),
+            deadline: Joi.date().iso().required(),
+            status: Joi.string().valid('en attente', 'terminé', 'en retard').optional(),
+            repositoryUrl: Joi.string()
+                .uri()
+                .pattern(/^https:\/\/github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/)
+                .required()
+        })
+    ).optional()
+});
+
+// Résolveurs GraphQL
+export const resolvers = {
+    Query: {
+        projects: async (_, __, { dataSources }) => {
+            return await dataSources.projectAPI.getAllProjects();
+        },
+        project: async (_, { id }, { dataSources }) => {
+            return await dataSources.projectAPI.getProjectById(id);
+        }
+    },
+    Mutation: {
+        createProject: async (_, { input }, { dataSources }) => {
+            const { error } = graphqlCreateProjectSchema.validate(input);
+            if (error) throw new Error(`Validation Error: ${error.details.map(d => d.message).join(', ')}`);
+
+            try {
+                return await dataSources.projectAPI.createProject(input);
+            } catch (error) {
+                throw new Error(`Erreur de création: ${error.message}`);
+            }
+        }
+    },
+    Project: {
+        equipe: async (parent) => {
+            return await User.find({ _id: { $in: parent.equipe } });
+        },
+        tuteur: async (parent) => {
+            return await User.findById(parent.tuteur);
+        }
+    }
+};
+
+// Définitions de types GraphQL
+export const typeDefs = `#graphql
+  type Project {
+    id: ID!
+    titre: String!
+    description: String!
+    equipe: [User!]!
+    tuteur: User!
+    skills: [String!]!
+    deliverables: [Deliverable!]
+    createdAt: String!
+    updatedAt: String!
+  }
+
+  type Deliverable {
+    name: String!
+    deadline: String!
+    status: String
+    repositoryUrl: String!
+  }
+
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+  }
+
+  input CreateProjectInput {
+    titre: String!
+    description: String!
+    equipe: [ID!]!
+    tuteur: ID!
+    skills: [String!]!
+    deliverables: [DeliverableInput!]
+  }
+
+  input DeliverableInput {
+    name: String!
+    deadline: String!
+    status: String
+    repositoryUrl: String!
+  }
+
+  type Query {
+    projects: [Project!]!
+    project(id: ID!): Project
+  }
+
+  type Mutation {
+    createProject(input: CreateProjectInput!): Project!
+  }
+`;
+
+// ======= Contenu de ./src/modules/project-management/services/project.service.js =======
+
+// src/modules/project-management/services/project.service.js
+
+import Project from '../models/project.model.js';
+import { redisClient } from '../../../utils/redis.js';
+import { ProjectUtils } from '../utils/project.utils.js';
+
+export class ProjectService {
+    static async createProject(projectData) {
+        const projectCode = ProjectUtils.generateProjectCode(projectData.team.length);
+        const project = await Project.create({ ...projectData, code: projectCode });
+
+        await redisClient.del('projects:all');
+        return project;
+    }
+
+    static async getProjectById(id) {
+        const cacheKey = `project:${id}`;
+        const cached = await redisClient.get(cacheKey);
+
+        if (cached) return JSON.parse(cached);
+
+        const project = await Project.findById(id)
+            .populate('team lead')
+            .lean();
+
+        if (project) {
+            await redisClient.setEx(cacheKey, 3600, JSON.stringify(project));
+        }
+
+        return project;
+    }
+
+    static async updateProjectStatus(id, status) {
+        return Project.findByIdAndUpdate(
+            id,
+            { $set: { status } },
+            { new: true, runValidators: true }
+        );
+    }
+
+    static async calculateProjectHealth(id) {
+        const project = await this.getProjectById(id);
+        return {
+            riskScore: ProjectUtils.calculateRiskScore(project),
+            progress: project.progress,
+            budgetHealth: project.budget / project.estimatedBudget
+        };
+    }
+}
+
+// ======= Contenu de ./src/modules/project-management/tests/project.test.js =======
+
+import request from 'supertest';
+    import mongoose from 'mongoose';
+    import app from '../../../app.js';
+    import Project from '../models/project.model.js';
+    import User from '../../user-management/models/user.model.js';
+    import Evaluation from '../../evaluation-system/models/evaluation.model.js';
+
+    describe('Project Management', () => {
+        let token;
+        let tutorId;
+        let regularUserId;
+        let projectId;
+
+        beforeAll(async () => {
+            const regularUser = new User({
+                email: 'user@example.com',
+                password: 'password',
+                role: 'etudiant',
+                nom: 'Étudiant Alpha'
+            });
+            await regularUser.save();
+            regularUserId = regularUser._id;
+
+            const tutor = new User({
+                email: 'tutor@example.com',
+                password: 'password',
+                role: 'tuteur',
+                experience: 85,
+                nom: 'Tuteur Pro'
+            });
+            await tutor.save();
+            tutorId = tutor._id;
+
+            const authResponse = await request(app)
+                .post('/api/users/login')
+                .send({ email: 'tutor@example.com', password: 'password' });
+            token = authResponse.body.token;
+
+            const projectResponse = await request(app)
+                .post('/api/projects/create')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    titre: 'Projet de Test',
+                    description: 'Ceci est une description valide de plus de 50 caractères.',
+                    equipe: [regularUserId],
+                    tuteur: tutorId,
+                    skills: ['Python', 'Machine Learning']
+                });
+            projectId = projectResponse.body._id;
+        });
+
+        afterAll(async () => {
+            await Project.deleteMany({});
+            await User.deleteMany({});
+            await Evaluation.deleteMany({});
+            await mongoose.connection.close();
+        });
+
+        it('should create a project', async () => {
+            const response = await request(app)
+                .post('/api/projects/create')
+                .set('Authorization', `Bearer ${token}`)
+                .send({
+                    titre: 'Projet de Test 2',
+                    description: 'Une description bien longue pour satisfaire la validation Joi.',
+                    equipe: [regularUserId],
+                    tuteur: tutorId,
+                    deliverables: [
+                        {
+                            name: 'Spécification',
+                            deadline: '2025-12-31T23:59:59Z',
+                            repositoryUrl: 'https://github.com/testuser/projet-repo'
+                        }
+                    ],
+                    skills: ['Node.js']
+                });
+
+            expect(response.status).toBe(201);
+            expect(response.body.titre).toBe('Projet de Test 2');
+            expect(response.body.equipe).toContainEqual(regularUserId.toString());
+        });
+
+        it('should add an evaluation', async () => {
+            const evaluation = await Evaluation.create({
+                projet_id: projectId,
+                evaluateur_id: regularUserId,
+                score: 85
+            });
+
+            const response = await request(app)
+                .post(`/api/projects/${projectId}/add-evaluation`)
+                .set('Authorization', `Bearer ${token}`)
+                .send({ evaluationId: evaluation._id });
+
+            expect(response.status).toBe(200);
+            expect(response.body.project.evaluations).toContain(evaluation._id.toString());
+        });
+
+        describe('IA Features', () => {
+            it('should predict performance', async () => {
+                const predictResponse = await request(app)
+                    .post(`/api/projects/${projectId}/predict-performance`)
+                    .set('Authorization', `Bearer ${token}`);
+
+                expect(predictResponse.status).toBe(200);
+
+                const updatedProject = await Project.findById(projectId);
+                expect(updatedProject.predictedPerformance).toBeGreaterThan(0);
+            });
+
+            it('should assign a smart tutor', async () => {
+                const response = await request(app)
+                    .post(`/api/projects/${projectId}/assign-tutor`)
+                    .set('Authorization', `Bearer ${token}`);
+
+                expect(response.status).toBe(200);
+                expect(response.body.tutor.role).toBe('tuteur');
+            });
+        });
+
+        it('should return all projects with formations', async () => {
+            const response = await request(app)
+                .get('/api/projects/all')
+                .set('Authorization', `Bearer ${token}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body[0].equipe.length).toBeGreaterThan(0);
+            expect(response.body[0].equipe[0].nom).toBeDefined();
+        });
+
+        it('should handle validation errors', async () => {
+            const invalidResponse = await request(app)
+                .post('/api/projects/create')
+                .set('Authorization', `Bearer ${token}`)
+                .send({ description: 'Courte' }); // description trop courte + pas de titre
+
+            expect(invalidResponse.status).toBe(400);
+            expect(invalidResponse.body.errors).toBeDefined();
+        });
+    });
+
+// ======= Contenu de ./src/modules/user-management/app.js =======
+
+// src/app.js
+
+const express = require('express');
+const mongoose = require('mongoose');
+const userRoutes = require('./routes/user.routes');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+
+// Routes
+app.use('/api', userRoutes);
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/project-management-app', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Connected to MongoDB');
+}).catch((error) => {
+    console.error('Error connecting to MongoDB:', error);
+});
+
+// Route pour la page d'accueil
+app.get('/', (req, res) => {
+    res.send('<h1>Welcome to PROGEASE !</h1>');
+});
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+});
+
+
+// ======= Contenu de ./src/modules/user-management/controllers/user.controller.js =======
+
+// src/modules/user-management/controllers/user.controller.js
+
+const User = require('../models/user.model');
+const { HTTP_STATUS, ERROR_MESSAGES } = require('../../../config/constants');
+
+// 🔐 Créer un nouvel utilisateur
+exports.createUser = async (req, res) => {
+    try {
+        const { userId, name, email, password, role } = req.body;
+
+        // Vérifier l'existence de l'utilisateur
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(HTTP_STATUS.BAD_REQUEST).json({
+                message: ERROR_MESSAGES.USER.EMAIL_EXISTS
+            });
+        }
+
+        // Création de l'utilisateur
+        const newUser = new User({ userId, name, email, password, role });
+        await newUser.save();
+
+        // Formater la réponse sans données sensibles
+        const userResponse = newUser.toObject();
+        delete userResponse.password;
+
+        res.status(HTTP_STATUS.CREATED).json(userResponse);
+
+    } catch (error) {
+        res.status(HTTP_STATUS.BAD_REQUEST).json({
+            message: error.message.includes('validation failed')
+                ? ERROR_MESSAGES.VALIDATION.INVALID_DATA
+                : error.message
+        });
+    }
+};
+
+// 🔍 Récupérer tous les utilisateurs (avec pagination)
+exports.getAllUsers = async (req, res) => {
+    try {
+        const { page = 1, limit = 10 } = req.query;
+        const options = {
+            page: parseInt(page),
+            limit: parseInt(limit),
+            select: '-password -__v',
+            collation: { locale: 'fr' }
+        };
+
+        const result = await User.paginate({}, options);
+
+        res.status(HTTP_STATUS.OK).json({
+            data: result.docs,
+            total: result.totalDocs,
+            page: result.page,
+            totalPages: result.totalPages
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(HTTP_STATUS.INTERNAL_ERROR).json({
+            message: ERROR_MESSAGES.DB_CONNECTION
+        });
+    }
+};
+
+// 🔎 Récupérer un utilisateur par ID
+exports.getUserById = async (req, res) => {
+    try {
+        const user = await User.findById(req.params.id)
+            .select('-password -failedAttempts -__v');
+
+        if (!user) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: ERROR_MESSAGES.USER.NOT_FOUND
+            });
+        }
+
+        res.status(HTTP_STATUS.OK).json(user);
+    } catch (error) {
+        handleMongooseError(res, error);
+    }
+};
+
+// 🔄 Mettre à jour un utilisateur
+exports.updateUser = async (req, res) => {
+    try {
+        const { email, ...updateData } = req.body;
+
+        // Vérifier la disponibilité du nouvel email
+        if (email) {
+            const existingUser = await User.findOne({ email });
+            if (existingUser && existingUser.id !== req.params.id) {
+                return res.status(HTTP_STATUS.CONFLICT).json({
+                    message: ERROR_MESSAGES.USER.EMAIL_EXISTS
+                });
+            }
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            { ...updateData, email },
+            { new: true, runValidators: true }
+        ).select('-password -__v');
+
+        if (!updatedUser) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: ERROR_MESSAGES.USER.NOT_FOUND
+            });
+        }
+
+        res.status(HTTP_STATUS.OK).json(updatedUser);
+    } catch (error) {
+        handleMongooseError(res, error);
+    }
+};
+
+// ❌ Supprimer un utilisateur
+exports.deleteUser = async (req, res) => {
+    try {
+        const deletedUser = await User.findByIdAndDelete(req.params.id);
+
+        if (!deletedUser) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: ERROR_MESSAGES.USER.NOT_FOUND
+            });
+        }
+
+        res.status(HTTP_STATUS.OK).json({
+            message: ERROR_MESSAGES.USER.DELETED
+        });
+    } catch (error) {
+        handleMongooseError(res, error);
+    }
+};
+
+// 🛡️ Gestion centralisée des erreurs Mongoose
+function handleMongooseError(res, error) {
+    console.error(error);
+
+    const response = {
+        message: ERROR_MESSAGES.DB_CONNECTION
+    };
+
+    if (error.name === 'CastError') {
+        response.message = ERROR_MESSAGES.VALIDATION.INVALID_ID;
+        res.status(HTTP_STATUS.BAD_REQUEST);
+    } else if (error.name === 'ValidationError') {
+        response.message = ERROR_MESSAGES.VALIDATION.FAILED;
+        response.errors = Object.values(error.errors).map(err => err.message);
+        res.status(HTTP_STATUS.BAD_REQUEST);
+    } else {
+        res.status(HTTP_STATUS.INTERNAL_ERROR);
+    }
+
+    res.json(response);
+}
+
+// ======= Contenu de ./src/modules/user-management/middlewares/user.middleware.js =======
+
+// src/modules/user-management/middlewares/user.middleware.js
+
+const { HTTP_STATUS, ERROR_MESSAGES, SECURITY } = require('../../../config/constants');
+const User = require('../models/user.model');
+
+// 🛡️ Vérifier la propriété de la ressource
+exports.checkOwnership = (allowAdmin = true) => {
+    return async (req, res, next) => {
+        try {
+            const resourceId = req.params.id;
+            const userId = req.user.id;
+            const userRole = req.user.role;
+
+            // Admin bypass
+            if (allowAdmin && userRole === SECURITY.ROLES.ADMIN) return next();
+
+            // Vérifier la correspondance des IDs
+            if (resourceId !== userId) {
+                return res.status(HTTP_STATUS.FORBIDDEN).json({
+                    message: ERROR_MESSAGES.USER.UNAUTHORIZED_OPERATION
+                });
+            }
+
+            next();
+        } catch (error) {
+            res.status(HTTP_STATUS.INTERNAL_ERROR).json({
+                message: ERROR_MESSAGES.DB_CONNECTION
+            });
+        }
+    };
+};
+
+// 🔐 Vérifier l'état du compte
+exports.checkAccountStatus = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id).select('status failedAttempts');
+
+        if (user.status === APP.STATUSES.LOCKED) {
+            const lockDuration = SECURITY.PASSWORD.lockDuration;
+            const timeSinceLock = Date.now() - user.updatedAt;
+
+            if (timeSinceLock < lockDuration) {
+                return res.status(HTTP_STATUS.FORBIDDEN).json({
+                    message: ERROR_MESSAGES.USER.ACCOUNT_LOCKED,
+                    retryAfter: Math.ceil((lockDuration - timeSinceLock) / 1000)
+                });
+            }
+
+            // Déverrouillage automatique
+            user.status = APP.STATUSES.ACTIVE;
+            user.failedAttempts = 0;
+            await user.save();
+        }
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
+// 🛑 Empêcher l'auto-promotion de rôle
+exports.preventRoleEscalation = (req, res, next) => {
+    if (req.body.role && req.user.role !== SECURITY.ROLES.ADMIN) {
+        return res.status(HTTP_STATUS.FORBIDDEN).json({
+            message: ERROR_MESSAGES.USER.ROLE_CHANGE_DENIED
+        });
+    }
+    next();
+};
+
+// 📦 Attacher l'utilisateur à la requête
+exports.attachUser = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.params.id)
+            .select('-password -__v -failedAttempts');
+
+        if (!user) {
+            return res.status(HTTP_STATUS.NOT_FOUND).json({
+                message: ERROR_MESSAGES.USER.NOT_FOUND
+            });
+        }
+
+        req.requestedUser = user;
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
+// ======= Contenu de ./src/modules/user-management/models/user.model.js =======
+
+// src/modules/user-management/models/user.model.js
+
+import mongoose from 'mongoose';
+import bcrypt from 'bcrypt';
+import { SecurityConfig } from '../../../config/constants.js';
+
+const userSchema = new mongoose.Schema({
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        trim: true,
+        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Email invalide']
+    },
+    password: {
+        type: String,
+        required: true,
+        select: false
+    },
+    role: {
+        type: String,
+        enum: Object.values(RoleEnum),
+        default: RoleEnum.STUDENT
+    },
+    profile: {
+        firstName: String,
+        lastName: String,
+        avatar: String,
+        bio: { type: String, maxlength: 500 }
+    },
+    loginAttempts: {
+        type: Number,
+        default: 0,
+        select: false
+    },
+    lockUntil: {
+        type: Date,
+        select: false
+    }
+}, {
+    timestamps: true,
+    methods: {
+        async comparePassword(candidatePassword) {
+            return bcrypt.compare(candidatePassword, this.password);
+        },
+
+        isLocked() {
+            return this.lockUntil && this.lockUntil > Date.now();
+        }
+    }
+});
+
+// 🛡️ Pré-save hook pour le hachage du mot de passe
+userSchema.pre('save', async function(next) {
+    if (!this.isModified('password')) return next();
+
+    try {
+        const salt = await bcrypt.genSalt(SecurityConfig.PASSWORD.SALT_ROUNDS);
+        this.password = await bcrypt.hash(this.password, salt);
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+// Index pour les recherches courantes
+userSchema.index({ email: 1, role: 1 });
+
+export default mongoose.model('User', userSchema);
+
+// ======= Contenu de ./src/modules/user-management/routes/user.routes.js =======
+
+// src/modules/user-management/routes/user.routes.js
+const express = require('express');
+const router = express.Router();
+const userController = require('../controllers/user.controller');
+const userMiddleware = require('../middlewares/user.middleware'); // Ajout manquant
+const {
+    verifyToken,
+    checkRoles,
+    validateRequest,
+    sanitizeInput
+} = require('../middlewares/user.middleware');
+const {
+    HTTP_STATUS,
+    SECURITY,
+    API
+} = require('../../../config/constants');
+const userValidation = require('../validations/user.validation');
+
+// Middleware de versioning API
+router.use(`/api/${API.CURRENT_VERSION}/users`, router);
+
+// ✅ Création utilisateur (public avec limite de taux)
+router.post(
+    '/',
+    sanitizeInput,
+    validateRequest(userValidation.createUserSchema),
+    userController.createUser
+);
+
+// 🔒 Routes protégées
+router.use(verifyToken);
+
+// 🔍 Liste utilisateurs (admin only)
+router.get(
+    '/',
+    checkRoles([SECURITY.ROLES.ADMIN]),
+    sanitizeInput,
+    userController.getAllUsers
+);
+
+// 🔎 Détails utilisateur
+router.get(
+    '/:id',
+    sanitizeInput,
+    validateRequest(userValidation.userIdSchema),
+    userMiddleware.attachUser, // Déplacé ici
+    userController.getUserById
+);
+
+// 🔄 Mise à jour utilisateur (propriétaire ou admin)
+router.put(
+    '/:id',
+    sanitizeInput,
+    validateRequest(userValidation.updateUserSchema),
+    userMiddleware.checkOwnership(),
+    userMiddleware.preventRoleEscalation,
+    userController.updateUser
+);
+
+// ❌ Suppression utilisateur (admin only)
+router.delete(
+    '/:id',
+    checkRoles([SECURITY.ROLES.ADMIN]),
+    sanitizeInput,
+    validateRequest(userValidation.userIdSchema),
+    userController.deleteUser
+);
+
+module.exports = router;
+
+// ======= Contenu de ./src/modules/user-management/services/user.service.js =======
+
+// src/modules/user-management/services/user.service.js
+
+import User from '../models/user.model.js';
+import { SecurityConfig } from '../../../config/constants.js';
+import { redisClient } from '../../../utils/redis.js';
+
+export class UserService {
+    static async createUser(userData) {
+        const existingUser = await User.findOne({ email: userData.email });
+        if (existingUser) {
+            throw new Error('User already exists');
+        }
+        return User.create(userData);
+    }
+
+    static async getUserWithCache(userId) {
+        const cacheKey = `user:${userId}`;
+        const cachedUser = await redisClient.get(cacheKey);
+
+        if (cachedUser) {
+            return JSON.parse(cachedUser);
+        }
+
+        const user = await User.findById(userId)
+            .select('-password -loginAttempts')
+            .lean();
+
+        if (user) {
+            await redisClient.setEx(cacheKey, 3600, JSON.stringify(user));
+        }
+
+        return user;
+    }
+
+    static async updateUserSecurity(userId, updateData) {
+        return User.findByIdAndUpdate(
+            userId,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        ).select('-password');
+    }
+
+    static async recordLoginAttempt(email, success) {
+        const update = success ?
+            { $set: { loginAttempts: 0 } } :
+            { $inc: { loginAttempts: 1 }, $set: { lockUntil: Date.now() + SecurityConfig.PASSWORD.LOCKOUT_MINUTES * 60000 } };
+
+        await User.updateOne({ email }, update);
+    }
+}
+
+// ======= Contenu de ./src/modules/user-management/tests/user.test.js =======
+
+
+
+// ======= Contenu de ./src/schema.js =======
+
+// src/schema.js
+
+const { gql } = require('apollo-server-express');
+const Joi = require('joi');
+const Project = require('./modules/project-management/models/project.model');
+const User = require('./modules/user-management/models/user.model');
+const Evaluation = require('./modules/evaluation-system/models/evaluation.model');
+const IaService = require('./services/ia.service');
+const { graphqlCreateProjectSchema } = require('./modules/project-management/schema'); // Joi schema
+
+// 📚 Définition des types GraphQL
+const typeDefs = gql`
+  type User {
+    _id: ID!
+    email: String!
+    role: String!
+    experience: Int
+    skills: [String]
+  }
+
+  type Project {
+    _id: ID!
+    titre: String!
+    description: String
+    equipe: [User!]!
+    tuteur: User!
+    status: String!
+    deliverables: [Deliverable!]!
+    evaluations: [Evaluation!]!
+    progression: Float
+    predictedPerformance: Float
+  }
+
+  type Deliverable {
+    name: String!
+    deadline: String!
+    status: String!
+    repositoryUrl: String!
+  }
+
+  type Evaluation {
+    _id: ID!
+    projet_id: Project!
+    evaluateur_id: User!
+    score: Int!
+    comments: String
+  }
+
+  type Query {
+    projects: [Project!]!
+    project(id: ID!): Project
+    users: [User!]!
+    user(id: ID!): User
+
+    # 🤖 Requêtes IA
+    getProjectProgress(id: ID!): Float
+    getPredictedPerformance(id: ID!): Float
+    getSmartTutor(id: ID!): User
+  }
+
+  type Mutation {
+    # 🛠️ Projets
+    createProject(
+      titre: String!
+      description: String
+      equipe: [ID!]!
+      tuteur: ID!
+      deliverables: [DeliverableInput!]!
+      skills: [String!]!
+    ): Project
+
+    addEvaluation(
+      projectId: ID!
+      evaluation: EvaluationInput!
+    ): Project
+
+    # 🤖 Mutations IA
+    predictPerformance(projectId: ID!): Float
+    assignSmartTutor(projectId: ID!): Project
+    setupReminders(projectId: ID!): String
+  }
+
+  input DeliverableInput {
+    name: String!
+    deadline: String! # ISO date string
+    status: String
+    repositoryUrl: String!
+  }
+
+  input EvaluationInput {
+    projet_id: ID!
+    evaluateur_id: ID!
+    score: Int!
+    comments: String
+  }
+`;
+
+const resolvers = {
+    Query: {
+        projects: async () => await Project.find().populate(['equipe', 'tuteur']),
+        project: async (_, { id }) => await Project.findById(id).populate(['equipe', 'tuteur', 'evaluations']),
+        users: async () => await User.find(),
+        user: async (_, { id }) => await User.findById(id),
+
+        // 🔍 Requêtes IA
+        getProjectProgress: async (_, { id }) => await IaService.trackProgress(id),
+        getPredictedPerformance: async (_, { id }) => await IaService.predictPerformance(id),
+        getSmartTutor: async (_, { id }) => await IaService.matchTutor(id)
+    },
+
+    Mutation: {
+        createProject: async (_, args) => {
+            // ✅ Validation centralisée avec Joi
+            const { error } = graphqlCreateProjectSchema.validate(args, { abortEarly: false });
+            if (error) {
+                throw new Error('Erreur de validation :\n' + error.details.map(e => e.message).join('\n'));
+            }
+
+            const newProject = new Project(args);
+            await newProject.save();
+
+            // 🤖 Appels IA post-création
+            await IaService.trackProgress(newProject._id);
+            await IaService.predictPerformance(newProject._id);
+            await IaService.setupReminders(newProject._id);
+
+            return newProject;
+        },
+
+        addEvaluation: async (_, { projectId, evaluation }) => {
+            const project = await Project.findById(projectId);
+            if (!project) throw new Error('Projet non trouvé');
+
+            const newEvaluation = await Evaluation.create(evaluation);
+            project.evaluations.push(newEvaluation._id);
+            await project.save();
+
+            return project;
+        },
+
+        predictPerformance: async (_, { projectId }) => {
+            return await IaService.predictPerformance(projectId);
+        },
+
+        assignSmartTutor: async (_, { projectId }) => {
+            const tutor = await IaService.matchTutor(projectId);
+            await Project.findByIdAndUpdate(projectId, { tuteur: tutor._id }, { new: true });
+            return await Project.findById(projectId);
+        },
+
+        setupReminders: async (_, { projectId }) => {
+            await IaService.setupReminders(projectId);
+            return 'Rappels programmés avec succès';
+        }
+    },
+
+    Project: {
+        tuteur: async (project) => await User.findById(project.tuteur),
+        equipe: async (project) => await User.find({ _id: { $in: project.equipe } }),
+        evaluations: async (project) => await Evaluation.find({ _id: { $in: project.evaluations } })
+    },
+
+    Evaluation: {
+        projet_id: async (evaluation) => await Project.findById(evaluation.projet_id),
+        evaluateur_id: async (evaluation) => await User.findById(evaluation.evaluateur_id)
+    }
+};
+
+module.exports = { typeDefs, resolvers };
+
+
+// ======= Contenu de ./src/services/email.service.js =======
+
+// src/services/email.service.js
+
+import nodemailer from 'nodemailer';
+import { logger } from '../utils/logger.js';
+
+class EmailService {
+    constructor() {
+        this.transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: process.env.EMAIL_PORT,
+            secure: process.env.EMAIL_USE_TLS === 'true',
+            auth: {
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
+            },
+            pool: true,
+            maxConnections: 5,
+            rateLimit: 10
+        });
+    }
+
+    async sendTemplateEmail(templateName, recipient, data) {
+        const templates = {
+            welcome: {
+                subject: 'Bienvenue sur Progease!',
+                text: `Bonjour ${data.name}, Bienvenue!`,
+                html: `<h1>Bienvenue ${data.name}!</h1>`
+            },
+            resetPassword: {
+                subject: 'Réinitialisation de mot de passe',
+                text: `Lien de réinitialisation: ${data.link}`,
+                html: `<a href="${data.link}">Réinitialiser</a>`
+            }
+        };
+
+        const template = templates[templateName];
+        if (!template) throw new Error('Template introuvable');
+
+        return this.sendEmail({
+            to: recipient,
+            ...template
+        });
+    }
+
+    async sendEmail({ to, subject, text, html }) {
+        try {
+            const info = await this.transporter.sendMail({
+                from: `"Progease" <${process.env.EMAIL_FROM}>`,
+                to,
+                subject,
+                text,
+                html,
+                headers: {
+                    'X-Progease-Version': process.env.npm_package_version
+                }
+            });
+
+            logger.info(`Email envoyé: ${info.messageId}`);
+            return info;
+        } catch (error) {
+            logger.error(`Erreur d'envoi email: ${error.message}`);
+            throw error;
+        }
+    }
+}
+
+export default new EmailService();
+
+// ======= Contenu de ./src/services/ia.service.js =======
+
+// src/services/ia.service.js
+
+export const matchTutor = async (projectId) => {
+    const project = await Project.findById(projectId)
+        .select('skills')
+        .lean();
+
+    return User.aggregate([
+        {
+            $match: {
+                role: 'tuteur',
+                availability: true,
+                skills: { $in: project.skills }
+            }
+        },
+        {
+            $addFields: {
+                skillMatchCount: {
+                    $size: { $setIntersection: [project.skills, '$skills'] }
+                },
+                experienceWeight: { $multiply: ['$experience', 0.1] }
+            }
+        },
+        {
+            $sort: {
+                skillMatchCount: -1,
+                experienceWeight: -1
+            }
+        },
+        { $limit: 3 }
+    ]);
+};
+
+// ======= Contenu de ./src/services/iaCron.js =======
+
+// 📁 services/iaCron.js
+
+import { schedule } from 'node-cron';
+import { logger } from '../utils/logger.js';
+import * as IaService from './ia.service.js';
+import { QueueService } from '../utils/queue.js';
+
+const CRON_CONFIG = {
+  performancePrediction: '0 3 * * *', // 3h du matin
+  progressTracking: '*/30 * * * *',
+  cleanup: '0 0 * * 0'
+};
+
+export class Scheduler {
+  constructor() {
+    this.jobs = new Map();
+    this.queueService = new QueueService();
+  }
+
+  init() {
+    this.jobs.set('performance', schedule(
+        CRON_CONFIG.performancePrediction,
+        this.runPerformancePredictions.bind(this)
+    ));
+
+    this.jobs.set('progress', schedule(
+        CRON_CONFIG.progressTracking,
+        this.trackAllProjectsProgress.bind(this)
+    ));
+
+    this.jobs.set('cleanup', schedule(
+        CRON_CONFIG.cleanup,
+        this.cleanupOldData.bind(this)
+    ));
+  }
+
+  async runPerformancePredictions() {
+    try {
+      const projects = await Project.find().lean();
+      await this.queueService.addBulk(
+          'performance-prediction',
+          projects.map(p => ({ id: p._id }))
+      );
+      logger.info(`Scheduled ${projects.length} predictions`);
+    } catch (error) {
+      logger.error(`Prediction scheduling failed: ${error.message}`);
+    }
+  }
+
+  async trackAllProjectsProgress() {
+    const cursor = Project.find().cursor({ batchSize: 100 });
+
+    cursor.on('data', async (project) => {
+      await IaService.trackProgress(project._id);
+    });
+
+    cursor.on('error', (error) => {
+      logger.error(`Progress tracking error: ${error.message}`);
+    });
+  }
+
+  async cleanupOldData() {
+    // Suppression des données de plus de 6 mois
+    await Project.deleteMany({
+      createdAt: { $lt: new Date(Date.now() - 15552000000) }
+    });
+  }
+}
+
+// ======= Contenu de ./src/tests/db.test.js =======
+
+// 📁 test/db-test.js
+
+import { connectToDatabase, closeDatabase } from '../core/db.js';
+import { mockDatabase } from './mocks/database.mock.js';
+
+beforeAll(async () => {
+    await connectToDatabase();
+    await mockDatabase();
+});
+
+afterAll(async () => {
+    await closeDatabase();
+});
+
+describe('Database Operations', () => {
+    it('should maintain connection pool', async () => {
+        const connection = await connectToDatabase();
+        expect(connection.readyState).toBe(1);
+    });
+
+    it('should handle concurrent queries', async () => {
+        const promises = Array(10).fill().map(() =>
+            Project.find().lean().exec()
+        );
+
+        const results = await Promise.all(promises);
+        expect(results.length).toBe(10);
+    });
+
+    it('should recover from connection loss', async () => {
+        // Simuler une déconnexion
+        await mongoose.connection.close();
+
+        // Tenter une nouvelle requête
+        const projects = await Project.find();
+        expect(Array.isArray(projects)).toBe(true);
+    });
+});
+
+
+// ======= Contenu de ./src/tests/integration.test.js =======
+
+// src/tests/integration.test.js
+
+import request from 'supertest';
+import { app } from '../../app.js';
+import { setupTestDB, teardownTestDB } from './testUtils.js';
+import { mockRedis } from './mocks/redis.mock.js';
+
+describe('API Integration Tests', () => {
+    beforeAll(async () => {
+        await setupTestDB();
+        mockRedis();
+    });
+
+    afterAll(async () => {
+        await teardownTestDB();
+    });
+
+    describe('Project Lifecycle', () => {
+        let authToken;
+        let projectId;
+
+        beforeAll(async () => {
+            // Authentification
+            const res = await request(app)
+                .post('/api/auth/login')
+                .send({ email: 'test@example.com', password: 'validPassword' });
+
+            authToken = res.body.token;
+        });
+
+        test('Full project creation flow', async () => {
+            // Création de projet
+            const createRes = await request(app)
+                .post('/api/projects')
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    title: 'Integration Test Project',
+                    description: 'Project for integration testing'
+                });
+
+            projectId = createRes.body.id;
+
+            // Ajout de livrable
+            await request(app)
+                .post(`/api/projects/${projectId}/deliverables`)
+                .set('Authorization', `Bearer ${authToken}`)
+                .send({
+                    name: 'Initial Setup',
+                    deadline: new Date(Date.now() + 86400000)
+                });
+
+            // Vérification du statut
+            const getRes = await request(app)
+                .get(`/api/projects/${projectId}`)
+                .set('Authorization', `Bearer ${authToken}`);
+
+            expect(getRes.body).toMatchObject({
+                status: 'en_cours',
+                deliverables: expect.arrayContaining([
+                    expect.objectContaining({ name: 'Initial Setup' })
+                ])
+            });
+        });
+    });
+
+    describe('Error Handling', () => {
+        test('Invalid endpoint should return 404', async () => {
+            const res = await request(app).get('/api/invalid-endpoint');
+            expect(res.status).toBe(404);
+            expect(res.body).toHaveProperty('error.code', 'NOT_FOUND');
+        });
+
+        test('Unauthorized access should return 401', async () => {
+            const res = await request(app).get('/api/projects');
+            expect(res.status).toBe(401);
+        });
+    });
+});
+
+// ======= Contenu de ./src/utils/date.util.js =======
+
+// src/utils/date.util.js
+
+import { DateTime, Interval } from 'luxon';
+
+export const DateUtils = {
+    formatISO: (date) => DateTime.fromJSDate(date).toISO(),
+
+    calculateWorkingDays: (start, end) => {
+        let count = 0;
+        let current = DateTime.fromJSDate(start);
+        const endDate = DateTime.fromJSDate(end);
+
+        while (current <= endDate) {
+            if (current.weekday <= 5) count++;
+            current = current.plus({ days: 1 });
+        }
+
+        return count;
+    },
+
+    isWeekend: (date) => {
+        const dt = DateTime.fromJSDate(date);
+        return dt.weekday > 5;
+    },
+
+    addBusinessDays: (startDate, days) => {
+        let result = DateTime.fromJSDate(startDate);
+        let added = 0;
+
+        while (added < days) {
+            result = result.plus({ days: 1 });
+            if (result.weekday <= 5) added++;
+        }
+
+        return result.toJSDate();
+    },
+
+    timeBetween: (start, end, unit = 'hours') => {
+        const startDt = DateTime.fromJSDate(start);
+        const endDt = DateTime.fromJSDate(end);
+        return Interval.fromDateTimes(startDt, endDt)
+            .toDuration(unit)
+            .toObject();
+    }
+};
+
+// ======= Contenu de ./src/utils/github.util.js =======
+
+// src/utils/github.util.js
+
+import axios from 'axios';
+import { logger } from './logger.js';
+
+const GITHUB_API = 'https://api.github.com';
+
+export class GitHubService {
+    constructor(token) {
+        this.client = axios.create({
+            baseURL: GITHUB_API,
+            headers: {
+                Authorization: `token ${token}`,
+                Accept: 'application/vnd.github.v3+json'
+            }
+        });
+    }
+
+    async getRepoDetails(repoUrl) {
+        try {
+            const [owner, repo] = this.parseRepoUrl(repoUrl);
+            const { data } = await this.client.get(`/repos/${owner}/${repo}`);
+
+            return {
+                stars: data.stargazers_count,
+                forks: data.forks_count,
+                issues: data.open_issues_count,
+                lastCommit: new Date(data.pushed_at)
+            };
+        } catch (error) {
+            logger.error(`GitHub API Error: ${error.response?.status}`);
+            throw error;
+        }
+    }
+
+    async checkCollaborator(repoUrl, username) {
+        const [owner, repo] = this.parseRepoUrl(repoUrl);
+        try {
+            await this.client.get(`/repos/${owner}/${repo}/collaborators/${username}`);
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
+    parseRepoUrl(url) {
+        const match = url.match(/github.com\/([^/]+)\/([^/]+)/);
+        if (!match) throw new Error('URL GitHub invalide');
+        return [match[1], match[2]];
+    }
+}
+
+// ======= Contenu de ./src/utils/logger.js =======
+
+// src/utils/logger.js
+
+import { createLogger as winstonCreateLogger, format, transports } from 'winston';
+
+const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
+
+const baseLogger = winstonCreateLogger({
+    level: LOG_LEVEL,
+    format: format.combine(
+        format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
+        format.printf(({ timestamp, level, message, ...meta }) => {
+            const metaString = Object.keys(meta).length ? JSON.stringify(meta) : '';
+            return `[${timestamp}] ${level.toUpperCase()}: ${message} ${metaString}`;
+        })
+    ),
+    transports: [
+        new transports.Console(),
+        new transports.File({ filename: 'application.log' })
+    ]
+});
+
+/**
+ * Crée un logger avec un nom de contexte
+ * @param {string} context - Nom du contexte
+ * @returns {object} Logger configuré
+ */
+export const createLogger = (context) => ({
+    info: (message, meta) => baseLogger.info(`[${context}] ${message}`, meta),
+    error: (message, meta) => baseLogger.error(`[${context}] ${message}`, meta),
+    warn: (message, meta) => baseLogger.warn(`[${context}] ${message}`, meta),
+    debug: (message, meta) => baseLogger.debug(`[${context}] ${message}`, meta)
+});
+
+export default baseLogger;
+
+// ======= Contenu de ./src/utils/queue.js =======
+
+// src/utils/queue.js
+
+import Bull from 'bull';
+import { logger } from './logger.js';
+
+const queues = new Map();
+
+export const createQueue = (name, options = {}) => {
+    if (queues.has(name)) return queues.get(name);
+
+    const queue = new Bull(name, {
+        redis: {
+            host: process.env.REDIS_HOST,
+            port: process.env.REDIS_PORT,
+            tls: process.env.NODE_ENV === 'production'
+        },
+        defaultJobOptions: {
+            removeOnComplete: true,
+            removeOnFail: 100,
+            attempts: 3,
+            backoff: {
+                type: 'exponential',
+                delay: 5000
+            }
+        },
+        ...options
+    });
+
+    queue.on('failed', (job, err) => {
+        logger.error(`Job ${job.id} failed: ${err.message}`);
+        metrics.trackError('QUEUE_ERROR', job.name);
+    });
+
+    queues.set(name, queue);
+    return queue;
+};
+
+// ======= Contenu de ./src/utils/validation.util.js =======
+
+// src/utils/validation.util.js
+
+import Joi from 'joi';
+import { RoleEnum } from '../config/constants.js';
+
+export const projectValidationSchema = Joi.object({
+    title: Joi.string().min(3).max(100).required(),
+    description: Joi.string().min(50).max(2000).required(),
+    team: Joi.array().items(Joi.string().hex().length(24)).min(1),
+    deliverables: Joi.array().items(
+        Joi.object({
+            name: Joi.string().required(),
+            deadline: Joi.date().iso().min('now').required()
+        })
+    )
+});
+
+export const userValidationSchema = Joi.object({
+    email: Joi.string().email().required(),
+    role: Joi.string().valid(...Object.values(RoleEnum)).required(),
+    password: Joi.string().min(8).pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])'))
+});
+
+export const validate = (schema) => (req, res, next) => {
+    const { error } = schema.validate(req.body);
+    if (error) {
+        return res.status(400).json({
+            error: error.details.map(d => d.message)
+        });
+    }
+    next();
+};
+
+// ======= Contenu de ./.env =======
+
+# Configuration MongoDB
+MONGODB_URI=mongodb+srv://Walid:Progease@cluster.mongodb.net/db?retryWrites=true&w=majority
+
+# Sécurité JWT
+JWT_SECRET=7x!A%D*G-KaPdSgVkYp3s6v9y$B&E(H+MbQeThWmZq4t7w!z%C*F-J@NcRfUjXn
+JWT_EXPIRES_IN=15m
+REFRESH_TOKEN_EXPIRES_IN=7d
+
+# Redis
+REDIS_TLS_URL=rediss://user:pass@redis-host:6380
+
+# GitHub OAuth
+GITHUB_CLIENT_ID=your_client_id
+GITHUB_CLIENT_SECRET=your_client_secret
