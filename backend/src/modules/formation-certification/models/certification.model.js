@@ -1,6 +1,6 @@
 // src/modules/formation-certification/models/certification.model.js
 
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const certificatSchema = new mongoose.Schema({
   titre: { type: String, required: true },
@@ -22,4 +22,5 @@ const certificatSchema = new mongoose.Schema({
   }
 });
 
-module.exports = mongoose.model("Certificat", certificatSchema);
+const Certificat = mongoose.model("Certificat", certificatSchema);
+export default Certificat;

@@ -1,7 +1,7 @@
 // src/core/performance.js
 
 import { performance } from 'perf_hooks';
-import { logger } from '../utils/logger.js';
+import * as logger from '../utils/logger.js';
 
 // 📌 Initialisation des métriques
 const metrics = {

@@ -1,7 +1,10 @@
 // src/modules/evaluation-system/controllers/evaluation.controller.js
 
 import { EvaluationService } from '../services/evaluation.service.js';
-import { HTTP_STATUS, ERROR_MESSAGES } from '../../../config/constants.js';
+import { HTTP_STATUS } from '../../../config/constants.js';
+
+
+
 
 export class EvaluationController {
     static async createEvaluation(req, res) {
@@ -25,9 +28,10 @@ export class EvaluationController {
             res.status(HTTP_STATUS.OK).json(report);
         } catch (error) {
             res.status(HTTP_STATUS.NOT_FOUND).json({
-                code: 'REPORT_GENERATION_ERROR',
-                message: ERROR_MESSAGES.EVALUATION.REPORT_ERROR
+                error: ERROR_MESSAGES.GENERAL.NOT_FOUND
             });
         }
     }
 }
+
+

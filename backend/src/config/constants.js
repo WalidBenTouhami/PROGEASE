@@ -35,3 +35,37 @@ export const PaginationDefaults = Object.freeze({
     LIMIT: 20, // Limite par défaut
     MAX_LIMIT: 100 // Limite maximale autorisée
 });
+
+// 📌 Messages d'erreur globaux & modulaires
+export const ERROR_MESSAGES = Object.freeze({
+    GENERAL: {
+        NOT_FOUND: 'Ressource non trouvée.',
+        SERVER_ERROR: 'Erreur serveur interne.',
+        UNAUTHORIZED: 'Accès non autorisé.',
+        FORBIDDEN: 'Action interdite.',
+        INVALID_ID: 'ID invalide.'
+    },
+    EVALUATION: {
+        CREATION_FAILED: 'Échec de la création de l’évaluation.',
+        REPORT_ERROR: 'Impossible de générer le rapport d’évaluation.'
+    },
+    PROJECT: {
+        INVALID_TEAM_MEMBER: 'Un membre de l’équipe est invalide.',
+        NOT_FOUND: 'Projet introuvable.'
+    },
+    USER: {
+        DUPLICATE_EMAIL: 'Email déjà utilisé.',
+        INVALID_ROLE: 'Rôle utilisateur invalide.'
+    }
+});
+export const HTTP_STATUS = Object.freeze({
+    OK: 200,
+    CREATED: 201,
+    NO_CONTENT: 204,
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    CONFLICT: 409,
+    INTERNAL_ERROR: 500
+});

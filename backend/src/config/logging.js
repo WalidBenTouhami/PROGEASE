@@ -3,6 +3,7 @@
 import winston from 'winston';
 import { Logtail } from '@logtail/node';
 import { LogtailTransport } from '@logtail/winston';
+import 'dotenv/config';
 
 // ✅ Validation de la variable d'environnement LOGTAIL_TOKEN
 if (!process.env.LOGTAIL_TOKEN) {
