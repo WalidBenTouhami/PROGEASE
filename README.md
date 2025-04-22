@@ -53,7 +53,11 @@ L'objectif principal est de fournir une solution intuitive et efficace pour amé
 
 ### **Sécurité et Fiabilité**
 - Gestion des authentifications et des autorisations.
+- Validation côté frontend assurée avec **Yup**, garantissant des formulaires robustes, typés et sécurisés avant toute soumission au backend.
 
+<p align="center">
+  <img src="assets/Yup.png" alt="PROGEASE logo" width="400"/>
+</p>
 ---
 
 ## TECHNOLOGIES UTILISÉES
