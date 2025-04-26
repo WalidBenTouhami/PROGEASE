@@ -69,6 +69,7 @@ const deleteProject = async (req, res) => {
 const addDeliverable = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(id)
         const project = await Project.findById(id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
