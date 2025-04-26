@@ -4,7 +4,13 @@
   <img src="assets/PROGEASE.png" alt="PROGEASE logo" width="400"/>
 </p>
 
-## ÉQUIPE DE DÉVELOPPEMENT
+## 🚀 Introduction
+
+**PROGEASE** est une plateforme centralisée conçue pour améliorer la gestion des projets étudiants dans un cadre universitaire. Elle aide les étudiants, tuteurs et administrateurs à gérer efficacement les projets grâce à des fonctionnalités innovantes telles que l'automatisation, la collaboration en temps réel, et l'analyse des performances des projets.
+
+---
+
+## 🧑‍💻 Équipe de Développement
 
 | **Développeur**         | **Modules**               |
 |--------------------------|---------------------------|
@@ -16,65 +22,52 @@
 
 ---
 
-## DESCRIPTION DU PROJET
-
-PROGEASE est une plateforme centralisée conçue pour simplifier la gestion des projets étudiants dans un cadre universitaire. Elle permet aux utilisateurs (étudiants, tuteurs et administrateurs) de :
-
-- Ajouter et gérer des sujets de projet.
-- Affecter des équipes et des tuteurs.
-- Suivre l'avancement des projets en temps réel.
-- Évaluer les résultats des projets.
-- Automatiser certaines tâches comme la prédiction des performances et l'attribution intelligente de tuteurs.
-
-L'objectif principal est de fournir une solution intuitive et efficace pour améliorer la collaboration et le suivi des projets.
-
----
-
-## FONCTIONNALITÉS PRINCIPALES
+## 🌟 Fonctionnalités Principales
 
 ### **Gestion des Projets**
-- Création, mise à jour et suppression de projets.
-- Suivi de la progression des projets.
-- Prédiction des performances des projets grâce à des algorithmes d'IA.
+- Ajouter, modifier et supprimer des projets.
+- Suivre l'avancement des projets en temps réel.
+- Prédire les performances grâce à des algorithmes d'IA.
 
 ### **Gestion des Utilisateurs**
-- Gestion des rôles (étudiant, tuteur, administrateur).
+- Gestion des rôles : étudiant, tuteur, administrateur.
 - Authentification et autorisation sécurisées.
 
 ### **Système d'Évaluation**
-- Ajout d'évaluations pour les projets.
+- Ajout et gestion des évaluations pour les projets.
 - Gestion des scores et des commentaires des évaluateurs.
 
 ### **Formation et Certification**
-- Gestion des formations et certifications liées aux projets.
+- Gestion des formations et certifications pour les étudiants.
 
 ### **Gestion du Forum**
-- Création de discussions et échanges entre les membres des équipes.
+- Création et gestion des discussions entre membres des équipes.
 
 ### **Sécurité et Fiabilité**
-- Gestion des authentifications et des autorisations.
-- Validation côté frontend assurée avec **Yup**, garantissant des formulaires robustes, typés et sécurisés avant toute soumission au backend.
+- Authentification sécurisée avec validation via **Yup**.
+- Protection des données sensibles côté backend.
 
 <p align="center">
-  <img src="assets/Yup.png" alt="PROGEASE logo" width="400"/>
+  <img src="assets/Yup.png" alt="Validation Yup" width="400"/>
 </p>
+
 ---
 
-## TECHNOLOGIES UTILISÉES
+## 🛠️ Technologies Utilisées
 
 - **Backend** : Node.js, Express.js
 - **Base de données** : MongoDB
 - **AI** : TensorFlow.js, scikit-learn
+- **Validation** : Yup
 
 ---
 
-## INSTALLATION ET CONFIGURATION
+## ⚙️ Installation et Configuration
 
 ### **Prérequis**
 - Node.js (v16 ou supérieur)
 - npm (v7 ou supérieur)
 - MongoDB
-
 
 ### **Étapes d'installation**
 
@@ -82,51 +75,51 @@ L'objectif principal est de fournir une solution intuitive et efficace pour amé
    ```bash
    git clone <URL_DU_DEPOT>
    cd <NOM_DU_DEPOT>
+   ```
 
-Installer les dépendances :
+2. **Installer les dépendances :**
+   ```bash
+   npm install
+   ```
 
-npm install
-Configurer les variables d'environnement : Créez un fichier .env à la racine du projet et ajoutez les variables suivantes :
+3. **Configurer les variables d'environnement :**
+   Créez un fichier `.env` à la racine du projet et ajoutez les variables suivantes :
+   ```env
+   PORT=3000
+   NODE_ENV=development
+   MONGO_URI=mongodb://localhost:27017/progease
+   CORS_ORIGINS=http://localhost:3000
+   ```
 
+4. **Lancer l'application :**
+   ```bash
+   npm start
+   ```
 
-PORT=3000
-NODE_ENV=development
-MONGO_URI=mongodb://localhost:27017/progease
-CORS_ORIGINS=http://localhost:3000
-Lancer l'application :
+5. **Accéder à l'application :**
+   - **API REST** : [http://localhost:4000/api/v1/](http://localhost:4000/api/v1/)
+   - **GraphQL Playground** : [http://localhost:4000/graphql](http://localhost:4000/graphql)
 
+---
 
-npm start
-Accéder à l'application :
+## 🧪 Tests
 
-API REST : http://localhost:4000/api/v1/
-GraphQL Playground : http://localhost:4000/graphql
-<hr></hr>
-
-TESTS
 Pour exécuter les tests, utilisez la commande suivante :
+```bash
 npm test
+```
 
-Les tests incluent :
-Tests unitaires pour les modules principaux.
-Tests d'intégration pour les routes REST et GraphQL.
+### **Tests inclus :**
+- Tests unitaires pour les modules principaux.
+- Tests d'intégration pour les routes REST et GraphQL.
 
+---
 
-## STRUCTURE GLOBALE DU BACKEND
+## 📂 Structure Globale du Backend
 
-### LES MODULES
-
-
-<p align="left">
-  <img src="assets/Tree map.png" alt="Les modules" width="1600"/>
-</p>
-
-
-### Structure du Backend
-
+### **Structure des Dossiers**
 <details>
   <summary>📂 Cliquez pour afficher la structure</summary>
-
 
 ```
 backend
@@ -171,21 +164,42 @@ backend
     `-- utils
         |-- date.util.js
         `-- github.util.js
-
 ```
-
 
 </details>
 
+---
 
-CONTRIBUTIONS
-Les contributions sont les bienvenues !
-Veuillez soumettre un pull request ou ouvrir une issue pour discuter des changements.
+## 📊 Modules et Arborescence
 
-<hr></hr>
-LICENCE
-Ce projet est sous licence MIT.
+<p align="center">
+  <img src="assets/Tree map.png" alt="Arborescence des modules" width="1600"/>
+</p>
 
+---
 
+## 🤝 Contributions
 
+Les contributions sont les bienvenues ! Veuillez suivre ces étapes pour proposer des modifications :
+1. **Forkez le dépôt.**
+2. **Créez une branche pour vos modifications.**
+   ```bash
+   git checkout -b feature/nom-feature
+   ```
+3. **Soumettez un pull request.**
 
+N'hésitez pas à ouvrir une issue pour discuter des améliorations.
+
+---
+
+## 📜 Licence
+
+Ce projet est sous licence **MIT**. Consultez le fichier `LICENSE` pour plus de détails.
+
+---
+
+## 🔗 Liens Utiles
+
+- **Documentation API** : [Lien vers la documentation](http://localhost:4000/api-docs)
+- **Documentation GraphQL** : [Lien vers GraphQL Playground](http://localhost:4000/graphql)
+- **Dépôt GitHub** : [Lien vers le dépôt](<URL_DU_DEPOT>)
