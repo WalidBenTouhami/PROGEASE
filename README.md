@@ -1,7 +1,7 @@
 # PROGEASE Project
 
 <p align="center">
-  <img src="assets/PROGEASE.png" alt="PROGEASE logo" width="400"/>
+  <img src="./assets/PROGEASE.png" alt="PROGEASE logo" width="400"/>
 </p>
 
 ## 🚀 Introduction
@@ -48,7 +48,7 @@
 - Protection des données sensibles côté backend.
 
 <p align="center">
-  <img src="assets/Yup.png" alt="Validation Yup" width="400"/>
+  <img src="./assets/Yup.png" alt="Validation Yup" width="400"/>
 </p>
 
 ---
@@ -173,7 +173,7 @@ backend
 ## 📊 Modules et Arborescence
 
 <p align="center">
-  <img src="assets/Tree map.png" alt="Arborescence des modules" width="1600"/>
+  <img src="./assets/Tree%20map.png" alt="Arborescence des modules" width="1600"/>
 </p>
 
 ---
