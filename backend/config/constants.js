@@ -1,10 +1,6 @@
-require('dotenv').config();
+//config/constants.js
 
-module.exports = {
-    MONGO_URI: process.env.MONGO_URI,
-    PORT: process.env.PORT || 3000,
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-};
+require('dotenv').config();
 
 // 📌 Énumérations globales
 const Enums = Object.freeze({
@@ -83,8 +79,11 @@ const HttpStatus = Object.freeze({
     INTERNAL_ERROR: 500,
 });
 
-// 📌 Export des constantes
+// 📌 Export consolidé des constantes
 module.exports = {
+    MONGO_URI: process.env.MONGO_URI,
+    PORT: process.env.PORT || 3000,
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     Enums,
     SecurityConfig,
     PaginationDefaults,

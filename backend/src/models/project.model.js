@@ -1,9 +1,7 @@
-//src/models/project.model.js
-
 const mongoose = require('mongoose');
-const User = require('../models/user.model');
 const { checkGithubRepoExists } = require('../services/github.service');
-
+const { Enums } = require('../../config/constants');
+const User = require('../models/user.model');
 const { Schema } = mongoose;
 
 // ✅ Sous-schéma pour les livrables
@@ -38,10 +36,16 @@ const deliverableSchema = new Schema({
             },
             message: 'URL GitHub invalide ou dépôt inexistant.'
         }
+    },
+    statut: {
+        type: String,
+        enum: Object.values(Enums.DeliverableStatus),
+        default: Enums.DeliverableStatus.PENDING,
+        required: [true, 'Le statut est requis.']
     }
 });
 
-// ✅ Schéma principal
+// ✅ Schéma principal pour le projet
 const projectSchema = new Schema({
     titre: {
         type: String,
@@ -54,7 +58,7 @@ const projectSchema = new Schema({
         trim: true
     },
     equipe: [{
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: [true, 'L\'équipe est requise.']
     }],
@@ -70,6 +74,14 @@ const projectSchema = new Schema({
             validator: (arr) => arr.length > 0,
             message: 'Le projet doit contenir au moins une compétence.'
         }
+    },
+    startDate: {
+        type: Date,
+        required: [true, 'Start date is required'],
+    },
+    endDate: {
+        type: Date,
+        required: [true, 'End date is required'],
     },
     deliverables: {
         type: [deliverableSchema],
@@ -108,11 +120,15 @@ projectSchema.pre('save', async function (next) {
             _id: { $in: this.equipe }
         });
 
+        console.log("Membres de l'équipe fournis :", this.equipe);
+        console.log("Nombre d'utilisateurs existants :", existingUsers);
+
         if (existingUsers !== this.equipe.length) {
             return next(new Error("Un ou plusieurs membres de l'équipe sont invalides."));
         }
     }
     next();
 });
+
 
 module.exports = mongoose.model('Project', projectSchema);

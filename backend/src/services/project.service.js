@@ -1,47 +1,53 @@
-// src/modules/project-management/services/project.service.js
-
 const Project = require('../models/project.model');
 
-/**
- * Crée un nouveau projet
- * @param {Object} projectData Les données du projet à créer
- * @returns {Object} Le projet créé
- */
-const createProject = async (projectData) => {
-    const project = new Project(projectData);
+// ✅ Service pour créer un projet
+exports.createProject = async (data) => {
+    const project = new Project(data);
     return await project.save();
 };
 
-/**
- * Récupère tous les projets
- * @returns {Array} La liste des projets
- */
-const getAllProjects = async () => {
-    return await Project.find().populate('team tutor').lean();
+// ✅ Service pour récupérer tous les projets
+exports.getAllProjects = async () => {
+    return await Project.find().populate('equipe tuteur');
 };
 
-/**
- * Met à jour un projet existant
- * @param {String} projectId L'ID du projet à mettre à jour
- * @param {Object} updateData Les données de mise à jour
- * @returns {Object} Le projet mis à jour
- */
-const updateProject = async (projectId, updateData) => {
-    return await Project.findByIdAndUpdate(projectId, updateData, { new: true });
+// ✅ Service pour récupérer un projet par ID
+exports.getProjectById = async (id) => {
+    return await Project.findById(id).populate('equipe tuteur deliverables');
 };
 
-/**
- * Supprime un projet
- * @param {String} projectId L'ID du projet à supprimer
- * @returns {Object} Le projet supprimé
- */
-const deleteProject = async (projectId) => {
-    return await Project.findByIdAndDelete(projectId);
+// ✅ Service pour mettre à jour un projet
+exports.updateProject = async (id, data) => {
+    return await Project.findByIdAndUpdate(id, data, { new: true });
 };
 
-module.exports = {
-    createProject,
-    getAllProjects,
-    updateProject,
-    deleteProject,
+// ✅ Service pour supprimer un projet
+exports.deleteProject = async (id) => {
+    return await Project.findByIdAndDelete(id);
+};
+
+// ✅ Service pour ajouter un livrable
+exports.addDeliverable = async (projectId, deliverableData) => {
+    const project = await Project.findById(projectId);
+    if (!project) throw new Error('Projet introuvable');
+    project.deliverables.push(deliverableData);
+    return await project.save();
+};
+
+// ✅ Service pour mettre à jour un livrable
+exports.updateDeliverable = async (projectId, deliverableId, deliverableData) => {
+    const project = await Project.findById(projectId);
+    if (!project) throw new Error('Projet introuvable');
+    const deliverable = project.deliverables.id(deliverableId);
+    if (!deliverable) throw new Error('Livrable introuvable');
+    Object.assign(deliverable, deliverableData);
+    return await project.save();
+};
+
+// ✅ Service pour supprimer un livrable
+exports.removeDeliverable = async (projectId, deliverableId) => {
+    const project = await Project.findById(projectId);
+    if (!project) throw new Error('Projet introuvable');
+    project.deliverables.id(deliverableId).remove();
+    return await project.save();
 };

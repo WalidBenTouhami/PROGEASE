@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config(); // Charge les variables d'environnement depuis le fichier .env
+const projectRouter = require('./src/routers/project.router');
+
+const app = express();
 
 // Récupération des variables d'environnement
 const MONGO_URI = process.env.MONGO_URI;
@@ -13,34 +16,29 @@ if (!MONGO_URI) {
     process.exit(1);
 }
 
-// Initialisation de l'application Express
-const app = express();
-
 // Middleware
 app.use(cors());
 app.use(express.json());
 
-
 // Connexion à MongoDB avec mongoose
 mongoose
     .connect(MONGO_URI)
-    .then(() => console.log('Connexion à MongoDB réussie'))
+    .then(() => console.log('✅ Connecté à MongoDB'))
     .catch((err) => {
-        console.error('Erreur de connexion à MongoDB :', err);
+        console.error('❌ Erreur de connexion à MongoDB :', err);
         process.exit(1); // Arrête le serveur si la connexion échoue
     });
 
-// Rroute par défaut
+// Routes
 app.get('/', (req, res) => {
     res.send('API PROGEASE fonctionne correctement');
 });
 
-// Route de vérification de l'état de l'API (Health Check)
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date() });
 });
 
-// Importation des routes
+app.use('/api/projects', projectRouter);
 app.use('/api/v1/ai', require('./src/routers/ai.router'));
 
 // Gestion des routes non définies
@@ -56,5 +54,5 @@ app.use((err, req, res, next) => {
 
 // Démarrage du serveur
 app.listen(PORT, () => {
-    console.log(`Serveur démarré sur le port ${PORT}`);
+    console.log(`✅ Serveur démarré sur le port ${PORT}`);
 });
