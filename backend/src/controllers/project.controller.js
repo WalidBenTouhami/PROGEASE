@@ -1,130 +1,154 @@
-// src/controllers/project.controller.js
+const Project = require('../models/project.model'); // Import the Mongoose model for projects
 
-const Project = require('../models/project.model');
-
-// ✅ Créer un projet
-const createProject = async (req, res) => {
+// Controller for creating a new project
+exports.createProject = async (req, res) => {
     try {
         const project = new Project(req.body);
-        await project.save();
-        res.status(201).json(project);
+        const savedProject = await project.save();
+        res.status(201).json(savedProject);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la création du projet' });
     }
 };
 
-// ✅ Récupérer tous les projets
-const getProjects = async (req, res) => {
+// Controller for retrieving all projects
+exports.getProjects = async (req, res) => {
     try {
-        const projects = await Project.find().populate('equipe tuteur');
+        const projects = await Project.find();
         res.status(200).json(projects);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des projets' });
     }
 };
 
-// ✅ Récupérer un projet par ID
-const getProjectById = async (req, res) => {
+// Controller for retrieving a single project by ID
+exports.getProjectById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const project = await Project.findById(id).populate('equipe tuteur deliverables');
+        const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
         res.status(200).json(project);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération du projet' });
     }
 };
 
-// ✅ Mettre à jour un projet
-const updateProject = async (req, res) => {
+// Controller for updating a project
+exports.updateProject = async (req, res) => {
     try {
-        const { id } = req.params;
-        const project = await Project.findByIdAndUpdate(id, req.body, { new: true });
-        if (!project) {
+        const updatedProject = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedProject) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        res.status(200).json(project);
+        res.status(200).json(updatedProject);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour du projet' });
     }
 };
 
-// ✅ Supprimer un projet
-const deleteProject = async (req, res) => {
+// Controller for deleting a project
+exports.deleteProject = async (req, res) => {
     try {
-        const { id } = req.params;
-        const project = await Project.findByIdAndDelete(id);
-        if (!project) {
+        const deletedProject = await Project.findByIdAndDelete(req.params.id);
+        if (!deletedProject) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        res.status(200).json({ message: 'Projet supprimé avec succès' });
+        res.status(204).send();
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du projet' });
     }
 };
 
-// ✅ Ajouter un livrable à un projet
-const addDeliverable = async (req, res) => {
+// Controller for adding a deliverable to a project
+exports.addDeliverable = async (req, res) => {
     try {
-        const { id } = req.params;
-        console.log(id)
-        const project = await Project.findById(id);
+        const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        project.deliverables.push(req.body);
+
+        const deliverable = {
+            name: req.body.name,
+            deadline: req.body.deadline,
+            repositoryUrl: req.body.repositoryUrl,
+            statut: 'PENDING', // Default status
+        };
+
+        project.deliverables.push(deliverable);
         await project.save();
-        res.status(201).json(project);
+
+        res.status(201).json(deliverable);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de l\'ajout du livrable' });
     }
 };
 
-// ✅ Mettre à jour un livrable
-const updateDeliverable = async (req, res) => {
+// Controller for retrieving all deliverables of a project
+exports.getDeliverables = async (req, res) => {
     try {
-        const { id, deliverableId } = req.params;
-        const project = await Project.findById(id);
+        const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        const deliverable = project.deliverables.id(deliverableId);
+
+        res.status(200).json(project.deliverables);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des livrables' });
+    }
+};
+
+// Controller for updating a specific deliverable of a project
+exports.updateDeliverable = async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id);
+        if (!project) {
+            return res.status(404).json({ error: 'Projet introuvable' });
+        }
+
+        const deliverable = project.deliverables.id(req.params.deliverableId);
         if (!deliverable) {
             return res.status(404).json({ error: 'Livrable introuvable' });
         }
-        Object.assign(deliverable, req.body);
+
+        if (req.body.name) deliverable.name = req.body.name;
+        if (req.body.statut) deliverable.statut = req.body.statut;
+
         await project.save();
-        res.status(200).json(project);
+
+        res.status(200).json(deliverable);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour du livrable' });
     }
 };
 
-// ✅ Supprimer un livrable
-const removeDeliverable = async (req, res) => {
+// Controller for removing a specific deliverable from a project
+exports.removeDeliverable = async (req, res) => {
     try {
-        const { id, deliverableId } = req.params;
-        const project = await Project.findById(id);
+        const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        project.deliverables.id(deliverableId).remove();
-        await project.save();
-        res.status(200).json(project);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-};
 
-module.exports = {
-    createProject,
-    getProjects,
-    getProjectById,
-    updateProject,
-    deleteProject,
-    addDeliverable,
-    updateDeliverable,
-    removeDeliverable,
+        const deliverable = project.deliverables.id(req.params.deliverableId);
+        if (!deliverable) {
+            return res.status(404).json({ error: 'Livrable introuvable' });
+        }
+
+        deliverable.remove();
+        await project.save();
+
+        res.status(204).send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du livrable' });
+    }
 };

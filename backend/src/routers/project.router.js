@@ -1,87 +1,154 @@
-const express = require('express');
-const { check, param } = require('express-validator');
-const projectController = require('../controllers/project.controller');
-const validateRequest = require('../middlewares/validate.Request'); // Middleware personnalisé pour gérer les erreurs de validation
+const Project = require('../models/project.model'); // Import the Mongoose model for projects
 
-const router = express.Router();
+// Controller for creating a new project
+exports.createProject = async (req, res) => {
+    try {
+        const project = new Project(req.body);
+        const savedProject = await project.save();
+        res.status(201).json(savedProject);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la création du projet' });
+    }
+};
 
-// ✅ Routes pour les projets
-router.post(
-    '/',
-    [
-        check('titre').notEmpty().withMessage('Le titre est requis.'),
-        check('description').notEmpty().withMessage('La description est requise.'),
-        check('startDate').isISO8601().withMessage('StartDate doit être une date valide.'),
-        check('endDate').isISO8601().withMessage('EndDate doit être une date valide.'),
-    ],
-    validateRequest,
-    projectController.createProject
-);
+// Controller for retrieving all projects
+exports.getProjects = async (req, res) => {
+    try {
+        const projects = await Project.find();
+        res.status(200).json(projects);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des projets' });
+    }
+};
 
-router.get('/', projectController.getProjects);
+// Controller for retrieving a single project by ID
+exports.getProjectById = async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id);
+        if (!project) {
+            return res.status(404).json({ error: 'Projet introuvable' });
+        }
+        res.status(200).json(project);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération du projet' });
+    }
+};
 
-router.get(
-    '/:id',
-    [
-        param('id').isMongoId().withMessage('ID invalide.'),
-    ],
-    validateRequest,
-    projectController.getProjectById
-);
+// Controller for updating a project
+exports.updateProject = async (req, res) => {
+    try {
+        const updatedProject = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!updatedProject) {
+            return res.status(404).json({ error: 'Projet introuvable' });
+        }
+        res.status(200).json(updatedProject);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour du projet' });
+    }
+};
 
-router.put(
-    '/:id',
-    [
-        param('id').isMongoId().withMessage('ID invalide.'),
-        check('titre').optional().notEmpty().withMessage('Le titre ne peut pas être vide.'),
-        check('description').optional().notEmpty().withMessage('La description ne peut pas être vide.'),
-    ],
-    validateRequest,
-    projectController.updateProject
-);
+// Controller for deleting a project
+exports.deleteProject = async (req, res) => {
+    try {
+        const deletedProject = await Project.findByIdAndDelete(req.params.id);
+        if (!deletedProject) {
+            return res.status(404).json({ error: 'Projet introuvable' });
+        }
+        res.status(204).send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du projet' });
+    }
+};
 
-router.delete(
-    '/:id',
-    [
-        param('id').isMongoId().withMessage('ID invalide.'),
-    ],
-    validateRequest,
-    projectController.deleteProject
-);
+// Controller for adding a deliverable to a project
+exports.addDeliverable = async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id);
+        if (!project) {
+            return res.status(404).json({ error: 'Projet introuvable' });
+        }
 
-// ✅ Routes pour les livrables
-router.post(
-    '/:id/deliverables',
-    [
-        param('id').isMongoId().withMessage('ID de projet invalide.'),
-        check('name').notEmpty().withMessage('Le nom du livrable est requis.'),
-        check('deadline').isISO8601().withMessage('La deadline doit être une date valide.'),
-        check('repositoryUrl').isURL().withMessage('URL du dépôt invalide.'),
-    ],
-    validateRequest,
-    projectController.addDeliverable
-);
+        const deliverable = {
+            name: req.body.name,
+            deadline: req.body.deadline,
+            repositoryUrl: req.body.repositoryUrl,
+            statut: 'PENDING', // Default status
+        };
 
-router.put(
-    '/:id/deliverables/:deliverableId',
-    [
-        param('id').isMongoId().withMessage('ID de projet invalide.'),
-        param('deliverableId').isMongoId().withMessage('ID du livrable invalide.'),
-        check('name').optional().notEmpty().withMessage('Le nom ne peut pas être vide.'),
-        check('statut').optional().isIn(['PENDING', 'DONE']).withMessage('Statut invalide.'),
-    ],
-    validateRequest,
-    projectController.updateDeliverable
-);
+        project.deliverables.push(deliverable);
+        await project.save();
 
-router.delete(
-    '/:id/deliverables/:deliverableId',
-    [
-        param('id').isMongoId().withMessage('ID de projet invalide.'),
-        param('deliverableId').isMongoId().withMessage('ID du livrable invalide.'),
-    ],
-    validateRequest,
-    projectController.removeDeliverable
-);
+        res.status(201).json(deliverable);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de l\'ajout du livrable' });
+    }
+};
 
-module.exports = router;
+// Controller for retrieving all deliverables of a project
+exports.getDeliverables = async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id);
+        if (!project) {
+            return res.status(404).json({ error: 'Projet introuvable' });
+        }
+
+        res.status(200).json(project.deliverables);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des livrables' });
+    }
+};
+
+// Controller for updating a specific deliverable of a project
+exports.updateDeliverable = async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id);
+        if (!project) {
+            return res.status(404).json({ error: 'Projet introuvable' });
+        }
+
+        const deliverable = project.deliverables.id(req.params.deliverableId);
+        if (!deliverable) {
+            return res.status(404).json({ error: 'Livrable introuvable' });
+        }
+
+        if (req.body.name) deliverable.name = req.body.name;
+        if (req.body.statut) deliverable.statut = req.body.statut;
+
+        await project.save();
+
+        res.status(200).json(deliverable);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour du livrable' });
+    }
+};
+
+// Controller for removing a specific deliverable from a project
+exports.removeDeliverable = async (req, res) => {
+    try {
+        const project = await Project.findById(req.params.id);
+        if (!project) {
+            return res.status(404).json({ error: 'Projet introuvable' });
+        }
+
+        const deliverable = project.deliverables.id(req.params.deliverableId);
+        if (!deliverable) {
+            return res.status(404).json({ error: 'Livrable introuvable' });
+        }
+
+        deliverable.remove();
+        await project.save();
+
+        res.status(204).send();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du livrable' });
+    }
+};
