@@ -1,6 +1,14 @@
-//config/constants.js
+// ../backend/config/constants.js
 
-require('dotenv').config();
+require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
+
+// 📌 Valider les variables d'environnement critiques
+const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "OPENAI_API_KEY"];
+REQUIRED_ENV_VARS.forEach((envVar) => {
+    if (!process.env[envVar]) {
+        throw new Error(`La variable d'environnement ${envVar} est manquante.`);
+    }
+});
 
 // 📌 Énumérations globales
 const Enums = Object.freeze({
@@ -26,13 +34,13 @@ const Enums = Object.freeze({
 const SecurityConfig = Object.freeze({
     JWT: {
         EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d", // Durée de validité du token JWT
-        COOKIE_NAME: "__progease_token", // Nom du cookie pour le token
+        COOKIE_NAME: process.env.JWT_COOKIE_NAME || "__progease_token", // Nom du cookie pour le token
     },
     PASSWORD: {
-        MIN_LENGTH: 10, // Longueur minimale du mot de passe
-        SALT_ROUNDS: 12, // Nombre de tours pour le salage du mot de passe
-        MAX_ATTEMPTS: 5, // Nombre maximum de tentatives de connexion
-        LOCKOUT_MINUTES: 30, // Durée de verrouillage après échec
+        MIN_LENGTH: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10, // Longueur minimale du mot de passe
+        SALT_ROUNDS: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12, // Nombre de tours pour le salage du mot de passe
+        MAX_ATTEMPTS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5, // Nombre maximum de tentatives de connexion
+        LOCKOUT_MINUTES: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30, // Durée de verrouillage après échec
     },
 });
 
@@ -83,6 +91,7 @@ const HttpStatus = Object.freeze({
 module.exports = {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT || 3000,
+    JWT_SECRET: process.env.JWT_SECRET,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     Enums,
     SecurityConfig,

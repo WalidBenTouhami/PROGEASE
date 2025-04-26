@@ -1,7 +1,4 @@
 const mongoose = require('mongoose');
-const { checkGithubRepoExists } = require('../services/github.service');
-const { Enums } = require('../../config/constants');
-const User = require('../models/user.model');
 const { Schema } = mongoose;
 
 // ✅ Sous-schéma pour les livrables
@@ -25,22 +22,15 @@ const deliverableSchema = new Schema({
         validate: {
             validator: async function (url) {
                 const pattern = /^https:\/\/github\.com\/[^/]+\/[^/]+$/;
-                if (!pattern.test(url)) return false;
-
-                try {
-                    return await checkGithubRepoExists(url);
-                } catch (err) {
-                    console.warn('⚠️ Erreur GitHub API :', err.message);
-                    return false;
-                }
+                return pattern.test(url);
             },
             message: 'URL GitHub invalide ou dépôt inexistant.'
         }
     },
     statut: {
         type: String,
-        enum: Object.values(Enums.DeliverableStatus),
-        default: Enums.DeliverableStatus.PENDING,
+        enum: ['PENDING', 'DONE'],
+        default: 'PENDING',
         required: [true, 'Le statut est requis.']
     }
 });
@@ -57,15 +47,14 @@ const projectSchema = new Schema({
         required: [true, 'La description est requise.'],
         trim: true
     },
-    equipe: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: [true, 'L\'équipe est requise.']
-    }],
+    equipe: {
+        // Simule une liste d'IDs au lieu de références au modèle `User`
+        type: [mongoose.Schema.Types.ObjectId],
+        default: []
+    },
     tuteur: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: [true, 'Le tuteur est requis.']
+        // Simule un ObjectId au lieu d'une référence au modèle `User`
+        type: mongoose.Schema.Types.ObjectId
     },
     skills: {
         type: [String],
@@ -112,23 +101,5 @@ projectSchema.index({
     description: 'text',
     skillsText: 'text'
 });
-
-// ✅ Validation des membres d’équipe avant sauvegarde
-projectSchema.pre('save', async function (next) {
-    if (this.isModified('equipe')) {
-        const existingUsers = await User.countDocuments({
-            _id: { $in: this.equipe }
-        });
-
-        console.log("Membres de l'équipe fournis :", this.equipe);
-        console.log("Nombre d'utilisateurs existants :", existingUsers);
-
-        if (existingUsers !== this.equipe.length) {
-            return next(new Error("Un ou plusieurs membres de l'équipe sont invalides."));
-        }
-    }
-    next();
-});
-
 
 module.exports = mongoose.model('Project', projectSchema);

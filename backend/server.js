@@ -1,10 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const morgan = require('morgan'); // Importation de morgan
 require('dotenv').config(); // Charge les variables d'environnement depuis le fichier .env
-const projectRouter = require('./src/routers/project.router');
 
-const app = express();
+const projectRouter = require('./src/routers/project.router');
+const aiRouter = require('./src/routers/ai.router');
+
+const app = express(); // Initialisation de l'application Express
 
 // Récupération des variables d'environnement
 const MONGO_URI = process.env.MONGO_URI;
@@ -17,6 +20,7 @@ if (!MONGO_URI) {
 }
 
 // Middleware
+app.use(morgan('dev')); // Format 'dev' pour des logs succincts
 app.use(cors());
 app.use(express.json());
 
@@ -39,7 +43,7 @@ app.get('/health', (req, res) => {
 });
 
 app.use('/api/projects', projectRouter);
-app.use('/api/v1/ai', require('./src/routers/ai.router'));
+app.use('/api/v1/ai', aiRouter);
 
 // Gestion des routes non définies
 app.use((req, res) => {

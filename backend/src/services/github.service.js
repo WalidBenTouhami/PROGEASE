@@ -1,5 +1,3 @@
-// src/services/github.service.js
-
 const dotenv = require('dotenv');
 dotenv.config();
 
@@ -12,10 +10,12 @@ const axios = require('axios');
  */
 async function checkGithubRepoExists(url) {
     try {
-        // 🧠 Extraire owner/repo du lien GitHub
-        const match = url.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)(\.git)?$/);
+        // Vérifie si l'URL est valide
+        const pattern = /^https:\/\/github\.com\/([^/]+)\/([^/]+)$/;
+        const match = url.match(pattern);
+
         if (!match) {
-            console.warn(`[GitHub] ❌ URL GitHub invalide : ${url}`);
+            console.error('❌ URL GitHub invalide :', url);
             return false;
         }
 

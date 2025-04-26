@@ -1,4 +1,4 @@
-//src/validations/project.validation.js
+// src/validations/project.validation.js
 
 const yup = require('yup');
 

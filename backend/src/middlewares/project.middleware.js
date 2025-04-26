@@ -1,20 +1,11 @@
 // backend/src/middlewares/project.middleware.js
 
-const { projectSchema } = require('../validations/project.validation');
+const { validationResult } = require('express-validator');
 
-const validateProject = async (req, res, next) => {
-    try {
-        await projectSchema.validate(req.body, { abortEarly: false });
-        next();
-    } catch (error) {
-        res.status(400).json({
-            message: 'Validation échouée.',
-            errors: error.inner.map(err => ({
-                path: err.path,
-                message: err.message,
-            })),
-        });
+module.exports = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
+    next();
 };
-
-                module.exports = { validateProject };
