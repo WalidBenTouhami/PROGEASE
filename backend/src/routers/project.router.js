@@ -1,10 +1,8 @@
+// src/routers/project.router.js
+
 const express = require('express');
 const router = express.Router();
 const projectController = require('../controllers/project.controller'); // Import project controllers
-
-//------------------------------------------------------//
-//       1. Routes for project management               //
-//------------------------------------------------------//
 
 // Route for creating a new project
 router.post('/', projectController.createProject);
