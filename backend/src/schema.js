@@ -37,9 +37,10 @@ const typeDefs = gql`
     # 📌 Type livrable
     type Deliverable {
         name: String!
+        description: String!
         deadline: String!
-        status: DeliverableStatus! # Utilise l'énumération DeliverableStatus
         repositoryUrl: String!
+        status: DeliverableStatus! # Utilise l'énumération DeliverableStatus
     }
 
     # 📌 Type évaluation

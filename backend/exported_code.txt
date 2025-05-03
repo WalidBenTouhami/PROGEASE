@@ -1,9 +1,17 @@
 
 // ======= Contenu de config/constants.js =======
 
-//config/constants.js
+// ../backend/config/constants.js
 
-require('dotenv').config();
+require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
+
+// 📌 Valider les variables d'environnement critiques
+const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "OPENAI_API_KEY"];
+REQUIRED_ENV_VARS.forEach((envVar) => {
+    if (!process.env[envVar]) {
+        throw new Error(`La variable d'environnement ${envVar} est manquante.`);
+    }
+});
 
 // 📌 Énumérations globales
 const Enums = Object.freeze({
@@ -29,13 +37,13 @@ const Enums = Object.freeze({
 const SecurityConfig = Object.freeze({
     JWT: {
         EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d", // Durée de validité du token JWT
-        COOKIE_NAME: "__progease_token", // Nom du cookie pour le token
+        COOKIE_NAME: process.env.JWT_COOKIE_NAME || "__progease_token", // Nom du cookie pour le token
     },
     PASSWORD: {
-        MIN_LENGTH: 10, // Longueur minimale du mot de passe
-        SALT_ROUNDS: 12, // Nombre de tours pour le salage du mot de passe
-        MAX_ATTEMPTS: 5, // Nombre maximum de tentatives de connexion
-        LOCKOUT_MINUTES: 30, // Durée de verrouillage après échec
+        MIN_LENGTH: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10, // Longueur minimale du mot de passe
+        SALT_ROUNDS: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12, // Nombre de tours pour le salage du mot de passe
+        MAX_ATTEMPTS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5, // Nombre maximum de tentatives de connexion
+        LOCKOUT_MINUTES: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30, // Durée de verrouillage après échec
     },
 });
 
@@ -86,6 +94,7 @@ const HttpStatus = Object.freeze({
 module.exports = {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT || 3000,
+    JWT_SECRET: process.env.JWT_SECRET,
     OPENAI_API_KEY: process.env.OPENAI_API_KEY,
     Enums,
     SecurityConfig,
@@ -123,60 +132,64 @@ process.env.JWT_SECRET = envConfig.JWT_SECRET;
 // ======= Contenu de exportCode.js =======
 
 const fs = require('fs');
-        const path = require('path');
+            const path = require('path');
 
-        // Liste des fichiers à exporter
-        const filesToExport = [
-            'config/constants.js',
-            'config/db.js',
-            'config/env.js',
-            'exportCode.js',
-            'filesList.js',
-            'server.js',
-            'src/controllers/project.controller.js',
-            'src/middlewares/project.middleware.js',
-            'src/models/project.model.js',
-            'src/models/user.model.js',
-            'src/routers/ai.router.js',
-            'src/routers/project.router.js',
-            'src/schema.js',
-            'src/services/ai.service.js',
-            'src/services/github.service.js',
-            'src/services/project.service.js',
-            'src/utils/date.util.js',
-            'src/utils/github.util.js',
-            'src/utils/project.class.js',
-            'src/utils/project.utils.js',
-            'src/validations/project.validation.js'
-        ];
+            // Liste des fichiers à exporter
+            const filesToExport = [
+                'config/constants.js',
+                'config/db.js',
+                'config/env.js',
+                'exportCode.js',
+                'filesList.js',
+                'server.js',
+                'src/controllers/project.controller.js',
+                'src/graphql/resolvers.js',
+                'src/graphql/typeDefs.js',
+                'src/middlewares/project.middleware.js',
+                'src/middlewares/validate.Request.js',
+                'src/models/project.model.js',
+                'src/routers/ai.router.js',
+                'src/routers/project.router.js',
+                'src/schema.js',
+                'src/services/ai.service.js',
+                'src/services/github.service.js',
+                'src/services/project.service.js',
+                'src/utils/date.util.js',
+                'src/utils/github.util.js',
+                'src/utils/project.class.js',
+                'src/utils/project.utils.js',
+                'src/validations/project.validation.js',
+                'test-env.js',
+                'testGithubService.js'
+            ];
 
-        // Chemin du fichier de sortie
-        const outputFile = './exported_code.txt';
+            // Chemin du fichier de sortie
+            const outputFile = './exported_code.txt';
 
-        async function exportCode() {
-            try {
-                let outputContent = '';
+            async function exportCode() {
+                try {
+                    let outputContent = '';
 
-                for (const file of filesToExport) {
-                    const filePath = path.resolve(file);
+                    for (const file of filesToExport) {
+                        const filePath = path.resolve(file);
 
-                    if (fs.existsSync(filePath)) {
-                        const fileContent = fs.readFileSync(filePath, 'utf-8');
-                        outputContent += `\n// ======= Contenu de ${file} =======\n\n`;
-                        outputContent += fileContent + '\n';
-                    } else {
-                        console.warn(`⚠️ Fichier introuvable : ${file}`);
+                        if (fs.existsSync(filePath)) {
+                            const fileContent = fs.readFileSync(filePath, 'utf-8');
+                            outputContent += `\n// ======= Contenu de ${file} =======\n\n`;
+                            outputContent += fileContent + '\n';
+                        } else {
+                            console.warn(`⚠️ Fichier introuvable : ${file}`);
+                        }
                     }
+
+                    fs.writeFileSync(outputFile, outputContent, 'utf-8');
+                    console.log(`✅ Code exporté avec succès dans ${outputFile}`);
+                } catch (error) {
+                    console.error('❌ Erreur lors de l\'exportation :', error.message);
                 }
-
-                fs.writeFileSync(outputFile, outputContent, 'utf-8');
-                console.log(`✅ Code exporté avec succès dans ${outputFile}`);
-            } catch (error) {
-                console.error('❌ Erreur lors de l\'exportation :', error.message);
             }
-        }
 
-        exportCode();
+            exportCode();
 
 // ======= Contenu de filesList.js =======
 
@@ -228,223 +241,511 @@ const fs = require('fs');
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config(); // Charge les variables d'environnement depuis le fichier .env
+const morgan = require('morgan'); // Importing morgan for logging
+require('dotenv').config(); // Load environment variables from .env
+const { ApolloServer } = require('apollo-server-express');
+const { typeDefs } = require('./src/graphql/typeDefs'); // Your GraphQL schema
+const { resolvers } = require('./src/graphql/resolvers'); // Your resolvers
 const projectRouter = require('./src/routers/project.router');
+const aiRouter = require('./src/routers/ai.router');
 
+// Initialize Express application
 const app = express();
 
-// Récupération des variables d'environnement
+// Retrieve environment variables
 const MONGO_URI = process.env.MONGO_URI;
-const PORT = process.env.PORT || 3000; // Fallback sur 3000 si PORT est manquant
+const PORT = process.env.PORT || 3000; // Default to 3000 if PORT is not defined
 
-// Vérification des variables critiques
+// Check for critical environment variables
 if (!MONGO_URI) {
-    console.error('Erreur : La variable MONGO_URI est manquante dans le fichier .env');
-    process.exit(1);
+    console.error('Error: MONGO_URI is missing in environment variables.');
+    process.exit(1); // Terminate process if MONGO_URI is missing
 }
 
 // Middleware
-app.use(cors());
-app.use(express.json());
+app.use(morgan('dev')); // Logging middleware
+app.use(cors()); // Enable Cross-Origin Resource Sharing
+app.use(express.json()); // Middleware to parse incoming JSON requests
 
-// Connexion à MongoDB avec mongoose
+// Initialize Apollo Server
+const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+});
+
+// Start Apollo Server and apply middleware to Express app
+async function startServer() {
+    await server.start();
+    server.applyMiddleware({ app }); // Apply Apollo middleware
+}
+
+// Connect to MongoDB using mongoose
 mongoose
     .connect(MONGO_URI)
-    .then(() => console.log('✅ Connecté à MongoDB'))
+    .then(() => console.log('✅ Connected to MongoDB'))
     .catch((err) => {
-        console.error('❌ Erreur de connexion à MongoDB :', err);
-        process.exit(1); // Arrête le serveur si la connexion échoue
+        console.error('❌ MongoDB connection error:', err);
+        process.exit(1); // Terminate process if MongoDB connection fails
     });
 
-// Routes
+// Define routes
 app.get('/', (req, res) => {
-    res.send('API PROGEASE fonctionne correctement');
+    res.send('API PROGEASE is working correctly');
 });
 
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK', timestamp: new Date() });
 });
 
-app.use('/api/projects', projectRouter);
-app.use('/api/v1/ai', require('./src/routers/ai.router'));
+app.use('/api/projects', projectRouter); // Project-related routes
+app.use('/api/v1/ai', aiRouter); // AI-related routes
 
-// Gestion des routes non définies
+// Handle undefined routes
 app.use((req, res) => {
-    res.status(404).json({ error: 'Route non trouvée' });
+    res.status(404).json({ error: 'Route not found' });
 });
 
-// Gestion des erreurs globales
+// Global error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
-    res.status(500).json({ error: 'Erreur interne du serveur' });
+    res.status(500).json({ error: 'Internal server error' });
 });
 
-// Démarrage du serveur
-app.listen(PORT, () => {
-    console.log(`✅ Serveur démarré sur le port ${PORT}`);
+// Start both Apollo Server and Express
+startServer().then(() => {
+    app.listen(PORT, () => {
+        console.log(`🚀 Apollo Server is ready at http://localhost:${PORT}${server.graphqlPath}`);
+        console.log(`✅ Server started on port ${PORT}`);
+    });
 });
 
 // ======= Contenu de src/controllers/project.controller.js =======
 
-// src/controllers/project.controller.js
+// scr/controllers/project.controller.js
 
-const Project = require('../models/project.model');
+const Project = require('../models/project.model'); // Import the Mongoose model for projects
+const mongoose = require('mongoose');
 
-// ✅ Créer un projet
-const createProject = async (req, res) => {
+
+//*******************************//
+// Project controller functions //
+//*****************************//
+
+// Controller for creating a new project
+exports.createProject = async (req, res) => {
     try {
         const project = new Project(req.body);
-        await project.save();
-        res.status(201).json(project);
+        const savedProject = await project.save();
+        res.status(201).json(savedProject);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error creating project:', error);
+        res.status(500).json({ error: 'Erreur lors de la création du projet' });
     }
 };
 
-// ✅ Récupérer tous les projets
-const getProjects = async (req, res) => {
+// Controller for retrieving all projects
+exports.getProjects = async (req, res) => {
     try {
-        const projects = await Project.find().populate('equipe tuteur');
+        const projects = await Project.find();
         res.status(200).json(projects);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error retrieving projects:', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération des projets' });
     }
 };
 
-// ✅ Récupérer un projet par ID
-const getProjectById = async (req, res) => {
+// Controller for retrieving a single project by ID
+exports.getProjectById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const project = await Project.findById(id).populate('equipe tuteur deliverables');
+        const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
         res.status(200).json(project);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error retrieving project by ID:', error);
+        res.status(500).json({ error: 'Erreur lors de la récupération du projet' });
     }
 };
 
-// ✅ Mettre à jour un projet
-const updateProject = async (req, res) => {
+// Controller for updating a project
+exports.updateProject = async (req, res) => {
     try {
-        const { id } = req.params;
-        const project = await Project.findByIdAndUpdate(id, req.body, { new: true });
-        if (!project) {
+        const updatedProject = await Project.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true } // Ensure validators are enforced during updates
+        );
+        if (!updatedProject) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        res.status(200).json(project);
+        res.status(200).json(updatedProject);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error updating project:', error);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour du projet' });
     }
 };
 
-// ✅ Supprimer un projet
-const deleteProject = async (req, res) => {
+// Controller for deleting a project
+exports.deleteProject = async (req, res) => {
     try {
-        const { id } = req.params;
-        const project = await Project.findByIdAndDelete(id);
-        if (!project) {
+        const deletedProject = await Project.findByIdAndDelete(req.params.id);
+        if (!deletedProject) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        res.status(200).json({ message: 'Projet supprimé avec succès' });
+        res.status(204).send();
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error deleting project:', error);
+        res.status(500).json({ error: 'Erreur lors de la suppression du projet' });
     }
 };
+//***********************************//
+// Deliverable controller functions //
+//*********************************//
 
-// ✅ Ajouter un livrable à un projet
-const addDeliverable = async (req, res) => {
+// Controller for adding a deliverable to a project
+exports.addDeliverable = async (req, res) => {
     try {
-        const { id } = req.params;
-        const project = await Project.findById(id);
+        // Validate project existence
+        const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        project.deliverables.push(req.body);
+
+        // Validate request body
+        const { name, description, deadline, repositoryUrl } = req.body;
+        if (!name || !description || !deadline || !repositoryUrl) {
+            return res.status(400).json({ error: 'Tous les champs sont requis : name, description, deadline, repositoryUrl.' });
+        }
+
+        // Create deliverable
+        const deliverable = {
+            name,
+            description,
+            deadline,
+            repositoryUrl,
+            statut: 'PENDING', // Default status
+        };
+
+        project.deliverables.push(deliverable);
         await project.save();
-        res.status(201).json(project);
+
+        res.status(201).json(deliverable);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error adding deliverable:', error.message);
+        res.status(500).json({ error: 'Erreur lors de l\'ajout du livrable' });
     }
 };
 
-// ✅ Mettre à jour un livrable
-const updateDeliverable = async (req, res) => {
+// Controller for retrieving all deliverables of a project
+exports.getDeliverables = async (req, res) => {
     try {
-        const { id, deliverableId } = req.params;
-        const project = await Project.findById(id);
+        // Fetch deliverables of the project
+        const project = await Project.findById(req.params.id).select('deliverables');
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        const deliverable = project.deliverables.id(deliverableId);
+
+        res.status(200).json(project.deliverables);
+    } catch (error) {
+        console.error('Error retrieving deliverables:', error.message);
+        res.status(500).json({ error: 'Erreur lors de la récupération des livrables' });
+    }
+};
+
+// Controller for updating a specific deliverable of a project
+exports.updateDeliverable = async (req, res) => {
+    try {
+        // Validate project existence
+        const project = await Project.findById(req.params.id);
+        if (!project) {
+            return res.status(404).json({ error: 'Projet introuvable' });
+        }
+
+        // Validate deliverable existence
+        const deliverable = project.deliverables.id(req.params.deliverableId);
         if (!deliverable) {
             return res.status(404).json({ error: 'Livrable introuvable' });
         }
-        Object.assign(deliverable, req.body);
+
+        // Update only provided fields
+        const { name, statut, deadline, repositoryUrl } = req.body;
+        if (name !== undefined) deliverable.name = name;
+        if (statut !== undefined) deliverable.statut = statut;
+        if (deadline !== undefined) deliverable.deadline = deadline;
+        if (repositoryUrl !== undefined) deliverable.repositoryUrl = repositoryUrl;
+
         await project.save();
-        res.status(200).json(project);
+
+        res.status(200).json(deliverable);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error updating deliverable:', error.message);
+        res.status(500).json({ error: 'Erreur lors de la mise à jour du livrable' });
     }
 };
 
-// ✅ Supprimer un livrable
-const removeDeliverable = async (req, res) => {
+// Controller for removing a specific deliverable from a project
+exports.removeDeliverable = async (req, res) => {
     try {
-        const { id, deliverableId } = req.params;
-        const project = await Project.findById(id);
+        // Validate project existence
+        const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
-        project.deliverables.id(deliverableId).remove();
+
+        // Validate deliverable existence
+        const deliverable = project.deliverables.id(req.params.deliverableId);
+        if (!deliverable) {
+            return res.status(404).json({ error: 'Livrable introuvable' });
+        }
+
+        // Remove deliverable
+        deliverable.remove();
         await project.save();
-        res.status(200).json(project);
+
+        res.status(204).send(); // No content
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error('Error deleting deliverable:', error.message);
+        res.status(500).json({ error: 'Erreur lors de la suppression du livrable' });
     }
 };
 
-module.exports = {
-    createProject,
-    getProjects,
-    getProjectById,
-    updateProject,
-    deleteProject,
-    addDeliverable,
-    updateDeliverable,
-    removeDeliverable,
-};
+// ======= Contenu de src/graphql/resolvers.js =======
+
+const Project = require('../models/project.model'); // Import Project model
+const Deliverable = require('../models/project.model');
+
+        const resolvers = {
+            Query: {
+                // Retrieve all projects
+                projects: async () => {
+                    try {
+                        return await Project.find();
+                    } catch (error) {
+                        throw new Error('Failed to fetch projects: ' + error.message);
+                    }
+                },
+
+                // Retrieve a single project by ID
+                project: async (_, { id }) => {
+                    try {
+                        const project = await Project.findById(id);
+                        if (!project) {
+                            throw new Error('Project not found');
+                        }
+                        return project;
+                    } catch (error) {
+                        throw new Error('Failed to fetch project: ' + error.message);
+                    }
+                },
+
+                // Retrieve all deliverables for a specific project
+                deliverables: async (_, { projectId }) => {
+                    try {
+                        const project = await Project.findById(projectId);
+                        if (!project) {
+                            throw new Error('Project not found');
+                        }
+                        return project.deliverables;
+                    } catch (error) {
+                        throw new Error('Failed to fetch deliverables: ' + error.message);
+                    }
+                },
+            },
+
+            Mutation: {
+                // Create a new project
+                createProject: async (_, { input }) => {
+                    try {
+                        const newProject = new Project(input);
+                        return await newProject.save();
+                    } catch (error) {
+                        throw new Error('Failed to create project: ' + error.message);
+                    }
+                },
+
+                // Update a project
+                updateProject: async (_, { id, input }) => {
+                    try {
+                        const updatedProject = await Project.findByIdAndUpdate(id, input, { new: true, runValidators: true });
+                        if (!updatedProject) {
+                            throw new Error('Project not found');
+                        }
+                        return updatedProject;
+                    } catch (error) {
+                        throw new Error('Failed to update project: ' + error.message);
+                    }
+                },
+
+                // Delete a project
+                deleteProject: async (_, { id }) => {
+                    try {
+                        const deletedProject = await Project.findByIdAndDelete(id);
+                        if (!deletedProject) {
+                            throw new Error('Project not found');
+                        }
+                        return deletedProject;
+                    } catch (error) {
+                        throw new Error('Failed to delete project: ' + error.message);
+                    }
+                },
+
+                // Add a deliverable to a project
+                addDeliverable: async (_, { projectId, input }) => {
+                    try {
+                        const project = await Project.findById(projectId);
+                        if (!project) {
+                            throw new Error('Project not found');
+                        }
+
+                        if (!input.name || !input.description || !input.deadline || !input.repositoryUrl) {
+                            throw new Error('All deliverable fields are required: name, description, deadline, repositoryUrl.');
+                        }
+
+                        project.deliverables.push(input);
+                        await project.save();
+
+                        return project;
+                    } catch (error) {
+                        throw new Error('Failed to add deliverable: ' + error.message);
+                    }
+                },
+
+                // Update a specific deliverable of a project
+                updateDeliverable: async (_, { projectId, deliverableId, input }) => {
+                    try {
+                        const project = await Project.findById(projectId);
+                        if (!project) {
+                            throw new Error('Project not found');
+                        }
+
+                        const deliverable = project.deliverables.id(deliverableId);
+                        if (!deliverable) {
+                            throw new Error('Deliverable not found');
+                        }
+
+                        Object.assign(deliverable, input);
+                        await project.save();
+
+                        return deliverable;
+                    } catch (error) {
+                        throw new Error('Failed to update deliverable: ' + error.message);
+                    }
+                },
+
+                // Remove a specific deliverable from a project
+                removeDeliverable: async (_, { projectId, deliverableId }) => {
+                    try {
+                        const project = await Project.findById(projectId);
+                        if (!project) {
+                            throw new Error('Project not found');
+                        }
+
+                        const deliverable = project.deliverables.id(deliverableId);
+                        if (!deliverable) {
+                            throw new Error('Deliverable not found');
+                        }
+
+                        deliverable.remove();
+                        await project.save();
+
+                        return deliverable;
+                    } catch (error) {
+                        throw new Error('Failed to remove deliverable: ' + error.message);
+                    }
+                },
+            },
+        };
+
+        module.exports = { resolvers };
+
+// ======= Contenu de src/graphql/typeDefs.js =======
+
+const { gql } = require('apollo-server-express');
+
+const typeDefs = gql`
+    type Project {
+        id: ID!
+        name: String!
+        description: String
+        startDate: String
+        endDate: String
+        status: String
+        deliverables: [Deliverable!]! # Array of deliverables associated with the project
+    }
+
+    input ProjectInput {
+        name: String!
+        description: String
+        startDate: String
+        endDate: String
+        status: String
+    }
+
+    type Deliverable {
+        id: ID!
+        title: String!
+        description: String
+        deadline: String
+        status: String
+    }
+
+    input DeliverableInput {
+        title: String!
+        description: String
+        deadline: String
+        status: String
+    }
+
+    type Query {
+        projects: [Project!]!
+        project(id: ID!): Project
+        deliverables(projectId: ID!): [Deliverable!]!
+    }
+
+    type Mutation {
+        createProject(input: ProjectInput!): Project!
+        updateProject(id: ID!, input: ProjectInput!): Project!
+        deleteProject(id: ID!): Project!
+
+        addDeliverable(projectId: ID!, input: DeliverableInput!): Project!
+        updateDeliverable(projectId: ID!, deliverableId: ID!, input: DeliverableInput!): Deliverable!
+        removeDeliverable(projectId: ID!, deliverableId: ID!): Deliverable!
+    }
+`;
+
+module.exports = { typeDefs };
 
 // ======= Contenu de src/middlewares/project.middleware.js =======
 
 // backend/src/middlewares/project.middleware.js
 
-const { projectSchema } = require('../validations/project.validation');
+const { validationResult } = require('express-validator');
 
-const validateProject = async (req, res, next) => {
-    try {
-        await projectSchema.validate(req.body, { abortEarly: false });
-        next();
-    } catch (error) {
-        res.status(400).json({
-            message: 'Validation échouée.',
-            errors: error.inner.map(err => ({
-                path: err.path,
-                message: err.message,
-            })),
-        });
+module.exports = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
     }
+    next();
 };
 
-                module.exports = { validateProject };
+// ======= Contenu de src/middlewares/validate.Request.js =======
+
+const { validationResult } = require('express-validator');
+
+// Middleware pour valider les requêtes
+module.exports = (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    next();
+};
 
 // ======= Contenu de src/models/project.model.js =======
 
 const mongoose = require('mongoose');
-const { checkGithubRepoExists } = require('../services/github.service');
-const { Enums } = require('../../config/constants');
-const User = require('../models/user.model');
 const { Schema } = mongoose;
 
 // ✅ Sous-schéma pour les livrables
@@ -454,11 +755,16 @@ const deliverableSchema = new Schema({
         required: [true, 'Le nom du livrable est requis.'],
         trim: true
     },
+    description: {
+        type: String,
+        required: [true, 'La description du livrable est requise.'],
+        trim: true
+    },
     deadline: {
         type: Date,
         required: [true, 'La deadline est requise.'],
         validate: {
-            validator: (v) => v > Date.now() + 86400000,
+            validator: (v) => v > Date.now() + 86400000, // Minimum 24h dans le futur
             message: 'La deadline doit être au moins 24h dans le futur.'
         }
     },
@@ -468,23 +774,24 @@ const deliverableSchema = new Schema({
         validate: {
             validator: async function (url) {
                 const pattern = /^https:\/\/github\.com\/[^/]+\/[^/]+$/;
-                if (!pattern.test(url)) return false;
-
-                try {
-                    return await checkGithubRepoExists(url);
-                } catch (err) {
-                    console.warn('⚠️ Erreur GitHub API :', err.message);
-                    return false;
-                }
+                return pattern.test(url);
             },
             message: 'URL GitHub invalide ou dépôt inexistant.'
         }
     },
     statut: {
         type: String,
-        enum: Object.values(Enums.DeliverableStatus),
-        default: Enums.DeliverableStatus.PENDING,
+        enum: ['OVERDUE', 'PENDING', 'COMPLETED'],
+        default: 'PENDING',
         required: [true, 'Le statut est requis.']
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
@@ -500,15 +807,14 @@ const projectSchema = new Schema({
         required: [true, 'La description est requise.'],
         trim: true
     },
-    equipe: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: [true, 'L\'équipe est requise.']
-    }],
+    equipe: {
+        // Simule une liste d'IDs au lieu de références au modèle `User`
+        type: [mongoose.Schema.Types.ObjectId],
+        default: []
+    },
     tuteur: {
-        type: Schema.Types.ObjectId,
-        ref: 'User',
-        required: [true, 'Le tuteur est requis.']
+        // Simule un ObjectId au lieu d'une référence au modèle `User`
+        type: mongoose.Schema.Types.ObjectId
     },
     skills: {
         type: [String],
@@ -556,66 +862,28 @@ projectSchema.index({
     skillsText: 'text'
 });
 
-// ✅ Validation des membres d’équipe avant sauvegarde
-projectSchema.pre('save', async function (next) {
-    if (this.isModified('equipe')) {
-        const existingUsers = await User.countDocuments({
-            _id: { $in: this.equipe }
-        });
-
-        console.log("Membres de l'équipe fournis :", this.equipe);
-        console.log("Nombre d'utilisateurs existants :", existingUsers);
-
-        if (existingUsers !== this.equipe.length) {
-            return next(new Error("Un ou plusieurs membres de l'équipe sont invalides."));
-        }
-    }
-    next();
-});
-
-
 module.exports = mongoose.model('Project', projectSchema);
-
-// ======= Contenu de src/models/user.model.js =======
-
-// src/models/user.model.js
-
-const mongoose = require('mongoose');
-const { Enums } = require('../../config/constants');
-const { Schema } = mongoose;
-
-const userSchema = new Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
-    role: {
-        type: String,
-        enum: Object.values(Enums.UserRole),
-        required: true
-    }
-}, { timestamps: true });
-
-module.exports = mongoose.model('User', userSchema);
 
 // ======= Contenu de src/routers/ai.router.js =======
 
 // src/routers/ai.router.js
 
-
-// backend/src/routers/ai.router.js
 const express = require('express');
 const router = express.Router();
+const { generateText } = require('../services/ai.service');
 
-// Route AI
-router.get('/', (req, res) => {
-    res.send('AI Router fonctionne correctement');
+// Endpoint pour générer du texte avec IA
+router.post('/generate', async (req, res) => {
+    const { prompt } = req.body;
+    if (!prompt) {
+        return res.status(400).json({ error: 'Le champ "prompt" est requis.' });
+    }
+    try {
+        const result = await generateText(prompt);
+        res.status(200).json({ result });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
 });
 
 module.exports = router;
@@ -623,265 +891,177 @@ module.exports = router;
 // ======= Contenu de src/routers/project.router.js =======
 
 const express = require('express');
-const projectController = require('../controllers/project.controller');
-
 const router = express.Router();
+const projectController = require('../controllers/project.controller'); // Import project controllers
 
-// ✅ Routes pour les projets
-router.post('/', projectController.createProject); // Créer un projet
-router.get('/', projectController.getProjects); // Récupérer tous les projets
-router.get('/:id', projectController.getProjectById); // Récupérer un projet par ID
-router.put('/:id', projectController.updateProject); // Mettre à jour un projet
-router.delete('/:id', projectController.deleteProject); // Supprimer un projet
 
-// ✅ Routes pour les livrables
-router.post('/:id/deliverables', projectController.addDeliverable); // Ajouter un livrable à un projet
-router.put('/:id/deliverables/:deliverableId', projectController.updateDeliverable); // Mettre à jour un livrable
-router.delete('/:id/deliverables/:deliverableId', projectController.removeDeliverable); // Supprimer un livrable
+//------------------------------------------------------//
+//       1.Routes for project management                //
+//------------------------------------------------------//
+
+// Route for creating a new project
+router.post('/', projectController.createProject);
+
+// Route for retrieving all projects
+router.get('/', projectController.getProjects);
+
+// Route for retrieving a single project by ID
+router.get('/:id', projectController.getProjectById);
+
+// Route for updating a project
+router.put('/:id', projectController.updateProject);
+
+// Route for deleting a project
+router.delete('/:id', projectController.deleteProject);
+
+//------------------------------------------------------//
+// 2.Routes for deliverables management within a project//
+//------------------------------------------------------//
+
+// Route for adding a deliverable to a project
+router.post('/:id/deliverables', projectController.addDeliverable);
+
+// Route for retrieving all deliverables of a project
+router.get('/:id/deliverables', projectController.getDeliverables);
+
+// Route for updating a specific deliverable of a project
+router.put('/:id/deliverables/:deliverableId', projectController.updateDeliverable);
+
+// Route for removing a specific deliverable from a project
+router.delete('/:id/deliverables/:deliverableId', projectController.removeDeliverable);
 
 module.exports = router;
-
-
 
 // ======= Contenu de src/schema.js =======
 
 // src/schema.js
 
-    const { gql } = require('apollo-server-express');
-    const Project = require('../src/models/project.model');
-    const User = require('../src/models/user.model');
-    const Evaluation = require('../src/models/evaluation.model');
-    const IaService = require('../src/services/ai.service');
+const { gql } = require('apollo-server-express');
+const { Enums } = require('../config/constants'); // Importation des énumérations depuis constants.js
 
-    // 📌 Définition des types GraphQL
-    const typeDefs = gql`
-        # 📌 Type utilisateur
-        type User {
-            _id: ID!
-            email: String!
-            role: String!
-            experience: Int
-            skills: [String]
-        }
-    
-        # 📌 Type projet
-        type Project {
-            _id: ID!
+// Dynamically generate the enum values from constants
+const userRoleEnumValues = Object.keys(Enums.UserRole).join("\n");
+const projectStatusEnumValues = Object.keys(Enums.ProjectStatus).join("\n");
+const deliverableStatusEnumValues = Object.keys(Enums.DeliverableStatus).join("\n");
+
+// Define the GraphQL schema
+const typeDefs = gql`
+    # 📌 Enumération UserRole
+    enum UserRole {
+    ${userRoleEnumValues}
+    },
+
+    # 📌 Enumérations ProjectStatus et DeliverableStatus
+    enum ProjectStatus {
+    ${projectStatusEnumValues}
+    },
+
+    enum DeliverableStatus {
+    ${deliverableStatusEnumValues}
+    },
+
+    # 📌 Type utilisateur
+    type User {
+        _id: ID!
+        name: String!
+        email: String!
+        role: UserRole! # Utilise l'énumération UserRole
+        createdAt: String
+        updatedAt: String
+    }
+
+    # 📌 Type livrable
+    type Deliverable {
+        name: String!
+        description: String!
+        deadline: String!
+        repositoryUrl: String!
+        status: DeliverableStatus! # Utilise l'énumération DeliverableStatus
+    }
+
+    # 📌 Type évaluation
+    type Evaluation {
+        _id: ID!
+        projectId: Project! # Référence au projet
+        evaluatorId: User! # Référence à l'évaluateur
+        score: Int!
+        comments: String
+        createdAt: String
+        updatedAt: String
+    }
+
+    # 📌 Type projet
+    type Project {
+        _id: ID!
+        titre: String!
+        description: String
+        equipe: [User!]!
+        tuteur: User!
+        skills: [String!]!
+        startDate: String!
+        endDate: String!
+        deliverables: [Deliverable!]! # Liste des livrables
+        evaluations: [Evaluation!]! # Liste des évaluations
+        progression: Float
+        predictedPerformance: Float
+        status: ProjectStatus! # Utilise l'énumération ProjectStatus
+        createdAt: String
+        updatedAt: String
+    }
+
+    # 📌 Requêtes disponibles
+    type Query {
+        projects: [Project!]!
+        project(id: ID!): Project
+        users: [User!]!
+        user(id: ID!): User
+        getProjectProgress(id: ID!): Float
+        getPredictedPerformance(id: ID!): Float
+        getSmartTutor(id: ID!): User
+    }
+
+    # 📌 Mutations disponibles
+    type Mutation {
+        createProject(
             titre: String!
             description: String
-            equipe: [User!]!
-            tuteur: User!
-            status: String!
-            deliverables: [Deliverable!]!
-            evaluations: [Evaluation!]!
-            progression: Float
-            predictedPerformance: Float
-        }
-    
-        # 📌 Type livrable
-        type Deliverable {
-            name: String!
-            deadline: String!
-            status: String!
-            repositoryUrl: String!
-        }
-    
-        # 📌 Type évaluation
-        type Evaluation {
-            _id: ID!
-            projet_id: Project!
-            evaluateur_id: User!
-            score: Int!
-            comments: String
-        }
-    
-        # 📌 Requêtes disponibles
-        type Query {
-            projects: [Project!]!
-            project(id: ID!): Project
-            users: [User!]!
-            user(id: ID!): User
-            getProjectProgress(id: ID!): Float
-            getPredictedPerformance(id: ID!): Float
-            getSmartTutor(id: ID!): User
-        }
-    
-        # 📌 Mutations disponibles
-        type Mutation {
-            createProject(
-                titre: String!
-                description: String
-                equipe: [ID!]!
-                tuteur: ID!
-                deliverables: [DeliverableInput!]!
-                skills: [String!]!
-            ): Project
-    
-            addEvaluation(
-                projectId: ID!
-                evaluation: EvaluationInput!
-            ): Project
-    
-            predictPerformance(projectId: ID!): Float
-            assignSmartTutor(projectId: ID!): Project
-            setupReminders(projectId: ID!): String
-        }
-    
-        # 📌 Entrée pour les livrables
-        input DeliverableInput {
-            name: String!
-            deadline: String!
-            status: String
-            repositoryUrl: String!
-        }
-    
-        # 📌 Entrée pour les évaluations
-        input EvaluationInput {
-            projet_id: ID!
-            evaluateur_id: ID!
-            score: Int!
-            comments: String
-        }
-    `;
+            equipe: [ID!]!
+            tuteur: ID!
+            skills: [String!]!
+            startDate: String!
+            endDate: String!
+            deliverables: [DeliverableInput!]! # Entrée pour les livrables
+            status: ProjectStatus! # Utilise l'énumération ProjectStatus
+        ): Project
 
-    // 📌 Résolveurs pour les requêtes et mutations
-    const resolvers = {
-        Query: {
-            projects: async () => {
-                try {
-                    return await Project.find().populate(['equipe', 'tuteur']).lean();
-                } catch (error) {
-                    throw new Error(`Erreur lors de la récupération des projets : ${error.message}`);
-                }
-            },
-            project: async (_, { id }) => {
-                try {
-                    const project = await Project.findById(id).populate(['equipe', 'tuteur', 'evaluations']).lean();
-                    if (!project) throw new Error('Projet introuvable');
-                    return project;
-                } catch (error) {
-                    throw new Error(`Erreur lors de la récupération du projet : ${error.message}`);
-                }
-            },
-            users: async () => {
-                try {
-                    return await User.find().lean();
-                } catch (error) {
-                    throw new Error(`Erreur lors de la récupération des utilisateurs : ${error.message}`);
-                }
-            },
-            user: async (_, { id }) => {
-                try {
-                    const user = await User.findById(id).lean();
-                    if (!user) throw new Error('Utilisateur introuvable');
-                    return user;
-                } catch (error) {
-                    throw new Error(`Erreur lors de la récupération de l'utilisateur : ${error.message}`);
-                }
-            },
-            getProjectProgress: async (_, { id }) => {
-                try {
-                    return await IaService.trackProgress(id);
-                } catch (error) {
-                    throw new Error(`Erreur lors du suivi de la progression : ${error.message}`);
-                }
-            },
-            getPredictedPerformance: async (_, { id }) => {
-                try {
-                    return await IaService.predictPerformance(id);
-                } catch (error) {
-                    throw new Error(`Erreur lors de la prédiction des performances : ${error.message}`);
-                }
-            },
-            getSmartTutor: async (_, { id }) => {
-                try {
-                    return await IaService.matchTutor(id);
-                } catch (error) {
-                    throw new Error(`Erreur lors de la recherche du tuteur intelligent : ${error.message}`);
-                }
-            }
-        },
+        addEvaluation(
+            projectId: ID! # Référence au projet
+            evaluation: EvaluationInput! # Entrée pour l'évaluation
+        ): Project
 
-        Mutation: {
-            createProject: async (_, args) => {
-                try {
-                    const { error } = graphqlCreateProjectSchema.validate(args, { abortEarly: false });
-                    if (error) {
-                        throw new Error('Erreur de validation : ' + error.details.map(e => e.message).join(', '));
-                    }
+        predictPerformance(projectId: ID!): Float
+        assignSmartTutor(projectId: ID!): Project
+        setupReminders(projectId: ID!): String
+    }
 
-                    const newProject = new Project(args);
-                    await newProject.save();
+    # 📌 Entrée pour les livrables
+    input DeliverableInput {
+        name: String!
+        deadline: String!
+        status: DeliverableStatus! # Utilise l'énumération DeliverableStatus
+        repositoryUrl: String!
+    }
 
-                    await Promise.all([
-                        IaService.trackProgress(newProject._id),
-                        IaService.predictPerformance(newProject._id),
-                        IaService.setupReminders(newProject._id)
-                    ]);
+    # 📌 Entrée pour les évaluations
+    input EvaluationInput {
+        projectId: ID! # Référence au projet
+        evaluatorId: ID! # Référence à l'évaluateur
+        score: Int!
+        comments: String
+    }
+`;
 
-                    return newProject;
-                } catch (error) {
-                    throw new Error(`Erreur lors de la création du projet : ${error.message}`);
-                }
-            },
-            addEvaluation: async (_, { projectId, evaluation }) => {
-                try {
-                    const project = await Project.findById(projectId);
-                    if (!project) throw new Error('Projet non trouvé');
-
-                    const newEvaluation = await Evaluation.create(evaluation);
-                    project.evaluations.push(newEvaluation._id);
-                    await project.save();
-
-                    return project;
-                } catch (error) {
-                    throw new Error(`Erreur lors de l'ajout de l'évaluation : ${error.message}`);
-                }
-            },
-            predictPerformance: async (_, { projectId }) => {
-                try {
-                    return await IaService.predictPerformance(projectId);
-                } catch (error) {
-                    throw new Error(`Erreur lors de la prédiction des performances : ${error.message}`);
-                }
-            },
-            assignSmartTutor: async (_, { projectId }) => {
-                try {
-                    const tutor = await IaService.matchTutor(projectId);
-                    const updatedProject = await Project.findByIdAndUpdate(
-                        projectId,
-                        { tuteur: tutor._id },
-                        { new: true }
-                    ).lean();
-                    if (!updatedProject) throw new Error('Projet introuvable');
-                    return updatedProject;
-                } catch (error) {
-                    throw new Error(`Erreur lors de l'attribution du tuteur : ${error.message}`);
-                }
-            },
-            setupReminders: async (_, { projectId }) => {
-                try {
-                    await IaService.setupReminders(projectId);
-                    return 'Rappels programmés avec succès';
-                } catch (error) {
-                    throw new Error(`Erreur lors de la configuration des rappels : ${error.message}`);
-                }
-            }
-        },
-
-        Project: {
-            tuteur: async (project) => await User.findById(project.tuteur).lean(),
-            equipe: async (project) => await User.find({ _id: { $in: project.equipe } }).lean(),
-            evaluations: async (project) => await Evaluation.find({ _id: { $in: project.evaluations } }).lean()
-        },
-
-        Evaluation: {
-            projet_id: async (evaluation) => await Project.findById(evaluation.projet_id).lean(),
-            evaluateur_id: async (evaluation) => await User.findById(evaluation.evaluateur_id).lean()
-        }
-    };
-
-    module.exports = { typeDefs, resolvers };
+module.exports = { typeDefs };
 
 // ======= Contenu de src/services/ai.service.js =======
 
@@ -904,16 +1084,35 @@ async function generateText(prompt) {
     });
     return response.choices[0].message.content.trim();
   } catch (error) {
+    // Log complet de l'erreur pour débogage
     console.error('Erreur lors de la génération de texte :', error);
+    console.error('Erreur complète :', error.response?.data || error.message);
     throw error;
+  }
+}
+
+async function generateText(prompt) {
+  try {
+    const response = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: 100,
+    });
+    return response.choices[0].message.content.trim();
+  } catch (error) {
+    if (error.response?.status === 429) {
+      console.error('Quota dépassé :', error.response.data.error.message);
+      throw new Error('Quota dépassé. Veuillez vérifier vos limites et réessayer plus tard.');
+    } else {
+      console.error('Erreur lors de la génération de texte :', error);
+      throw error;
+    }
   }
 }
 
 module.exports = { generateText };
 
 // ======= Contenu de src/services/github.service.js =======
-
-// src/services/github.service.js
 
 const dotenv = require('dotenv');
 dotenv.config();
@@ -927,10 +1126,12 @@ const axios = require('axios');
  */
 async function checkGithubRepoExists(url) {
     try {
-        // 🧠 Extraire owner/repo du lien GitHub
-        const match = url.match(/^https:\/\/github\.com\/([^/]+)\/([^/]+)(\.git)?$/);
+        // Vérifie si l'URL est valide
+        const pattern = /^https:\/\/github\.com\/([^/]+)\/([^/]+)$/;
+        const match = url.match(pattern);
+
         if (!match) {
-            console.warn(`[GitHub] ❌ URL GitHub invalide : ${url}`);
+            console.error('❌ URL GitHub invalide :', url);
             return false;
         }
 
@@ -1093,7 +1294,7 @@ module.exports = { ProjectUtils };
 
 // ======= Contenu de src/validations/project.validation.js =======
 
-//src/validations/project.validation.js
+// src/validations/project.validation.js
 
 const yup = require('yup');
 
@@ -1116,3 +1317,34 @@ const projectSchema = yup.object().shape({
 module.exports = {
     projectSchema,
 };
+
+// ======= Contenu de test-env.js =======
+
+require('dotenv').config({ path: './.env' });
+
+console.log('MONGO_URI:', process.env.MONGO_URI);
+
+// ======= Contenu de testGithubService.js =======
+
+const { checkGithubRepoExists } = require('./src/services/github.service'); // Assurez-vous que le chemin est correct
+
+(async () => {
+    try {
+        // Exemple d'URL valide
+        const urlValid = 'https://github.com/WalidBenTouhami/PROGEASE';
+        const existsValid = await checkGithubRepoExists(urlValid);
+        console.log(`Le dépôt "${urlValid}" existe ?`, existsValid);
+
+        // Exemple d'URL invalide (dépôt inexistant)
+        const urlInvalid = 'https://github.com/WalidBenTouhami/NonExistentRepo';
+        const existsInvalid = await checkGithubRepoExists(urlInvalid);
+        console.log(`Le dépôt "${urlInvalid}" existe ?`, existsInvalid);
+
+        // Exemple d'URL mal formatée
+        const urlMalformed = 'https://github.com/Invalid/URL/';
+        const existsMalformed = await checkGithubRepoExists(urlMalformed);
+        console.log(`Le dépôt "${urlMalformed}" existe ?`, existsMalformed);
+    } catch (error) {
+        console.error('Une erreur est survenue :', error.message);
+    }
+})();

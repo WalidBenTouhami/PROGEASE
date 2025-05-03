@@ -1,6 +1,12 @@
 // scr/controllers/project.controller.js
 
 const Project = require('../models/project.model'); // Import the Mongoose model for projects
+const mongoose = require('mongoose');
+
+
+//*******************************//
+// Project controller functions //
+//*****************************//
 
 // Controller for creating a new project
 exports.createProject = async (req, res) => {
@@ -70,19 +76,31 @@ exports.deleteProject = async (req, res) => {
         res.status(500).json({ error: 'Erreur lors de la suppression du projet' });
     }
 };
+//***********************************//
+// Deliverable controller functions //
+//*********************************//
 
 // Controller for adding a deliverable to a project
 exports.addDeliverable = async (req, res) => {
     try {
+        // Validate project existence
         const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
 
+        // Validate request body
+        const { name, description, deadline, repositoryUrl } = req.body;
+        if (!name || !description || !deadline || !repositoryUrl) {
+            return res.status(400).json({ error: 'Tous les champs sont requis : name, description, deadline, repositoryUrl.' });
+        }
+
+        // Create deliverable
         const deliverable = {
-            name: req.body.name,
-            deadline: req.body.deadline,
-            repositoryUrl: req.body.repositoryUrl,
+            name,
+            description,
+            deadline,
+            repositoryUrl,
             statut: 'PENDING', // Default status
         };
 
@@ -91,7 +109,7 @@ exports.addDeliverable = async (req, res) => {
 
         res.status(201).json(deliverable);
     } catch (error) {
-        console.error('Error adding deliverable:', error);
+        console.error('Error adding deliverable:', error.message);
         res.status(500).json({ error: 'Erreur lors de l\'ajout du livrable' });
     }
 };
@@ -99,6 +117,7 @@ exports.addDeliverable = async (req, res) => {
 // Controller for retrieving all deliverables of a project
 exports.getDeliverables = async (req, res) => {
     try {
+        // Fetch deliverables of the project
         const project = await Project.findById(req.params.id).select('deliverables');
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
@@ -106,7 +125,7 @@ exports.getDeliverables = async (req, res) => {
 
         res.status(200).json(project.deliverables);
     } catch (error) {
-        console.error('Error retrieving deliverables:', error);
+        console.error('Error retrieving deliverables:', error.message);
         res.status(500).json({ error: 'Erreur lors de la récupération des livrables' });
     }
 };
@@ -114,27 +133,30 @@ exports.getDeliverables = async (req, res) => {
 // Controller for updating a specific deliverable of a project
 exports.updateDeliverable = async (req, res) => {
     try {
+        // Validate project existence
         const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
 
+        // Validate deliverable existence
         const deliverable = project.deliverables.id(req.params.deliverableId);
         if (!deliverable) {
             return res.status(404).json({ error: 'Livrable introuvable' });
         }
 
         // Update only provided fields
-        if (req.body.name !== undefined) deliverable.name = req.body.name;
-        if (req.body.statut !== undefined) deliverable.statut = req.body.statut;
-        if (req.body.deadline !== undefined) deliverable.deadline = req.body.deadline;
-        if (req.body.repositoryUrl !== undefined) deliverable.repositoryUrl = req.body.repositoryUrl;
+        const { name, statut, deadline, repositoryUrl } = req.body;
+        if (name !== undefined) deliverable.name = name;
+        if (statut !== undefined) deliverable.statut = statut;
+        if (deadline !== undefined) deliverable.deadline = deadline;
+        if (repositoryUrl !== undefined) deliverable.repositoryUrl = repositoryUrl;
 
         await project.save();
 
         res.status(200).json(deliverable);
     } catch (error) {
-        console.error('Error updating deliverable:', error);
+        console.error('Error updating deliverable:', error.message);
         res.status(500).json({ error: 'Erreur lors de la mise à jour du livrable' });
     }
 };
@@ -142,22 +164,25 @@ exports.updateDeliverable = async (req, res) => {
 // Controller for removing a specific deliverable from a project
 exports.removeDeliverable = async (req, res) => {
     try {
+        // Validate project existence
         const project = await Project.findById(req.params.id);
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
 
+        // Validate deliverable existence
         const deliverable = project.deliverables.id(req.params.deliverableId);
         if (!deliverable) {
             return res.status(404).json({ error: 'Livrable introuvable' });
         }
 
+        // Remove deliverable
         deliverable.remove();
         await project.save();
 
-        res.status(204).send();
+        res.status(204).send(); // No content
     } catch (error) {
-        console.error('Error deleting deliverable:', error);
+        console.error('Error deleting deliverable:', error.message);
         res.status(500).json({ error: 'Erreur lors de la suppression du livrable' });
     }
 };

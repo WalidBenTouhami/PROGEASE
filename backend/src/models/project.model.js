@@ -8,11 +8,16 @@ const deliverableSchema = new Schema({
         required: [true, 'Le nom du livrable est requis.'],
         trim: true
     },
+    description: {
+        type: String,
+        required: [true, 'La description du livrable est requise.'],
+        trim: true
+    },
     deadline: {
         type: Date,
         required: [true, 'La deadline est requise.'],
         validate: {
-            validator: (v) => v > Date.now() + 86400000,
+            validator: (v) => v > Date.now() + 86400000, // Minimum 24h dans le futur
             message: 'La deadline doit être au moins 24h dans le futur.'
         }
     },
@@ -29,9 +34,17 @@ const deliverableSchema = new Schema({
     },
     statut: {
         type: String,
-        enum: ['PENDING', 'DONE'],
+        enum: ['OVERDUE', 'PENDING', 'COMPLETED'],
         default: 'PENDING',
         required: [true, 'Le statut est requis.']
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
 });
 
