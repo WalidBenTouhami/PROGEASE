@@ -2,7 +2,7 @@
 
 require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
 
-// 📌 Valider les variables d'environnement critiques
+// ✅ Validation des variables d'environnement critiques
 const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "OPENAI_API_KEY"];
 REQUIRED_ENV_VARS.forEach((envVar) => {
     if (!process.env[envVar]) {
@@ -10,7 +10,7 @@ REQUIRED_ENV_VARS.forEach((envVar) => {
     }
 });
 
-// 📌 Énumérations globales
+// ✅ Énumérations globales
 const Enums = Object.freeze({
     ProjectStatus: {
         DRAFT: "brouillon",
@@ -30,28 +30,28 @@ const Enums = Object.freeze({
     },
 });
 
-// 📌 Configuration de sécurité
+// ✅ Configuration de sécurité
 const SecurityConfig = Object.freeze({
     JWT: {
-        EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d", // Durée de validité du token JWT
-        COOKIE_NAME: process.env.JWT_COOKIE_NAME || "__progease_token", // Nom du cookie pour le token
+        EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
+        COOKIE_NAME: process.env.JWT_COOKIE_NAME || "__progease_token",
     },
     PASSWORD: {
-        MIN_LENGTH: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10, // Longueur minimale du mot de passe
-        SALT_ROUNDS: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12, // Nombre de tours pour le salage du mot de passe
-        MAX_ATTEMPTS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5, // Nombre maximum de tentatives de connexion
-        LOCKOUT_MINUTES: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30, // Durée de verrouillage après échec
+        MIN_LENGTH: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10,
+        SALT_ROUNDS: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
+        MAX_ATTEMPTS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5,
+        LOCKOUT_MINUTES: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30,
     },
 });
 
-// 📌 Paramètres de pagination par défaut
+// ✅ Paramètres de pagination par défaut
 const PaginationDefaults = Object.freeze({
-    PAGE: 1, // Page par défaut
-    LIMIT: 20, // Limite par défaut
-    MAX_LIMIT: 100, // Limite maximale autorisée
+    PAGE: 1,
+    LIMIT: 20,
+    MAX_LIMIT: 100,
 });
 
-// 📌 Messages d'erreur globaux & modulaires
+// ✅ Messages d'erreur globaux & modulaires
 const ErrorMessages = Object.freeze({
     GENERAL: {
         NOT_FOUND: "Ressource non trouvée.",
@@ -59,10 +59,6 @@ const ErrorMessages = Object.freeze({
         UNAUTHORIZED: "Accès non autorisé.",
         FORBIDDEN: "Action interdite.",
         INVALID_ID: "ID invalide.",
-    },
-    EVALUATION: {
-        CREATION_FAILED: "Échec de la création de l’évaluation.",
-        REPORT_ERROR: "Impossible de générer le rapport d’évaluation.",
     },
     PROJECT: {
         INVALID_TEAM_MEMBER: "Un membre de l’équipe est invalide.",
@@ -74,7 +70,7 @@ const ErrorMessages = Object.freeze({
     },
 });
 
-// 📌 Codes de statut HTTP
+// ✅ Codes de statut HTTP
 const HttpStatus = Object.freeze({
     OK: 200,
     CREATED: 201,
@@ -87,7 +83,6 @@ const HttpStatus = Object.freeze({
     INTERNAL_ERROR: 500,
 });
 
-// 📌 Export consolidé des constantes
 module.exports = {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT || 3000,

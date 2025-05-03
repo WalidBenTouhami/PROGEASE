@@ -9,13 +9,16 @@ const fs = require('fs');
                 'exportCode.js',
                 'filesList.js',
                 'server.js',
+                'src/controllers/deliverable.controller.js',
                 'src/controllers/project.controller.js',
                 'src/graphql/resolvers.js',
                 'src/graphql/typeDefs.js',
                 'src/middlewares/project.middleware.js',
                 'src/middlewares/validate.Request.js',
+                'src/models/deliverable.model.js',
                 'src/models/project.model.js',
                 'src/routers/ai.router.js',
+                'src/routers/deliverable.router.js',
                 'src/routers/project.router.js',
                 'src/schema.js',
                 'src/services/ai.service.js',
@@ -42,8 +45,8 @@ const fs = require('fs');
 
                         if (fs.existsSync(filePath)) {
                             const fileContent = fs.readFileSync(filePath, 'utf-8');
-                            outputContent += `\n// ======= Contenu de ${file} =======\n\n`;
-                            outputContent += fileContent + '\n';
+                            outputContent += `/n// ======= Contenu de ${file} =======/n/n`;
+                            outputContent += fileContent + '/n';
                         } else {
                             console.warn(`⚠️ Fichier introuvable : ${file}`);
                         }

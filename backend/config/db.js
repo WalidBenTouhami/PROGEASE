@@ -1,9 +1,16 @@
 // config/db.js
 
-const fs = require('fs');
-const path = require('path');
+const mongoose = require('mongoose');
 
-const dbConfigPath = path.resolve(__dirname, 'db.json');
-const dbConfig = JSON.parse(fs.readFileSync(dbConfigPath, 'utf-8'));
+// ✅ Connexion à MongoDB
+async function connectToDatabase(mongoUri) {
+    try {
+        await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+        console.log('✅ Connected to MongoDB');
+    } catch (error) {
+        console.error('❌ MongoDB connection error:', error.message);
+        process.exit(1); // Terminate process if connection fails
+    }
+}
 
-console.log('Database Config:', dbConfig);
+module.exports = connectToDatabase;
