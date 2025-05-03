@@ -1,3 +1,5 @@
+// scr/controllers/project.controller.js
+
 const Project = require('../models/project.model'); // Import the Mongoose model for projects
 
 // Controller for creating a new project
@@ -7,7 +9,7 @@ exports.createProject = async (req, res) => {
         const savedProject = await project.save();
         res.status(201).json(savedProject);
     } catch (error) {
-        console.error(error);
+        console.error('Error creating project:', error);
         res.status(500).json({ error: 'Erreur lors de la création du projet' });
     }
 };
@@ -18,7 +20,7 @@ exports.getProjects = async (req, res) => {
         const projects = await Project.find();
         res.status(200).json(projects);
     } catch (error) {
-        console.error(error);
+        console.error('Error retrieving projects:', error);
         res.status(500).json({ error: 'Erreur lors de la récupération des projets' });
     }
 };
@@ -32,7 +34,7 @@ exports.getProjectById = async (req, res) => {
         }
         res.status(200).json(project);
     } catch (error) {
-        console.error(error);
+        console.error('Error retrieving project by ID:', error);
         res.status(500).json({ error: 'Erreur lors de la récupération du projet' });
     }
 };
@@ -40,13 +42,17 @@ exports.getProjectById = async (req, res) => {
 // Controller for updating a project
 exports.updateProject = async (req, res) => {
     try {
-        const updatedProject = await Project.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        const updatedProject = await Project.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            { new: true, runValidators: true } // Ensure validators are enforced during updates
+        );
         if (!updatedProject) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
         res.status(200).json(updatedProject);
     } catch (error) {
-        console.error(error);
+        console.error('Error updating project:', error);
         res.status(500).json({ error: 'Erreur lors de la mise à jour du projet' });
     }
 };
@@ -60,7 +66,7 @@ exports.deleteProject = async (req, res) => {
         }
         res.status(204).send();
     } catch (error) {
-        console.error(error);
+        console.error('Error deleting project:', error);
         res.status(500).json({ error: 'Erreur lors de la suppression du projet' });
     }
 };
@@ -85,7 +91,7 @@ exports.addDeliverable = async (req, res) => {
 
         res.status(201).json(deliverable);
     } catch (error) {
-        console.error(error);
+        console.error('Error adding deliverable:', error);
         res.status(500).json({ error: 'Erreur lors de l\'ajout du livrable' });
     }
 };
@@ -93,14 +99,14 @@ exports.addDeliverable = async (req, res) => {
 // Controller for retrieving all deliverables of a project
 exports.getDeliverables = async (req, res) => {
     try {
-        const project = await Project.findById(req.params.id);
+        const project = await Project.findById(req.params.id).select('deliverables');
         if (!project) {
             return res.status(404).json({ error: 'Projet introuvable' });
         }
 
         res.status(200).json(project.deliverables);
     } catch (error) {
-        console.error(error);
+        console.error('Error retrieving deliverables:', error);
         res.status(500).json({ error: 'Erreur lors de la récupération des livrables' });
     }
 };
@@ -118,14 +124,17 @@ exports.updateDeliverable = async (req, res) => {
             return res.status(404).json({ error: 'Livrable introuvable' });
         }
 
-        if (req.body.name) deliverable.name = req.body.name;
-        if (req.body.statut) deliverable.statut = req.body.statut;
+        // Update only provided fields
+        if (req.body.name !== undefined) deliverable.name = req.body.name;
+        if (req.body.statut !== undefined) deliverable.statut = req.body.statut;
+        if (req.body.deadline !== undefined) deliverable.deadline = req.body.deadline;
+        if (req.body.repositoryUrl !== undefined) deliverable.repositoryUrl = req.body.repositoryUrl;
 
         await project.save();
 
         res.status(200).json(deliverable);
     } catch (error) {
-        console.error(error);
+        console.error('Error updating deliverable:', error);
         res.status(500).json({ error: 'Erreur lors de la mise à jour du livrable' });
     }
 };
@@ -148,7 +157,7 @@ exports.removeDeliverable = async (req, res) => {
 
         res.status(204).send();
     } catch (error) {
-        console.error(error);
+        console.error('Error deleting deliverable:', error);
         res.status(500).json({ error: 'Erreur lors de la suppression du livrable' });
     }
 };

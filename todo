@@ -1,0 +1,20 @@
+[ ] 1. Configurer GraphQL
+    - Définir les schémas
+    - Implémenter les résolveurs
+    - Tester les requêtes de base
+
+[ ] 2. Modéliser les tests Postman
+    - Créer un fichier de collection Postman
+    - Ajouter des exemples de requêtes pour chaque endpoint
+
+[ ] 3. Créer un rapport de test Postman
+    - Générer un rapport via Newman
+    - Documenter les résultats des tests
+
+[ ] 4. Créer 02 métiers du module Project Management
+    - Définir les entités et leurs relations
+    - Implémenter la logique métier
+
+[ ] 5. Créer les tests pour `ai.model`
+    - Écrire des tests unitaires
+    - Couvrir les cas d'erreur et les cas limites

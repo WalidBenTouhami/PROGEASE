@@ -1,19 +1,28 @@
+// src/schema.js
+
 const { gql } = require('apollo-server-express');
 const { Enums } = require('../config/constants'); // Importation des énumérations depuis constants.js
 
-const typeDefs = gql`
-    # 📌 Enumérations
-    enum ProjectStatus {
-    ${Object.keys(Enums.ProjectStatus).join("\n")}
-    }
+// Dynamically generate the enum values from constants
+const userRoleEnumValues = Object.keys(Enums.UserRole).join("\n");
+const projectStatusEnumValues = Object.keys(Enums.ProjectStatus).join("\n");
+const deliverableStatusEnumValues = Object.keys(Enums.DeliverableStatus).join("\n");
 
+// Define the GraphQL schema
+const typeDefs = gql`
+    # 📌 Enumération UserRole
     enum UserRole {
-    ${Object.keys(Enums.UserRole).join("\n")}
-    }
+    ${userRoleEnumValues}
+    },
+
+    # 📌 Enumérations ProjectStatus et DeliverableStatus
+    enum ProjectStatus {
+    ${projectStatusEnumValues}
+    },
 
     enum DeliverableStatus {
-    ${Object.keys(Enums.DeliverableStatus).join("\n")}
-    }
+    ${deliverableStatusEnumValues}
+    },
 
     # 📌 Type utilisateur
     type User {
@@ -33,6 +42,17 @@ const typeDefs = gql`
         repositoryUrl: String!
     }
 
+    # 📌 Type évaluation
+    type Evaluation {
+        _id: ID!
+        projectId: Project! # Référence au projet
+        evaluatorId: User! # Référence à l'évaluateur
+        score: Int!
+        comments: String
+        createdAt: String
+        updatedAt: String
+    }
+
     # 📌 Type projet
     type Project {
         _id: ID!
@@ -48,17 +68,6 @@ const typeDefs = gql`
         progression: Float
         predictedPerformance: Float
         status: ProjectStatus! # Utilise l'énumération ProjectStatus
-        createdAt: String
-        updatedAt: String
-    }
-
-    # 📌 Type évaluation
-    type Evaluation {
-        _id: ID!
-        projectId: Project! # Référence au projet
-        evaluatorId: User! # Référence à l'évaluateur
-        score: Int!
-        comments: String
         createdAt: String
         updatedAt: String
     }
