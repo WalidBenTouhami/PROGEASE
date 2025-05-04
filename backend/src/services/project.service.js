@@ -51,3 +51,52 @@ exports.removeDeliverable = async (projectId, deliverableId) => {
     project.deliverables.id(deliverableId).remove();
     return await project.save();
 };
+
+// ✅ Service pour analyse des risques (Risk Analysis)
+exports.analyzeRisks = async ({ projectDescription, milestones, resources }) => {
+    if (!projectDescription) {
+        throw new Error('La description du projet est requise pour l\'analyse des risques.');
+    }
+
+    // Simuler une analyse des risques
+    const risks = [
+        { risk: 'Manque de ressources', severity: 'Élevée', recommendation: 'Allouez des ressources supplémentaires.' },
+        { risk: 'Retard dans les étapes clés', severity: 'Moyenne', recommendation: 'Revoir les échéances et les priorités.' },
+        { risk: 'Défi technique', severity: 'Faible', recommendation: 'Planifiez une formation technique pour l\'équipe.' }
+    ];
+
+    return risks;
+};
+
+// ✅ Service pour suivi des tâches et rapport d'avancement (Task Tracking)
+exports.trackTasks = async (tasks, filter = {}) => {
+    if (!tasks || tasks.length === 0) {
+        throw new Error('La liste des tâches est vide. Impossible de générer un rapport.');
+    }
+
+    // Appliquer les filtres si fournis
+    const filteredTasks = tasks.filter(task => {
+        const matchesStatus = filter.status ? task.status === filter.status : true;
+        const matchesResponsible = filter.responsible ? task.responsible === filter.responsible : true;
+        return matchesStatus && matchesResponsible;
+    });
+
+    // Calcul des indicateurs clés
+    const totalTasks = filteredTasks.length;
+    const completedTasks = filteredTasks.filter(task => task.status === 'Terminé').length;
+    const inProgressTasks = filteredTasks.filter(task => task.status === 'En cours').length;
+    const pendingTasks = filteredTasks.filter(task => task.status === 'À faire').length;
+    const overdueTasks = filteredTasks.filter(task => new Date(task.deadline) < new Date()).length;
+
+    const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+    return {
+        totalTasks,
+        completedTasks,
+        inProgressTasks,
+        pendingTasks,
+        overdueTasks,
+        progressPercentage,
+        tasks: filteredTasks
+    };
+};
