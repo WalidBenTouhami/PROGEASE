@@ -67,4 +67,31 @@ async function generateText(prompt) {
   }
 }
 
-module.exports = { generateText };
+// Generate text based on a given prompt
+async function generateText(prompt) {
+  try {
+    const response = await client.generateText({
+      model: CONFIG.MODEL,
+      prompt,
+      maxTokens: CONFIG.MAX_TOKENS,
+    });
+    return response.text.trim();
+  } catch (error) {
+    console.error('❌ Error during text generation:', error.message);
+    throw error;
+  }
+}
+
+// Example: Summarize a conversation
+async function summarizeNotes(notes) {
+  const prompt = `Résume ces notes de réunion : ${notes}`;
+  return await generateText(prompt);
+}
+
+// Example: Generate a task list from a description
+async function generateTaskList(description) {
+  const prompt = `Créer une liste de tâches à partir de cette description : ${description}`;
+  return await generateText(prompt);
+}
+
+module.exports = { generateText, summarizeNotes, generateTaskList };
