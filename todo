@@ -18,3 +18,84 @@
 [x] 5. Créer les tests pour `ai.model`
     - Écrire des tests unitaires
     - Couvrir les cas d'erreur et les cas limites
+
+### Backend Tasks
+
+[ ] 1. **CRUD pour les posts** :
+   Implémentez les routes pour créer, lire, mettre à jour et supprimer des posts.
+
+[ ] 2. **CRUD pour les commentaires** :
+   Implémentez les routes pour gérer les commentaires associés aux posts.
+
+[ ] 3. **Validation avec Yup** :
+   Ajoutez des validations pour les champs des posts et des commentaires (ex. : champ requis, longueur minimale).
+
+[ ] 4. **Système de recommandation de posts** :
+   Implémentez un algorithme pour recommander des posts basés sur des critères (ex. : popularité, catégorie).
+
+[ ] 5. **Upvote/Downvote (style Reddit)** :
+   Ajoutez des fonctionnalités pour voter sur les posts et les commentaires.
+
+[ ] 6. **Statistiques (thème + catégorie)** :
+   Implémentez des endpoints pour récupérer des statistiques sur les thèmes et catégories.
+
+[ ] 7. **API pour filtrer les mots interdits** :
+   Intégrez une API ou une bibliothèque pour détecter et filtrer les mots inappropriés dans les posts et commentaires.
+
+[ ] 8. **Signalement des posts/commentaires** :
+   Ajoutez une fonctionnalité pour signaler un post ou un commentaire avec une raison.
+
+---
+
+### Frontend Tasks
+
+[ ] 1. **Créer un nouveau projet Angular** :
+   Créez un projet Angular avec la commande :
+   ```bash
+   ng new project-name
+   ```
+
+[ ] 2. **Ajouter un template Back-Office** :
+   Intégrez un template comme [AdminLTE](https://adminlte.io/).
+
+[ ] 3. **Ajouter un template Front-Office** :
+   Intégrez un template comme [Themewagon](https://themewagon.com/).
+
+[ ] 4. **Pousser le projet sur GitHub** :
+   Initialisez un dépôt Git et poussez le projet sur GitHub :
+   ```bash
+   git init
+   git remote add origin https://github.com/AlouiOmar97/firstapp-4ARCTIC10.git
+   git add .
+   git commit -m "Initial commit"
+   git push -u origin main
+   ```
+
+[ ] 5. **Création du module Blog** :
+   Créez un module pour le blog et configurez le routage :
+   ```bash
+   ng g m blog
+   ng g m blog/blog-routing --flat --module=blog
+   ```
+
+[ ] 6. **Créer un composant pour ajouter un blog** :
+   Créez un composant pour ajouter un blog :
+   ```bash
+   ng g c blog/add-blog
+   ```
+
+[ ] 7. **Importer le module Blog** :
+   Ajoutez `BlogModule` dans la section `imports` de `app.module.ts` :
+   ```typescript
+   import { BlogModule } from './blog/blog.module';
+
+   @NgModule({
+     declarations: [...],
+     imports: [
+       ...,
+       BlogModule
+     ],
+     bootstrap: [AppComponent]
+   })
+   export class AppModule {}
+   ```
