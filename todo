@@ -1,101 +1,219 @@
-[ ] 1. Configurer GraphQL
-    - Définir les schémas
-    - Implémenter les résolveurs
-    - Tester les requêtes de base
+-------------------------------------------------------------------------------------------
+                                        Backend Tasks
+-------------------------------------------------------------------------------------------
 
-[x] 2. Modéliser les tests Postman
-    - Créer un fichier de collection Postman
-    - Ajouter des exemples de requêtes pour chaque endpoint
+### **Module Project Management**
+[ ] 1. **Créer 02 métiers du module Project Management**
+   - [x] Analyse des risques (Risk Analysis)
+     - Définir la logique métier.
+     - Exposer l’API `/api/projects/risk-analysis`.
+     - Tester l’intégration avec la base de données et les services.
+   - [x] Suivi des tâches et rapports d'avancement (Task Tracking)
+     - Implémenter la logique métier.
+     - Exposer l’API `/api/projects/task-tracking`.
+     - Ajouter des tests Postman pour vérifier les fonctionnalités.
 
-[x] 3. Créer un rapport de test Postman
-    - Générer un rapport via Newman
-    - Documenter les résultats des tests
+[ ] 2. **Statistiques (thème + catégorie)**
+   - Implémenter des endpoints pour récupérer des statistiques sur les projets (ex. : avancement global, tâches en retard, etc.).
 
-[ ] 4. Créer 02 métiers du module Project Management
-    - Définir les entités et leurs relations
-    - Implémenter la logique métier
-
-[x] 5. Créer les tests pour `ai.model`
-    - Écrire des tests unitaires
-    - Couvrir les cas d'erreur et les cas limites
-
-### Backend Tasks
-
-[ ] 1. **CRUD pour les posts** :
-   Implémentez les routes pour créer, lire, mettre à jour et supprimer des posts.
-
-[ ] 2. **CRUD pour les commentaires** :
-   Implémentez les routes pour gérer les commentaires associés aux posts.
-
-[ ] 3. **Validation avec Yup** :
-   Ajoutez des validations pour les champs des posts et des commentaires (ex. : champ requis, longueur minimale).
-
-[ ] 4. **Système de recommandation de posts** :
-   Implémentez un algorithme pour recommander des posts basés sur des critères (ex. : popularité, catégorie).
-
-[ ] 5. **Upvote/Downvote (style Reddit)** :
-   Ajoutez des fonctionnalités pour voter sur les posts et les commentaires.
-
-[ ] 6. **Statistiques (thème + catégorie)** :
-   Implémentez des endpoints pour récupérer des statistiques sur les thèmes et catégories.
-
-[ ] 7. **API pour filtrer les mots interdits** :
-   Intégrez une API ou une bibliothèque pour détecter et filtrer les mots inappropriés dans les posts et commentaires.
-
-[ ] 8. **Signalement des posts/commentaires** :
-   Ajoutez une fonctionnalité pour signaler un post ou un commentaire avec une raison.
+[ ] 3. **Signalement des projets/tâches**
+   - Ajouter une fonctionnalité pour signaler des anomalies (ex. : tâche bloquée, retard important).
 
 ---
 
-### Frontend Tasks
+### **Module Blog**
+[ ] 4. CRUD pour les posts
+   - Implémentez les routes pour créer, lire, mettre à jour et supprimer des posts.
 
-[ ] 1. **Créer un nouveau projet Angular** :
-   Créez un projet Angular avec la commande :
-   ```bash
-   ng new project-name
-   ```
+[ ] 5. CRUD pour les commentaires
+   - Implémentez les routes pour gérer les commentaires associés aux posts.
 
-[ ] 2. **Ajouter un template Back-Office** :
-   Intégrez un template comme [AdminLTE](https://adminlte.io/).
+[ ] 6. Validation avec Yup
+   - Ajoutez des validations pour les champs des posts et des commentaires (ex. : champ requis, longueur minimale).
 
-[ ] 3. **Ajouter un template Front-Office** :
-   Intégrez un template comme [Themewagon](https://themewagon.com/).
+[ ] 7. Système de recommandation de posts
+   - Implémentez un algorithme pour recommander des posts basés sur des critères (ex. : popularité, catégorie).
 
-[ ] 4. **Pousser le projet sur GitHub** :
-   Initialisez un dépôt Git et poussez le projet sur GitHub :
-   ```bash
-   git init
-   git remote add origin https://github.com/AlouiOmar97/firstapp-4ARCTIC10.git
-   git add .
-   git commit -m "Initial commit"
-   git push -u origin main
-   ```
+[ ] 8. Upvote/Downvote (style Reddit)
+   - Ajoutez des fonctionnalités pour voter sur les posts et les commentaires.
 
-[ ] 5. **Création du module Blog** :
-   Créez un module pour le blog et configurez le routage :
-   ```bash
-   ng g m blog
-   ng g m blog/blog-routing --flat --module=blog
-   ```
+[ ] 9. API pour filtrer les mots interdits
+   - Intégrez une API ou une bibliothèque pour détecter et filtrer les mots inappropriés dans les posts et commentaires.
 
-[ ] 6. **Créer un composant pour ajouter un blog** :
-   Créez un composant pour ajouter un blog :
-   ```bash
-   ng g c blog/add-blog
-   ```
+---
 
-[ ] 7. **Importer le module Blog** :
-   Ajoutez `BlogModule` dans la section `imports` de `app.module.ts` :
-   ```typescript
-   import { BlogModule } from './blog/blog.module';
+### **Tests et Documentation**
+[x] 10. Modéliser les tests Postman
+   - Créer un fichier de collection Postman pour gérer les endpoints.
+   - Ajouter des exemples de requêtes pour chaque endpoint.
 
-   @NgModule({
-     declarations: [...],
-     imports: [
-       ...,
-       BlogModule
-     ],
-     bootstrap: [AppComponent]
-   })
-   export class AppModule {}
-   ```
+[x] 11. Créer un rapport de test Postman
+   - Générer un rapport via Newman.
+   - Documenter les résultats des tests.
+
+---
+
+-------------------------------------------------------------------------------------------
+                                        Frontend Tasks
+-------------------------------------------------------------------------------------------
+
+### **Initial Setup**
+[ ] 1. **Créer un projet Angular dans le sous-dossier `frontend`**
+   - Depuis le dossier racine `PROGEASE`, exécutez les commandes suivantes :
+     ```bash
+     cd PROGEASE
+     mkdir frontend
+     cd frontend
+     npm install -g @angular/cli
+     cd ..
+     ng new frontend
+     ```
+   - **Options choisies :**
+     - Feuilles de style : `CSS`
+     - **Server-Side Rendering (SSR)** activé.
+
+[ ] 2. **Configurer les environnements**
+   - Ajouter les URLs de développement et de production dans `environment.ts` et `environment.prod.ts`.
+
+[ ] 3. **Démarrer le serveur Angular**
+   - Accédez au dossier `frontend` et démarrez le serveur Angular :
+     ```bash
+     cd frontend
+     ng serve -o
+     ```
+
+---
+
+### **Module Project Management**
+[ ] 4. **Créer un module pour la gestion de projet**
+   - Créez un module Angular pour la gestion des projets et configurez le routage :
+     ```bash
+     ng g m project
+     ng g m project/project-routing --flat --module=project
+     ```
+
+[ ] 5. **Ajouter des composants pour les fonctionnalités clés**
+   - **Liste des projets :**
+     ```bash
+     ng g c project/project-list
+     ```
+   - **Détails d’un projet :**
+     ```bash
+     ng g c project/project-detail
+     ```
+   - **Formulaire pour ajouter ou modifier un projet :**
+     ```bash
+     ng g c project/project-form
+     ```
+
+[ ] 6. **Configurer le routage pour le module Project**
+   - Ajoutez les routes dans le fichier `project-routing.module.ts` :
+     ```typescript
+     import { NgModule } from '@angular/core';
+     import { RouterModule, Routes } from '@angular/router';
+     import { ProjectListComponent } from './project-list/project-list.component';
+     import { ProjectDetailComponent } from './project-detail/project-detail.component';
+     import { ProjectFormComponent } from './project-form/project-form.component';
+
+     const routes: Routes = [
+       { path: '', component: ProjectListComponent },
+       { path: ':id', component: ProjectDetailComponent },
+       { path: ':id/edit', component: ProjectFormComponent },
+     ];
+
+     @NgModule({
+       imports: [RouterModule.forChild(routes)],
+       exports: [RouterModule]
+     })
+     export class ProjectRoutingModule {}
+     ```
+
+---
+
+### **Module Deliverable**
+[ ] 7. **Créer un module pour la gestion des livrables**
+   - Créez un module Angular pour gérer les livrables et configurez le routage :
+     ```bash
+     ng g m deliverable
+     ng g m deliverable/deliverable-routing --flat --module=deliverable
+     ```
+
+[ ] 8. **Ajouter des composants pour les fonctionnalités clés**
+   - **Liste des livrables :**
+     ```bash
+     ng g c deliverable/deliverable-list
+     ```
+   - **Détails d’un livrable :**
+     ```bash
+     ng g c deliverable/deliverable-detail
+     ```
+   - **Formulaire pour ajouter ou modifier un livrable :**
+     ```bash
+     ng g c deliverable/deliverable-form
+     ```
+
+[ ] 9. **Configurer le routage pour le module Deliverable**
+   - Ajoutez les routes dans le fichier `deliverable-routing.module.ts` :
+     ```typescript
+     import { NgModule } from '@angular/core';
+     import { RouterModule, Routes } from '@angular/router';
+     import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
+     import { DeliverableDetailComponent } from './deliverable-detail/deliverable-detail.component';
+     import { DeliverableFormComponent } from './deliverable-form/deliverable-form.component';
+
+     const routes: Routes = [
+       { path: '', component: DeliverableListComponent },
+       { path: ':id', component: DeliverableDetailComponent },
+       { path: ':id/edit', component: DeliverableFormComponent },
+     ];
+
+     @NgModule({
+       imports: [RouterModule.forChild(routes)],
+       exports: [RouterModule]
+     })
+     export class DeliverableRoutingModule {}
+     ```
+
+---
+
+### **Services pour les appels API**
+[ ] 10. **Créer des services Angular pour Project et Deliverable**
+   - Service pour `project` :
+     ```bash
+     ng g s core/services/project
+     ```
+   - Service pour `deliverable` :
+     ```bash
+     ng g s core/services/deliverable
+     ```
+
+[ ] 11. **Intégrer les services dans les composants**
+   - Utilisez les services pour effectuer les appels API à partir des composants Angular.
+
+---
+
+### **Tester et déployer**
+[ ] 12. **Tester l’intégration backend/frontend**
+   - Vérifiez les appels API avec le backend en mode développement.
+   - Testez le rendu SSR (Server-Side Rendering) avec la commande :
+     ```bash
+     npm run dev:ssr
+     ```
+
+[ ] 13. **Déployer l’application**
+   - Déployez le frontend sur une plateforme compatible SSR, comme **Firebase Hosting**, **Vercel**, ou **Netlify**.
+
+---
+
+-------------------------------------------------------------------------------------------
+                                        Priorités Générales
+-------------------------------------------------------------------------------------------
+### **Priorités Backend**
+- Terminer les métiers liés au **module Project Management**.
+- Ajouter des tests unitaires et d’intégration pour les APIs critiques.
+
+### **Priorités Frontend**
+- Configurer le projet Angular et commencer par les composants clés du **module Project Management**.
+- Tester les interactions avec l’API backend.
+
+-------------------------------------------------------------------------------------------
