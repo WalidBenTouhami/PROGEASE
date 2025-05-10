@@ -64,7 +64,7 @@
      cd PROGEASE
      mkdir frontend
      cd frontend
-     npm install -g @angular/cli
+     npm install -g @angular/cli@18
      cd ..
      ng new frontend
      ```
