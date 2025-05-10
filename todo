@@ -217,3 +217,11 @@
 - Tester les interactions avec l’API backend.
 
 -------------------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------------------
+                                        Notes
+--------------------------------------------------------------------------------------------
+les services
+- **ProjectService** : Gère les appels API pour les projets.
+- **DeliverableService** : Gère les appels API pour les livrables.
