@@ -1,3 +1,5 @@
+//src/app/project/project-list/project-list.component.spec.ts
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProjectListComponent } from './project-list.component';

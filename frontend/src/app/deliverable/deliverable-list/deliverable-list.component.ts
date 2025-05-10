@@ -1,3 +1,5 @@
+//src/app/deliverable/deliverable-list/deliverable-list.component.ts
+
 import { Component } from '@angular/core';
 
 @Component({

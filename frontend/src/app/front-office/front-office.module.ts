@@ -1,3 +1,5 @@
+//src/app/front-office/front-office.module.ts
+
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 

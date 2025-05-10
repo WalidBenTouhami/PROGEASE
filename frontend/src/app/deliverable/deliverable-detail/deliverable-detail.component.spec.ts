@@ -1,3 +1,5 @@
+//src/app/deliverable/deliverable-detail/deliverable-detail.component.spec.ts
+
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DeliverableDetailComponent } from './deliverable-detail.component';

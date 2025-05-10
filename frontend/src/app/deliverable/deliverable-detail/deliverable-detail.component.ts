@@ -1,3 +1,5 @@
+//src/app/deliverable/deliverable-detail/deliverable-detail.component.ts
+
 import { Component } from '@angular/core';
 
 @Component({

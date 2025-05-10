@@ -1,3 +1,5 @@
+//src/app/project/project-detail/project-detail.component.ts
+
 import { Component } from '@angular/core';
 
 @Component({
