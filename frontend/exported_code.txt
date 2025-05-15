@@ -1,116 +1,737 @@
 
-// ======= Contenu de exportCode.js =======
+// ======= Contenu de server.ts =======
 
-const fs = require('fs');
-const path = require('path');
+import { APP_BASE_HREF } from '@angular/common';
+import { CommonEngine } from '@angular/ssr';
+import express from 'express';
+import { fileURLToPath } from 'node:url';
+import { dirname, join, resolve } from 'node:path';
+import bootstrap from './src/main.server';
 
-// Liste des fichiers à exporter
-const filesToExport = [
-  'exportCode.js',
-  'filesList.js'
+// The Express app is exported so that it can be used by serverless Functions.
+export function app(): express.Express {
+  const server = express();
+  const serverDistFolder = dirname(fileURLToPath(import.meta.url));
+  const browserDistFolder = resolve(serverDistFolder, '../browser');
+  const indexHtml = join(serverDistFolder, 'index.server.html');
+
+  const commonEngine = new CommonEngine();
+
+  server.set('view engine', 'html');
+  server.set('views', browserDistFolder);
+
+  // Example Express Rest API endpoints
+  // server.get('/api/**', (req, res) => { });
+  // Serve static files from /browser
+  server.get('**', express.static(browserDistFolder, {
+    maxAge: '1y',
+    index: 'index.html',
+  }));
+
+  // All regular routes use the Angular engine
+  server.get('**', (req, res, next) => {
+    const { protocol, originalUrl, baseUrl, headers } = req;
+
+    commonEngine
+      .render({
+        bootstrap,
+        documentFilePath: indexHtml,
+        url: `${protocol}://${headers.host}${originalUrl}`,
+        publicPath: browserDistFolder,
+        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+      })
+      .then((html) => res.send(html))
+      .catch((err) => next(err));
+  });
+
+  return server;
+}
+
+function run(): void {
+  const port = process.env['PORT'] || 4000;
+
+  // Start up the Node server
+  const server = app();
+  server.listen(port, () => {
+    console.log(`Node Express server listening on http://localhost:${port}`);
+  });
+}
+
+run();
+
+
+// ======= Contenu de src/app/app-routing.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [
+  {
+    path: 'back-office',
+    loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule)
+  },
+  {
+    path: 'front-office',
+    loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule)
+  },
+  {
+    path: 'deliverable',
+    loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule)
+  },
+  {
+    path: 'project',
+    loadChildren: () => import('./project/project.module').then(m => m.ProjectModule)
+  },
+  {
+    path: '',
+    redirectTo: 'front-office',
+    pathMatch: 'full'
+  },
+  {
+    path: '**',
+    redirectTo: 'front-office'
+  }
 ];
 
-// Chemin du fichier de sortie
-const outputFile = './exported_code.txt';
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {}
 
-/**
- * Fonction pour exporter le contenu des fichiers.
- */
-async function exportCode() {
-  try {
-    let outputContent = '';
 
-    console.log('🚀 Début de l\'export des fichiers...\n');
+// ======= Contenu de src/app/app.component.spec.ts =======
 
-    for (const file of filesToExport) {
-      const filePath = path.resolve(file);
+//src/app/app.component.spec.ts
 
-      if (fs.existsSync(filePath)) {
-        console.log(`✅ Lecture du fichier : ${file}`);
-        const fileContent = fs.readFileSync(filePath, 'utf-8');
-        outputContent += `\n// ======= Contenu de ${file} =======\n\n`;
-        outputContent += fileContent + '\n';
-      } else {
-        console.warn(`⚠️ Fichier introuvable : ${file}`);
-      }
-    }
+import { TestBed } from '@angular/core/testing';
+import { AppComponent } from './app.component';
 
-    fs.writeFileSync(outputFile, outputContent, 'utf-8');
-    console.log(`\n✅ Code exporté avec succès dans : ${outputFile}`);
-  } catch (error) {
-    console.error('❌ Erreur lors de l\'exportation :', error.message);
-  }
+describe('AppComponent', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [AppComponent],
+    }).compileComponents();
+  });
+
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  it(`should have the 'frontend' title`, () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual('frontend');
+  });
+
+  it('should render title', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, frontend');
+  });
+});
+
+
+// ======= Contenu de src/app/app.component.ts =======
+
+//src/app/app.component.ts
+
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css'
+})
+export class AppComponent {
+  title = 'frontend';
 }
 
-// Appel de la fonction d'exportation
-exportCode();
+
+// ======= Contenu de src/app/app.config.server.ts =======
+
+//src/app/app.config.server.ts
+
+import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
+import { provideServerRendering } from '@angular/platform-server';
+import { appConfig } from './app.config';
+
+const serverConfig: ApplicationConfig = {
+  providers: [
+    provideServerRendering()
+  ]
+};
+
+export const config = mergeApplicationConfig(appConfig, serverConfig);
 
 
-// ======= Contenu de filesList.js =======
+// ======= Contenu de src/app/app.config.ts =======
 
-const fs = require('fs').promises;
-const path = require('path');
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
 
-/**
- * Fonction récursive pour récupérer tous les fichiers `.js` d'un répertoire donné.
- * Exclut certains répertoires et fichiers indésirables.
- * @param {string} dirPath - Chemin du répertoire à parcourir.
- * @param {string[]} jsFiles - Tableau pour stocker les fichiers trouvés.
- * @returns {Promise<string[]>} - Promesse contenant un tableau des chemins relatifs des fichiers `.js`.
- */
-async function getAllJsFiles(dirPath, jsFiles = []) {
-  try {
-    const files = await fs.readdir(dirPath, { withFileTypes: true });
+import { routes } from './app.routes';
+import { provideClientHydration } from '@angular/platform-browser';
 
-    for (const file of files) {
-      const fullPath = path.join(dirPath, file.name);
+export const appConfig: ApplicationConfig = {
+  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideClientHydration()]
+};
 
-      // Exclure les répertoires ou fichiers indésirables
-      if (
-        file.name === 'node_modules' || // Ignorer `node_modules`
-        file.name.startsWith('.') || // Ignorer les fichiers/dossiers cachés comme `.angular`
-        fullPath.includes('.angular/cache') // Ignorer tout dans `.angular/cache`
-      ) {
-        continue;
-      }
 
-      if (file.isDirectory()) {
-        await getAllJsFiles(fullPath, jsFiles);
-      } else if (file.name.endsWith('.js')) {
-        jsFiles.push(path.relative('.', fullPath).replace(/\\/g, '/'));
-      }
-    }
-  } catch (error) {
-    console.error(`❌ Erreur lors de la lecture du répertoire ${dirPath}: ${error.message}`);
-  }
+// ======= Contenu de src/app/app.module.ts =======
 
-  return jsFiles;
+
+
+// ======= Contenu de src/app/app.routes.ts =======
+
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [];
+
+
+// ======= Contenu de src/app/back-office/back-office-routing.module.ts =======
+
+//src/app/back-office/back-office-routing.module.ts
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class BackOfficeRoutingModule { }
+
+
+// ======= Contenu de src/app/back-office/back-office.module.ts =======
+
+//src/app/back-office/back-office.module.ts
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { BackOfficeRoutingModule } from './back-office-routing.module';
+
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    BackOfficeRoutingModule
+  ]
+})
+export class BackOfficeModule { }
+
+
+// ======= Contenu de src/app/core/services/deliverable.service.spec.ts =======
+
+//src/app/core/services/deliverable.service.spec.ts
+
+import { TestBed } from '@angular/core/testing';
+
+import { DeliverableService } from './deliverable.service';
+
+describe('DeliverableService', () => {
+  let service: DeliverableService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(DeliverableService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/core/services/deliverable.service.ts =======
+
+//src/app/core/services/deliverable.service.spec.ts
+
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DeliverableService {
+
+  constructor() { }
 }
 
-/**
- * Fonction principale pour récupérer les fichiers `.js` et écrire la liste dans un fichier.
- */
-async function main() {
-  const directoryPath = path.resolve('.'); // Répertoire actuel
-  const outputFilePath = path.resolve('filesList.txt'); // Fichier de sortie
 
-  try {
-    // Vérifier si le répertoire existe
-    const stat = await fs.stat(directoryPath);
-    if (!stat.isDirectory()) {
-      throw new Error(`Le chemin spécifié (${directoryPath}) n'est pas un répertoire valide.`);
-    }
+// ======= Contenu de src/app/core/services/project.service.spec.ts =======
 
-    const jsFiles = await getAllJsFiles(directoryPath);
+//src/app/core/services/deliverable.service.spec.ts
 
-    const formattedList = `[\n${jsFiles.map(file => `    '${file}'`).join(',\n')}\n];`;
-    await fs.writeFile(outputFilePath, formattedList, 'utf8');
+import { TestBed } from '@angular/core/testing';
 
-    console.log(`✅ Liste des fichiers .js écrite dans ${outputFilePath}`);
-  } catch (error) {
-    console.error(`❌ Erreur: ${error.message}`);
-  }
+import { ProjectService } from './project.service';
+
+describe('ProjectService', () => {
+  let service: ProjectService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(ProjectService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/core/services/project.service.ts =======
+
+//src/app/core/services/project.service.ts
+
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProjectService {
+
+  constructor() { }
 }
 
-main();
+
+// ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.spec.ts =======
+
+//src/app/deliverable/deliverable-detail/deliverable-detail.component.spec.ts
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DeliverableDetailComponent } from './deliverable-detail.component';
+
+describe('DeliverableDetailComponent', () => {
+  let component: DeliverableDetailComponent;
+  let fixture: ComponentFixture<DeliverableDetailComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DeliverableDetailComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(DeliverableDetailComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.ts =======
+
+//src/app/deliverable/deliverable-detail/deliverable-detail.component.ts
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-deliverable-detail',
+  standalone: true,
+  imports: [],
+  templateUrl: './deliverable-detail.component.html',
+  styleUrl: './deliverable-detail.component.css'
+})
+export class DeliverableDetailComponent {
+
+}
+
+
+// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.spec.ts =======
+
+//src/app/deliverable/deliverable-form/deliverable-form.component.spec.ts
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DeliverableFormComponent } from './deliverable-form.component';
+
+describe('DeliverableFormComponent', () => {
+  let component: DeliverableFormComponent;
+  let fixture: ComponentFixture<DeliverableFormComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DeliverableFormComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(DeliverableFormComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.ts =======
+
+//src/app/deliverable/deliverable-form/deliverable-form.component.ts
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-deliverable-form',
+  standalone: true,
+  imports: [],
+  templateUrl: './deliverable-form.component.html',
+  styleUrl: './deliverable-form.component.css'
+})
+export class DeliverableFormComponent {
+
+}
+
+
+// ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.spec.ts =======
+
+//src/app/deliverable/deliverable-list/deliverable-list.component.spec.ts
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DeliverableListComponent } from './deliverable-list.component';
+
+describe('DeliverableListComponent', () => {
+  let component: DeliverableListComponent;
+  let fixture: ComponentFixture<DeliverableListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DeliverableListComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(DeliverableListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.ts =======
+
+//src/app/deliverable/deliverable-list/deliverable-list.component.ts
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-deliverable-list',
+  standalone: true,
+  imports: [],
+  templateUrl: './deliverable-list.component.html',
+  styleUrl: './deliverable-list.component.css'
+})
+export class DeliverableListComponent {
+
+}
+
+
+// ======= Contenu de src/app/deliverable/deliverable-routing.module.ts =======
+
+//src/app/deliverable/deliverable-list/deliverable-routing.module.ts
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule
+  ]
+})
+export class DeliverableRoutingModule { }
+
+
+// ======= Contenu de src/app/deliverable/deliverable.module.ts =======
+
+//src/app/deliverable/deliverable-list/deliverable.module.ts
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DeliverableRoutingModule } from './deliverable-routing.module';
+
+
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    DeliverableRoutingModule
+  ]
+})
+export class DeliverableModule { }
+
+
+// ======= Contenu de src/app/front-office/front-office-routing.module.ts =======
+
+//src/app/front-office/front-office.routing.module.ts
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+const routes: Routes = [];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class FrontOfficeRoutingModule { }
+
+
+// ======= Contenu de src/app/front-office/front-office.module.ts =======
+
+//src/app/front-office/front-office.module.ts
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { FrontOfficeRoutingModule } from './front-office-routing.module';
+
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    FrontOfficeRoutingModule
+  ]
+})
+export class FrontOfficeModule { }
+
+
+// ======= Contenu de src/app/project/project-detail/project-detail.component.spec.ts =======
+
+//src/app/project/project-detail/project-detail.component.spec.ts
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjectDetailComponent } from './project-detail.component';
+
+describe('ProjectDetailComponent', () => {
+  let component: ProjectDetailComponent;
+  let fixture: ComponentFixture<ProjectDetailComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjectDetailComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(ProjectDetailComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/project/project-detail/project-detail.component.ts =======
+
+//src/app/project/project-detail/project-detail.component.ts
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-project-detail',
+  standalone: true,
+  imports: [],
+  templateUrl: './project-detail.component.html',
+  styleUrl: './project-detail.component.css'
+})
+export class ProjectDetailComponent {
+
+}
+
+
+// ======= Contenu de src/app/project/project-form/project-form.component.spec.ts =======
+
+//src/app/project/project-form/project-form.component.spec.ts
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjectFormComponent } from './project-form.component';
+
+describe('ProjectFormComponent', () => {
+  let component: ProjectFormComponent;
+  let fixture: ComponentFixture<ProjectFormComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjectFormComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(ProjectFormComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/project/project-form/project-form.component.ts =======
+
+//src/app/project/project-form/project-form.component.ts
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-project-form',
+  standalone: true,
+  imports: [],
+  templateUrl: './project-form.component.html',
+  styleUrl: './project-form.component.css'
+})
+export class ProjectFormComponent {
+
+}
+
+
+// ======= Contenu de src/app/project/project-list/project-list.component.spec.ts =======
+
+//src/app/project/project-list/project-list.component.spec.ts
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjectListComponent } from './project-list.component';
+
+describe('ProjectListComponent', () => {
+  let component: ProjectListComponent;
+  let fixture: ComponentFixture<ProjectListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjectListComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(ProjectListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/project/project-list/project-list.component.ts =======
+
+//src/app/project/project-list/project-list.component.ts
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-project-list',
+  standalone: true,
+  imports: [],
+  templateUrl: './project-list.component.html',
+  styleUrl: './project-list.component.css'
+})
+export class ProjectListComponent {
+
+}
+
+
+// ======= Contenu de src/app/project/project-routing.module.ts =======
+
+//src/app/project/project-routing.module.ts
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule
+  ]
+})
+export class ProjectRoutingModule { }
+
+
+// ======= Contenu de src/app/project/project.module.ts =======
+
+//src//app/project/project.module.ts
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ProjectRoutingModule } from './project-routing.module';
+
+
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    ProjectRoutingModule
+  ]
+})
+export class ProjectModule { }
+
+
+// ======= Contenu de src/environments/environment.prod.ts =======
+
+export const environment = {
+  production: true,
+  apiUrl: 'https://your-production-url.com/api', // URL du backend en production
+};
+
+
+// ======= Contenu de src/environments/environment.ts =======
+
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api', // URL du backend en local
+};
+
+
+// ======= Contenu de src/main.server.ts =======
+
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { config } from './app/app.config.server';
+
+const bootstrap = () => bootstrapApplication(AppComponent, config);
+
+export default bootstrap;
+
+
+// ======= Contenu de src/main.ts =======
+
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { AppComponent } from './app/app.component';
+
+bootstrapApplication(AppComponent, appConfig)
+  .catch((err) => console.error(err));
 

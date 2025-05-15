@@ -1,8 +1,11 @@
-/n// ======= Contenu de config/constants.js =======/n/n// ../backend/config/constants.js
+
+// ======= Contenu de config/constants.js =======
+
+// ../backend/config/constants.js
 
 require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
 
-// 📌 Valider les variables d'environnement critiques
+// ✅ Validation des variables d'environnement critiques
 const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "OPENAI_API_KEY"];
 REQUIRED_ENV_VARS.forEach((envVar) => {
     if (!process.env[envVar]) {
@@ -10,7 +13,7 @@ REQUIRED_ENV_VARS.forEach((envVar) => {
     }
 });
 
-// 📌 Énumérations globales
+// ✅ Énumérations globales
 const Enums = Object.freeze({
     ProjectStatus: {
         DRAFT: "brouillon",
@@ -30,28 +33,28 @@ const Enums = Object.freeze({
     },
 });
 
-// 📌 Configuration de sécurité
+// ✅ Configuration de sécurité
 const SecurityConfig = Object.freeze({
     JWT: {
-        EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d", // Durée de validité du token JWT
-        COOKIE_NAME: process.env.JWT_COOKIE_NAME || "__progease_token", // Nom du cookie pour le token
+        EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
+        COOKIE_NAME: process.env.JWT_COOKIE_NAME || "__progease_token",
     },
     PASSWORD: {
-        MIN_LENGTH: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10, // Longueur minimale du mot de passe
-        SALT_ROUNDS: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12, // Nombre de tours pour le salage du mot de passe
-        MAX_ATTEMPTS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5, // Nombre maximum de tentatives de connexion
-        LOCKOUT_MINUTES: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30, // Durée de verrouillage après échec
+        MIN_LENGTH: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10,
+        SALT_ROUNDS: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
+        MAX_ATTEMPTS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5,
+        LOCKOUT_MINUTES: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30,
     },
 });
 
-// 📌 Paramètres de pagination par défaut
+// ✅ Paramètres de pagination par défaut
 const PaginationDefaults = Object.freeze({
-    PAGE: 1, // Page par défaut
-    LIMIT: 20, // Limite par défaut
-    MAX_LIMIT: 100, // Limite maximale autorisée
+    PAGE: 1,
+    LIMIT: 20,
+    MAX_LIMIT: 100,
 });
 
-// 📌 Messages d'erreur globaux & modulaires
+// ✅ Messages d'erreur globaux & modulaires
 const ErrorMessages = Object.freeze({
     GENERAL: {
         NOT_FOUND: "Ressource non trouvée.",
@@ -59,10 +62,6 @@ const ErrorMessages = Object.freeze({
         UNAUTHORIZED: "Accès non autorisé.",
         FORBIDDEN: "Action interdite.",
         INVALID_ID: "ID invalide.",
-    },
-    EVALUATION: {
-        CREATION_FAILED: "Échec de la création de l’évaluation.",
-        REPORT_ERROR: "Impossible de générer le rapport d’évaluation.",
     },
     PROJECT: {
         INVALID_TEAM_MEMBER: "Un membre de l’équipe est invalide.",
@@ -74,7 +73,7 @@ const ErrorMessages = Object.freeze({
     },
 });
 
-// 📌 Codes de statut HTTP
+// ✅ Codes de statut HTTP
 const HttpStatus = Object.freeze({
     OK: 200,
     CREATED: 201,
@@ -87,7 +86,6 @@ const HttpStatus = Object.freeze({
     INTERNAL_ERROR: 500,
 });
 
-// 📌 Export consolidé des constantes
 module.exports = {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT || 3000,
@@ -98,160 +96,221 @@ module.exports = {
     PaginationDefaults,
     ErrorMessages,
     HttpStatus,
-};/n/n// ======= Contenu de config/db.js =======/n/n// config/db.js
+};
 
+// ======= Contenu de config/db.js =======
+
+// config/db.js
+
+const mongoose = require('mongoose');
+
+// ✅ Connexion à MongoDB
+async function connectToDatabase(mongoUri) {
+    try {
+        await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+        console.log('✅ Connected to MongoDB');
+    } catch (error) {
+        console.error('❌ MongoDB connection error:', error.message);
+        process.exit(1); // Terminate process if connection fails
+    }
+}
+
+module.exports = connectToDatabase;
+
+// ======= Contenu de config/env.js =======
+
+// config/env.js
+
+require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
 const dbConfigPath = path.resolve(__dirname, 'db.json');
-const dbConfig = JSON.parse(fs.readFileSync(dbConfigPath, 'utf-8'));
 
-console.log('Database Config:', dbConfig);/n/n// ======= Contenu de config/env.js =======/n/n// config/env.js
+// ✅ Chargement des variables d'environnement depuis db.json
+if (fs.existsSync(dbConfigPath)) {
+    const envConfig = JSON.parse(fs.readFileSync(dbConfigPath, 'utf-8')).env;
+
+    process.env.PORT = envConfig.PORT || process.env.PORT;
+    process.env.MONGO_URI = envConfig.MONGO_URI || process.env.MONGO_URI;
+    process.env.JWT_SECRET = envConfig.JWT_SECRET || process.env.JWT_SECRET;
+}
+
+// ======= Contenu de exportCode.js =======
 
 const fs = require('fs');
 const path = require('path');
 
-const dbConfigPath = path.resolve(__dirname, 'db.json');
-const envConfig = JSON.parse(fs.readFileSync(dbConfigPath, 'utf-8')).env;
+// Liste des fichiers à exporter
+const filesToExport = [
+    'config/constants.js',
+    'config/db.js',
+    'config/env.js',
+    'exportCode.js',
+    'filesList.js',
+    'server.js',
+    'src/controllers/deliverable.controller.js',
+    'src/controllers/project.controller.js',
+    'src/graphql/resolvers.js',
+    'src/graphql/typeDefs.js',
+    'src/middlewares/project.middleware.js',
+    'src/middlewares/validate.Request.js',
+    'src/models/deliverable.model.js',
+    'src/models/project.model.js',
+    'src/routers/ai.router.js',
+    'src/routers/deliverable.router.js',
+    'src/routers/project.router.js',
+    'src/schema.js',
+    'src/services/ai.service.js',
+    'src/services/github.service.js',
+    'src/services/project.service.js',
+    'src/utils/date.util.js',
+    'src/utils/github.util.js',
+    'src/utils/project.class.js',
+    'src/utils/project.utils.js',
+    'src/validations/project.validation.js',
+    'test-env.js',
+    'testGithubService.js'
+];
 
-process.env.PORT = envConfig.PORT;
-process.env.MONGO_URI = envConfig.MONGO_URI;
-process.env.JWT_SECRET = envConfig.JWT_SECRET;/n/n// ======= Contenu de exportCode.js =======/n/nconst fs = require('fs');
-            const path = require('path');
+// Chemin du fichier de sortie
+const outputFile = './exported_code.txt';
 
-            // Liste des fichiers à exporter
-            const filesToExport = [
-                'config/constants.js',
-                'config/db.js',
-                'config/env.js',
-                'exportCode.js',
-                'filesList.js',
-                'server.js',
-                'src/controllers/deliverable.controller.js',
-                'src/controllers/project.controller.js',
-                'src/graphql/resolvers.js',
-                'src/graphql/typeDefs.js',
-                'src/middlewares/project.middleware.js',
-                'src/middlewares/validate.Request.js',
-                'src/models/deliverable.model.js',
-                'src/models/project.model.js',
-                'src/routers/ai.router.js',
-                'src/routers/deliverable.router.js',
-                'src/routers/project.router.js',
-                'src/schema.js',
-                'src/services/ai.service.js',
-                'src/services/github.service.js',
-                'src/services/project.service.js',
-                'src/utils/date.util.js',
-                'src/utils/github.util.js',
-                'src/utils/project.class.js',
-                'src/utils/project.utils.js',
-                'src/validations/project.validation.js',
-                'test-env.js',
-                'testGithubService.js'
-            ];
+/**
+ * Fonction pour exporter le contenu des fichiers.
+ */
+async function exportCode() {
+    try {
+        let outputContent = '';
 
-            // Chemin du fichier de sortie
-            const outputFile = './exported_code.txt';
+        console.log('🚀 Début de l\'export des fichiers...\n');
 
-            async function exportCode() {
-                try {
-                    let outputContent = '';
+        for (const file of filesToExport) {
+            const filePath = path.resolve(file);
 
-                    for (const file of filesToExport) {
-                        const filePath = path.resolve(file);
-
-                        if (fs.existsSync(filePath)) {
-                            const fileContent = fs.readFileSync(filePath, 'utf-8');
-                            outputContent += `/n// ======= Contenu de ${file} =======/n/n`;
-                            outputContent += fileContent + '/n';
-                        } else {
-                            console.warn(`⚠️ Fichier introuvable : ${file}`);
-                        }
-                    }
-
-                    fs.writeFileSync(outputFile, outputContent, 'utf-8');
-                    console.log(`✅ Code exporté avec succès dans ${outputFile}`);
-                } catch (error) {
-                    console.error('❌ Erreur lors de l\'exportation :', error.message);
-                }
-            }
-
-            exportCode();/n/n// ======= Contenu de filesList.js =======/n/nconst fs = require('fs');
-            const path = require('path');
-
-            function getAllJsFiles(dirPath, arrayOfFiles = []) {
-                try {
-                    const files = fs.readdirSync(dirPath);
-
-                    files.forEach(file => {
-                        const fullPath = path.join(dirPath, file);
-
-                        // Ignorer le répertoire node_modules
-                        if (file === 'node_modules') {
-                            return;
-                        }
-
-                        if (fs.statSync(fullPath).isDirectory()) {
-                            getAllJsFiles(fullPath, arrayOfFiles);
-                        } else if (file.endsWith('.js')) {
-                            arrayOfFiles.push(fullPath);
-                        }
-                    });
-                } catch (error) {
-                    console.error(`Erreur lors de la lecture du répertoire ${dirPath}:`, error.message);
-                }
-
-                return arrayOfFiles;
-            }
-
-            // Utilisation
-            const directoryPath = '.'; // Remplacez par le chemin de votre répertoire
-            if (fs.existsSync(directoryPath) && fs.statSync(directoryPath).isDirectory()) {
-                const jsFiles = getAllJsFiles(directoryPath);
-
-                // Formater la liste en tableau avec chaque fichier sur une ligne
-                const formattedList = `[\n${jsFiles.map(file => `  '${file}'`).join(',\n')}\n]`;
-
-                // Écrire dans le fichier filesList.txt
-                fs.writeFileSync('filesList.txt', formattedList, 'utf8');
-                console.log('Liste des fichiers .js écrite dans filesList.txt');
+            if (fs.existsSync(filePath)) {
+                console.log(`✅ Lecture du fichier : ${file}`);
+                const fileContent = fs.readFileSync(filePath, 'utf-8');
+                outputContent += `\n// ======= Contenu de ${file} =======\n\n`;
+                outputContent += fileContent + '\n';
             } else {
-                console.error(`Le chemin spécifié (${directoryPath}) n'est pas un répertoire valide.`);
-            }/n/n// ======= Contenu de server.js =======/n/n// ./backend/server.js
+                console.warn(`⚠️ Fichier introuvable : ${file}`);
+            }
+        }
+
+        fs.writeFileSync(outputFile, outputContent, 'utf-8');
+        console.log(`\n✅ Code exporté avec succès dans : ${outputFile}`);
+    } catch (error) {
+        console.error('❌ Erreur lors de l\'exportation :', error.message);
+    }
+}
+
+// Appel de la fonction d'exportation
+exportCode();
+
+// ======= Contenu de filesList.js =======
+
+const fs = require('fs').promises;
+const path = require('path');
+
+/**
+ * Fonction récursive pour récupérer tous les fichiers `.js` d'un répertoire donné.
+ * Exclut certains répertoires et fichiers indésirables.
+ * @param {string} dirPath - Chemin du répertoire à parcourir.
+ * @param {string[]} jsFiles - Tableau pour stocker les fichiers trouvés.
+ * @returns {Promise<string[]>} - Promesse contenant un tableau des chemins relatifs des fichiers `.js`.
+ */
+async function getAllJsFiles(dirPath, jsFiles = []) {
+    try {
+        const files = await fs.readdir(dirPath, { withFileTypes: true });
+
+        for (const file of files) {
+            const fullPath = path.join(dirPath, file.name);
+
+            // Exclure les répertoires ou fichiers indésirables
+            if (
+                file.name === 'node_modules' || // Ignorer `node_modules`
+                file.name.startsWith('.') || // Ignorer les fichiers/dossiers cachés comme `.angular`
+                fullPath.includes('.angular/cache') // Ignorer tout dans `.angular/cache`
+            ) {
+                continue;
+            }
+
+            if (file.isDirectory()) {
+                await getAllJsFiles(fullPath, jsFiles);
+            } else if (file.name.endsWith('.js')) {
+                jsFiles.push(path.relative('.', fullPath).replace(/\\/g, '/'));
+            }
+        }
+    } catch (error) {
+        console.error(`❌ Erreur lors de la lecture du répertoire ${dirPath}: ${error.message}`);
+    }
+
+    return jsFiles;
+}
+
+/**
+ * Fonction principale pour récupérer les fichiers `.js` et écrire la liste dans un fichier.
+ */
+async function main() {
+    const directoryPath = path.resolve('.'); // Répertoire actuel
+    const outputFilePath = path.resolve('filesList.txt'); // Fichier de sortie
+
+    try {
+        // Vérifier si le répertoire existe
+        const stat = await fs.stat(directoryPath);
+        if (!stat.isDirectory()) {
+            throw new Error(`Le chemin spécifié (${directoryPath}) n'est pas un répertoire valide.`);
+        }
+
+        const jsFiles = await getAllJsFiles(directoryPath);
+
+        const formattedList = `[\n${jsFiles.map(file => `    '${file}'`).join(',\n')}\n];`;
+        await fs.writeFile(outputFilePath, formattedList, 'utf8');
+
+        console.log(`✅ Liste des fichiers .js écrite dans ${outputFilePath}`);
+    } catch (error) {
+        console.error(`❌ Erreur: ${error.message}`);
+    }
+}
+
+main();
+
+
+// ======= Contenu de server.js =======
+
+// ./backend/server.js
 
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
 require('dotenv').config();
+
 const { ApolloServer } = require('apollo-server-express');
 const { typeDefs } = require('./src/graphql/typeDefs');
 const { resolvers } = require('./src/graphql/resolvers');
 const projectRouter = require('./src/routers/project.router');
-const aiRouter = require('./src/routers/ai.router');
-const deliverableRouter = require('./src/routers/deliverable.router'); // Import deliverable router
+const deliverableRouter = require('./src/routers/deliverable.router');
+const aiRouter = require('./src/routers/ai.router'); // ✅ Import AI Router
 
-// Initialize Express application
 const app = express();
-
-// Retrieve environment variables
+const PORT = process.env.PORT || 3000; // ✅ Fallback for missing PORT
 const MONGO_URI = process.env.MONGO_URI;
-const PORT = process.env.PORT || 3000;
 
-// Ensure critical environment variables are set
+// ✅ Check for critical environment variables
 if (!MONGO_URI) {
     console.error('❌ Error: MONGO_URI is missing in environment variables.');
-    process.exit(1); // Terminate process if MONGO_URI is missing
+    process.exit(1);
 }
 
-// Middleware
-app.use(morgan('dev')); // Log HTTP requests
+// ✅ Middleware
+app.use(morgan('dev')); // Logging
 app.use(cors()); // Enable Cross-Origin Resource Sharing
-app.use(express.json()); // Parse incoming JSON requests
+app.use(express.json()); // Parse JSON requests
 
-// Apollo Server Initialization
-const server = new ApolloServer({
+// ✅ Apollo Server Initialization
+const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
     formatError: (err) => {
@@ -263,61 +322,53 @@ const server = new ApolloServer({
     },
 });
 
-// Start Apollo Server and apply middleware to Express app
+// ✅ Function to start Apollo Server
 async function startApolloServer() {
-    await server.start();
-    server.applyMiddleware({ app }); // Attach Apollo middleware to Express
+    await apolloServer.start();
+    apolloServer.applyMiddleware({ app });
 }
 
-// Connect to MongoDB with Mongoose
+// ✅ Connect to MongoDB
 mongoose
-    .connect(MONGO_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    })
+    .connect(MONGO_URI) // ✅ Removed deprecated options
     .then(() => console.log('✅ Connected to MongoDB'))
     .catch((err) => {
         console.error('❌ MongoDB connection error:', err.message);
         process.exit(1);
     });
 
-// Define routes
+// ✅ Define Routes
 app.get('/', (req, res) => {
     res.send('API PROGEASE is working correctly.');
 });
-
-app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'OK', timestamp: new Date() });
-});
-
 app.use('/api/projects', projectRouter);
-app.use('/api/deliverables', deliverableRouter); // Deliverable-related routes
-app.use('/api/v1/ai', aiRouter);
+app.use('/api/deliverables', deliverableRouter);
+app.use('/api/ai', aiRouter); // ✅ Register AI routes
 
-// Handle undefined routes
-app.use((req, res) => {
-    res.status(404).json({ error: 'Route not found' });
-});
-
-// Global error handling middleware
+// ✅ Global Error Handling
+app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
 app.use((err, req, res, next) => {
     console.error('Unhandled Error:', err.stack);
     res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
 });
 
-// Start application
+// ✅ Start the Application
 (async () => {
     try {
-        await startApolloServer(); // Start Apollo Server
+        await startApolloServer();
         app.listen(PORT, () => {
-            console.log(`🚀 Apollo Server is ready at http://localhost:${PORT}${server.graphqlPath}`);
+            console.log(`🚀 Apollo Server running at http://localhost:${PORT}${apolloServer.graphqlPath}`);
             console.log(`✅ Express server started on port ${PORT}`);
         });
     } catch (error) {
         console.error('❌ Failed to start server:', error.message);
         process.exit(1);
     }
-})();/n/n// ======= Contenu de src/controllers/deliverable.controller.js =======/n/n// src/controllers/deliverable.controller.js
+})();
+
+// ======= Contenu de src/controllers/deliverable.controller.js =======
+
+// src/controllers/deliverable.controller.js
 
 const Deliverable = require('../models/deliverable.model');
 const Project = require('../models/project.model');
@@ -404,15 +455,13 @@ exports.removeDeliverable = async (req, res) => {
         console.error('Error deleting deliverable:', error.message);
         res.status(500).json({ error: 'Failed to delete deliverable.' });
     }
-};/n/n// ======= Contenu de src/controllers/project.controller.js =======/n/n// scr/controllers/project.controller.js
+};
+
+// ======= Contenu de src/controllers/project.controller.js =======
+
+// scr/controllers/project.controller.js
 
 const Project = require('../models/project.model'); // Import the Mongoose model for projects
-const mongoose = require('mongoose');
-
-
-//*******************************//
-// Project controller functions //
-//*****************************//
 
 // Controller for creating a new project
 exports.createProject = async (req, res) => {
@@ -422,7 +471,7 @@ exports.createProject = async (req, res) => {
         res.status(201).json(savedProject);
     } catch (error) {
         console.error('Error creating project:', error);
-        res.status(500).json({ error: 'Erreur lors de la création du projet' });
+        res.status(500).json({ error: 'Failed to create project.' });
     }
 };
 
@@ -433,7 +482,7 @@ exports.getProjects = async (req, res) => {
         res.status(200).json(projects);
     } catch (error) {
         console.error('Error retrieving projects:', error);
-        res.status(500).json({ error: 'Erreur lors de la récupération des projets' });
+        res.status(500).json({ error: 'Failed to retrieve projects.' });
     }
 };
 
@@ -442,12 +491,12 @@ exports.getProjectById = async (req, res) => {
     try {
         const project = await Project.findById(req.params.id);
         if (!project) {
-            return res.status(404).json({ error: 'Projet introuvable' });
+            return res.status(404).json({ error: 'Project not found.' });
         }
         res.status(200).json(project);
     } catch (error) {
         console.error('Error retrieving project by ID:', error);
-        res.status(500).json({ error: 'Erreur lors de la récupération du projet' });
+        res.status(500).json({ error: 'Failed to retrieve project.' });
     }
 };
 
@@ -460,12 +509,12 @@ exports.updateProject = async (req, res) => {
             { new: true, runValidators: true } // Ensure validators are enforced during updates
         );
         if (!updatedProject) {
-            return res.status(404).json({ error: 'Projet introuvable' });
+            return res.status(404).json({ error: 'Project not found.' });
         }
         res.status(200).json(updatedProject);
     } catch (error) {
         console.error('Error updating project:', error);
-        res.status(500).json({ error: 'Erreur lors de la mise à jour du projet' });
+        res.status(500).json({ error: 'Failed to update project.' });
     }
 };
 
@@ -474,124 +523,18 @@ exports.deleteProject = async (req, res) => {
     try {
         const deletedProject = await Project.findByIdAndDelete(req.params.id);
         if (!deletedProject) {
-            return res.status(404).json({ error: 'Projet introuvable' });
+            return res.status(404).json({ error: 'Project not found.' });
         }
-        res.status(204).send();
-    } catch (error) {
-        console.error('Error deleting project:', error);
-        res.status(500).json({ error: 'Erreur lors de la suppression du projet' });
-    }
-};
-//***********************************//
-// Deliverable controller functions //
-//*********************************//
-
-// Controller for adding a deliverable to a project
-exports.addDeliverable = async (req, res) => {
-    try {
-        // Validate project existence
-        const project = await Project.findById(req.params.id);
-        if (!project) {
-            return res.status(404).json({ error: 'Projet introuvable' });
-        }
-
-        // Validate request body
-        const { name, description, deadline, repositoryUrl } = req.body;
-        if (!name || !description || !deadline || !repositoryUrl) {
-            return res.status(400).json({ error: 'Tous les champs sont requis : name, description, deadline, repositoryUrl.' });
-        }
-
-        // Create deliverable
-        const deliverable = {
-            name,
-            description,
-            deadline,
-            repositoryUrl,
-            statut: 'PENDING', // Default status
-        };
-
-        project.deliverables.push(deliverable);
-        await project.save();
-
-        res.status(201).json(deliverable);
-    } catch (error) {
-        console.error('Error adding deliverable:', error.message);
-        res.status(500).json({ error: 'Erreur lors de l\'ajout du livrable' });
-    }
-};
-
-// Controller for retrieving all deliverables of a project
-exports.getDeliverables = async (req, res) => {
-    try {
-        // Fetch deliverables of the project
-        const project = await Project.findById(req.params.id).select('deliverables');
-        if (!project) {
-            return res.status(404).json({ error: 'Projet introuvable' });
-        }
-
-        res.status(200).json(project.deliverables);
-    } catch (error) {
-        console.error('Error retrieving deliverables:', error.message);
-        res.status(500).json({ error: 'Erreur lors de la récupération des livrables' });
-    }
-};
-
-// Controller for updating a specific deliverable of a project
-exports.updateDeliverable = async (req, res) => {
-    try {
-        // Validate project existence
-        const project = await Project.findById(req.params.id);
-        if (!project) {
-            return res.status(404).json({ error: 'Projet introuvable' });
-        }
-
-        // Validate deliverable existence
-        const deliverable = project.deliverables.id(req.params.deliverableId);
-        if (!deliverable) {
-            return res.status(404).json({ error: 'Livrable introuvable' });
-        }
-
-        // Update only provided fields
-        const { name, statut, deadline, repositoryUrl } = req.body;
-        if (name !== undefined) deliverable.name = name;
-        if (statut !== undefined) deliverable.statut = statut;
-        if (deadline !== undefined) deliverable.deadline = deadline;
-        if (repositoryUrl !== undefined) deliverable.repositoryUrl = repositoryUrl;
-
-        await project.save();
-
-        res.status(200).json(deliverable);
-    } catch (error) {
-        console.error('Error updating deliverable:', error.message);
-        res.status(500).json({ error: 'Erreur lors de la mise à jour du livrable' });
-    }
-};
-
-// Controller for removing a specific deliverable from a project
-exports.removeDeliverable = async (req, res) => {
-    try {
-        // Validate project existence
-        const project = await Project.findById(req.params.id);
-        if (!project) {
-            return res.status(404).json({ error: 'Projet introuvable' });
-        }
-
-        // Validate deliverable existence
-        const deliverable = project.deliverables.id(req.params.deliverableId);
-        if (!deliverable) {
-            return res.status(404).json({ error: 'Livrable introuvable' });
-        }
-
-        // Remove deliverable
-        deliverable.remove();
-        await project.save();
-
         res.status(204).send(); // No content
     } catch (error) {
-        console.error('Error deleting deliverable:', error.message);
-        res.status(500).json({ error: 'Erreur lors de la suppression du livrable' });
+        console.error('Error deleting project:', error);
+        res.status(500).json({ error: 'Failed to delete project.' });
     }
-};/n/n// ======= Contenu de src/graphql/resolvers.js =======/n/nconst Project = require('../models/project.model'); // Import Project model
+};
+
+// ======= Contenu de src/graphql/resolvers.js =======
+
+const Project = require('../models/project.model'); // Import Project model
 const Deliverable = require('../models/project.model');
 
         const resolvers = {
@@ -736,7 +679,11 @@ const Deliverable = require('../models/project.model');
             },
         };
 
-        module.exports = { resolvers };/n/n// ======= Contenu de src/graphql/typeDefs.js =======/n/nconst { gql } = require('apollo-server-express');
+        module.exports = { resolvers };
+
+// ======= Contenu de src/graphql/typeDefs.js =======
+
+const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
     type Project {
@@ -789,7 +736,11 @@ const typeDefs = gql`
     }
 `;
 
-module.exports = { typeDefs };/n/n// ======= Contenu de src/middlewares/project.middleware.js =======/n/n// backend/src/middlewares/project.middleware.js
+module.exports = { typeDefs };
+
+// ======= Contenu de src/middlewares/project.middleware.js =======
+
+// backend/src/middlewares/project.middleware.js
 
 const { validationResult } = require('express-validator');
 
@@ -799,7 +750,11 @@ module.exports = (req, res, next) => {
         return res.status(400).json({ errors: errors.array() });
     }
     next();
-};/n/n// ======= Contenu de src/middlewares/validate.Request.js =======/n/nconst { validationResult } = require('express-validator');
+};
+
+// ======= Contenu de src/middlewares/validate.Request.js =======
+
+const { validationResult } = require('express-validator');
 
 // Middleware pour valider les requêtes
 module.exports = (req, res, next) => {
@@ -808,7 +763,11 @@ module.exports = (req, res, next) => {
         return res.status(400).json({ errors: errors.array() });
     }
     next();
-};/n/n// ======= Contenu de src/models/deliverable.model.js =======/n/n// src/models/deliverable.model.js
+};
+
+// ======= Contenu de src/models/deliverable.model.js =======
+
+// src/models/deliverable.model.js
 
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
@@ -861,83 +820,144 @@ const deliverableSchema = new Schema({
     },
 });
 
-module.exports = mongoose.model('Deliverable', deliverableSchema);/n/n// ======= Contenu de src/models/project.model.js =======/n/n// src/models/project.model.js
+module.exports = mongoose.model('Deliverable', deliverableSchema);
+
+// ======= Contenu de src/models/project.model.js =======
+
+// src/models/project.model.js
 
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// Project Schema
-const projectSchema = new Schema(
-    {
-        title: {
-            type: String,
-            required: [true, 'Project title is required.'],
-            trim: true,
-        },
-        description: {
-            type: String,
-            required: [true, 'Project description is required.'],
-            trim: true,
-        },
-        team: {
-            type: [Schema.Types.ObjectId],
-            ref: 'User',
-            default: [],
-        },
-        tutor: {
-            type: Schema.Types.ObjectId,
-            ref: 'User',
-        },
-        skills: {
-            type: [String],
-            validate: {
-                validator: (arr) => arr.length > 0,
-                message: 'Project must have at least one skill.',
-            },
-        },
-        startDate: {
-            type: Date,
-            required: [true, 'Start date is required.'],
-        },
-        endDate: {
-            type: Date,
-            required: [true, 'End date is required.'],
+const projectSchema = new Schema({
+    title: {
+        type: String,
+        required: [true, 'Project title is required.'],
+        trim: true,
+    },
+    description: {
+        type: String,
+        required: [true, 'Project description is required.'],
+        trim: true,
+    },
+    team: {
+        type: [Schema.Types.ObjectId], // Tableau d'ObjectId
+        ref: 'User', // Référence au modèle User
+        default: [],
+    },
+    tutor: {
+        type: Schema.Types.ObjectId, // ObjectId unique
+        ref: 'User', // Référence au modèle User
+    },
+    skills: {
+        type: [String],
+        validate: {
+            validator: (arr) => arr.length > 0,
+            message: 'Project must have at least one skill.',
         },
     },
-    {
-        timestamps: true,
-        toJSON: {
-            virtuals: true,
-            transform: (doc, ret) => {
-                ret.id = ret._id;
-                delete ret._id;
-                delete ret.__v;
-            },
-        },
-    }
-);
+    startDate: {
+        type: Date,
+        required: [true, 'Start date is required.'],
+    },
+    endDate: {
+        type: Date,
+        required: [true, 'End date is required.'],
+    },
+});
 
-module.exports = mongoose.model('Project', projectSchema);/n/n// ======= Contenu de src/routers/ai.router.js =======/n/n// src/routers/ai.router.js
+module.exports = mongoose.model('Project', projectSchema);
+
+// ======= Contenu de src/routers/ai.router.js =======
+
+// src/routers/ai.router.js
 
 const express = require('express');
 const router = express.Router();
-const { generateText } = require('../services/ai.service');
+const {
+    generateText,
+    trackProgress,
+    predictPerformance,
+    scheduleTasks,
+    buildTeams,
+    matchTutors,
+    recommendLearning
+} = require('../services/ai.service');
 
-// Endpoint pour générer du texte avec IA
-router.post('/generate', async (req, res) => {
-    const { prompt } = req.body;
-    if (!prompt) {
-        return res.status(400).json({ error: 'Le champ "prompt" est requis.' });
+// Middleware for handling async errors
+const catchAsync = (fn) => (req, res, next) => {
+    Promise.resolve(fn(req, res, next)).catch(next);
+};
+
+// Utility function to validate required fields
+const validateField = (field, req, res) => {
+    if (!req.body[field]) {
+        res.status(400).json({ error: `The field "${field}" is required.` });
+        return false;
     }
-    try {
-        const result = await generateText(prompt);
-        res.status(200).json({ result });
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
+    return true;
+};
+
+// Endpoint: Generate Text with AI
+router.post('/generate-text', catchAsync(async (req, res) => {
+    if (!validateField('prompt', req, res)) return;
+    const result = await generateText(req.body.prompt);
+    res.status(200).json({ result });
+}));
+
+// Endpoint: Track Project Progress
+router.post('/track-progress', catchAsync(async (req, res) => {
+    if (!validateField('tasks', req, res)) return;
+    const progress = await trackProgress(req.body.tasks);
+    res.status(200).json({ progress });
+}));
+
+// Endpoint: Predict Performance
+router.post('/predict-performance', catchAsync(async (req, res) => {
+    if (!validateField('history', req, res)) return;
+    const prediction = await predictPerformance(req.body.history);
+    res.status(200).json({ prediction });
+}));
+
+// Endpoint: Generate Optimized Task Schedule
+router.post('/schedule-tasks', catchAsync(async (req, res) => {
+    if (!validateField('tasks', req, res)) return;
+    const schedule = await scheduleTasks(req.body.tasks);
+    res.status(200).json({ schedule });
+}));
+
+// Endpoint: Build Teams
+router.post('/build-teams', catchAsync(async (req, res) => {
+    if (!validateField('members', req, res)) return;
+    const teams = await buildTeams(req.body.members);
+    res.status(200).json({ teams });
+}));
+
+// Endpoint: Match Mentors and Mentees
+router.post('/match-tutors', catchAsync(async (req, res) => {
+    if (!validateField('members', req, res)) return;
+    const pairs = await matchTutors(req.body.members);
+    res.status(200).json({ pairs });
+}));
+
+// Endpoint: Recommend Learning Resources
+router.post('/recommend-learning', catchAsync(async (req, res) => {
+    if (!validateField('skills', req, res)) return;
+    const resources = await recommendLearning(req.body.skills);
+    res.status(200).json({ resources });
+}));
+
+// Global Error Handling Middleware
+router.use((err, req, res, next) => {
+    console.error('❌ Error caught in global middleware:', err);
+    res.status(500).json({ error: 'An internal error occurred. Please try again later.' });
 });
 
-module.exports = router;/n/n// ======= Contenu de src/routers/deliverable.router.js =======/n/n// src/routers/deliverable.router.js
+module.exports = router;
+
+// ======= Contenu de src/routers/deliverable.router.js =======
+
+// src/routers/deliverable.router.js
 
 const express = require('express');
 const router = express.Router();
@@ -958,14 +978,14 @@ router.delete('/:deliverableId', deliverableController.removeDeliverable);
 module.exports = router;
 
 
-/n/n// ======= Contenu de src/routers/project.router.js =======/n/nconst express = require('express');
+
+
+// ======= Contenu de src/routers/project.router.js =======
+
+const express = require('express');
 const router = express.Router();
 const projectController = require('../controllers/project.controller'); // Import project controllers
-
-
-//------------------------------------------------------//
-//       1.Routes for project management                //
-//------------------------------------------------------//
+const { analyzeRisks, trackTasks } = require('../services/project.service'); // Import project services
 
 // Route for creating a new project
 router.post('/', projectController.createProject);
@@ -982,7 +1002,35 @@ router.put('/:id', projectController.updateProject);
 // Route for deleting a project
 router.delete('/:id', projectController.deleteProject);
 
-module.exports = router;/n/n// ======= Contenu de src/schema.js =======/n/n// src/schema.js
+// Route for Risk Analysis
+router.post('/risk-analysis', async (req, res) => {
+    try {
+        const { projectDescription, milestones, resources } = req.body;
+        const risks = await analyzeRisks({ projectDescription, milestones, resources });
+        res.status(200).json(risks);
+    } catch (error) {
+        console.error('Error in /risk-analysis:', error.message);
+        res.status(500).json({ error: 'Failed to analyze risks.' });
+    }
+});
+
+// Route for Task Tracking and Progress Reporting
+router.post('/task-tracking', async (req, res) => {
+    try {
+        const { tasks, filter } = req.body;
+        const taskReport = await trackTasks(tasks, filter);
+        res.status(200).json(taskReport);
+    } catch (error) {
+        console.error('Error in /task-tracking:', error.message);
+        res.status(500).json({ error: 'Failed to track tasks.' });
+    }
+});
+
+module.exports = router;
+
+// ======= Contenu de src/schema.js =======
+
+// src/schema.js
 
 const { gql } = require('apollo-server-express');
 const { Enums } = require('../config/constants'); // Importation des énumérations depuis constants.js
@@ -1109,52 +1157,218 @@ const typeDefs = gql`
     }
 `;
 
-module.exports = { typeDefs };/n/n// ======= Contenu de src/services/ai.service.js =======/n/nconst { OpenAI } = require('openai');
+module.exports = { typeDefs };
+
+// ======= Contenu de src/services/ai.service.js =======
+
+const deepseek = require('deepseek'); // Import the library
 const dotenv = require('dotenv');
-dotenv.config(({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' }));
 
-console.log('OPENAI_API_KEY:', process.env.OPENAI_API_KEY);
+// Load environment variables
+dotenv.config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
+if (!DEEPSEEK_API_KEY) {
+  throw new Error('❌ DEEPSEEK_API_KEY is missing. Please check your .env file.');
+}
+
+console.log('✅ DEEPSEEK_API_KEY loaded successfully.');
+
+const client = deepseek.createClient({ apiKey: DEEPSEEK_API_KEY });
+
+// Configuration
+const CONFIG = {
+  MODEL: 'gpt-3.5-turbo',
+  MAX_TOKENS: 200,
+};
+
+/**
+ * Utility to handle errors during AI calls.
+ * Logs the error and rethrows it with a meaningful message.
+ */
+async function handleAIError(error, response = null) {
+  console.error('❌ Error during AI processing:', error.message);
+  if (response) {
+    console.error('❌ AI Response:', response);
+  }
+  throw new Error('AI response is invalid or could not be processed.');
+}
+
+/**
+ * Generates text based on a given prompt.
+ * @param {string} prompt - The text prompt to send to the AI.
+ * @returns {string} - The generated text response.
+ */
 async function generateText(prompt) {
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 100,
+    const response = await client.generateText({
+      model: CONFIG.MODEL,
+      prompt,
+      maxTokens: CONFIG.MAX_TOKENS,
     });
-    return response.choices[0].message.content.trim();
+    return response.text.trim();
   } catch (error) {
-    // Log complet de l'erreur pour débogage
-    console.error('Erreur lors de la génération de texte :', error);
-    console.error('Erreur complète :', error.response?.data || error.message);
-    throw error;
+    await handleAIError(error);
   }
 }
 
-async function generateText(prompt) {
+/**
+ * Validates the AI response to ensure it is valid JSON.
+ * @param {string} response - The response from the AI.
+ * @returns {object} - The parsed JSON object.
+ */
+function validateJSONResponse(response) {
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo',
-      messages: [{ role: 'user', content: prompt }],
-      max_tokens: 100,
-    });
-    return response.choices[0].message.content.trim();
+    return JSON.parse(response);
   } catch (error) {
-    if (error.response?.status === 429) {
-      console.error('Quota dépassé :', error.response.data.error.message);
-      throw new Error('Quota dépassé. Veuillez vérifier vos limites et réessayer plus tard.');
-    } else {
-      console.error('Erreur lors de la génération de texte :', error);
-      throw error;
+    throw new Error('AI response is not valid JSON.');
+  }
+}
+
+/**
+ * Tries to extract JSON from a potentially invalid AI response.
+ * @param {string} response - The AI response.
+ * @returns {object} - The extracted JSON object.
+ */
+function extractJSONFromResponse(response) {
+  try {
+    const jsonMatch = response.match(/{.*}/s); // Match JSON object
+    if (jsonMatch) {
+      return JSON.parse(jsonMatch[0]);
     }
+    throw new Error('No JSON found in response.');
+  } catch (error) {
+    throw new Error('Failed to extract JSON from AI response.');
   }
 }
 
-module.exports = { generateText };/n/n// ======= Contenu de src/services/github.service.js =======/n/nconst dotenv = require('dotenv');
+/**
+ * Processes an AI prompt and returns structured JSON.
+ * Uses fallback logic to parse potentially invalid AI responses.
+ * @param {string} prompt - The AI prompt.
+ * @returns {object} - Parsed JSON response.
+ */
+async function processAIResponse(prompt) {
+  const response = await generateText(prompt);
+  try {
+    return validateJSONResponse(response);
+  } catch (error) {
+    console.warn('⚠️ Falling back to JSON extraction.');
+    return extractJSONFromResponse(response);
+  }
+}
+
+/**
+ * Progress Tracker: Calculates overall progress based on task statuses.
+ * @param {Array} tasks - List of tasks with statuses (e.g., [{ status: 'completed' }, ...]).
+ * @returns {Object} - Progress summary.
+ */
+async function trackProgress(tasks) {
+  const completed = tasks.filter(task => task.status === 'completed').length;
+  const inProgress = tasks.filter(task => task.status === 'in-progress').length;
+  const total = tasks.length;
+
+  const progressPercentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+  return {
+    totalTasks: total,
+    completedTasks: completed,
+    inProgressTasks: inProgress,
+    progressPercentage,
+  };
+}
+
+/**
+ * Performance Predictor: Predicts performance based on historical data.
+ * @param {Array} history - Array of past task durations (e.g., [2, 3, 1.5]).
+ * @returns {Object} - Predicted performance metrics.
+ */
+async function predictPerformance(history) {
+  if (!history || history.length === 0) {
+    throw new Error('❌ Historical data is required for performance prediction.');
+  }
+
+  const averageTime = history.reduce((sum, time) => sum + time, 0) / history.length;
+  return {
+    averageCompletionTime: averageTime.toFixed(2),
+    predictedCompletion: `Estimated completion time for the next task: ${averageTime.toFixed(2)} hours.`,
+  };
+}
+
+/**
+ * Scheduler IA: Generates an optimized schedule based on tasks and priorities.
+ * @param {Array} tasks - List of tasks with priorities and durations (e.g., [{ name, priority, duration }]).
+ * @returns {Array} - Optimized task schedule.
+ */
+async function scheduleTasks(tasks) {
+  if (!tasks || tasks.length === 0) {
+    throw new Error('❌ Task list is empty. Cannot generate schedule.');
+  }
+
+  return tasks
+      .sort((a, b) => b.priority - a.priority)
+      .map((task, index, array) => {
+        const startTime = index === 0 ? 0 : array[index - 1].endTime;
+        const endTime = startTime + task.duration;
+        return { ...task, startTime, endTime };
+      });
+}
+
+/**
+ * Team Builder IA: Forms teams based on skills, availability, and preferences.
+ * @param {Array} members - List of team members (e.g., [{ name, skills, availability, preferences }]).
+ * @returns {Array} - Optimized teams.
+ */
+async function buildTeams(members) {
+  if (!members || members.length === 0) {
+    throw new Error('❌ Members list is empty. Cannot build teams.');
+  }
+
+  const prompt = `Formez des équipes optimisées en fonction des compétences, disponibilités et préférences suivantes. Retournez uniquement au format JSON : ${JSON.stringify(members)}`;
+  return processAIResponse(prompt);
+}
+
+/**
+ * Tutor Matcher: Matches mentors with mentees based on skills and needs.
+ * @param {Array} members - List of team members (e.g., [{ name, skills, needs }]).
+ * @returns {Array} - Mentor-mentee pairs.
+ */
+async function matchTutors(members) {
+  if (!members || members.length === 0) {
+    throw new Error('❌ Members list is empty. Cannot match tutors.');
+  }
+
+  const prompt = `Associez les mentors et tutorés selon leurs compétences et besoins. Retournez uniquement au format JSON : ${JSON.stringify(members)}`;
+  return processAIResponse(prompt);
+}
+
+/**
+ * Learning Recommender: Recommends learning resources based on skills to develop.
+ * @param {Array} skills - List of skills or topics to improve (e.g., ['JavaScript', 'Team Management']).
+ * @returns {Array} - Recommended learning resources.
+ */
+async function recommendLearning(skills) {
+  if (!skills || skills.length === 0) {
+    throw new Error('❌ Skills list is empty. Cannot recommend learning resources.');
+  }
+
+  const prompt = `Recommandez des ressources d'apprentissage pour les compétences suivantes. Retournez uniquement au format JSON : ${skills.join(', ')}`;
+  return processAIResponse(prompt);
+}
+
+module.exports = {
+  generateText,
+  trackProgress,
+  predictPerformance,
+  scheduleTasks,
+  buildTeams,
+  matchTutors,
+  recommendLearning,
+};
+
+// ======= Contenu de src/services/github.service.js =======
+
+const dotenv = require('dotenv');
 dotenv.config();
 
 const axios = require('axios');
@@ -1199,7 +1413,11 @@ async function checkGithubRepoExists(url) {
     }
 }
 
-module.exports = { checkGithubRepoExists };/n/n// ======= Contenu de src/services/project.service.js =======/n/nconst Project = require('../models/project.model');
+module.exports = { checkGithubRepoExists };
+
+// ======= Contenu de src/services/project.service.js =======
+
+const Project = require('../models/project.model');
 
 // ✅ Service pour créer un projet
 exports.createProject = async (data) => {
@@ -1251,7 +1469,68 @@ exports.removeDeliverable = async (projectId, deliverableId) => {
     if (!project) throw new Error('Projet introuvable');
     project.deliverables.id(deliverableId).remove();
     return await project.save();
-};/n/n// ======= Contenu de src/utils/date.util.js =======/n/n/n/n// ======= Contenu de src/utils/github.util.js =======/n/n/n/n// ======= Contenu de src/utils/project.class.js =======/n/nclass Projet {
+};
+
+// ✅ Service pour analyse des risques (Risk Analysis)
+exports.analyzeRisks = async ({ projectDescription, milestones, resources }) => {
+    if (!projectDescription) {
+        throw new Error('La description du projet est requise pour l\'analyse des risques.');
+    }
+
+    // Simuler une analyse des risques
+    const risks = [
+        { risk: 'Manque de ressources', severity: 'Élevée', recommendation: 'Allouez des ressources supplémentaires.' },
+        { risk: 'Retard dans les étapes clés', severity: 'Moyenne', recommendation: 'Revoir les échéances et les priorités.' },
+        { risk: 'Défi technique', severity: 'Faible', recommendation: 'Planifiez une formation technique pour l\'équipe.' }
+    ];
+
+    return risks;
+};
+
+// ✅ Service pour suivi des tâches et rapport d'avancement (Task Tracking)
+exports.trackTasks = async (tasks, filter = {}) => {
+    if (!tasks || tasks.length === 0) {
+        throw new Error('La liste des tâches est vide. Impossible de générer un rapport.');
+    }
+
+    // Appliquer les filtres si fournis
+    const filteredTasks = tasks.filter(task => {
+        const matchesStatus = filter.status ? task.status === filter.status : true;
+        const matchesResponsible = filter.responsible ? task.responsible === filter.responsible : true;
+        return matchesStatus && matchesResponsible;
+    });
+
+    // Calcul des indicateurs clés
+    const totalTasks = filteredTasks.length;
+    const completedTasks = filteredTasks.filter(task => task.status === 'Terminé').length;
+    const inProgressTasks = filteredTasks.filter(task => task.status === 'En cours').length;
+    const pendingTasks = filteredTasks.filter(task => task.status === 'À faire').length;
+    const overdueTasks = filteredTasks.filter(task => new Date(task.deadline) < new Date()).length;
+
+    const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+
+    return {
+        totalTasks,
+        completedTasks,
+        inProgressTasks,
+        pendingTasks,
+        overdueTasks,
+        progressPercentage,
+        tasks: filteredTasks
+    };
+};
+
+// ======= Contenu de src/utils/date.util.js =======
+
+
+
+// ======= Contenu de src/utils/github.util.js =======
+
+
+
+// ======= Contenu de src/utils/project.class.js =======
+
+class Projet {
     constructor(id, titre, description, dateDebut, dateFin, statut) {
         this.id = id;
         this.titre = titre;
@@ -1279,7 +1558,11 @@ exports.removeDeliverable = async (projectId, deliverableId) => {
         return Math.round((dureeEcoulee / dureeTotale) * 100);
     }
 }
-/n/n// ======= Contenu de src/utils/project.utils.js =======/n/n// src/utils/project.utils.js
+
+
+// ======= Contenu de src/utils/project.utils.js =======
+
+// src/utils/project.utils.js
 
 const ProjectUtils = {
     /**
@@ -1310,7 +1593,11 @@ const ProjectUtils = {
     }
 };
 
-module.exports = { ProjectUtils };/n/n// ======= Contenu de src/validations/project.validation.js =======/n/n// src/validations/project.validation.js
+module.exports = { ProjectUtils };
+
+// ======= Contenu de src/validations/project.validation.js =======
+
+// src/validations/project.validation.js
 
 const yup = require('yup');
 
@@ -1332,9 +1619,17 @@ const projectSchema = yup.object().shape({
 
 module.exports = {
     projectSchema,
-};/n/n// ======= Contenu de test-env.js =======/n/nrequire('dotenv').config({ path: './.env' });
+};
 
-console.log('MONGO_URI:', process.env.MONGO_URI);/n/n// ======= Contenu de testGithubService.js =======/n/nconst { checkGithubRepoExists } = require('./src/services/github.service'); // Assurez-vous que le chemin est correct
+// ======= Contenu de test-env.js =======
+
+require('dotenv').config({ path: './.env' });
+
+console.log('MONGO_URI:', process.env.MONGO_URI);
+
+// ======= Contenu de testGithubService.js =======
+
+const { checkGithubRepoExists } = require('./src/services/github.service'); // Assurez-vous que le chemin est correct
 
 (async () => {
     try {
@@ -1355,4 +1650,4 @@ console.log('MONGO_URI:', process.env.MONGO_URI);/n/n// ======= Contenu de testG
     } catch (error) {
         console.error('Une erreur est survenue :', error.message);
     }
-})();/n
+})();
