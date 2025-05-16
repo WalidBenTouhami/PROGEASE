@@ -170,6 +170,58 @@ backend
 
 ---
 
+## 📂 Structure Globale du Frontend
+
+### **Structure des Dossiers**
+<details>
+  <summary>📂 Cliquez pour afficher la structure</summary>
+
+```
+frontend
+|-- README.md
+|-- angular.json
+|-- exportCode.js
+|-- exported_code.txt
+|-- filesList.js
+|-- filesList.txt
+|-- package-lock.json
+|-- package.json
+|-- public
+|   `-- favicon.ico
+|-- server.ts
+|-- src
+|   |-- app
+|   |   |-- app-routing.module.ts
+|   |   |-- app.component.css
+|   |   |-- app.component.html
+|   |   |-- app.component.spec.ts
+|   |   |-- app.component.ts
+|   |   |-- app.config.server.ts
+|   |   |-- app.config.ts
+|   |   |-- app.module.ts
+|   |   |-- app.routes.ts
+|   |   |-- back-office
+|   |   |-- core
+|   |   |-- deliverable
+|   |   |-- front-office
+|   |   `-- project
+|   |-- environments
+|   |   |-- environment.prod.ts
+|   |   `-- environment.ts
+|   |-- index.html
+|   |-- main.server.ts
+|   |-- main.ts
+|   `-- styles.css
+|-- tsconfig.app.json
+|-- tsconfig.json
+`-- tsconfig.spec.json
+
+```
+
+</details>
+
+---
+
 ## 📊 Modules et Arborescence
 
 <p align="center">
