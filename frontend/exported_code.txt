@@ -4,7 +4,7 @@
 import { APP_BASE_HREF } from '@angular/common';
 import { CommonEngine } from '@angular/ssr';
 import express from 'express';
-import { fileURLToPath } from 'node:url';tree -L 2 -I "node_modules|.vscode|.angular"
+import { fileURLToPath } from 'node:url';
 import { dirname, join, resolve } from 'node:path';
 import bootstrap from './src/main.server';
 
@@ -201,8 +201,15 @@ export const routes: Routes = [];
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjectManagementComponent } from './project-management/project-management.component';
+import { DeliverableManagementComponent } from './deliverable-management/deliverable-management.component';
 
-const routes: Routes = [];
+const routes: Routes = [
+  { path: '', component: DashboardComponent },
+  { path: 'projects', component: ProjectManagementComponent },
+  { path: 'deliverables', component: DeliverableManagementComponent },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
@@ -217,18 +224,153 @@ export class BackOfficeRoutingModule { }
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { BackOfficeRoutingModule } from './back-office-routing.module';
-
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjectManagementComponent } from './project-management/project-management.component';
+import { DeliverableManagementComponent } from './deliverable-management/deliverable-management.component';
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
-    BackOfficeRoutingModule
+    BackOfficeRoutingModule,
+    DashboardComponent,
+    ProjectManagementComponent,
+    DeliverableManagementComponent
   ]
 })
 export class BackOfficeModule { }
+
+
+// ======= Contenu de src/app/back-office/dashboard/dashboard.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DashboardComponent } from './dashboard.component';
+
+describe('DashboardComponent', () => {
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DashboardComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(DashboardComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/back-office/dashboard/dashboard.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.css'
+})
+export class DashboardComponent {
+
+}
+
+
+
+
+
+// ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DeliverableManagementComponent } from './deliverable-management.component';
+
+describe('DeliverableManagementComponent', () => {
+  let component: DeliverableManagementComponent;
+  let fixture: ComponentFixture<DeliverableManagementComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DeliverableManagementComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(DeliverableManagementComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-deliverable-management',
+  standalone: true,
+  imports: [],
+  templateUrl: './deliverable-management.component.html',
+  styleUrl: './deliverable-management.component.css'
+})
+export class DeliverableManagementComponent {
+
+}
+
+
+// ======= Contenu de src/app/back-office/project-management/project-management.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjectManagementComponent } from './project-management.component';
+
+describe('ProjectManagementComponent', () => {
+  let component: ProjectManagementComponent;
+  let fixture: ComponentFixture<ProjectManagementComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjectManagementComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(ProjectManagementComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/back-office/project-management/project-management.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-project-management',
+  standalone: true,
+  imports: [],
+  templateUrl: './project-management.component.html',
+  styleUrl: './project-management.component.css'
+})
+export class ProjectManagementComponent {
+
+}
 
 
 // ======= Contenu de src/app/core/services/deliverable.service.spec.ts =======
@@ -484,14 +626,111 @@ import { DeliverableRoutingModule } from './deliverable-routing.module';
 export class DeliverableModule { }
 
 
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DashboardComponent } from './dashboard.component';
+
+describe('DashboardComponent', () => {
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DashboardComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(DashboardComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.css'
+})
+export class DashboardComponent {
+
+}
+
+
+
+
+
+// ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DeliverableListComponent } from './deliverable-list.component';
+
+describe('DeliverableListComponent', () => {
+  let component: DeliverableListComponent;
+  let fixture: ComponentFixture<DeliverableListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DeliverableListComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(DeliverableListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-deliverable-list',
+  standalone: true,
+  imports: [],
+  templateUrl: './deliverable-list.component.html',
+  styleUrl: './deliverable-list.component.css'
+})
+export class DeliverableListComponent {
+
+}
+
+
 // ======= Contenu de src/app/front-office/front-office-routing.module.ts =======
 
 //src/app/front-office/front-office.routing.module.ts
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjectListComponent } from './project-list/project-list.component';
+import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
 
-const routes: Routes = [];
+
+const routes: Routes = [
+  { path: '', component: DashboardComponent },
+  { path: 'projects', component: ProjectListComponent },
+  { path: 'deliverables', component: DeliverableListComponent },
+];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
@@ -506,18 +745,65 @@ export class FrontOfficeRoutingModule { }
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { FrontOfficeRoutingModule } from './front-office-routing.module';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjectListComponent } from './project-list/project-list.component';
+import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
 
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
-    FrontOfficeRoutingModule
+    FrontOfficeRoutingModule,
+    DashboardComponent,
+    ProjectListComponent,
+    DeliverableListComponent,
   ]
 })
 export class FrontOfficeModule { }
+
+
+// ======= Contenu de src/app/front-office/project-list/project-list.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjectListComponent } from './project-list.component';
+
+describe('ProjectListComponent', () => {
+  let component: ProjectListComponent;
+  let fixture: ComponentFixture<ProjectListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjectListComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(ProjectListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/front-office/project-list/project-list.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-project-list',
+  standalone: true,
+  imports: [],
+  templateUrl: './project-list.component.html',
+  styleUrl: './project-list.component.css'
+})
+export class ProjectListComponent {
+
+}
 
 
 // ======= Contenu de src/app/project/project-detail/project-detail.component.spec.ts =======
@@ -720,6 +1006,7 @@ export const environment = {
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
 import { config } from './app/app.config.server';
+import '../src/polyfills';
 
 const bootstrap = () => bootstrapApplication(AppComponent, config);
 
@@ -731,7 +1018,16 @@ export default bootstrap;
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
+import '../src/polyfills';
 
 bootstrapApplication(AppComponent, appConfig)
   .catch((err) => console.error(err));
+
+
+// ======= Contenu de src/polyfills.ts =======
+
+/***************************************************************************************************
+ * Zone JS is required by Angular itself.
+ */
+import 'zone.js';  // Included with Angular CLI.
 

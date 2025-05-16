@@ -13,6 +13,12 @@ const filesToExport = [
   'src/app/app.routes.ts',
   'src/app/back-office/back-office-routing.module.ts',
   'src/app/back-office/back-office.module.ts',
+  'src/app/back-office/dashboard/dashboard.component.spec.ts',
+  'src/app/back-office/dashboard/dashboard.component.ts',
+  'src/app/back-office/deliverable-management/deliverable-management.component.spec.ts',
+  'src/app/back-office/deliverable-management/deliverable-management.component.ts',
+  'src/app/back-office/project-management/project-management.component.spec.ts',
+  'src/app/back-office/project-management/project-management.component.ts',
   'src/app/core/services/deliverable.service.spec.ts',
   'src/app/core/services/deliverable.service.ts',
   'src/app/core/services/project.service.spec.ts',
@@ -25,8 +31,14 @@ const filesToExport = [
   'src/app/deliverable/deliverable-list/deliverable-list.component.ts',
   'src/app/deliverable/deliverable-routing.module.ts',
   'src/app/deliverable/deliverable.module.ts',
+  'src/app/front-office/dashboard/dashboard.component.spec.ts',
+  'src/app/front-office/dashboard/dashboard.component.ts',
+  'src/app/front-office/deliverable-list/deliverable-list.component.spec.ts',
+  'src/app/front-office/deliverable-list/deliverable-list.component.ts',
   'src/app/front-office/front-office-routing.module.ts',
   'src/app/front-office/front-office.module.ts',
+  'src/app/front-office/project-list/project-list.component.spec.ts',
+  'src/app/front-office/project-list/project-list.component.ts',
   'src/app/project/project-detail/project-detail.component.spec.ts',
   'src/app/project/project-detail/project-detail.component.ts',
   'src/app/project/project-form/project-form.component.spec.ts',
@@ -38,7 +50,8 @@ const filesToExport = [
   'src/environments/environment.prod.ts',
   'src/environments/environment.ts',
   'src/main.server.ts',
-  'src/main.ts'
+  'src/main.ts',
+  'src/polyfills.ts'
 ];
 
 // Chemin du fichier de sortie

@@ -1,21 +1,92 @@
-<div class="dashboard-container">
-  <h1 class="title">Bienvenue sur PROGEASE</h1>
-  <div class="stats-grid">
-    <div class="stat-card">
-      <span>Projets actifs</span>
-      <strong>{{ stats.projects }}</strong>
+<div class="fo-dashboard">
+  <!-- Vue d'ensemble des projets -->
+  <section class="overview">
+    <h2>Mes Projets</h2>
+    <div class="project-cards">
+      <div *ngFor="let project of projects" class="project-card">
+        <div class="card-header">
+          <span class="project-title">{{project.titre}}</span>
+          <span class="progress-indicator">{{project.progression}}%</span>
+        </div>
+        <div class="card-body">
+          <p>{{project.description}}</p>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width]="project.progression + '%'"></div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <span *ngIf="project.echeanceProche" class="alert-badge">Échéance proche !</span>
+          <span *ngIf="project.isLate" class="alert-badge alert-danger">Retard</span>
+        </div>
+      </div>
     </div>
-    <div class="stat-card">
-      <span>Livrables</span>
-      <strong>{{ stats.deliverables }}</strong>
+  </section>
+  <!-- Alertes et notifications -->
+  <section class="notifications">
+    <h3>Notifications</h3>
+    <ul>
+      <li *ngFor="let notif of notifications" [class.unread]="!notif.read">
+        <span>{{notif.message}}</span>
+        <span class="notif-date">{{notif.date | date:'short'}}</span>
+      </li>
+    </ul>
+  </section>
+  <!-- Calendrier intégré -->
+  <section class="calendar-section">
+    <h3>Calendrier des événements</h3>
+    <app-calendar [events]="calendarEvents"></app-calendar>
+  </section>
+  <!-- Gestion d'équipe -->
+  <section class="team-section">
+    <h3>Mon équipe</h3>
+    <div class="team-members">
+      <div *ngFor="let member of team" class="team-member">
+        <span>{{member.name}}</span>
+        <span class="role">{{member.role}}</span>
+        <button *ngIf="canMessage(member)" (click)="openChat(member)">💬</button>
+        <span class="contrib-score">Contribs: {{member.contributions}}</span>
+      </div>
     </div>
-    <div class="stat-card">
-      <span>Utilisateurs</span>
-      <strong>{{ stats.users }}</strong>
+  </section>
+  <!-- Livrables -->
+  <section class="deliverables-section">
+    <h3>Livrables</h3>
+    <table>
+      <thead>
+      <tr>
+        <th>Nom</th><th>Statut</th><th>Échéance</th><th>Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let d of deliverables">
+        <td>{{d.name}}</td>
+        <td>{{d.status}}</td>
+        <td>{{d.deadline | date}}</td>
+        <td>
+          <button *ngIf="d.canUpload" (click)="upload(d)">Télécharger</button>
+          <button *ngIf="d.canValidate" (click)="validate(d)">Valider</button>
+          <a [href]="d.historyUrl" target="_blank">Historique</a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </section>
+  <!-- IA intégrée -->
+  <section class="ai-section">
+    <h3>Assistant IA</h3>
+    <div class="ai-features">
+      <div>
+        <strong>Ressources personnalisées :</strong>
+        <button (click)="getAiResources()">Recommander</button>
+      </div>
+      <div>
+        <strong>Prédiction de performance :</strong>
+        <button (click)="predictPerformance()">Analyser</button>
+      </div>
+      <div>
+        <strong>Planification intelligente :</strong>
+        <button (click)="planTasks()">Planifier</button>
+      </div>
     </div>
-  </div>
-  <section>
-    <h2>Derniers projets</h2>
-    <app-project-list [projects]="latestProjects"></app-project-list>
   </section>
 </div>
