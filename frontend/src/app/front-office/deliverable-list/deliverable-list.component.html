@@ -1,0 +1,30 @@
+<div class="page-header">
+  <h2>Livrables</h2>
+  <button class="btn-primary" routerLink="/deliverable/new">
+    <i class="fas fa-plus"></i> Nouveau
+  </button>
+</div>
+<table class="ninja-table">
+  <thead>
+  <tr>
+    <th>Nom</th>
+    <th>Description</th>
+    <th>Deadline</th>
+    <th>Statut</th>
+    <th>Dépôt</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let deliverable of deliverables">
+    <td>{{deliverable.name}}</td>
+    <td>{{deliverable.description}}</td>
+    <td>{{deliverable.deadline | date}}</td>
+    <td>
+      <span class="badge" [ngClass]="deliverable.status">{{deliverable.status}}</span>
+    </td>
+    <td>
+      <a [href]="deliverable.repositoryUrl" target="_blank" class="action-link">GitHub</a>
+    </td>
+  </tr>
+  </tbody>
+</table>

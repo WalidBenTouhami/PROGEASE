@@ -1,0 +1,21 @@
+<div class="dashboard-container">
+  <h1 class="title">Bienvenue sur PROGEASE</h1>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span>Projets actifs</span>
+      <strong>{{ stats.projects }}</strong>
+    </div>
+    <div class="stat-card">
+      <span>Livrables</span>
+      <strong>{{ stats.deliverables }}</strong>
+    </div>
+    <div class="stat-card">
+      <span>Utilisateurs</span>
+      <strong>{{ stats.users }}</strong>
+    </div>
+  </div>
+  <section>
+    <h2>Derniers projets</h2>
+    <app-project-list [projects]="latestProjects"></app-project-list>
+  </section>
+</div>

@@ -1,0 +1,32 @@
+<div class="page-header">
+  <h2>Projets</h2>
+  <button class="btn-primary" routerLink="/project/new">
+    <i class="fas fa-plus"></i> Nouveau
+  </button>
+</div>
+<table class="ninja-table">
+  <thead>
+  <tr>
+    <th>Titre</th>
+    <th>Description</th>
+    <th>Début</th>
+    <th>Fin</th>
+    <th>Statut</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let project of projects">
+    <td>{{project.titre}}</td>
+    <td>{{project.description}}</td>
+    <td>{{project.startDate | date}}</td>
+    <td>{{project.endDate | date}}</td>
+    <td>
+      <span class="badge" [ngClass]="project.status">{{project.status}}</span>
+    </td>
+    <td>
+      <a [routerLink]="['/project', project._id]" class="action-link">Voir</a>
+    </td>
+  </tr>
+  </tbody>
+</table>

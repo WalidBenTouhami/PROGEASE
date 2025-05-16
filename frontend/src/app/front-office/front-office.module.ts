@@ -2,15 +2,19 @@
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-
 import { FrontOfficeRoutingModule } from './front-office-routing.module';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjectListComponent } from './project-list/project-list.component';
+import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
 
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
-    FrontOfficeRoutingModule
+    FrontOfficeRoutingModule,
+    DashboardComponent,
+    ProjectListComponent,
+    DeliverableListComponent,
   ]
 })
 export class FrontOfficeModule { }
