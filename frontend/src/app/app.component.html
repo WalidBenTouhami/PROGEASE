@@ -1,11 +1,15 @@
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * * * The content below * * * * * * * * * * * -->
-<!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * -->
-<!-- * * * * * * * * * * and can be replaced.  * * * * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
-<!-- * * * * * * * to get started with your project! * * * * * * * -->
-<!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
+<header>
+  <h1>{{ titre }}</h1>
+  <nav>
+    <a routerLink="/front-office" routerLinkActive="active">Accueil</a>
+    <a routerLink="/project" routerLinkActive="active">Projets</a>
+    <a routerLink="/deliverable" routerLinkActive="active">Livrables</a>
+    <a routerLink="/back-office" routerLinkActive="active">Back office</a>
+  </nav>
+</header>
+<main>
+  <router-outlet></router-outlet>
+</main>
 
 <style>
   :host {

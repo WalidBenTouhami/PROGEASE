@@ -3,82 +3,80 @@
 const express = require('express');
 const router = express.Router();
 const {
-    generateText,
-    trackProgress,
-    predictPerformance,
-    scheduleTasks,
-    buildTeams,
-    matchTutors,
-    recommendLearning
+    genererTexte,
+    suiviProgression,
+    predirePerformance,
+    genererPlanning,
+    creerEquipes,
+    associerTuteurs,
+    recommanderApprentissage
 } = require('../services/ai.service');
 
-// Middleware for handling async errors
 const catchAsync = (fn) => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
 };
 
-// Utility function to validate required fields
-const validateField = (field, req, res) => {
-    if (!req.body[field]) {
-        res.status(400).json({ error: `The field "${field}" is required.` });
+const validerChamp = (champ, req, res) => {
+    if (!req.body[champ]) {
+        res.status(400).json({ error: `Le champ "${champ}" est requis.` });
         return false;
     }
     return true;
 };
 
-// Endpoint: Generate Text with AI
-router.post('/generate-text', catchAsync(async (req, res) => {
-    if (!validateField('prompt', req, res)) return;
-    const result = await generateText(req.body.prompt);
-    res.status(200).json({ result });
+// Générer du texte avec l'IA
+router.post('/generer-texte', catchAsync(async (req, res) => {
+    if (!validerChamp('prompt', req, res)) return;
+    const resultat = await genererTexte(req.body.prompt);
+    res.status(200).json({ resultat });
 }));
 
-// Endpoint: Track Project Progress
-router.post('/track-progress', catchAsync(async (req, res) => {
-    if (!validateField('tasks', req, res)) return;
-    const progress = await trackProgress(req.body.tasks);
-    res.status(200).json({ progress });
+// Suivi de la progression du projet
+router.post('/suivi-progression', catchAsync(async (req, res) => {
+    if (!validerChamp('taches', req, res)) return;
+    const progression = await suiviProgression(req.body.taches);
+    res.status(200).json({ progression });
 }));
 
-// Endpoint: Predict Performance
-router.post('/predict-performance', catchAsync(async (req, res) => {
-    if (!validateField('history', req, res)) return;
-    const prediction = await predictPerformance(req.body.history);
+// Prédire la performance
+router.post('/predire-performance', catchAsync(async (req, res) => {
+    if (!validerChamp('historique', req, res)) return;
+    const prediction = await predirePerformance(req.body.historique);
     res.status(200).json({ prediction });
 }));
 
-// Endpoint: Generate Optimized Task Schedule
-router.post('/schedule-tasks', catchAsync(async (req, res) => {
-    if (!validateField('tasks', req, res)) return;
-    const schedule = await scheduleTasks(req.body.tasks);
-    res.status(200).json({ schedule });
+// Générer un planning optimisé
+router.post('/generer-planning', catchAsync(async (req, res) => {
+    if (!validerChamp('taches', req, res)) return;
+    const planning = await genererPlanning(req.body.taches);
+    res.status(200).json({ planning });
 }));
 
-// Endpoint: Build Teams
-router.post('/build-teams', catchAsync(async (req, res) => {
-    if (!validateField('members', req, res)) return;
-    const teams = await buildTeams(req.body.members);
-    res.status(200).json({ teams });
+// Création des équipes
+router.post('/creer-equipes', catchAsync(async (req, res) => {
+    if (!validerChamp('membres', req, res)) return;
+    const equipes = await creerEquipes(req.body.membres);
+    res.status(200).json({ equipes });
 }));
 
-// Endpoint: Match Mentors and Mentees
-router.post('/match-tutors', catchAsync(async (req, res) => {
-    if (!validateField('members', req, res)) return;
-    const pairs = await matchTutors(req.body.members);
-    res.status(200).json({ pairs });
+// Associer mentors et mentorés
+router.post('/associer-tuteurs', catchAsync(async (req, res) => {
+    if (!validerChamp('membres', req, res)) return;
+    const paires = await associerTuteurs(req.body.membres);
+    res.status(200).json({ paires });
 }));
 
-// Endpoint: Recommend Learning Resources
-router.post('/recommend-learning', catchAsync(async (req, res) => {
-    if (!validateField('skills', req, res)) return;
-    const resources = await recommendLearning(req.body.skills);
-    res.status(200).json({ resources });
+// Recommander des ressources d'apprentissage
+router.post('/recommander-apprentissage', catchAsync(async (req, res) => {
+    if (!validerChamp('competences', req, res)) return;
+    const ressources = await recommanderApprentissage(req.body.competences);
+    res.status(200).json({ ressources });
 }));
 
-// Global Error Handling Middleware
+// Middleware de gestion d'erreur global
 router.use((err, req, res, next) => {
-    console.error('❌ Error caught in global middleware:', err);
-    res.status(500).json({ error: 'An internal error occurred. Please try again later.' });
+    console.error('❌ Erreur attrapée par le middleware global :', err);
+    res.status(500).json({ error: 'Une erreur interne est survenue. Veuillez réessayer plus tard.' });
 });
 
 module.exports = router;

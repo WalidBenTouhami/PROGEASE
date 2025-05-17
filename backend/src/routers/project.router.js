@@ -1,44 +1,44 @@
 const express = require('express');
 const router = express.Router();
-const projectController = require('../controllers/project.controller'); // Import project controllers
-const { analyzeRisks, trackTasks } = require('../services/project.service'); // Import project services
+const projectController = require('../controllers/project.controller');
+const { analyserRisques, suiviTaches } = require('../services/project.service');
 
-// Route for creating a new project
-router.post('/', projectController.createProject);
+// Création d'un projet
+router.post('/', projectController.creerProjet);
 
-// Route for retrieving all projects
-router.get('/', projectController.getProjects);
+// Récupération de tous les projets
+router.get('/', projectController.recupererProjets);
 
-// Route for retrieving a single project by ID
-router.get('/:id', projectController.getProjectById);
+// Récupération d'un projet par ID
+router.get('/:id', projectController.recupererProjetParId);
 
-// Route for updating a project
-router.put('/:id', projectController.updateProject);
+// Mise à jour d'un projet
+router.put('/:id', projectController.mettreAJourProjet);
 
-// Route for deleting a project
-router.delete('/:id', projectController.deleteProject);
+// Suppression d'un projet
+router.delete('/:id', projectController.supprimerProjet);
 
-// Route for Risk Analysis
-router.post('/risk-analysis', async (req, res) => {
+// Analyse de risques
+router.post('/analyse-risques', async (req, res) => {
     try {
-        const { projectDescription, milestones, resources } = req.body;
-        const risks = await analyzeRisks({ projectDescription, milestones, resources });
-        res.status(200).json(risks);
+        const { descriptionProjet, jalons, ressources } = req.body;
+        const risques = await analyserRisques({ descriptionProjet, jalons, ressources });
+        res.status(200).json(risques);
     } catch (error) {
-        console.error('Error in /risk-analysis:', error.message);
-        res.status(500).json({ error: 'Failed to analyze risks.' });
+        console.error('Erreur lors de l\'analyse des risques :', error.message);
+        res.status(500).json({ error: 'Échec de l\'analyse des risques.' });
     }
 });
 
-// Route for Task Tracking and Progress Reporting
-router.post('/task-tracking', async (req, res) => {
+// Suivi des tâches et progression
+router.post('/suivi-taches', async (req, res) => {
     try {
-        const { tasks, filter } = req.body;
-        const taskReport = await trackTasks(tasks, filter);
-        res.status(200).json(taskReport);
+        const { taches, filtre } = req.body;
+        const rapportTaches = await suiviTaches(taches, filtre);
+        res.status(200).json(rapportTaches);
     } catch (error) {
-        console.error('Error in /task-tracking:', error.message);
-        res.status(500).json({ error: 'Failed to track tasks.' });
+        console.error('Erreur lors du suivi des tâches :', error.message);
+        res.status(500).json({ error: 'Échec du suivi des tâches.' });
     }
 });
 

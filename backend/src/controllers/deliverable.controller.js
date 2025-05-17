@@ -1,88 +1,76 @@
 // src/controllers/deliverable.controller.js
 
-const Deliverable = require('../models/deliverable.model');
-const Project = require('../models/project.model');
+const Livrable = require('../models/deliverable.model');
+const Projet = require('../models/project.model');
 
-// Add a new deliverable
-exports.addDeliverable = async (req, res) => {
+// Ajouter un livrable
+exports.ajouterLivrable = async (req, res) => {
     try {
-        const { projectId, name, description, deadline, repositoryUrl } = req.body;
-
-        // Verify the project exists
-        const project = await Project.findById(projectId);
-        if (!project) {
-            return res.status(404).json({ error: 'Project not found.' });
+        const { projetId, nom, description, dateLimite, urlDepot } = req.body;
+        const projet = await Projet.findById(projetId);
+        if (!projet) {
+            return res.status(404).json({ error: 'Projet introuvable.' });
         }
-
-        // Create the deliverable
-        const deliverable = new Deliverable({
-            projectId,
-            name,
+        const livrable = new Livrable({
+            projetId,
+            nom,
             description,
-            deadline,
-            repositoryUrl,
+            dateLimite,
+            urlDepot,
         });
-
-        const savedDeliverable = await deliverable.save();
-        res.status(201).json(savedDeliverable);
+        const livrableEnregistre = await livrable.save();
+        res.status(201).json(livrableEnregistre);
     } catch (error) {
-        console.error('Error adding deliverable:', error.message);
-        res.status(500).json({ error: 'Failed to add deliverable.' });
+        console.error('Erreur lors de l\'ajout du livrable :', error.message);
+        res.status(500).json({ error: 'Échec de l\'ajout du livrable.' });
     }
 };
 
-// Get all deliverables for a project
-exports.getDeliverables = async (req, res) => {
+// Récupérer tous les livrables d'un projet
+exports.recupererLivrables = async (req, res) => {
     try {
-        const { projectId } = req.params;
-
-        const deliverables = await Deliverable.find({ projectId });
-        if (!deliverables.length) {
-            return res.status(404).json({ error: 'No deliverables found for this project.' });
+        const { projetId } = req.params;
+        const livrables = await Livrable.find({ projetId });
+        if (!livrables.length) {
+            return res.status(404).json({ error: 'Aucun livrable trouvé pour ce projet.' });
         }
-
-        res.status(200).json(deliverables);
+        res.status(200).json(livrables);
     } catch (error) {
-        console.error('Error fetching deliverables:', error.message);
-        res.status(500).json({ error: 'Failed to fetch deliverables.' });
+        console.error('Erreur lors de la récupération des livrables :', error.message);
+        res.status(500).json({ error: 'Échec de la récupération des livrables.' });
     }
 };
 
-// Update a specific deliverable
-exports.updateDeliverable = async (req, res) => {
+// Mettre à jour un livrable
+exports.mettreAJourLivrable = async (req, res) => {
     try {
-        const { deliverableId } = req.params;
-
-        const updatedDeliverable = await Deliverable.findByIdAndUpdate(
-            deliverableId,
+        const { livrableId } = req.params;
+        const livrableMisAJour = await Livrable.findByIdAndUpdate(
+            livrableId,
             req.body,
             { new: true, runValidators: true }
         );
-
-        if (!updatedDeliverable) {
-            return res.status(404).json({ error: 'Deliverable not found.' });
+        if (!livrableMisAJour) {
+            return res.status(404).json({ error: 'Livrable introuvable.' });
         }
-
-        res.status(200).json(updatedDeliverable);
+        res.status(200).json(livrableMisAJour);
     } catch (error) {
-        console.error('Error updating deliverable:', error.message);
-        res.status(500).json({ error: 'Failed to update deliverable.' });
+        console.error('Erreur lors de la mise à jour du livrable :', error.message);
+        res.status(500).json({ error: 'Échec de la mise à jour du livrable.' });
     }
 };
 
-// Delete a specific deliverable
-exports.removeDeliverable = async (req, res) => {
+// Supprimer un livrable
+exports.supprimerLivrable = async (req, res) => {
     try {
-        const { deliverableId } = req.params;
-
-        const deletedDeliverable = await Deliverable.findByIdAndDelete(deliverableId);
-        if (!deletedDeliverable) {
-            return res.status(404).json({ error: 'Deliverable not found.' });
+        const { livrableId } = req.params;
+        const livrableSupprime = await Livrable.findByIdAndDelete(livrableId);
+        if (!livrableSupprime) {
+            return res.status(404).json({ error: 'Livrable introuvable.' });
         }
-
-        res.status(204).send(); // No content
+        res.status(204).send();
     } catch (error) {
-        console.error('Error deleting deliverable:', error.message);
-        res.status(500).json({ error: 'Failed to delete deliverable.' });
+        console.error('Erreur lors de la suppression du livrable :', error.message);
+        res.status(500).json({ error: 'Échec de la suppression du livrable.' });
     }
 };

@@ -2,17 +2,17 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
 import { apolloProviders } from './core/apollo.config';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    // autres composants si tu en as
+    AppComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
-    // autres modules si besoin
+    AppRoutingModule
   ],
   providers: [
     ...apolloProviders

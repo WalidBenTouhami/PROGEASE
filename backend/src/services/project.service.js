@@ -1,102 +1,86 @@
-const Project = require('../models/project.model');
+const Projet = require('../models/project.model');
 
-// ✅ Service pour créer un projet
-exports.createProject = async (data) => {
-    const project = new Project(data);
-    return await project.save();
+exports.creerProjet = async (data) => {
+    const projet = new Projet(data);
+    return await projet.save();
 };
 
-// ✅ Service pour récupérer tous les projets
-exports.getAllProjects = async () => {
-    return await Project.find().populate('equipe tuteur');
+exports.recupererTousLesProjets = async () => {
+    return await Projet.find().populate('equipe tuteur');
 };
 
-// ✅ Service pour récupérer un projet par ID
-exports.getProjectById = async (id) => {
-    return await Project.findById(id).populate('equipe tuteur deliverables');
+exports.recupererProjetParId = async (id) => {
+    return await Projet.findById(id).populate('equipe tuteur livrables');
 };
 
-// ✅ Service pour mettre à jour un projet
-exports.updateProject = async (id, data) => {
-    return await Project.findByIdAndUpdate(id, data, { new: true });
+exports.mettreAJourProjet = async (id, data) => {
+    return await Projet.findByIdAndUpdate(id, data, { new: true });
 };
 
-// ✅ Service pour supprimer un projet
-exports.deleteProject = async (id) => {
-    return await Project.findByIdAndDelete(id);
+exports.supprimerProjet = async (id) => {
+    return await Projet.findByIdAndDelete(id);
 };
 
-// ✅ Service pour ajouter un livrable
-exports.addDeliverable = async (projectId, deliverableData) => {
-    const project = await Project.findById(projectId);
-    if (!project) throw new Error('Projet introuvable');
-    project.deliverables.push(deliverableData);
-    return await project.save();
+exports.ajouterLivrable = async (projetId, dataLivrable) => {
+    const projet = await Projet.findById(projetId);
+    if (!projet) throw new Error('Projet introuvable');
+    projet.livrables.push(dataLivrable);
+    return await projet.save();
 };
 
-// ✅ Service pour mettre à jour un livrable
-exports.updateDeliverable = async (projectId, deliverableId, deliverableData) => {
-    const project = await Project.findById(projectId);
-    if (!project) throw new Error('Projet introuvable');
-    const deliverable = project.deliverables.id(deliverableId);
-    if (!deliverable) throw new Error('Livrable introuvable');
-    Object.assign(deliverable, deliverableData);
-    return await project.save();
+exports.mettreAJourLivrable = async (projetId, livrableId, dataLivrable) => {
+    const projet = await Projet.findById(projetId);
+    if (!projet) throw new Error('Projet introuvable');
+    const livrable = projet.livrables.id(livrableId);
+    if (!livrable) throw new Error('Livrable introuvable');
+    Object.assign(livrable, dataLivrable);
+    return await projet.save();
 };
 
-// ✅ Service pour supprimer un livrable
-exports.removeDeliverable = async (projectId, deliverableId) => {
-    const project = await Project.findById(projectId);
-    if (!project) throw new Error('Projet introuvable');
-    project.deliverables.id(deliverableId).remove();
-    return await project.save();
+exports.supprimerLivrable = async (projetId, livrableId) => {
+    const projet = await Projet.findById(projetId);
+    if (!projet) throw new Error('Projet introuvable');
+    projet.livrables.id(livrableId).remove();
+    return await projet.save();
 };
 
-// ✅ Service pour analyse des risques (Risk Analysis)
-exports.analyzeRisks = async ({ projectDescription, milestones, resources }) => {
-    if (!projectDescription) {
+exports.analyserRisques = async ({ descriptionProjet, jalons, ressources }) => {
+    if (!descriptionProjet) {
         throw new Error('La description du projet est requise pour l\'analyse des risques.');
     }
-
-    // Simuler une analyse des risques
-    const risks = [
-        { risk: 'Manque de ressources', severity: 'Élevée', recommendation: 'Allouez des ressources supplémentaires.' },
-        { risk: 'Retard dans les étapes clés', severity: 'Moyenne', recommendation: 'Revoir les échéances et les priorités.' },
-        { risk: 'Défi technique', severity: 'Faible', recommendation: 'Planifiez une formation technique pour l\'équipe.' }
+    const risques = [
+        { risque: 'Manque de ressources', gravite: 'Élevée', recommandation: 'Allouez des ressources supplémentaires.' },
+        { risque: 'Retard dans les jalons', gravite: 'Moyenne', recommandation: 'Revoir les échéances et les priorités.' },
+        { risque: 'Défi technique', gravite: 'Faible', recommandation: 'Planifiez une formation technique pour l\'équipe.' }
     ];
-
-    return risks;
+    return risques;
 };
 
-// ✅ Service pour suivi des tâches et rapport d'avancement (Task Tracking)
-exports.trackTasks = async (tasks, filter = {}) => {
-    if (!tasks || tasks.length === 0) {
+exports.suiviTaches = async (taches, filtre = {}) => {
+    if (!taches || taches.length === 0) {
         throw new Error('La liste des tâches est vide. Impossible de générer un rapport.');
     }
-
-    // Appliquer les filtres si fournis
-    const filteredTasks = tasks.filter(task => {
-        const matchesStatus = filter.status ? task.status === filter.status : true;
-        const matchesResponsible = filter.responsible ? task.responsible === filter.responsible : true;
-        return matchesStatus && matchesResponsible;
+    const tachesFiltrees = taches.filter(tache => {
+        const statutOK = filtre.statut ? tache.statut === filtre.statut : true;
+        const responsableOK = filtre.responsable ? tache.responsable === filtre.responsable : true;
+        return statutOK && responsableOK;
     });
 
-    // Calcul des indicateurs clés
-    const totalTasks = filteredTasks.length;
-    const completedTasks = filteredTasks.filter(task => task.status === 'Terminé').length;
-    const inProgressTasks = filteredTasks.filter(task => task.status === 'En cours').length;
-    const pendingTasks = filteredTasks.filter(task => task.status === 'À faire').length;
-    const overdueTasks = filteredTasks.filter(task => new Date(task.deadline) < new Date()).length;
+    const total = tachesFiltrees.length;
+    const terminee = tachesFiltrees.filter(t => t.statut === 'Terminé').length;
+    const enCours = tachesFiltrees.filter(t => t.statut === 'En cours').length;
+    const aFaire = tachesFiltrees.filter(t => t.statut === 'À faire').length;
+    const enRetard = tachesFiltrees.filter(t => new Date(t.dateLimite) < new Date()).length;
 
-    const progressPercentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+    const progression = total > 0 ? Math.round((terminee / total) * 100) : 0;
 
     return {
-        totalTasks,
-        completedTasks,
-        inProgressTasks,
-        pendingTasks,
-        overdueTasks,
-        progressPercentage,
-        tasks: filteredTasks
+        total,
+        terminee,
+        enCours,
+        aFaire,
+        enRetard,
+        progression,
+        taches: tachesFiltrees
     };
 };

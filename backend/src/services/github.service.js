@@ -8,9 +8,8 @@ const axios = require('axios');
  * @param {string} url - L'URL du dépôt GitHub.
  * @returns {Promise<boolean>} - `true` si le dépôt existe, sinon `false`.
  */
-async function checkGithubRepoExists(url) {
+async function verifierDepotGithubExiste(url) {
     try {
-        // Vérifie si l'URL est valide
         const pattern = /^https:\/\/github\.com\/([^/]+)\/([^/]+)$/;
         const match = url.match(pattern);
 
@@ -19,10 +18,9 @@ async function checkGithubRepoExists(url) {
             return false;
         }
 
-        const [, owner, repo] = match;
-        const apiUrl = `https://api.github.com/repos/${owner}/${repo}`;
+        const [, proprietaire, depot] = match;
+        const apiUrl = `https://api.github.com/repos/${proprietaire}/${depot}`;
 
-        // 🔐 Ajouter authentification si token dispo
         const headers = {
             'User-Agent': 'progease-app'
         };
@@ -31,16 +29,13 @@ async function checkGithubRepoExists(url) {
             headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`;
         }
 
-        const response = await axios.get(apiUrl, { headers });
-
-        // ✅ Ajout du log pour la réponse de l'API
-        console.log('✅ GitHub API Response:', response.status);
-        return response.status === 200;
+        const reponse = await axios.get(apiUrl, { headers });
+        console.log('✅ Réponse de l’API GitHub :', reponse.status);
+        return reponse.status === 200;
     } catch (error) {
-        // ❌ Ajout du log pour les erreurs
-        console.error('❌ Erreur GitHub API:', error.response?.status, error.message);
-        return false; // Ne pas throw, sinon ça bloque la validation Mongoose
+        console.error('❌ Erreur API GitHub :', error.response?.status, error.message);
+        return false;
     }
 }
 
-module.exports = { checkGithubRepoExists };
+module.exports = { verifierDepotGithubExiste };

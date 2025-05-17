@@ -1,146 +1,97 @@
-const Project = require('../models/project.model'); // Import Project model
-const Deliverable = require('../models/project.model');
+const Projet = require('../models/project.model');
+const Livrable = require('../models/deliverable.model');
+// const Utilisateur = require('../models/user.model'); // À créer si besoin
 
-        const resolvers = {
-            Query: {
-                // Retrieve all projects
-                projects: async () => {
-                    try {
-                        return await Project.find();
-                    } catch (error) {
-                        throw new Error('Failed to fetch projects: ' + error.message);
-                    }
-                },
+function mapProjetMongoVersGraphQL(doc) {
+    if (!doc) return null;
+    return {
+        _id: doc._id,
+        titre: doc.titre,
+        description: doc.description,
+        equipe: doc.equipe,
+        tuteur: doc.tuteur,
+        competences: doc.competences,
+        dateDebut: doc.dateDebut,
+        dateFin: doc.dateFin,
+        livrables: doc.livrables,
+        statut: doc.statut,
+        creeLe: doc.creeLe,
+        majLe: doc.majLe,
+    };
+}
 
-                // Retrieve a single project by ID
-                project: async (_, { id }) => {
-                    try {
-                        const project = await Project.findById(id);
-                        if (!project) {
-                            throw new Error('Project not found');
-                        }
-                        return project;
-                    } catch (error) {
-                        throw new Error('Failed to fetch project: ' + error.message);
-                    }
-                },
+function mapLivrableMongoVersGraphQL(doc) {
+    if (!doc) return null;
+    return {
+        _id: doc._id,
+        nom: doc.nom,
+        description: doc.description,
+        dateLimite: doc.dateLimite,
+        urlDepot: doc.urlDepot,
+        statut: doc.statut,
+        projetId: doc.projetId,
+        creeLe: doc.creeLe,
+        majLe: doc.majLe,
+    };
+}
 
-                // Retrieve all deliverables for a specific project
-                deliverables: async (_, { projectId }) => {
-                    try {
-                        const project = await Project.findById(projectId);
-                        if (!project) {
-                            throw new Error('Project not found');
-                        }
-                        return project.deliverables;
-                    } catch (error) {
-                        throw new Error('Failed to fetch deliverables: ' + error.message);
-                    }
-                },
-            },
+const resolvers = {
+    Query: {
+        projets: async () => {
+            const projets = await Projet.find().populate('equipe tuteur livrables');
+            return projets.map(mapProjetMongoVersGraphQL);
+        },
+        projet: async (_, { id }) => {
+            const projet = await Projet.findById(id).populate('equipe tuteur livrables');
+            return mapProjetMongoVersGraphQL(projet);
+        },
+        livrables: async (_, { projetId }) => {
+            const livrables = await Livrable.find({ projetId });
+            return livrables.map(mapLivrableMongoVersGraphQL);
+        }
+    },
+    Mutation: {
+        creerProjet: async (_, args) => {
+            const projet = new Projet(args);
+            const saved = await projet.save();
+            return mapProjetMongoVersGraphQL(saved);
+        },
+        mettreAJourProjet: async (_, { id, ...args }) => {
+            const maj = await Projet.findByIdAndUpdate(id, args, { new: true, runValidators: true }).populate('equipe tuteur livrables');
+            return mapProjetMongoVersGraphQL(maj);
+        },
+        supprimerProjet: async (_, { id }) => {
+            const supprime = await Projet.findByIdAndDelete(id);
+            return mapProjetMongoVersGraphQL(supprime);
+        },
+        ajouterLivrable: async (_, { projetId, input }) => {
+            const livrable = new Livrable({ ...input, projetId });
+            const saved = await livrable.save();
+            await Projet.findByIdAndUpdate(projetId, { $push: { livrables: saved._id } });
+            return mapLivrableMongoVersGraphQL(saved);
+        },
+        mettreAJourLivrable: async (_, { livrableId, input }) => {
+            const maj = await Livrable.findByIdAndUpdate(livrableId, input, { new: true, runValidators: true });
+            return mapLivrableMongoVersGraphQL(maj);
+        },
+        supprimerLivrable: async (_, { livrableId }) => {
+            const supprime = await Livrable.findByIdAndDelete(livrableId);
+            return mapLivrableMongoVersGraphQL(supprime);
+        }
+    },
+    Projet: {
+        progression: (projet) => {
+            if (!projet.dateDebut || !projet.dateFin) return null;
+            const maintenant = new Date();
+            const debut = new Date(projet.dateDebut);
+            const fin = new Date(projet.dateFin);
+            if (maintenant < debut) return 0;
+            if (maintenant > fin) return 100;
+            const total = fin - debut;
+            const ecoule = maintenant - debut;
+            return Math.round((ecoule / total) * 100);
+        }
+    }
+};
 
-            Mutation: {
-                // Create a new project
-                createProject: async (_, { input }) => {
-                    try {
-                        const newProject = new Project(input);
-                        return await newProject.save();
-                    } catch (error) {
-                        throw new Error('Failed to create project: ' + error.message);
-                    }
-                },
-
-                // Update a project
-                updateProject: async (_, { id, input }) => {
-                    try {
-                        const updatedProject = await Project.findByIdAndUpdate(id, input, { new: true, runValidators: true });
-                        if (!updatedProject) {
-                            throw new Error('Project not found');
-                        }
-                        return updatedProject;
-                    } catch (error) {
-                        throw new Error('Failed to update project: ' + error.message);
-                    }
-                },
-
-                // Delete a project
-                deleteProject: async (_, { id }) => {
-                    try {
-                        const deletedProject = await Project.findByIdAndDelete(id);
-                        if (!deletedProject) {
-                            throw new Error('Project not found');
-                        }
-                        return deletedProject;
-                    } catch (error) {
-                        throw new Error('Failed to delete project: ' + error.message);
-                    }
-                },
-
-                // Add a deliverable to a project
-                addDeliverable: async (_, { projectId, input }) => {
-                    try {
-                        const project = await Project.findById(projectId);
-                        if (!project) {
-                            throw new Error('Project not found');
-                        }
-
-                        if (!input.name || !input.description || !input.deadline || !input.repositoryUrl) {
-                            throw new Error('All deliverable fields are required: name, description, deadline, repositoryUrl.');
-                        }
-
-                        project.deliverables.push(input);
-                        await project.save();
-
-                        return project;
-                    } catch (error) {
-                        throw new Error('Failed to add deliverable: ' + error.message);
-                    }
-                },
-
-                // Update a specific deliverable of a project
-                updateDeliverable: async (_, { projectId, deliverableId, input }) => {
-                    try {
-                        const project = await Project.findById(projectId);
-                        if (!project) {
-                            throw new Error('Project not found');
-                        }
-
-                        const deliverable = project.deliverables.id(deliverableId);
-                        if (!deliverable) {
-                            throw new Error('Deliverable not found');
-                        }
-
-                        Object.assign(deliverable, input);
-                        await project.save();
-
-                        return deliverable;
-                    } catch (error) {
-                        throw new Error('Failed to update deliverable: ' + error.message);
-                    }
-                },
-
-                // Remove a specific deliverable from a project
-                removeDeliverable: async (_, { projectId, deliverableId }) => {
-                    try {
-                        const project = await Project.findById(projectId);
-                        if (!project) {
-                            throw new Error('Project not found');
-                        }
-
-                        const deliverable = project.deliverables.id(deliverableId);
-                        if (!deliverable) {
-                            throw new Error('Deliverable not found');
-                        }
-
-                        deliverable.remove();
-                        await project.save();
-
-                        return deliverable;
-                    } catch (error) {
-                        throw new Error('Failed to remove deliverable: ' + error.message);
-                    }
-                },
-            },
-        };
-
-        module.exports = { resolvers };
+module.exports = { resolvers };

@@ -1,30 +1,27 @@
-<div class="page-header">
-  <h2>Livrables</h2>
-  <button class="btn-primary" routerLink="/deliverable/new">
-    <i class="fas fa-plus"></i> Nouveau
-  </button>
-</div>
-<table class="ninja-table">
+<h3>Livrables du projet</h3>
+<div *ngIf="chargement">Chargement...</div>
+<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+
+<table *ngIf="livrables.length">
   <thead>
   <tr>
     <th>Nom</th>
     <th>Description</th>
-    <th>Deadline</th>
+    <th>Date limite</th>
     <th>Statut</th>
-    <th>Dépôt</th>
+    <th>URL dépôt</th>
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let deliverable of deliverables">
-    <td>{{deliverable.name}}</td>
-    <td>{{deliverable.description}}</td>
-    <td>{{deliverable.deadline | date}}</td>
+  <tr *ngFor="let livrable of livrables">
+    <td>{{ livrable.nom }}</td>
+    <td>{{ livrable.description }}</td>
+    <td>{{ livrable.dateLimite | date:'dd/MM/yyyy' }}</td>
+    <td>{{ livrable.statut }}</td>
     <td>
-      <span class="badge" [ngClass]="deliverable.status">{{deliverable.status}}</span>
-    </td>
-    <td>
-      <a [href]="deliverable.repositoryUrl" target="_blank" class="action-link">GitHub</a>
+      <a [href]="livrable.urlDepot" target="_blank">Voir sur GitHub</a>
     </td>
   </tr>
   </tbody>
 </table>
+<div *ngIf="!livrables.length && !chargement">Aucun livrable trouvé.</div>

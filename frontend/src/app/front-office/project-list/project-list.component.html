@@ -1,32 +1,30 @@
-<div class="page-header">
-  <h2>Projets</h2>
-  <button class="btn-primary" routerLink="/project/new">
-    <i class="fas fa-plus"></i> Nouveau
-  </button>
-</div>
-<table class="ninja-table">
+<h2>Liste des projets</h2>
+
+<div *ngIf="chargement">Chargement...</div>
+<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+
+<table *ngIf="projets.length">
   <thead>
   <tr>
     <th>Titre</th>
     <th>Description</th>
-    <th>Début</th>
-    <th>Fin</th>
     <th>Statut</th>
+    <th>Date de début</th>
+    <th>Date de fin</th>
     <th>Actions</th>
   </tr>
   </thead>
   <tbody>
-  <tr *ngFor="let project of projects">
-    <td>{{project.titre}}</td>
-    <td>{{project.description}}</td>
-    <td>{{project.startDate | date}}</td>
-    <td>{{project.endDate | date}}</td>
+  <tr *ngFor="let projet of projets">
+    <td>{{ projet.titre }}</td>
+    <td>{{ projet.description }}</td>
+    <td>{{ projet.statut }}</td>
+    <td>{{ projet.dateDebut | date:'dd/MM/yyyy' }}</td>
+    <td>{{ projet.dateFin | date:'dd/MM/yyyy' }}</td>
     <td>
-      <span class="badge" [ngClass]="project.status">{{project.status}}</span>
-    </td>
-    <td>
-      <a [routerLink]="['/project', project._id]" class="action-link">Voir</a>
+      <a [routerLink]="['/project', projet._id]">Voir</a>
     </td>
   </tr>
   </tbody>
 </table>
+<div *ngIf="!projets.length && !chargement">Aucun projet trouvé.</div>

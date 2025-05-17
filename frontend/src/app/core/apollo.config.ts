@@ -1,15 +1,15 @@
-import { provideApollo, APOLLO_OPTIONS } from 'apollo-angular';
+import { APOLLO_OPTIONS } from 'apollo-angular';
 import { ApolloClient, InMemoryCache } from '@apollo/client/core';
 import { HttpLink } from 'apollo-angular/http';
 import { environment } from '../../environments/environment';
 
 export function createApollo(httpLink: HttpLink) {
-  return new ApolloClient({
-    link: httpLink.create({ uri: environment.graphqlUrl }),
+  return {
     cache: new InMemoryCache(),
+    link: httpLink.create({ uri: environment.graphqlUrl }),
     defaultOptions: {
       watchQuery: {
-        fetchPolicy: 'no-cache', // ou 'cache-first' selon ton besoin
+        fetchPolicy: 'no-cache',
         errorPolicy: 'ignore',
       },
       query: {
@@ -20,11 +20,10 @@ export function createApollo(httpLink: HttpLink) {
         errorPolicy: 'all',
       },
     },
-  });
+  };
 }
 
 export const apolloProviders = [
-  provideApollo(),
   {
     provide: APOLLO_OPTIONS,
     useFactory: createApollo,

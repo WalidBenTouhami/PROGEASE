@@ -1,7 +1,7 @@
 // src/schema.js
 
 const { gql } = require('apollo-server-express');
-const { Enums } = require('../config/constants'); // Importation des énumérations depuis constants.js
+const { Enums } = require('../../config/constants'); // Importation des énumérations depuis constants.js
 
 // Dynamically generate the enum values from constants
 const userRoleEnumValues = Object.keys(Enums.UserRole).join("\n");

@@ -1,19 +1,20 @@
-// src/validations/project.validation.js
-
 const yup = require('yup');
 
-// Définition du schéma de validation pour les projets
 const projectSchema = yup.object().shape({
-    titre: yup.string().required('Le titre est requis.'), // Utilisez "titre" au lieu de "title"
-    description: yup.string().required('La description est requise.'),
+    titre: yup.string().required('Le titre du projet est obligatoire.'),
+    description: yup.string().required('La description du projet est obligatoire.'),
     equipe: yup.array().of(yup.string().required()).min(1, 'L\'équipe doit contenir au moins un membre.'),
     tuteur: yup.string().required('Un tuteur est requis.'),
-    deliverables: yup.array().of(
+    competences: yup.array().of(yup.string().required()).min(1, 'Le projet doit comporter au moins une compétence.'),
+    dateDebut: yup.date().required('La date de début est obligatoire.'),
+    dateFin: yup.date().required('La date de fin est obligatoire.'),
+    livrables: yup.array().of(
         yup.object().shape({
-            name: yup.string().required('Le nom du livrable est requis.'),
-            deadline: yup.date().required('La date limite est requise.'),
+            nom: yup.string().required('Le nom du livrable est requis.'),
+            description: yup.string().required('La description du livrable est requise.'),
+            dateLimite: yup.date().required('La date limite est requise.'),
             statut: yup.string().oneOf(['Terminé', 'En attente', 'En retard']),
-            repositoryUrl: yup.string().url('URL invalide').required('L\'URL du dépôt est requise.')
+            urlDepot: yup.string().url('URL du dépôt invalide.').required('L\'URL du dépôt est requise.')
         })
     )
 });

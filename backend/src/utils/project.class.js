@@ -10,7 +10,7 @@ class Projet {
     }
 
     ajouterLivrable(livrable) {
-        if (!livrable || !livrable.name) {
+        if (!livrable || !livrable.nom) {
             throw new Error('Livrable invalide.');
         }
         this.livrables.push(livrable);
@@ -26,3 +26,5 @@ class Projet {
         return Math.round((dureeEcoulee / dureeTotale) * 100);
     }
 }
+
+module.exports = Projet;

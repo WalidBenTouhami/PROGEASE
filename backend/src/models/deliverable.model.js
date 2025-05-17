@@ -1,54 +1,51 @@
-// src/models/deliverable.model.js
-
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// Deliverable Schema
 const deliverableSchema = new Schema({
-    name: {
+    nom: {
         type: String,
-        required: [true, 'Deliverable name is required.'],
+        required: [true, 'Le nom du livrable est requis.'],
         trim: true,
     },
     description: {
         type: String,
-        required: [true, 'Deliverable description is required.'],
+        required: [true, 'La description du livrable est requise.'],
         trim: true,
     },
-    deadline: {
+    dateLimite: {
         type: Date,
-        required: [true, 'Deadline is required.'],
+        required: [true, 'La date limite est requise.'],
         validate: {
-            validator: (v) => v > Date.now() + 86400000, // At least 24h in the future
-            message: 'Deadline must be at least 24 hours in the future.',
+            validator: (v) => v > Date.now() + 86400000,
+            message: 'La date limite doit être au moins 24h dans le futur.',
         },
     },
-    repositoryUrl: {
+    urlDepot: {
         type: String,
         required: true,
         validate: {
             validator: (url) => /^https:\/\/github\.com\/[^/]+\/[^/]+$/.test(url),
-            message: 'Invalid GitHub repository URL.',
+            message: 'URL du dépôt GitHub invalide.',
         },
     },
-    status: {
+    statut: {
         type: String,
-        enum: ['OVERDUE', 'PENDING', 'COMPLETED'],
-        default: 'PENDING',
+        enum: ['En retard', 'En attente', 'Terminé'],
+        default: 'En attente',
     },
-    projectId: {
+    projetId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Project',
+        ref: 'Projet',
         required: true,
     },
-    createdAt: {
+    creeLe: {
         type: Date,
         default: Date.now,
     },
-    updatedAt: {
+    majLe: {
         type: Date,
         default: Date.now,
     },
 });
 
-module.exports = mongoose.model('Deliverable', deliverableSchema);
+module.exports = mongoose.model('Livrable', deliverableSchema);

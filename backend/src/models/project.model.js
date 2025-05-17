@@ -1,43 +1,58 @@
-// src/models/project.model.js
-
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const projectSchema = new Schema({
-    title: {
+    titre: {
         type: String,
-        required: [true, 'Project title is required.'],
+        required: [true, 'Le titre du projet est requis.'],
         trim: true,
     },
     description: {
         type: String,
-        required: [true, 'Project description is required.'],
+        required: [true, 'La description du projet est requise.'],
         trim: true,
     },
-    team: {
-        type: [Schema.Types.ObjectId], // Tableau d'ObjectId
-        ref: 'User', // Référence au modèle User
+    equipe: {
+        type: [Schema.Types.ObjectId],
+        ref: 'Utilisateur',
         default: [],
     },
-    tutor: {
-        type: Schema.Types.ObjectId, // ObjectId unique
-        ref: 'User', // Référence au modèle User
+    tuteur: {
+        type: Schema.Types.ObjectId,
+        ref: 'Utilisateur',
     },
-    skills: {
+    competences: {
         type: [String],
         validate: {
             validator: (arr) => arr.length > 0,
-            message: 'Project must have at least one skill.',
+            message: 'Le projet doit comporter au moins une compétence.',
         },
     },
-    startDate: {
+    dateDebut: {
         type: Date,
-        required: [true, 'Start date is required.'],
+        required: [true, 'La date de début est requise.'],
     },
-    endDate: {
+    dateFin: {
         type: Date,
-        required: [true, 'End date is required.'],
+        required: [true, 'La date de fin est requise.'],
+    },
+    livrables: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Livrable',
+    }],
+    statut: {
+        type: String,
+        enum: ['Brouillon', 'En cours', 'Terminé', 'Archivé'],
+        default: 'Brouillon',
+    },
+    creeLe: {
+        type: Date,
+        default: Date.now,
+    },
+    majLe: {
+        type: Date,
+        default: Date.now,
     },
 });
 
-module.exports = mongoose.model('Project', projectSchema);
+module.exports = mongoose.model('Projet', projectSchema);

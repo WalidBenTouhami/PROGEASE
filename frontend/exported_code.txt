@@ -137,8 +137,6 @@ describe('AppComponent', () => {
 
 // ======= Contenu de src/app/app.component.ts =======
 
-//src/app/app.component.ts
-
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 
@@ -150,13 +148,11 @@ import { RouterOutlet } from '@angular/router';
   styleUrl: './app.component.css'
 })
 export class AppComponent {
-  title = 'frontend';
+  titre = 'Application de gestion de projets';
 }
 
 
 // ======= Contenu de src/app/app.config.server.ts =======
-
-//src/app/app.config.server.ts
 
 import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
 import { provideServerRendering } from '@angular/platform-server';
@@ -175,17 +171,44 @@ export const config = mergeApplicationConfig(appConfig, serverConfig);
 
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-
-import { routes } from './app.routes';
+import { apolloProviders } from './core/apollo.config';
+import { AppRoutingModule } from './app-routing.module';
 import { provideClientHydration } from '@angular/platform-browser';
 
 export const appConfig: ApplicationConfig = {
-  providers: [provideZoneChangeDetection({ eventCoalescing: true }), provideRouter(routes), provideClientHydration()]
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter([]),
+    provideClientHydration(),
+    ...apolloProviders
+  ]
 };
 
 
 // ======= Contenu de src/app/app.module.ts =======
 
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+import { AppComponent } from './app.component';
+import { AppRoutingModule } from './app-routing.module';
+import { apolloProviders } from './core/apollo.config';
+
+@NgModule({
+  declarations: [
+    AppComponent
+  ],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    AppRoutingModule
+  ],
+  providers: [
+    ...apolloProviders
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule {}
 
 
 // ======= Contenu de src/app/app.routes.ts =======
@@ -196,8 +219,6 @@ export const routes: Routes = [];
 
 
 // ======= Contenu de src/app/back-office/back-office-routing.module.ts =======
-
-//src/app/back-office/back-office-routing.module.ts
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
@@ -215,12 +236,10 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class BackOfficeRoutingModule { }
+export class BackOfficeRoutingModule {}
 
 
 // ======= Contenu de src/app/back-office/back-office.module.ts =======
-
-//src/app/back-office/back-office.module.ts
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -230,15 +249,18 @@ import { ProjectManagementComponent } from './project-management/project-managem
 import { DeliverableManagementComponent } from './deliverable-management/deliverable-management.component';
 
 @NgModule({
+  declarations: [
+    ProjectManagementComponent,
+    DeliverableManagementComponent
+  ],
   imports: [
     CommonModule,
     BackOfficeRoutingModule,
-    DashboardComponent,
-    ProjectManagementComponent,
-    DeliverableManagementComponent
+    // DashboardComponent est STANDALONE, on l'importe ici :
+    DashboardComponent
   ]
 })
-export class BackOfficeModule { }
+export class BackOfficeModule {}
 
 
 // ======= Contenu de src/app/back-office/dashboard/dashboard.component.spec.ts =======
@@ -271,20 +293,48 @@ describe('DashboardComponent', () => {
 // ======= Contenu de src/app/back-office/dashboard/dashboard.component.ts =======
 
 import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [],
+  imports: [FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
+
 export class DashboardComponent {
+  users = [
+    { name: 'Jean', role: 'Administrateur' }
+    // etc...
+  ];
+  roles = ['Administrateur', 'Tuteur', 'Étudiant'];
+  projectTemplates = [
+    { name: 'Template 1' },
+    { name: 'Template 2' }
+  ];
+  stats = {
+    activeProjects: 5,
+    riskGroups: 2,
+    avgTutorPerf: 8.5
+  };
+  tutorPerformance = [];
+  aiConfig = {
+    teamAlgo: '',
+    riskThreshold: 50,
+    enableRecs: true,
+  };
 
+  openUserForm() {}
+  updateRole(user: any) {}
+  editUser(user: any) {}
+  deleteUser(user: any) {}
+  exportUsers() {}
+  importUsers() {}
+  createTemplate() {}
+  editTemplate(template: any) {}
+  updateAICfg() {}
 }
-
-
-
 
 
 // ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.spec.ts =======
@@ -320,14 +370,10 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-deliverable-management',
-  standalone: true,
-  imports: [],
   templateUrl: './deliverable-management.component.html',
-  styleUrl: './deliverable-management.component.css'
+  styleUrls: ['./deliverable-management.component.css']
 })
-export class DeliverableManagementComponent {
-
-}
+export class DeliverableManagementComponent {}
 
 
 // ======= Contenu de src/app/back-office/project-management/project-management.component.spec.ts =======
@@ -363,13 +409,80 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-project-management',
-  standalone: true,
-  imports: [],
   templateUrl: './project-management.component.html',
-  styleUrl: './project-management.component.css'
+  styleUrls: ['./project-management.component.css']
 })
-export class ProjectManagementComponent {
+export class ProjectManagementComponent {}
 
+
+// ======= Contenu de src/app/core/apollo.config.ts =======
+
+import { APOLLO_OPTIONS } from 'apollo-angular';
+import { ApolloClient, InMemoryCache } from '@apollo/client/core';
+import { HttpLink } from 'apollo-angular/http';
+import { environment } from '../../environments/environment';
+
+export function createApollo(httpLink: HttpLink) {
+  return {
+    cache: new InMemoryCache(),
+    link: httpLink.create({ uri: environment.graphqlUrl }),
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'no-cache',
+        errorPolicy: 'ignore',
+      },
+      query: {
+        fetchPolicy: 'no-cache',
+        errorPolicy: 'all',
+      },
+      mutate: {
+        errorPolicy: 'all',
+      },
+    },
+  };
+}
+
+export const apolloProviders = [
+  {
+    provide: APOLLO_OPTIONS,
+    useFactory: createApollo,
+    deps: [HttpLink],
+  },
+];
+
+
+// ======= Contenu de src/app/core/models/deliverable.model.ts =======
+
+export interface Deliverable {
+  _id?: string;
+  nom: string;
+  description: string;
+  dateLimite: Date | string;
+  urlDepot: string;
+  statut: 'En retard' | 'En attente' | 'Terminé';
+  projetId?: string;
+  creeLe?: Date | string;
+  majLe?: Date | string;
+}
+
+
+// ======= Contenu de src/app/core/models/project.model.ts =======
+
+import { Deliverable } from './deliverable.model';
+
+export interface Project {
+  _id?: string;
+  titre: string;
+  description: string;
+  equipe: string[]; // ou User[] si tu as un modèle utilisateur
+  tuteur: string;   // ou User
+  competences: string[];
+  dateDebut: Date | string;
+  dateFin: Date | string;
+  livrables: Deliverable[];
+  statut: 'Brouillon' | 'En cours' | 'Terminé' | 'Archivé';
+  creeLe?: Date | string;
+  majLe?: Date | string;
 }
 
 
@@ -397,16 +510,91 @@ describe('DeliverableService', () => {
 
 // ======= Contenu de src/app/core/services/deliverable.service.ts =======
 
-//src/app/core/services/deliverable.service.spec.ts
-
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Deliverable } from '../models/deliverable.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DeliverableService {
+  private baseUrl = `${environment.apiUrl}/deliverables`;
 
-  constructor() { }
+  constructor(private http: HttpClient) {}
+
+  recupererLivrablesParProjet(projetId: string) {
+    return this.http.get<Deliverable[]>(`${this.baseUrl}/${projetId}`);
+  }
+
+  ajouterLivrable(data: Deliverable) {
+    return this.http.post<Deliverable>(this.baseUrl, data);
+  }
+
+  mettreAJourLivrable(livrableId: string, data: Deliverable) {
+    return this.http.put<Deliverable>(`${this.baseUrl}/${livrableId}`, data);
+  }
+
+  supprimerLivrable(livrableId: string) {
+    return this.http.delete(`${this.baseUrl}/${livrableId}`);
+  }
+}
+
+
+// ======= Contenu de src/app/core/services/graphql.service.ts =======
+
+import { Injectable } from '@angular/core';
+import { Apollo, gql } from 'apollo-angular';
+import { Observable } from 'rxjs';
+
+@Injectable({ providedIn: 'root' })
+export class GraphqlService {
+  constructor(private apollo: Apollo) {}
+
+  recupererProjets(): Observable<any> {
+    return this.apollo.query({
+      query: gql`
+        query {
+          projets {
+            _id
+            titre
+            description
+            equipe
+            tuteur
+            competences
+            dateDebut
+            dateFin
+            statut
+            livrables {
+              _id
+              nom
+              description
+              dateLimite
+              urlDepot
+              statut
+              projetId
+            }
+          }
+        }
+      `
+    });
+  }
+
+  creerProjet(input: any): Observable<any> {
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation($input: ProjetInput!) {
+          creerProjet(input: $input) {
+            _id
+            titre
+            description
+            statut
+          }
+        }
+      `,
+      variables: { input }
+    });
+  }
 }
 
 
@@ -434,16 +622,36 @@ describe('ProjectService', () => {
 
 // ======= Contenu de src/app/core/services/project.service.ts =======
 
-//src/app/core/services/project.service.ts
-
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Project } from '../models/project.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ProjectService {
+  private baseUrl = `${environment.apiUrl}/projects`;
 
-  constructor() { }
+  constructor(private http: HttpClient) {}
+
+  recupererProjets() {
+    return this.http.get<Project[]>(this.baseUrl);
+  }
+
+  recupererProjet(id: string) {
+    return this.http.get<Project>(`${this.baseUrl}/${id}`);
+  }
+
+  creerProjet(data: Project) {
+    return this.http.post<Project>(this.baseUrl, data);
+  }
+
+  mettreAJourProjet(id: string, data: Project) {
+    return this.http.put<Project>(`${this.baseUrl}/${id}`, data);
+  }
+
+  supprimerProjet(id: string) {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  }
 }
 
 
@@ -572,9 +780,9 @@ describe('DeliverableListComponent', () => {
 
 // ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.ts =======
 
-//src/app/deliverable/deliverable-list/deliverable-list.component.ts
-
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { Deliverable } from '../../core/models/deliverable.model';
+import { DeliverableService } from '../../core/services/deliverable.service';
 
 @Component({
   selector: 'app-deliverable-list',
@@ -583,47 +791,65 @@ import { Component } from '@angular/core';
   templateUrl: './deliverable-list.component.html',
   styleUrl: './deliverable-list.component.css'
 })
-export class DeliverableListComponent {
+export class DeliverableListComponent implements OnInit {
+  @Input() projetId!: string;
+  livrables: Deliverable[] = [];
+  chargement = false;
+  erreur = '';
 
+  constructor(private deliverableService: DeliverableService) {}
+
+  ngOnInit() {
+    if (this.projetId) {
+      this.chargement = true;
+      this.deliverableService.recupererLivrablesParProjet(this.projetId).subscribe({
+        next: (livrables) => {
+          this.livrables = livrables;
+          this.chargement = false;
+        },
+        error: () => {
+          this.erreur = "Erreur lors du chargement des livrables.";
+          this.chargement = false;
+        }
+      });
+    }
+  }
 }
 
 
 // ======= Contenu de src/app/deliverable/deliverable-routing.module.ts =======
 
-//src/app/deliverable/deliverable-list/deliverable-routing.module.ts
-
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { RouterModule, Routes } from '@angular/router';
+import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
 
-
+const routes: Routes = [
+  { path: '', component: DeliverableListComponent }
+];
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
 })
-export class DeliverableRoutingModule { }
+export class DeliverableRoutingModule {}
 
 
 // ======= Contenu de src/app/deliverable/deliverable.module.ts =======
 
-//src/app/deliverable/deliverable-list/deliverable.module.ts
-
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DeliverableRoutingModule } from './deliverable-routing.module';
-
-
+import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
-    DeliverableRoutingModule
+    DeliverableRoutingModule,
+    // DeliverableListComponent est standalone :
+    DeliverableListComponent
   ]
 })
-export class DeliverableModule { }
+export class DeliverableModule {}
 
 
 // ======= Contenu de src/app/front-office/dashboard/dashboard.component.spec.ts =======
@@ -656,20 +882,33 @@ describe('DashboardComponent', () => {
 // ======= Contenu de src/app/front-office/dashboard/dashboard.component.ts =======
 
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
 export class DashboardComponent {
-
+  users = [{ name: 'Jean', role: 'Administrateur' }];
+  roles = ['Administrateur', 'Tuteur', 'Étudiant'];
+  projectTemplates = [{ name: 'Template 1' }, { name: 'Template 2' }];
+  stats = { activeProjects: 5, riskGroups: 2, avgTutorPerf: 8.5 };
+  tutorPerformance = [];
+  aiConfig = { teamAlgo: '', riskThreshold: 50, enableRecs: true };
+  openUserForm() {}
+  updateRole(user: any) {}
+  editUser(user: any) {}
+  deleteUser(user: any) {}
+  exportUsers() {}
+  importUsers() {}
+  createTemplate() {}
+  editTemplate(template: any) {}
+  updateAICfg() {}
 }
-
-
-
 
 
 // ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.spec.ts =======
@@ -701,30 +940,49 @@ describe('DeliverableListComponent', () => {
 
 // ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.ts =======
 
-import { Component } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Deliverable } from '../../core/models/deliverable.model';
+import { DeliverableService } from '../../core/services/deliverable.service';
 
 @Component({
   selector: 'app-deliverable-list',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './deliverable-list.component.html',
   styleUrl: './deliverable-list.component.css'
 })
-export class DeliverableListComponent {
-
+export class DeliverableListComponent implements OnInit {
+  @Input() projetId!: string;
+  livrables: Deliverable[] = [];
+  chargement = false;
+  erreur = '';
+  constructor(private deliverableService: DeliverableService) {}
+  ngOnInit() {
+    if (this.projetId) {
+      this.chargement = true;
+      this.deliverableService.recupererLivrablesParProjet(this.projetId).subscribe({
+        next: (livrables) => {
+          this.livrables = livrables;
+          this.chargement = false;
+        },
+        error: () => {
+          this.erreur = "Erreur lors du chargement des livrables.";
+          this.chargement = false;
+        }
+      });
+    }
+  }
 }
 
 
 // ======= Contenu de src/app/front-office/front-office-routing.module.ts =======
-
-//src/app/front-office/front-office.routing.module.ts
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProjectListComponent } from './project-list/project-list.component';
 import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
-
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
@@ -736,12 +994,10 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class FrontOfficeRoutingModule { }
+export class FrontOfficeRoutingModule {}
 
 
 // ======= Contenu de src/app/front-office/front-office.module.ts =======
-
-//src/app/front-office/front-office.module.ts
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -750,17 +1006,16 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProjectListComponent } from './project-list/project-list.component';
 import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
 
-
 @NgModule({
   imports: [
     CommonModule,
     FrontOfficeRoutingModule,
-    DashboardComponent,
-    ProjectListComponent,
-    DeliverableListComponent,
+    DashboardComponent, // standalone
+    ProjectListComponent, // standalone
+    DeliverableListComponent // standalone
   ]
 })
-export class FrontOfficeModule { }
+export class FrontOfficeModule {}
 
 
 // ======= Contenu de src/app/front-office/project-list/project-list.component.spec.ts =======
@@ -792,17 +1047,36 @@ describe('ProjectListComponent', () => {
 
 // ======= Contenu de src/app/front-office/project-list/project-list.component.ts =======
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ProjectService } from '../../core/services/project.service';
+import { Project } from '../../core/models/project.model';
 
 @Component({
   selector: 'app-project-list',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './project-list.component.html',
   styleUrl: './project-list.component.css'
 })
-export class ProjectListComponent {
-
+export class ProjectListComponent implements OnInit {
+  projets: Project[] = [];
+  chargement = false;
+  erreur = '';
+  constructor(private projectService: ProjectService) {}
+  ngOnInit() {
+    this.chargement = true;
+    this.projectService.recupererProjets().subscribe({
+      next: (projets) => {
+        this.projets = projets;
+        this.chargement = false;
+      },
+      error: (err) => {
+        this.erreur = "Erreur lors du chargement des projets.";
+        this.chargement = false;
+      }
+    });
+  }
 }
 
 
@@ -931,9 +1205,9 @@ describe('ProjectListComponent', () => {
 
 // ======= Contenu de src/app/project/project-list/project-list.component.ts =======
 
-//src/app/project/project-list/project-list.component.ts
-
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { ProjectService } from '../../core/services/project.service';
+import { Project } from '../../core/models/project.model';
 
 @Component({
   selector: 'app-project-list',
@@ -942,47 +1216,61 @@ import { Component } from '@angular/core';
   templateUrl: './project-list.component.html',
   styleUrl: './project-list.component.css'
 })
-export class ProjectListComponent {
+export class ProjectListComponent implements OnInit {
+  projets: Project[] = [];
+  chargement = false;
+  erreur = '';
 
+  constructor(private projectService: ProjectService) {}
+
+  ngOnInit() {
+    this.chargement = true;
+    this.projectService.recupererProjets().subscribe({
+      next: (projets) => {
+        this.projets = projets;
+        this.chargement = false;
+      },
+      error: (err) => {
+        this.erreur = "Erreur lors du chargement des projets.";
+        this.chargement = false;
+      }
+    });
+  }
 }
 
 
 // ======= Contenu de src/app/project/project-routing.module.ts =======
 
-//src/app/project/project-routing.module.ts
-
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { RouterModule, Routes } from '@angular/router';
+import { ProjectListComponent } from './project-list/project-list.component';
 
-
+const routes: Routes = [
+  { path: '', component: ProjectListComponent }
+];
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
 })
-export class ProjectRoutingModule { }
+export class ProjectRoutingModule {}
 
 
 // ======= Contenu de src/app/project/project.module.ts =======
 
-//src//app/project/project.module.ts
-
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ProjectRoutingModule } from './project-routing.module';
-
-
+import { ProjectListComponent } from './project-list/project-list.component';
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
-    ProjectRoutingModule
+    ProjectRoutingModule,
+    ProjectListComponent // standalone
   ]
 })
-export class ProjectModule { }
+export class ProjectModule {}
 
 
 // ======= Contenu de src/environments/environment.prod.ts =======
@@ -997,7 +1285,8 @@ export const environment = {
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:3000/api', // URL du backend en local
+  apiUrl: 'http://localhost:3000/api',
+  graphqlUrl: 'http://localhost:3000/graphql'
 };
 
 

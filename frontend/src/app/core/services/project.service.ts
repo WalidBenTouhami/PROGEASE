@@ -1,8 +1,7 @@
-//src/app/core/services/project.service.ts
-
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
+import { Project } from '../models/project.model';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectService {
@@ -10,23 +9,23 @@ export class ProjectService {
 
   constructor(private http: HttpClient) {}
 
-  getProjects() {
-    return this.http.get(this.baseUrl);
+  recupererProjets() {
+    return this.http.get<Project[]>(this.baseUrl);
   }
 
-  getProject(id: string) {
-    return this.http.get(`${this.baseUrl}/${id}`);
+  recupererProjet(id: string) {
+    return this.http.get<Project>(`${this.baseUrl}/${id}`);
   }
 
-  createProject(data: any) {
-    return this.http.post(this.baseUrl, data);
+  creerProjet(data: Project) {
+    return this.http.post<Project>(this.baseUrl, data);
   }
 
-  updateProject(id: string, data: any) {
-    return this.http.put(`${this.baseUrl}/${id}`, data);
+  mettreAJourProjet(id: string, data: Project) {
+    return this.http.put<Project>(`${this.baseUrl}/${id}`, data);
   }
 
-  deleteProject(id: string) {
+  supprimerProjet(id: string) {
     return this.http.delete(`${this.baseUrl}/${id}`);
   }
 }

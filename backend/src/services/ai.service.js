@@ -1,204 +1,144 @@
-const deepseek = require('deepseek'); // Import the library
+const deepseek = require('deepseek');
 const dotenv = require('dotenv');
 
-// Load environment variables
 dotenv.config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
 
-const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
+const CLE_API_DEEPSEEK = process.env.DEEPSEEK_API_KEY;
 
-if (!DEEPSEEK_API_KEY) {
-  throw new Error('❌ DEEPSEEK_API_KEY is missing. Please check your .env file.');
+if (!CLE_API_DEEPSEEK) {
+  throw new Error('❌ La variable DEEPSEEK_API_KEY est manquante. Vérifiez votre fichier .env.');
 }
 
-console.log('✅ DEEPSEEK_API_KEY loaded successfully.');
+console.log('✅ Clé API Deepseek chargée avec succès.');
 
-const client = deepseek.createClient({ apiKey: DEEPSEEK_API_KEY });
+const client = deepseek.createClient({ apiKey: CLE_API_DEEPSEEK });
 
-// Configuration
 const CONFIG = {
-  MODEL: 'gpt-3.5-turbo',
-  MAX_TOKENS: 200,
+  MODELE: 'gpt-3.5-turbo',
+  NB_MAX_TOKENS: 200,
 };
 
-/**
- * Utility to handle errors during AI calls.
- * Logs the error and rethrows it with a meaningful message.
- */
-async function handleAIError(error, response = null) {
-  console.error('❌ Error during AI processing:', error.message);
-  if (response) {
-    console.error('❌ AI Response:', response);
+async function gererErreurIA(erreur, reponse = null) {
+  console.error('❌ Erreur lors du traitement IA :', erreur.message);
+  if (reponse) {
+    console.error('❌ Réponse IA :', reponse);
   }
-  throw new Error('AI response is invalid or could not be processed.');
+  throw new Error('La réponse de l’IA est invalide ou n’a pas pu être traitée.');
 }
 
-/**
- * Generates text based on a given prompt.
- * @param {string} prompt - The text prompt to send to the AI.
- * @returns {string} - The generated text response.
- */
-async function generateText(prompt) {
+async function genererTexte(prompt) {
   try {
-    const response = await client.generateText({
-      model: CONFIG.MODEL,
+    const reponse = await client.generateText({
+      model: CONFIG.MODELE,
       prompt,
-      maxTokens: CONFIG.MAX_TOKENS,
+      maxTokens: CONFIG.NB_MAX_TOKENS,
     });
-    return response.text.trim();
-  } catch (error) {
-    await handleAIError(error);
+    return reponse.text.trim();
+  } catch (erreur) {
+    await gererErreurIA(erreur);
   }
 }
 
-/**
- * Validates the AI response to ensure it is valid JSON.
- * @param {string} response - The response from the AI.
- * @returns {object} - The parsed JSON object.
- */
-function validateJSONResponse(response) {
+function validerReponseJSON(reponse) {
   try {
-    return JSON.parse(response);
-  } catch (error) {
-    throw new Error('AI response is not valid JSON.');
+    return JSON.parse(reponse);
+  } catch (erreur) {
+    throw new Error('La réponse de l’IA n’est pas un JSON valide.');
   }
 }
 
-/**
- * Tries to extract JSON from a potentially invalid AI response.
- * @param {string} response - The AI response.
- * @returns {object} - The extracted JSON object.
- */
-function extractJSONFromResponse(response) {
+function extraireJSONDepuisReponse(reponse) {
   try {
-    const jsonMatch = response.match(/{.*}/s); // Match JSON object
-    if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+    const matcheJSON = reponse.match(/{.*}/s);
+    if (matcheJSON) {
+      return JSON.parse(matcheJSON[0]);
     }
-    throw new Error('No JSON found in response.');
-  } catch (error) {
-    throw new Error('Failed to extract JSON from AI response.');
+    throw new Error('Aucun JSON trouvé dans la réponse.');
+  } catch (erreur) {
+    throw new Error('Impossible d’extraire le JSON de la réponse IA.');
   }
 }
 
-/**
- * Processes an AI prompt and returns structured JSON.
- * Uses fallback logic to parse potentially invalid AI responses.
- * @param {string} prompt - The AI prompt.
- * @returns {object} - Parsed JSON response.
- */
-async function processAIResponse(prompt) {
-  const response = await generateText(prompt);
+async function traiterReponseIA(prompt) {
+  const reponse = await genererTexte(prompt);
   try {
-    return validateJSONResponse(response);
-  } catch (error) {
-    console.warn('⚠️ Falling back to JSON extraction.');
-    return extractJSONFromResponse(response);
+    return validerReponseJSON(reponse);
+  } catch (erreur) {
+    console.warn('⚠️ Tentative d’extraction JSON depuis la réponse IA.');
+    return extraireJSONDepuisReponse(reponse);
   }
 }
 
-/**
- * Progress Tracker: Calculates overall progress based on task statuses.
- * @param {Array} tasks - List of tasks with statuses (e.g., [{ status: 'completed' }, ...]).
- * @returns {Object} - Progress summary.
- */
-async function trackProgress(tasks) {
-  const completed = tasks.filter(task => task.status === 'completed').length;
-  const inProgress = tasks.filter(task => task.status === 'in-progress').length;
-  const total = tasks.length;
+async function suiviProgression(taches) {
+  const terminees = taches.filter(t => t.statut === 'terminée').length;
+  const enCours = taches.filter(t => t.statut === 'en cours').length;
+  const total = taches.length;
 
-  const progressPercentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+  const pourcentage = total > 0 ? Math.round((terminees / total) * 100) : 0;
   return {
-    totalTasks: total,
-    completedTasks: completed,
-    inProgressTasks: inProgress,
-    progressPercentage,
+    totalTaches: total,
+    tachesTerminees: terminees,
+    tachesEnCours: enCours,
+    pourcentageProgression: pourcentage,
   };
 }
 
-/**
- * Performance Predictor: Predicts performance based on historical data.
- * @param {Array} history - Array of past task durations (e.g., [2, 3, 1.5]).
- * @returns {Object} - Predicted performance metrics.
- */
-async function predictPerformance(history) {
-  if (!history || history.length === 0) {
-    throw new Error('❌ Historical data is required for performance prediction.');
+async function predirePerformance(historique) {
+  if (!historique || historique.length === 0) {
+    throw new Error('❌ Un historique est requis pour la prédiction de performance.');
   }
 
-  const averageTime = history.reduce((sum, time) => sum + time, 0) / history.length;
+  const tempsMoyen = historique.reduce((s, t) => s + t, 0) / historique.length;
   return {
-    averageCompletionTime: averageTime.toFixed(2),
-    predictedCompletion: `Estimated completion time for the next task: ${averageTime.toFixed(2)} hours.`,
+    tempsMoyenRealisation: tempsMoyen.toFixed(2),
+    prediction: `Temps estimé pour la prochaine tâche : ${tempsMoyen.toFixed(2)} heures.`,
   };
 }
 
-/**
- * Scheduler IA: Generates an optimized schedule based on tasks and priorities.
- * @param {Array} tasks - List of tasks with priorities and durations (e.g., [{ name, priority, duration }]).
- * @returns {Array} - Optimized task schedule.
- */
-async function scheduleTasks(tasks) {
-  if (!tasks || tasks.length === 0) {
-    throw new Error('❌ Task list is empty. Cannot generate schedule.');
+async function genererPlanning(taches) {
+  if (!taches || taches.length === 0) {
+    throw new Error('❌ La liste des tâches est vide. Impossible de générer un planning.');
   }
 
-  return tasks
-      .sort((a, b) => b.priority - a.priority)
-      .map((task, index, array) => {
-        const startTime = index === 0 ? 0 : array[index - 1].endTime;
-        const endTime = startTime + task.duration;
-        return { ...task, startTime, endTime };
+  return taches
+      .sort((a, b) => b.priorite - a.priorite)
+      .map((tache, index, tachesTriees) => {
+        const debut = index === 0 ? 0 : tachesTriees[index - 1].fin;
+        const fin = debut + tache.duree;
+        return { ...tache, debut, fin };
       });
 }
 
-/**
- * Team Builder IA: Forms teams based on skills, availability, and preferences.
- * @param {Array} members - List of team members (e.g., [{ name, skills, availability, preferences }]).
- * @returns {Array} - Optimized teams.
- */
-async function buildTeams(members) {
-  if (!members || members.length === 0) {
-    throw new Error('❌ Members list is empty. Cannot build teams.');
+async function creerEquipes(membres) {
+  if (!membres || membres.length === 0) {
+    throw new Error('❌ La liste des membres est vide. Impossible de créer les équipes.');
   }
-
-  const prompt = `Formez des équipes optimisées en fonction des compétences, disponibilités et préférences suivantes. Retournez uniquement au format JSON : ${JSON.stringify(members)}`;
-  return processAIResponse(prompt);
+  const prompt = `Forme des équipes optimisées selon les compétences, disponibilités et préférences suivantes. Retourne seulement au format JSON : ${JSON.stringify(membres)}`;
+  return traiterReponseIA(prompt);
 }
 
-/**
- * Tutor Matcher: Matches mentors with mentees based on skills and needs.
- * @param {Array} members - List of team members (e.g., [{ name, skills, needs }]).
- * @returns {Array} - Mentor-mentee pairs.
- */
-async function matchTutors(members) {
-  if (!members || members.length === 0) {
-    throw new Error('❌ Members list is empty. Cannot match tutors.');
+async function associerTuteurs(membres) {
+  if (!membres || membres.length === 0) {
+    throw new Error('❌ La liste des membres est vide. Impossible d’associer les tuteurs.');
   }
-
-  const prompt = `Associez les mentors et tutorés selon leurs compétences et besoins. Retournez uniquement au format JSON : ${JSON.stringify(members)}`;
-  return processAIResponse(prompt);
+  const prompt = `Associe les mentors et mentorés selon leurs compétences et besoins. Retourne seulement au format JSON : ${JSON.stringify(membres)}`;
+  return traiterReponseIA(prompt);
 }
 
-/**
- * Learning Recommender: Recommends learning resources based on skills to develop.
- * @param {Array} skills - List of skills or topics to improve (e.g., ['JavaScript', 'Team Management']).
- * @returns {Array} - Recommended learning resources.
- */
-async function recommendLearning(skills) {
-  if (!skills || skills.length === 0) {
-    throw new Error('❌ Skills list is empty. Cannot recommend learning resources.');
+async function recommanderApprentissage(competences) {
+  if (!competences || competences.length === 0) {
+    throw new Error('❌ Liste des compétences vide. Impossible de recommander des ressources.');
   }
-
-  const prompt = `Recommandez des ressources d'apprentissage pour les compétences suivantes. Retournez uniquement au format JSON : ${skills.join(', ')}`;
-  return processAIResponse(prompt);
+  const prompt = `Recommande des ressources d’apprentissage pour les compétences suivantes. Retourne seulement au format JSON : ${competences.join(', ')}`;
+  return traiterReponseIA(prompt);
 }
 
 module.exports = {
-  generateText,
-  trackProgress,
-  predictPerformance,
-  scheduleTasks,
-  buildTeams,
-  matchTutors,
-  recommendLearning,
+  genererTexte,
+  suiviProgression,
+  predirePerformance,
+  genererPlanning,
+  creerEquipes,
+  associerTuteurs,
+  recommanderApprentissage,
 };

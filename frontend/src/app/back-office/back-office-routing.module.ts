@@ -1,5 +1,3 @@
-//src/app/back-office/back-office-routing.module.ts
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -16,4 +14,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class BackOfficeRoutingModule { }
+export class BackOfficeRoutingModule {}

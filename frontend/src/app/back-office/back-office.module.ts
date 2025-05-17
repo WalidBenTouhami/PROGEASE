@@ -1,5 +1,3 @@
-//src/app/back-office/back-office.module.ts
-
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { BackOfficeRoutingModule } from './back-office-routing.module';
@@ -8,12 +6,14 @@ import { ProjectManagementComponent } from './project-management/project-managem
 import { DeliverableManagementComponent } from './deliverable-management/deliverable-management.component';
 
 @NgModule({
+  declarations: [
+    ProjectManagementComponent,
+    DeliverableManagementComponent
+  ],
   imports: [
     CommonModule,
     BackOfficeRoutingModule,
-    DashboardComponent,
-    ProjectManagementComponent,
-    DeliverableManagementComponent
+    DashboardComponent // standalone import
   ]
 })
-export class BackOfficeModule { }
+export class BackOfficeModule {}

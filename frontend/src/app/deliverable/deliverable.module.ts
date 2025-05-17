@@ -1,16 +1,14 @@
-//src/app/deliverable/deliverable-list/deliverable.module.ts
-
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DeliverableRoutingModule } from './deliverable-routing.module';
-
-
+import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
 
 @NgModule({
-  declarations: [],
   imports: [
     CommonModule,
-    DeliverableRoutingModule
+    DeliverableRoutingModule,
+    // DeliverableListComponent est standalone :
+    DeliverableListComponent
   ]
 })
-export class DeliverableModule { }
+export class DeliverableModule {}

@@ -7,80 +7,80 @@ const morgan = require('morgan');
 require('dotenv').config();
 
 const { ApolloServer } = require('apollo-server-express');
-const { typeDefs } = require('./src/graphql/typeDefs');
+const { typeDefs } = require('./src/graphql/schema');
 const { resolvers } = require('./src/graphql/resolvers');
 const projectRouter = require('./src/routers/project.router');
 const deliverableRouter = require('./src/routers/deliverable.router');
-const aiRouter = require('./src/routers/ai.router'); // ✅ Import AI Router
+const aiRouter = require('./src/routers/ai.router'); // ✅ Import du routeur IA
 
 const app = express();
-const PORT = process.env.PORT || 3000; // ✅ Fallback for missing PORT
+const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// ✅ Check for critical environment variables
+// ✅ Vérification des variables d'environnement critiques
 if (!MONGO_URI) {
-    console.error('❌ Error: MONGO_URI is missing in environment variables.');
+    console.error('❌ Erreur : MONGO_URI manquante dans les variables d\'environnement.');
     process.exit(1);
 }
 
-// ✅ Middleware
-app.use(morgan('dev')); // Logging
-app.use(cors()); // Enable Cross-Origin Resource Sharing
-app.use(express.json()); // Parse JSON requests
+// ✅ Middlewares
+app.use(morgan('dev')); // Journalisation
+app.use(cors()); // Autoriser les requêtes cross-origin
+app.use(express.json()); // Parseur JSON
 
-// ✅ Apollo Server Initialization
+// ✅ Initialisation Apollo Server
 const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
     formatError: (err) => {
-        console.error('GraphQL Error:', err.message);
+        console.error('Erreur GraphQL :', err.message);
         return {
             message: err.message,
-            code: err.extensions?.code || 'INTERNAL_SERVER_ERROR',
+            code: err.extensions?.code || 'ERREUR_INTERNE',
         };
     },
 });
 
-// ✅ Function to start Apollo Server
+// ✅ Fonction pour démarrer Apollo Server
 async function startApolloServer() {
     await apolloServer.start();
     apolloServer.applyMiddleware({ app });
 }
 
-// ✅ Connect to MongoDB
+// ✅ Connexion à MongoDB
 mongoose
-    .connect(MONGO_URI) // ✅ Removed deprecated options
-    .then(() => console.log('✅ Connected to MongoDB'))
+    .connect(MONGO_URI)
+    .then(() => console.log('✅ Connecté à MongoDB'))
     .catch((err) => {
-        console.error('❌ MongoDB connection error:', err.message);
+        console.error('❌ Erreur de connexion MongoDB :', err.message);
         process.exit(1);
     });
 
-// ✅ Define Routes
+// ✅ Définition des routes
 app.get('/', (req, res) => {
-    res.send('API PROGEASE is working correctly.');
+    res.send('API PROGEASE fonctionne correctement.');
 });
 app.use('/api/projects', projectRouter);
 app.use('/api/deliverables', deliverableRouter);
-app.use('/api/ai', aiRouter); // ✅ Register AI routes
+app.use('/api/ai', aiRouter); // ✅ Route IA
 
-// ✅ Global Error Handling
-app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
+// ✅ Gestion globale des erreurs
+app.use((req, res) => res.status(404).json({ error: 'Route introuvable' }));
 app.use((err, req, res, next) => {
-    console.error('Unhandled Error:', err.stack);
-    res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+    console.error('Erreur non gérée :', err.stack);
+    res.status(err.status || 500).json({ error: err.message || 'Erreur serveur interne' });
 });
 
-// ✅ Start the Application
+// ✅ Démarrage de l'application
 (async () => {
     try {
         await startApolloServer();
         app.listen(PORT, () => {
-            console.log(`🚀 Apollo Server running at http://localhost:${PORT}${apolloServer.graphqlPath}`);
-            console.log(`✅ Express server started on port ${PORT}`);
+            console.log(`🚀 Serveur Apollo lancé sur http://localhost:${PORT}${apolloServer.graphqlPath}`);
+            console.log(`✅ Serveur Express démarré sur le port ${PORT}`);
         });
     } catch (error) {
-        console.error('❌ Failed to start server:', error.message);
+        console.error('❌ Échec du démarrage du serveur :', error.message);
         process.exit(1);
     }
 })();
