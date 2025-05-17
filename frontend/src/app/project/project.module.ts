@@ -7,7 +7,7 @@ import { ProjectListComponent } from './project-list/project-list.component';
   imports: [
     CommonModule,
     ProjectRoutingModule,
-    ProjectListComponent // standalone
+    ProjectListComponent
   ]
 })
 export class ProjectModule {}

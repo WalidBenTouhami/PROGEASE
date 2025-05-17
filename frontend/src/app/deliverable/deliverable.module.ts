@@ -1,14 +1,34 @@
-import { NgModule } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DeliverableRoutingModule } from './deliverable-routing.module';
-import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
+import {Deliverable} from '../core/models/deliverable.model';
+import {DeliverableService} from '../core/services/deliverable.service';
 
-@NgModule({
-  imports: [
-    CommonModule,
-    DeliverableRoutingModule,
-    // DeliverableListComponent est standalone :
-    DeliverableListComponent
-  ]
+@Component({
+  selector: 'app-deliverable-list',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './deliverable-list.component.html',
+  styleUrl: './deliverable-list.component.css'
 })
-export class DeliverableModule {}
+export class DeliverableListComponent implements OnInit {
+  @Input() projetId!: string;
+  livrables: Deliverable[] = [];
+  chargement = false;
+  erreur = '';
+  constructor(private deliverableService: DeliverableService) {}
+  ngOnInit() {
+    if (this.projetId) {
+      this.chargement = true;
+      this.deliverableService.recupererLivrablesParProjet(this.projetId).subscribe({
+        next: (livrables: Deliverable[]) => {
+          this.livrables = livrables;
+          this.chargement = false;
+        },
+        error: () => {
+          this.erreur = "Erreur lors du chargement des livrables.";
+          this.chargement = false;
+        }
+      });
+    }
+  }
+}

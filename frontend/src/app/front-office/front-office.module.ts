@@ -9,9 +9,9 @@ import { DeliverableListComponent } from './deliverable-list/deliverable-list.co
   imports: [
     CommonModule,
     FrontOfficeRoutingModule,
-    DashboardComponent, // standalone
-    ProjectListComponent, // standalone
-    DeliverableListComponent // standalone
+    DashboardComponent,
+    ProjectListComponent,
+    DeliverableListComponent
   ]
 })
 export class FrontOfficeModule {}
