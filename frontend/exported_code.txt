@@ -139,11 +139,12 @@ describe('AppComponent', () => {
 
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, CommonModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -256,8 +257,7 @@ import { DeliverableManagementComponent } from './deliverable-management/deliver
   imports: [
     CommonModule,
     BackOfficeRoutingModule,
-    // DashboardComponent est STANDALONE, on l'importe ici :
-    DashboardComponent
+    DashboardComponent // standalone import
   ]
 })
 export class BackOfficeModule {}
@@ -293,38 +293,23 @@ describe('DashboardComponent', () => {
 // ======= Contenu de src/app/back-office/dashboard/dashboard.component.ts =======
 
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css'
 })
-
 export class DashboardComponent {
-  users = [
-    { name: 'Jean', role: 'Administrateur' }
-    // etc...
-  ];
+  users = [{ name: 'Jean', role: 'Administrateur' }];
   roles = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projectTemplates = [
-    { name: 'Template 1' },
-    { name: 'Template 2' }
-  ];
-  stats = {
-    activeProjects: 5,
-    riskGroups: 2,
-    avgTutorPerf: 8.5
-  };
+  projectTemplates = [{ name: 'Template 1' }, { name: 'Template 2' }];
+  stats = { activeProjects: 5, riskGroups: 2, avgTutorPerf: 8.5 };
   tutorPerformance = [];
-  aiConfig = {
-    teamAlgo: '',
-    riskThreshold: 50,
-    enableRecs: true,
-  };
-
+  aiConfig = { teamAlgo: '', riskThreshold: 50, enableRecs: true };
   openUserForm() {}
   updateRole(user: any) {}
   editUser(user: any) {}
@@ -836,20 +821,40 @@ export class DeliverableRoutingModule {}
 
 // ======= Contenu de src/app/deliverable/deliverable.module.ts =======
 
-import { NgModule } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DeliverableRoutingModule } from './deliverable-routing.module';
-import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
+import {Deliverable} from '../core/models/deliverable.model';
+import {DeliverableService} from '../core/services/deliverable.service';
 
-@NgModule({
-  imports: [
-    CommonModule,
-    DeliverableRoutingModule,
-    // DeliverableListComponent est standalone :
-    DeliverableListComponent
-  ]
+@Component({
+  selector: 'app-deliverable-list',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './deliverable-list.component.html',
+  styleUrl: './deliverable-list.component.css'
 })
-export class DeliverableModule {}
+export class DeliverableListComponent implements OnInit {
+  @Input() projetId!: string;
+  livrables: Deliverable[] = [];
+  chargement = false;
+  erreur = '';
+  constructor(private deliverableService: DeliverableService) {}
+  ngOnInit() {
+    if (this.projetId) {
+      this.chargement = true;
+      this.deliverableService.recupererLivrablesParProjet(this.projetId).subscribe({
+        next: (livrables: Deliverable[]) => {
+          this.livrables = livrables;
+          this.chargement = false;
+        },
+        error: () => {
+          this.erreur = "Erreur lors du chargement des livrables.";
+          this.chargement = false;
+        }
+      });
+    }
+  }
+}
 
 
 // ======= Contenu de src/app/front-office/dashboard/dashboard.component.spec.ts =======
@@ -1010,9 +1015,9 @@ import { DeliverableListComponent } from './deliverable-list/deliverable-list.co
   imports: [
     CommonModule,
     FrontOfficeRoutingModule,
-    DashboardComponent, // standalone
-    ProjectListComponent, // standalone
-    DeliverableListComponent // standalone
+    DashboardComponent,
+    ProjectListComponent,
+    DeliverableListComponent
   ]
 })
 export class FrontOfficeModule {}
@@ -1267,7 +1272,7 @@ import { ProjectListComponent } from './project-list/project-list.component';
   imports: [
     CommonModule,
     ProjectRoutingModule,
-    ProjectListComponent // standalone
+    ProjectListComponent
   ]
 })
 export class ProjectModule {}
