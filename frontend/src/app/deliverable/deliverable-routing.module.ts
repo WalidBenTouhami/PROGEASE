@@ -1,3 +1,4 @@
+// src/app/deliverable/deliverable-routing.module.ts
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';

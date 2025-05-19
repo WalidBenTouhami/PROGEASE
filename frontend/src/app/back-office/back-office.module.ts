@@ -1,9 +1,10 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BackOfficeRoutingModule } from './back-office-routing.module';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProjectManagementComponent } from './project-management/project-management.component';
 import { DeliverableManagementComponent } from './deliverable-management/deliverable-management.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -12,8 +13,10 @@ import { DeliverableManagementComponent } from './deliverable-management/deliver
   ],
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     BackOfficeRoutingModule,
-    DashboardComponent // standalone import
+    DashboardComponent // standalone component
   ]
 })
 export class BackOfficeModule {}

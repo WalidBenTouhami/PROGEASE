@@ -17,6 +17,13 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
+const cors = require('cors');
+app.use(cors({
+    origin: 'http://localhost:4200',
+    credentials: true
+}));
+
+
 // ✅ Vérification des variables d'environnement critiques
 if (!MONGO_URI) {
     console.error('❌ Erreur : MONGO_URI manquante dans les variables d\'environnement.');

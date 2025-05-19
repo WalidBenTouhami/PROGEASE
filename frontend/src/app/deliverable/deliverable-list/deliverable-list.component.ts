@@ -1,13 +1,15 @@
+// src/app/deliverable/deliverable-list/deliverable-list.component.ts
 import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Deliverable } from '../../core/models/deliverable.model';
 import { DeliverableService } from '../../core/services/deliverable.service';
 
 @Component({
   selector: 'app-deliverable-list',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './deliverable-list.component.html',
-  styleUrl: './deliverable-list.component.css'
+  styleUrls: ['./deliverable-list.component.css']
 })
 export class DeliverableListComponent implements OnInit {
   @Input() projetId!: string;
@@ -21,7 +23,7 @@ export class DeliverableListComponent implements OnInit {
     if (this.projetId) {
       this.chargement = true;
       this.deliverableService.recupererLivrablesParProjet(this.projetId).subscribe({
-        next: (livrables) => {
+        next: (livrables: Deliverable[]) => {
           this.livrables = livrables;
           this.chargement = false;
         },

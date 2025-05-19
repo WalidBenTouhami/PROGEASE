@@ -4,8 +4,14 @@ export interface Deliverable {
   description: string;
   dateLimite: Date | string;
   urlDepot: string;
-  statut: 'En retard' | 'En attente' | 'Terminé';
+  statut: 'OVERDUE' | 'PENDING' | 'COMPLETED';
   projetId?: string;
   creeLe?: Date | string;
   majLe?: Date | string;
 }
+
+export const DeliverableStatuses = {
+  COMPLETED: 'COMPLETED',
+  PENDING: 'PENDING',
+  OVERDUE: 'OVERDUE'
+};
