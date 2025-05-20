@@ -20,16 +20,13 @@ export function app(): express.Express {
   server.set('view engine', 'html');
   server.set('views', browserDistFolder);
 
-  // Example Express Rest API endpoints
-  // server.get('/api/**', (req, res) => { });
   // Serve static files from /browser
-  server.get('**', express.static(browserDistFolder, {
-    maxAge: '1y',
-    index: 'index.html',
+  server.get('*.*', express.static(browserDistFolder, {
+    maxAge: '1y'
   }));
 
   // All regular routes use the Angular engine
-  server.get('**', (req, res, next) => {
+  server.get('*', (req, res, next) => {
     const { protocol, originalUrl, baseUrl, headers } = req;
 
     commonEngine
@@ -66,31 +63,12 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-  {
-    path: 'back-office',
-    loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule)
-  },
-  {
-    path: 'front-office',
-    loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule)
-  },
-  {
-    path: 'deliverable',
-    loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule)
-  },
-  {
-    path: 'project',
-    loadChildren: () => import('./project/project.module').then(m => m.ProjectModule)
-  },
-  {
-    path: '',
-    redirectTo: 'front-office',
-    pathMatch: 'full'
-  },
-  {
-    path: '**',
-    redirectTo: 'front-office'
-  }
+  { path: 'back-office', loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule) },
+  { path: 'front-office', loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule) },
+  { path: 'deliverable', loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule) },
+  { path: 'project', loadChildren: () => import('./project/project.module').then(m => m.ProjectModule) },
+  { path: '', redirectTo: 'front-office', pathMatch: 'full' },
+  { path: '**', redirectTo: 'front-office' }
 ];
 
 @NgModule({
@@ -100,9 +78,138 @@ const routes: Routes = [
 export class AppRoutingModule {}
 
 
-// ======= Contenu de src/app/app.component.spec.ts =======
+// ======= Contenu de src/app/app.component.css =======
 
-//src/app/app.component.spec.ts
+:root {
+  --primary-color: #146D78;
+  --primary-light: #1D8A99;
+  --primary-dark: #0B4D57;
+  --accent-color: #17B5B5;
+  --background-light: #f7fbfc;
+  --background-medium: #e4f0f2;
+  --background-dark: #cfe0e6;
+}
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--background-light);
+}
+
+.app-header {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 0.8rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo-container h1 {
+  font-size: 1.6rem;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.main-nav {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.main-nav a {
+  color: white;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+}
+
+.main-nav a:focus {
+  box-shadow: 0 0 0 2px var(--accent-color);
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+  background-color: var(--accent-color);
+  color: #fff;
+}
+
+.app-content {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.app-footer {
+  background-color: var(--primary-dark);
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: column;
+    padding: 1rem;
+    gap: 1rem;
+  }
+  .main-nav {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .main-nav a {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+  .app-content {
+    padding: 1rem;
+  }
+}
+
+
+// ======= Contenu de src/app/app.component.html =======
+
+<div class="app-container">
+  <header class="app-header">
+    <div class="logo-container">
+      <img src="assets/PROGEASE.png" alt="PROGEASE logo" height="45" loading="lazy">
+      <h1>{{ titre }}</h1>
+    </div>
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a routerLink="/front-office" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Accueil</a>
+      <a routerLink="/project" routerLinkActive="active">Projets</a>
+      <a routerLink="/deliverable" routerLinkActive="active">Livrables</a>
+      <a routerLink="/back-office" routerLinkActive="active">Back office</a>
+    </nav>
+  </header>
+
+  <main class="app-content" tabindex="-1">
+    <router-outlet></router-outlet>
+  </main>
+
+  <footer class="app-footer">
+    <p>&copy; 2025 PROGEASE – Plateforme de Gestion de Projets Académiques</p>
+  </footer>
+</div>
+
+
+// ======= Contenu de src/app/app.component.spec.ts =======
 
 import { TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
@@ -120,17 +227,10 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'frontend' title`, () => {
+  it('should have the titre "Application de gestion de projets"', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('frontend');
-  });
-
-  it('should render title', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, frontend');
+    expect(app.titre).toEqual('Application de gestion de projets');
   });
 });
 
@@ -140,13 +240,14 @@ describe('AppComponent', () => {
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CommonModule],
+  imports: [RouterModule, RouterOutlet, CommonModule],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   titre = 'Application de gestion de projets';
@@ -172,15 +273,20 @@ export const config = mergeApplicationConfig(appConfig, serverConfig);
 
 import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { apolloProviders } from './core/apollo.config';
-import { AppRoutingModule } from './app-routing.module';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
+import { apolloProviders } from './core/apollo.config';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter([]),
+    provideRouter(routes),
     provideClientHydration(),
+    provideHttpClient(
+      withInterceptors([authInterceptor])
+    ),
     ...apolloProviders
   ]
 };
@@ -215,8 +321,18 @@ export class AppModule {}
 // ======= Contenu de src/app/app.routes.ts =======
 
 import { Routes } from '@angular/router';
+import { ApiTestComponent } from '../app/test/api-test/api-test.component';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+  { path: 'back-office', loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule) },
+  { path: 'front-office', loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule) },
+  { path: 'deliverable', loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule) },
+  { path: 'project', loadChildren: () => import('./project/project.module').then(m => m.ProjectModule) },
+  { path: '', redirectTo: 'front-office', pathMatch: 'full' },
+  { path: '**', redirectTo: 'front-office' },
+  // Route de test
+  { path: 'test-api', component: ApiTestComponent },
+];
 
 
 // ======= Contenu de src/app/back-office/back-office-routing.module.ts =======
@@ -244,10 +360,11 @@ export class BackOfficeRoutingModule {}
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BackOfficeRoutingModule } from './back-office-routing.module';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProjectManagementComponent } from './project-management/project-management.component';
 import { DeliverableManagementComponent } from './deliverable-management/deliverable-management.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -256,11 +373,139 @@ import { DeliverableManagementComponent } from './deliverable-management/deliver
   ],
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     BackOfficeRoutingModule,
-    DashboardComponent // standalone import
+    DashboardComponent // standalone component
   ]
 })
 export class BackOfficeModule {}
+
+
+// ======= Contenu de src/app/back-office/dashboard/dashboard.component.css =======
+
+.dashboard-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 18px #0001;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 0.4rem;
+  transition: background 0.2s;
+}
+button:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+button:hover { background: #174bb3; }
+
+.user-actions {
+  margin: 1rem 0;
+  display: flex;
+  gap: 1rem;
+}
+
+
+// ======= Contenu de src/app/back-office/dashboard/dashboard.component.html =======
+
+<h2>Tableau de bord (Back Office)</h2>
+
+<button type="button" (click)="openUserForm()">Créer un utilisateur</button>
+
+<table>
+  <thead>
+  <tr>
+    <th>Nom</th>
+    <th>Rôle</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let user of users">
+    <td>{{ user.nom }}</td>
+    <td>
+      <select [(ngModel)]="user.role" (change)="updateRole(user)">
+        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
+      </select>
+    </td>
+    <td>
+      <button type="button" (click)="editUser(user)" title="Éditer"><span aria-hidden="true">✏️</span></button>
+      <button type="button" (click)="deleteUser(user)" title="Supprimer"><span aria-hidden="true">🗑️</span></button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="user-actions">
+  <button type="button" (click)="exportUsers()">Exporter</button>
+  <button type="button" (click)="importUsers()">Importer</button>
+</div>
+
+<h3>Modèles de projet</h3>
+<button type="button" (click)="createTemplate()">Nouveau modèle</button>
+<ul>
+  <li *ngFor="let template of projectTemplates">
+    {{ template.nom }}
+    <button type="button" (click)="editTemplate(template)">Éditer</button>
+  </li>
+</ul>
+
+<h3>Statistiques</h3>
+<ul>
+  <li><strong>Projets en cours :</strong> {{ stats.projetsActifs }}</li>
+  <li><strong>Groupes à risque :</strong> {{ stats.groupesRisque }}</li>
+  <li><strong>Moyenne perf. tuteurs :</strong> {{ stats.performanceMoyTuteur }}</li>
+</ul>
+
+<!-- <app-performance-chart [data]="tutorPerformance"></app-performance-chart> -->
+
+<h3>Configuration IA</h3>
+<form (ngSubmit)="updateAICfg()" autocomplete="off">
+  <label>
+    Algorithme d’équipe :
+    <select [(ngModel)]="aiConfig.algoEquipe" name="algoEquipe">
+      <option value="algo1">Algorithme 1</option>
+      <option value="algo2">Algorithme 2</option>
+    </select>
+  </label>
+  <label>
+    Seuil de risque :
+    <input type="number" [(ngModel)]="aiConfig.seuilRisque" name="seuilRisque" min="0" max="100"/>
+  </label>
+  <label>
+    <input type="checkbox" [(ngModel)]="aiConfig.activerRecommandations" name="activerRecommandations"/> Recommandations activées
+  </label>
+  <button type="submit">Enregistrer</button>
+</form>
 
 
 // ======= Contenu de src/app/back-office/dashboard/dashboard.component.spec.ts =======
@@ -277,7 +522,7 @@ describe('DashboardComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DashboardComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
@@ -301,15 +546,16 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
-  users = [{ name: 'Jean', role: 'Administrateur' }];
+  users = [{ nom: 'Jean', role: 'Administrateur' }];
   roles = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projectTemplates = [{ name: 'Template 1' }, { name: 'Template 2' }];
-  stats = { activeProjects: 5, riskGroups: 2, avgTutorPerf: 8.5 };
-  tutorPerformance = [];
-  aiConfig = { teamAlgo: '', riskThreshold: 50, enableRecs: true };
+  projectTemplates = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
+  stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
+  tutorPerformance: { nom?: string; score?: number }[] = [];
+  aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
+
   openUserForm() {}
   updateRole(user: any) {}
   editUser(user: any) {}
@@ -320,6 +566,25 @@ export class DashboardComponent {
   editTemplate(template: any) {}
   updateAICfg() {}
 }
+
+
+// ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.css =======
+
+.section-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+p {
+  color: #555;
+}
+
+
+// ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.html =======
+
+<h2>Gestion des livrables</h2>
+<p>Section pour la gestion et le suivi des livrables.</p>
 
 
 // ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.spec.ts =======
@@ -336,7 +601,7 @@ describe('DeliverableManagementComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DeliverableManagementComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DeliverableManagementComponent);
     component = fixture.componentInstance;
@@ -361,6 +626,25 @@ import { Component } from '@angular/core';
 export class DeliverableManagementComponent {}
 
 
+// ======= Contenu de src/app/back-office/project-management/project-management.component.css =======
+
+.section-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+p {
+  color: #555;
+}
+
+
+// ======= Contenu de src/app/back-office/project-management/project-management.component.html =======
+
+<h2>Gestion des projets</h2>
+<p>Section pour la gestion et le suivi des projets.</p>
+
+
 // ======= Contenu de src/app/back-office/project-management/project-management.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
@@ -375,7 +659,7 @@ describe('ProjectManagementComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ProjectManagementComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProjectManagementComponent);
     component = fixture.componentInstance;
@@ -436,7 +720,26 @@ export const apolloProviders = [
 ];
 
 
+// ======= Contenu de src/app/core/interceptors/auth.interceptor.ts =======
+
+import { HttpInterceptorFn } from '@angular/common/http';
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authToken = localStorage.getItem('auth_token');
+
+  const authReq = authToken
+    ? req.clone({
+      headers: req.headers.set('Authorization', `Bearer ${authToken}`)
+    })
+    : req;
+
+  return next(authReq);
+};
+
+
 // ======= Contenu de src/app/core/models/deliverable.model.ts =======
+
+export type StatutLivrable = 'En retard' | 'En attente' | 'Terminé';
 
 export interface Deliverable {
   _id?: string;
@@ -444,36 +747,96 @@ export interface Deliverable {
   description: string;
   dateLimite: Date | string;
   urlDepot: string;
-  statut: 'En retard' | 'En attente' | 'Terminé';
+  statut: StatutLivrable;
   projetId?: string;
   creeLe?: Date | string;
   majLe?: Date | string;
 }
+
+export const DeliverableStatuses = {
+  TERMINE: 'Terminé',
+  EN_ATTENTE: 'En attente',
+  EN_RETARD: 'En retard'
+} as const;
 
 
 // ======= Contenu de src/app/core/models/project.model.ts =======
 
 import { Deliverable } from './deliverable.model';
 
+export type StatutProjet = 'Brouillon' | 'En cours' | 'Terminé' | 'Archivé';
+
 export interface Project {
   _id?: string;
   titre: string;
   description: string;
-  equipe: string[]; // ou User[] si tu as un modèle utilisateur
-  tuteur: string;   // ou User
+  equipe: string[];
+  tuteur: string;
   competences: string[];
   dateDebut: Date | string;
   dateFin: Date | string;
-  livrables: Deliverable[];
-  statut: 'Brouillon' | 'En cours' | 'Terminé' | 'Archivé';
+  livrables?: Deliverable[];
+  statut: StatutProjet;
+  progression?: number;
   creeLe?: Date | string;
   majLe?: Date | string;
 }
 
+export const ProjectStatuses = {
+  BROUILLON: 'Brouillon',
+  EN_COURS: 'En cours',
+  TERMINE: 'Terminé',
+  ARCHIVE: 'Archivé'
+} as const;
+
+
+// ======= Contenu de src/app/core/services/api-tester.service.ts =======
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
+import { Apollo, gql } from 'apollo-angular';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ApiTesterService {
+  private apiUrl = environment.apiUrl;
+
+  constructor(
+    private http: HttpClient,
+    private apollo: Apollo
+  ) {}
+
+  // Test REST API
+  testRestConnection(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/projects`);
+  }
+
+  // Test GraphQL
+  testGraphQLConnection(): Observable<any> {
+    return this.apollo.query({
+      query: gql`
+        query {
+          projets {
+            _id
+            titre
+            description
+          }
+        }
+      `
+    });
+  }
+
+  // Test AI service - correction du nom de la route
+  testAIService(prompt: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/ai/generer-texte`, { prompt });
+  }
+}
+
 
 // ======= Contenu de src/app/core/services/deliverable.service.spec.ts =======
-
-//src/app/core/services/deliverable.service.spec.ts
 
 import { TestBed } from '@angular/core/testing';
 
@@ -565,11 +928,29 @@ export class GraphqlService {
     });
   }
 
-  creerProjet(input: any): Observable<any> {
+  creerProjet(data: any): Observable<any> {
     return this.apollo.mutate({
       mutation: gql`
-        mutation($input: ProjetInput!) {
-          creerProjet(input: $input) {
+        mutation(
+          $titre: String!
+          $description: String!
+          $equipe: [ID!]!
+          $tuteur: ID
+          $competences: [String!]!
+          $dateDebut: String!
+          $dateFin: String!
+          $statut: String
+        ) {
+          creerProjet(
+            titre: $titre
+            description: $description
+            equipe: $equipe
+            tuteur: $tuteur
+            competences: $competences
+            dateDebut: $dateDebut
+            dateFin: $dateFin
+            statut: $statut
+          ) {
             _id
             titre
             description
@@ -577,7 +958,16 @@ export class GraphqlService {
           }
         }
       `,
-      variables: { input }
+      variables: {
+        titre: data.titre,
+        description: data.description,
+        equipe: data.equipe,
+        tuteur: data.tuteur,
+        competences: data.competences,
+        dateDebut: data.dateDebut,
+        dateFin: data.dateFin,
+        statut: data.statut
+      }
     });
   }
 }
@@ -585,22 +975,114 @@ export class GraphqlService {
 
 // ======= Contenu de src/app/core/services/project.service.spec.ts =======
 
-//src/app/core/services/deliverable.service.spec.ts
-
 import { TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ProjectService } from './project.service';
+import { environment } from '../../../environments/environment';
+import { Project } from '../models/project.model';
 
 describe('ProjectService', () => {
   let service: ProjectService;
+  let httpMock: HttpTestingController;
+
+  const API = `${environment.apiUrl}/projects`;
+
+  const mockProject: Project = {
+    _id: '1',
+    titre: 'Projet 1',
+    description: 'Description',
+    equipe: [],
+    tuteur: '123',
+    competences: ['Angular', 'Express'],
+    dateDebut: '2023-01-01',
+    dateFin: '2023-06-30',
+    statut: 'Brouillon'
+  };
 
   beforeEach(() => {
-    TestBed.configureTestingModule({});
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ProjectService]
+    });
+
     service = TestBed.inject(ProjectService);
+    httpMock = TestBed.inject(HttpTestingController);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  afterEach(() => {
+    httpMock.verify();
+  });
+
+  it('doit récupérer tous les projets', (done) => {
+    service.recupererProjets().subscribe(projects => {
+      expect(projects.length).toBe(1);
+      expect(projects[0].titre).toBe('Projet 1');
+      done();
+    });
+
+    const req = httpMock.expectOne(API);
+    expect(req.request.method).toBe('GET');
+    req.flush([mockProject]);
+  });
+
+  it('doit récupérer un projet par ID', (done) => {
+    service.recupererProjet('1').subscribe(project => {
+      expect(project._id).toBe('1');
+      expect(project.titre).toBe('Projet 1');
+      done();
+    });
+
+    const req = httpMock.expectOne(`${API}/1`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockProject);
+  });
+
+  it('doit créer un projet', (done) => {
+    service.creerProjet(mockProject).subscribe(project => {
+      expect(project.titre).toBe('Projet 1');
+      done();
+    });
+
+    const req = httpMock.expectOne(API);
+    expect(req.request.method).toBe('POST');
+    req.flush(mockProject);
+  });
+
+  it('doit mettre à jour un projet', (done) => {
+    const updated = { ...mockProject, titre: 'Projet Modifié' };
+    service.mettreAJourProjet('1', updated).subscribe(project => {
+      expect(project.titre).toBe('Projet Modifié');
+      done();
+    });
+
+    const req = httpMock.expectOne(`${API}/1`);
+    expect(req.request.method).toBe('PUT');
+    req.flush(updated);
+  });
+
+  it('doit supprimer un projet', (done) => {
+    service.supprimerProjet('1').subscribe(response => {
+      expect(response).toBeTruthy();
+      done();
+    });
+
+    const req = httpMock.expectOne(`${API}/1`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush({ success: true });
+  });
+
+  it('doit gérer une erreur serveur (500)', (done) => {
+    service.recupererProjets().subscribe({
+      next: () => fail('appel devait échouer'),
+      error: (err) => {
+        expect(err.status).toBe(500);
+        expect(err.message).toContain('Erreur serveur');
+        done();
+      }
+    });
+
+    const req = httpMock.expectOne(API);
+    req.flush({}, { status: 500, statusText: 'Erreur interne' });
   });
 });
 
@@ -609,43 +1091,88 @@ describe('ProjectService', () => {
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, catchError, retry, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Project } from '../models/project.model';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class ProjectService {
   private baseUrl = `${environment.apiUrl}/projects`;
 
   constructor(private http: HttpClient) {}
 
-  recupererProjets() {
-    return this.http.get<Project[]>(this.baseUrl);
+  recupererProjets(): Observable<Project[]> {
+    return this.http.get<Project[]>(this.baseUrl).pipe(
+      retry(1),
+      catchError(this.handleError)
+    );
   }
 
-  recupererProjet(id: string) {
-    return this.http.get<Project>(`${this.baseUrl}/${id}`);
+  recupererProjet(id: string): Observable<Project> {
+    return this.http.get<Project>(`${this.baseUrl}/${id}`).pipe(
+      retry(1),
+      catchError(this.handleError)
+    );
   }
 
-  creerProjet(data: Project) {
-    return this.http.post<Project>(this.baseUrl, data);
+  creerProjet(data: Project): Observable<Project> {
+    return this.http.post<Project>(this.baseUrl, data).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  mettreAJourProjet(id: string, data: Project) {
-    return this.http.put<Project>(`${this.baseUrl}/${id}`, data);
+  mettreAJourProjet(id: string, data: Project): Observable<Project> {
+    return this.http.put<Project>(`${this.baseUrl}/${id}`, data).pipe(
+      catchError(this.handleError)
+    );
   }
 
-  supprimerProjet(id: string) {
-    return this.http.delete(`${this.baseUrl}/${id}`);
+  supprimerProjet(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`).pipe(
+      retry(1),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any) {
+    let message = 'Une erreur est survenue';
+
+    if (error.error instanceof ErrorEvent) {
+      message = `Erreur client : ${error.error.message}`;
+    } else {
+      message = `Erreur serveur - code : ${error.status}, message : ${error.message}`;
+    }
+
+    console.error(`[ProjectService] ${message}`);
+    return throwError(() => ({
+      status: error.status,
+      message
+    }));
   }
 }
 
 
+// ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.css =======
+
+h2 {
+  margin-bottom: 1rem;
+}
+p {
+  color: #555;
+}
+
+
+// ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.html =======
+
+<h2>Détail du livrable</h2>
+<p>Ici s'affichera le détail du livrable sélectionné.</p>
+
+
 // ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.spec.ts =======
 
-//src/app/deliverable/deliverable-detail/deliverable-detail.component.spec.ts
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { DeliverableDetailComponent } from './deliverable-detail.component';
 
 describe('DeliverableDetailComponent', () => {
@@ -655,23 +1182,20 @@ describe('DeliverableDetailComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DeliverableDetailComponent]
-    })
-    .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DeliverableDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('devrait être créé', () => {
     expect(component).toBeTruthy();
   });
 });
 
 
 // ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.ts =======
-
-//src/app/deliverable/deliverable-detail/deliverable-detail.component.ts
 
 import { Component } from '@angular/core';
 
@@ -682,14 +1206,78 @@ import { Component } from '@angular/core';
   templateUrl: './deliverable-detail.component.html',
   styleUrl: './deliverable-detail.component.css'
 })
-export class DeliverableDetailComponent {
+export class DeliverableDetailComponent {}
 
+
+// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.css =======
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  margin: 2rem auto;
+  box-shadow: 0 2px 10px #0001;
+}
+
+label {
+  font-weight: 500;
+}
+
+input, textarea, select {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+button[type="submit"] {
+  align-self: flex-end;
+  background: #146D78;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button[type="submit"]:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+button[type="submit"]:hover {
+  background: #0B4D57;
 }
 
 
-// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.spec.ts =======
+// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.html =======
 
-//src/app/deliverable/deliverable-form/deliverable-form.component.spec.ts
+<form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" autocomplete="off">
+  <label for="nom">Nom :</label>
+  <input id="nom" formControlName="nom" required>
+
+  <label for="description">Description :</label>
+  <textarea id="description" formControlName="description" required></textarea>
+
+  <label for="dateLimite">Date limite :</label>
+  <input type="date" id="dateLimite" formControlName="dateLimite" required>
+
+  <label for="urlDepot">URL du dépôt :</label>
+  <input id="urlDepot" formControlName="urlDepot" required placeholder="https://github.com/monorg/monrepo">
+
+  <label for="statut">Statut :</label>
+  <select id="statut" formControlName="statut" required>
+    <option *ngFor="let statut of statutsLivrable" [value]="statut">{{statut}}</option>
+  </select>
+
+  <button type="submit" [disabled]="!livrableForm.valid">Enregistrer</button>
+</form>
+
+
+// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -703,7 +1291,7 @@ describe('DeliverableFormComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DeliverableFormComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DeliverableFormComponent);
     component = fixture.componentInstance;
@@ -718,9 +1306,9 @@ describe('DeliverableFormComponent', () => {
 
 // ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.ts =======
 
-//src/app/deliverable/deliverable-form/deliverable-form.component.ts
-
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Deliverable, DeliverableStatuses } from '../../core/models/deliverable.model';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-deliverable-form',
@@ -729,9 +1317,111 @@ import { Component } from '@angular/core';
   templateUrl: './deliverable-form.component.html',
   styleUrl: './deliverable-form.component.css'
 })
-export class DeliverableFormComponent {
+export class DeliverableFormComponent implements OnInit {
+  @Input() livrable?: Deliverable;
+  @Output() formSubmit = new EventEmitter<Deliverable>();
 
+  livrableForm!: FormGroup;
+  statutsLivrable = [
+    DeliverableStatuses.EN_ATTENTE,
+    DeliverableStatuses.EN_RETARD,
+    DeliverableStatuses.TERMINE
+  ];
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit() {
+    this.livrableForm = this.fb.group({
+      nom: [this.livrable?.nom || '', Validators.required],
+      description: [this.livrable?.description || '', Validators.required],
+      dateLimite: [this.livrable?.dateLimite ? this.livrable.dateLimite.toString().substring(0, 10) : '', Validators.required],
+      urlDepot: [this.livrable?.urlDepot || '', [Validators.required]],
+      statut: [this.livrable?.statut || DeliverableStatuses.EN_ATTENTE, Validators.required]
+    });
+  }
+
+  onSubmit() {
+    if (this.livrableForm.valid) {
+      this.formSubmit.emit(this.livrableForm.value);
+    }
+  }
 }
+
+
+// ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.css =======
+
+h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+
+a:hover {
+  color: #174bb3;
+}
+
+.erreur {
+  color: #F44336;
+  margin-bottom: 1rem;
+}
+
+
+// ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.html =======
+
+<h3>Liste des livrables</h3>
+<div *ngIf="chargement">Chargement...</div>
+<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+
+<table *ngIf="livrables.length">
+  <thead>
+  <tr>
+    <th>Nom</th>
+    <th>Description</th>
+    <th>Date limite</th>
+    <th>Statut</th>
+    <th>URL dépôt</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let livrable of livrables">
+    <td>{{ livrable.nom }}</td>
+    <td>{{ livrable.description }}</td>
+    <td>{{ livrable.dateLimite | date:'dd/MM/yyyy' }}</td>
+    <td>{{ livrable.statut }}</td>
+    <td>
+      <a [href]="livrable.urlDepot" target="_blank" rel="noopener noreferrer">Voir sur GitHub</a>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<div *ngIf="!livrables.length && !chargement">Aucun livrable trouvé.</div>
 
 
 // ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.spec.ts =======
@@ -766,15 +1456,16 @@ describe('DeliverableListComponent', () => {
 // ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.ts =======
 
 import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Deliverable } from '../../core/models/deliverable.model';
 import { DeliverableService } from '../../core/services/deliverable.service';
 
 @Component({
   selector: 'app-deliverable-list',
   standalone: true,
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './deliverable-list.component.html',
-  styleUrl: './deliverable-list.component.css'
+  styleUrls: ['./deliverable-list.component.css']
 })
 export class DeliverableListComponent implements OnInit {
   @Input() projetId!: string;
@@ -788,7 +1479,7 @@ export class DeliverableListComponent implements OnInit {
     if (this.projetId) {
       this.chargement = true;
       this.deliverableService.recupererLivrablesParProjet(this.projetId).subscribe({
-        next: (livrables) => {
+        next: (livrables: Deliverable[]) => {
           this.livrables = livrables;
           this.chargement = false;
         },
@@ -821,40 +1512,71 @@ export class DeliverableRoutingModule {}
 
 // ======= Contenu de src/app/deliverable/deliverable.module.ts =======
 
-import { Component, Input, OnInit } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {Deliverable} from '../core/models/deliverable.model';
-import {DeliverableService} from '../core/services/deliverable.service';
+import { DeliverableRoutingModule } from './deliverable-routing.module';
 
-@Component({
-  selector: 'app-deliverable-list',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './deliverable-list.component.html',
-  styleUrl: './deliverable-list.component.css'
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    DeliverableRoutingModule
+  ]
 })
-export class DeliverableListComponent implements OnInit {
-  @Input() projetId!: string;
-  livrables: Deliverable[] = [];
-  chargement = false;
-  erreur = '';
-  constructor(private deliverableService: DeliverableService) {}
-  ngOnInit() {
-    if (this.projetId) {
-      this.chargement = true;
-      this.deliverableService.recupererLivrablesParProjet(this.projetId).subscribe({
-        next: (livrables: Deliverable[]) => {
-          this.livrables = livrables;
-          this.chargement = false;
-        },
-        error: () => {
-          this.erreur = "Erreur lors du chargement des livrables.";
-          this.chargement = false;
-        }
-      });
-    }
-  }
+export class DeliverableModule {}
+
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.css =======
+
+h2 {
+  margin-bottom: 1.5rem;
 }
+section {
+  margin-bottom: 2rem;
+}
+ul {
+  padding-left: 1.2rem;
+}
+li {
+  margin: 0.5rem 0;
+}
+
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.html =======
+
+<h2>Tableau de bord (Front Office)</h2>
+
+<section>
+  <h3>Mes Projets</h3>
+  <div *ngIf="projects?.length; else noProjects">
+    <ul>
+      <li *ngFor="let project of projects">
+        {{ project.titre }} ({{ project.progression || 0 }}%)
+      </li>
+    </ul>
+  </div>
+  <ng-template #noProjects>
+    <p>Aucun projet attribué.</p>
+  </ng-template>
+</section>
+
+<section>
+  <h3>Notifications</h3>
+  <ul>
+    <li *ngFor="let notif of notifications">
+      {{ notif.message }} — <span>{{ notif.date | date:'short' }}</span>
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h3>Livrables</h3>
+  <ul>
+    <li *ngFor="let livrable of deliverables">
+      {{ livrable.nom }} - {{ livrable.statut }} ({{ livrable.dateLimite | date:'dd/MM/yyyy' }})
+    </li>
+  </ul>
+</section>
 
 
 // ======= Contenu de src/app/front-office/dashboard/dashboard.component.spec.ts =======
@@ -871,7 +1593,7 @@ describe('DashboardComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DashboardComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DashboardComponent);
     component = fixture.componentInstance;
@@ -895,15 +1617,19 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrls: ['./dashboard.component.css'] // Correction: styleUrls (array) et non styleUrl (string)
 })
 export class DashboardComponent {
-  users = [{ name: 'Jean', role: 'Administrateur' }];
+  projects = [];
+  notifications = [];
+  deliverables = [];
+  users = [{ nom: 'Jean', role: 'Administrateur' }]; // Utiliser 'nom' pour cohérence FR
   roles = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projectTemplates = [{ name: 'Template 1' }, { name: 'Template 2' }];
-  stats = { activeProjects: 5, riskGroups: 2, avgTutorPerf: 8.5 };
+  projectTemplates = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }]; // Utiliser 'nom'
+  stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 }; // FR
   tutorPerformance = [];
-  aiConfig = { teamAlgo: '', riskThreshold: 50, enableRecs: true };
+  aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
+
   openUserForm() {}
   updateRole(user: any) {}
   editUser(user: any) {}
@@ -914,6 +1640,82 @@ export class DashboardComponent {
   editTemplate(template: any) {}
   updateAICfg() {}
 }
+
+
+// ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.css =======
+
+h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+
+a:hover {
+  color: #174bb3;
+}
+
+.erreur {
+  color: #F44336;
+  margin-bottom: 1rem;
+}
+
+
+// ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.html =======
+
+<h3>Livrables du projet</h3>
+<div *ngIf="chargement">Chargement...</div>
+<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+
+<table *ngIf="livrables.length">
+  <thead>
+  <tr>
+    <th>Nom</th>
+    <th>Description</th>
+    <th>Date limite</th>
+    <th>Statut</th>
+    <th>URL dépôt</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let livrable of livrables">
+    <td>{{ livrable.nom }}</td>
+    <td>{{ livrable.description }}</td>
+    <td>{{ livrable.dateLimite | date:'dd/MM/yyyy' }}</td>
+    <td>{{ livrable.statut }}</td>
+    <td>
+      <a [href]="livrable.urlDepot" target="_blank" rel="noopener noreferrer">Voir sur GitHub</a>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<div *ngIf="!livrables.length && !chargement">Aucun livrable trouvé.</div>
 
 
 // ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.spec.ts =======
@@ -930,7 +1732,7 @@ describe('DeliverableListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DeliverableListComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DeliverableListComponent);
     component = fixture.componentInstance;
@@ -1006,6 +1808,7 @@ export class FrontOfficeRoutingModule {}
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FrontOfficeRoutingModule } from './front-office-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProjectListComponent } from './project-list/project-list.component';
@@ -1014,13 +1817,90 @@ import { DeliverableListComponent } from './deliverable-list/deliverable-list.co
 @NgModule({
   imports: [
     CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
     FrontOfficeRoutingModule,
-    DashboardComponent,
+    DashboardComponent, // standalone components
     ProjectListComponent,
     DeliverableListComponent
   ]
 })
 export class FrontOfficeModule {}
+
+
+// ======= Contenu de src/app/front-office/project-list/project-list.component.css =======
+
+h2 {
+  margin-bottom: 1.5rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: .5rem 1rem;
+  border-radius: .4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+button:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+button:hover { background: #174bb3; }
+.erreur {
+  color: #F44336;
+  margin-bottom: 1rem;
+}
+
+
+// ======= Contenu de src/app/front-office/project-list/project-list.component.html =======
+
+<h2>Liste des projets</h2>
+
+<div *ngIf="chargement">Chargement...</div>
+<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+
+<table *ngIf="projets.length">
+  <thead>
+  <tr>
+    <th>Titre</th>
+    <th>Description</th>
+    <th>Statut</th>
+    <th>Date de début</th>
+    <th>Date de fin</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let projet of projets">
+    <td>{{ projet.titre }}</td>
+    <td>{{ projet.description }}</td>
+    <td>{{ projet.statut }}</td>
+    <td>{{ projet.dateDebut | date:'dd/MM/yyyy' }}</td>
+    <td>{{ projet.dateFin | date:'dd/MM/yyyy' }}</td>
+    <td>
+      <button type="button" (click)="voirDetails(projet._id)">Voir</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<div *ngIf="!projets.length && !chargement">Aucun projet trouvé.</div>
 
 
 // ======= Contenu de src/app/front-office/project-list/project-list.component.spec.ts =======
@@ -1037,7 +1917,7 @@ describe('ProjectListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ProjectListComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProjectListComponent);
     component = fixture.componentInstance;
@@ -1052,26 +1932,38 @@ describe('ProjectListComponent', () => {
 
 // ======= Contenu de src/app/front-office/project-list/project-list.component.ts =======
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ProjectService } from '../../core/services/project.service';
 import { Project } from '../../core/models/project.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-project-list',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './project-list.component.html',
-  styleUrl: './project-list.component.css'
+  styleUrls: ['./project-list.component.css']
 })
-export class ProjectListComponent implements OnInit {
+export class ProjectListComponent implements OnInit, OnDestroy {
   projets: Project[] = [];
   chargement = false;
   erreur = '';
-  constructor(private projectService: ProjectService) {}
+  private subscription?: Subscription;
+
+  constructor(
+    private projectService: ProjectService,
+    private router: Router
+  ) {}
+
   ngOnInit() {
+    this.chargerProjets();
+  }
+
+  chargerProjets() {
     this.chargement = true;
-    this.projectService.recupererProjets().subscribe({
+    this.subscription = this.projectService.recupererProjets().subscribe({
       next: (projets) => {
         this.projets = projets;
         this.chargement = false;
@@ -1079,15 +1971,40 @@ export class ProjectListComponent implements OnInit {
       error: (err) => {
         this.erreur = "Erreur lors du chargement des projets.";
         this.chargement = false;
+        console.error('Erreur:', err);
       }
     });
+  }
+
+  voirDetails(id: string) {
+    this.router.navigate(['/project', id]);
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }
 
 
-// ======= Contenu de src/app/project/project-detail/project-detail.component.spec.ts =======
+// ======= Contenu de src/app/project/project-detail/project-detail.component.css =======
 
-//src/app/project/project-detail/project-detail.component.spec.ts
+h2 {
+  margin-bottom: 1rem;
+}
+p {
+  color: #555;
+}
+
+
+// ======= Contenu de src/app/project/project-detail/project-detail.component.html =======
+
+<h2>Détail du projet</h2>
+<p>À compléter : affichage détaillé du projet sélectionné.</p>
+
+
+// ======= Contenu de src/app/project/project-detail/project-detail.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -1101,7 +2018,7 @@ describe('ProjectDetailComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ProjectDetailComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProjectDetailComponent);
     component = fixture.componentInstance;
@@ -1116,8 +2033,6 @@ describe('ProjectDetailComponent', () => {
 
 // ======= Contenu de src/app/project/project-detail/project-detail.component.ts =======
 
-//src/app/project/project-detail/project-detail.component.ts
-
 import { Component } from '@angular/core';
 
 @Component({
@@ -1127,14 +2042,87 @@ import { Component } from '@angular/core';
   templateUrl: './project-detail.component.html',
   styleUrl: './project-detail.component.css'
 })
-export class ProjectDetailComponent {
+export class ProjectDetailComponent {}
 
+
+// ======= Contenu de src/app/project/project-form/project-form.component.css =======
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  margin: 2rem auto;
+  box-shadow: 0 2px 10px #0001;
+}
+
+label {
+  font-weight: 500;
+}
+
+input, textarea, select {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+button[type="submit"] {
+  align-self: flex-end;
+  background: #146D78;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button[type="submit"]:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+button[type="submit"]:hover {
+  background: #0B4D57;
 }
 
 
-// ======= Contenu de src/app/project/project-form/project-form.component.spec.ts =======
+// ======= Contenu de src/app/project/project-form/project-form.component.html =======
 
-//src/app/project/project-form/project-form.component.spec.ts
+<form [formGroup]="projetForm" (ngSubmit)="onSubmit()" autocomplete="off">
+  <label for="titre">Titre :</label>
+  <input id="titre" formControlName="titre" required>
+
+  <label for="description">Description :</label>
+  <textarea id="description" formControlName="description" required></textarea>
+
+  <label for="equipe">Équipe (IDs séparés par des virgules) :</label>
+  <input id="equipe" formControlName="equipe" required placeholder="ex: 664b1f8b...,664b1f8c...">
+
+  <label for="tuteur">Tuteur (ID) :</label>
+  <input id="tuteur" formControlName="tuteur" required>
+
+  <label for="competences">Compétences (séparées par des virgules) :</label>
+  <input id="competences" formControlName="competences" required placeholder="ex: Node.js,Express">
+
+  <label for="dateDebut">Date de début :</label>
+  <input type="date" id="dateDebut" formControlName="dateDebut" required>
+
+  <label for="dateFin">Date de fin :</label>
+  <input type="date" id="dateFin" formControlName="dateFin" required>
+
+  <label for="statut">Statut :</label>
+  <select id="statut" formControlName="statut" required>
+    <option *ngFor="let statut of statutsProjet" [value]="statut">{{statut}}</option>
+  </select>
+
+  <button type="submit" [disabled]="!projetForm.valid">Enregistrer</button>
+</form>
+
+
+// ======= Contenu de src/app/project/project-form/project-form.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -1148,7 +2136,7 @@ describe('ProjectFormComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ProjectFormComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProjectFormComponent);
     component = fixture.componentInstance;
@@ -1163,25 +2151,138 @@ describe('ProjectFormComponent', () => {
 
 // ======= Contenu de src/app/project/project-form/project-form.component.ts =======
 
-//src/app/project/project-form/project-form.component.ts
-
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Project, ProjectStatuses } from '../../core/models/project.model';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-project-form',
   standalone: true,
   imports: [],
   templateUrl: './project-form.component.html',
-  styleUrl: './project-form.component.css'
+  styleUrls: ['./project-form.component.css'] // Correction : styleUrls (array), pas styleUrl
 })
-export class ProjectFormComponent {
+export class ProjectFormComponent implements OnInit {
+  @Input() projet?: Project;
+  @Output() formSubmit = new EventEmitter<Project>();
 
+  projetForm!: FormGroup;
+  statutsProjet = [
+    ProjectStatuses.BROUILLON,
+    ProjectStatuses.EN_COURS,
+    ProjectStatuses.TERMINE,
+    ProjectStatuses.ARCHIVE
+  ];
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit() {
+    this.projetForm = this.fb.group({
+      titre: [this.projet?.titre || '', Validators.required],
+      description: [this.projet?.description || '', Validators.required],
+      equipe: [this.projet?.equipe ? this.projet.equipe.join(',') : '', Validators.required],
+      tuteur: [this.projet?.tuteur || '', Validators.required],
+      competences: [this.projet?.competences ? this.projet.competences.join(',') : '', Validators.required],
+      dateDebut: [this.projet?.dateDebut ? this.toDateInputValue(this.projet.dateDebut) : '', Validators.required],
+      dateFin: [this.projet?.dateFin ? this.toDateInputValue(this.projet.dateFin) : '', Validators.required],
+      statut: [this.projet?.statut || ProjectStatuses.BROUILLON, Validators.required]
+    });
+  }
+
+  /**
+   * S'assure que la date soit bien au format "YYYY-MM-DD" pour l'input[type=date]
+   */
+  toDateInputValue(date: string | Date): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toISOString().substring(0, 10);
+  }
+
+  onSubmit() {
+    if (this.projetForm.valid) {
+      const formValue = this.projetForm.value;
+      const projet: Project = {
+        ...formValue,
+        equipe: formValue.equipe.split(',').map((id: string) => id.trim()).filter((id: string) => id),
+        competences: formValue.competences.split(',').map((c: string) => c.trim()).filter((c: string) => c),
+        dateDebut: formValue.dateDebut,
+        dateFin: formValue.dateFin
+      };
+      this.formSubmit.emit(projet);
+    }
+  }
 }
 
 
-// ======= Contenu de src/app/project/project-list/project-list.component.spec.ts =======
+// ======= Contenu de src/app/project/project-list/project-list.component.css =======
 
-//src/app/project/project-list/project-list.component.spec.ts
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: .5rem 1rem;
+  border-radius: .4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+button:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+button:hover { background: #174bb3; }
+.erreur {
+  color: #F44336;
+  margin-bottom: 1rem;
+}
+
+
+// ======= Contenu de src/app/project/project-list/project-list.component.html =======
+
+<div *ngIf="chargement">Chargement...</div>
+<div *ngIf="erreur" class="erreur">{{erreur}}</div>
+
+<table *ngIf="projets.length > 0">
+  <thead>
+  <tr>
+    <th>Titre</th>
+    <th>Description</th>
+    <th>Statut</th>
+    <th>Progression</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let projet of projets">
+    <td>{{projet.titre}}</td>
+    <td>{{projet.description}}</td>
+    <td>{{projet.statut}}</td>
+    <td>{{projet.progression || 0}} %</td>
+    <td>
+      <button type="button" (click)="voirDetails(projet._id)">Détails</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<div *ngIf="projets.length === 0 && !chargement">Aucun projet trouvé.</div>
+
+
+// ======= Contenu de src/app/project/project-list/project-list.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
@@ -1195,7 +2296,7 @@ describe('ProjectListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ProjectListComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProjectListComponent);
     component = fixture.componentInstance;
@@ -1213,13 +2314,14 @@ describe('ProjectListComponent', () => {
 import { Component, OnInit } from '@angular/core';
 import { ProjectService } from '../../core/services/project.service';
 import { Project } from '../../core/models/project.model';
+import { CommonModule } from '@angular/common'; // <-- à importer !
 
 @Component({
   selector: 'app-project-list',
   standalone: true,
-  imports: [],
+  imports: [CommonModule], // <-- ajoute CommonModule ici
   templateUrl: './project-list.component.html',
-  styleUrl: './project-list.component.css'
+  styleUrls: ['./project-list.component.css']
 })
 export class ProjectListComponent implements OnInit {
   projets: Project[] = [];
@@ -1278,11 +2380,189 @@ import { ProjectListComponent } from './project-list/project-list.component';
 export class ProjectModule {}
 
 
+// ======= Contenu de src/app/test/api-test/api-test.component.ts =======
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ApiTesterService } from '../../core/services/api-tester.service';
+
+@Component({
+  selector: 'app-api-test',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="test-container">
+      <h2>Test de connexion API</h2>
+
+      <div class="test-card">
+        <h3>Test REST API</h3>
+        <button (click)="testRest()" [disabled]="testingRest">Tester</button>
+        <div *ngIf="restResult" class="result success">
+          <pre>{{ restResult | json }}</pre>
+        </div>
+        <div *ngIf="restError" class="result error">
+          <p>Erreur: {{ restError }}</p>
+        </div>
+      </div>
+
+      <div class="test-card">
+        <h3>Test GraphQL</h3>
+        <button (click)="testGraphQL()" [disabled]="testingGraphQL">Tester</button>
+        <div *ngIf="graphqlResult" class="result success">
+          <pre>{{ graphqlResult | json }}</pre>
+        </div>
+        <div *ngIf="graphqlError" class="result error">
+          <p>Erreur: {{ graphqlError }}</p>
+        </div>
+      </div>
+
+      <div class="test-card">
+        <h3>Test Service IA</h3>
+        <button (click)="testAI()" [disabled]="testingAI">Tester</button>
+        <div *ngIf="aiResult" class="result success">
+          <pre>{{ aiResult | json }}</pre>
+        </div>
+        <div *ngIf="aiError" class="result error">
+          <p>Erreur: {{ aiError }}</p>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .test-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    .test-card {
+      background: var(--background-medium);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+    }
+    button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: var(--primary-light);
+    }
+    button:disabled {
+      background: var(--text-secondary);
+      cursor: not-allowed;
+    }
+    .result {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow: auto;
+    }
+    .success {
+      background: #e3f2fd;
+      border: 1px solid #2196F3;
+    }
+    .error {
+      background: #ffebee;
+      border: 1px solid #f44336;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+  `]
+})
+export class ApiTestComponent {
+  // REST API
+  restResult: any = null;
+  restError: string | null = null;
+  testingRest = false;
+
+  // GraphQL
+  graphqlResult: any = null;
+  graphqlError: string | null = null;
+  testingGraphQL = false;
+
+  // AI Service
+  aiResult: any = null;
+  aiError: string | null = null;
+  testingAI = false;
+
+  constructor(private apiTester: ApiTesterService) {}
+
+  testRest() {
+    this.testingRest = true;
+    this.restResult = null;
+    this.restError = null;
+
+    this.apiTester.testRestConnection().subscribe({
+      next: (result) => {
+        this.restResult = result;
+        this.testingRest = false;
+      },
+      error: (error) => {
+        this.restError = error.message || "Erreur de connexion";
+        this.testingRest = false;
+      }
+    });
+  }
+
+  testGraphQL() {
+    this.testingGraphQL = true;
+    this.graphqlResult = null;
+    this.graphqlError = null;
+
+    this.apiTester.testGraphQLConnection().subscribe({
+      next: (result) => {
+        this.graphqlResult = result.data;
+        this.testingGraphQL = false;
+      },
+      error: (error) => {
+        this.graphqlError = error.message || "Erreur de connexion";
+        this.testingGraphQL = false;
+      }
+    });
+  }
+
+  testAI() {
+    this.testingAI = true;
+    this.aiResult = null;
+    this.aiError = null;
+
+    const prompt = "Résumer les avantages d'une gestion de projet académique";
+
+    this.apiTester.testAIService(prompt).subscribe({
+      next: (result) => {
+        this.aiResult = result;
+        this.testingAI = false;
+      },
+      error: (error) => {
+        this.aiError = error.message || "Erreur de connexion";
+        this.testingAI = false;
+      }
+    });
+  }
+}
+
+
 // ======= Contenu de src/environments/environment.prod.ts =======
 
 export const environment = {
   production: true,
-  apiUrl: 'https://your-production-url.com/api', // URL du backend en production
+  apiUrl: 'https://your-production-url.com/api',
+  graphqlUrl: 'https://your-production-url.com/graphql',
+  appVersion: '1.0.0',
+  appName: 'PROGEASE'
 };
 
 
@@ -1291,8 +2571,27 @@ export const environment = {
 export const environment = {
   production: false,
   apiUrl: 'http://localhost:3000/api',
-  graphqlUrl: 'http://localhost:3000/graphql'
+  graphqlUrl: 'http://localhost:3000/graphql',
+  appVersion: '1.0.0',
+  appName: 'PROGEASE'
 };
+
+
+// ======= Contenu de src/index.html =======
+
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>PROGEASE</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+<app-root></app-root>
+</body>
+</html>
 
 
 // ======= Contenu de src/main.server.ts =======
@@ -1312,10 +2611,10 @@ export default bootstrap;
 import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
-import '../src/polyfills';
+import './polyfills';
 
-bootstrapApplication(AppComponent, appConfig)
-  .catch((err) => console.error(err));
+// Initialisation de l'application
+bootstrapApplication(AppComponent, appConfig);
 
 
 // ======= Contenu de src/polyfills.ts =======
@@ -1324,4 +2623,100 @@ bootstrapApplication(AppComponent, appConfig)
  * Zone JS is required by Angular itself.
  */
 import 'zone.js';  // Included with Angular CLI.
+
+
+// ======= Contenu de src/styles.css =======
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f5f7fa;
+  color: #222;
+  margin: 0;
+}
+
+.dashboard-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 18px #0001;
+}
+
+.title {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats-grid {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  flex: 1;
+  background: #e3eefe;
+  border-radius: .8rem;
+  padding: 1.2rem 1rem;
+  text-align: center;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px #0001;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.btn-primary {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: .5rem 1rem;
+  border-radius: .4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+.btn-primary:focus {
+  outline: 2px solid #17B5B5;
+}
+.btn-primary:hover { background: #174bb3; }
+
+.ninja-table {
+  width: 100%;
+  border-collapse: collapse;
+  box-shadow: 0 2px 10px #0001;
+  background: #fff;
+}
+.ninja-table th, .ninja-table td {
+  padding: .7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+.ninja-table th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+.badge {
+  display: inline-block;
+  padding: 0.3em 1em;
+  border-radius: 1em;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+.badge.en_cours { background: #e0f2fe; color: #0369a1; }
+.badge.termine { background: #bbf7d0; color: #166534; }
+.badge.archive { background: #e5e7eb; color: #6b7280; }
+.badge.brouillon { background: #fef9c3; color: #ca8a04; }
+.action-link {
+  color: #2563eb;
+  text-decoration: underline;
+  cursor: pointer;
+}
+.action-link:focus {
+  outline: 2px solid #17B5B5;
+}
+.action-link:hover { color: #174bb3; }
 

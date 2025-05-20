@@ -22,7 +22,7 @@
     <td>{{ projet.dateDebut | date:'dd/MM/yyyy' }}</td>
     <td>{{ projet.dateFin | date:'dd/MM/yyyy' }}</td>
     <td>
-      <a [routerLink]="['/project', projet._id]">Voir</a>
+      <button type="button" (click)="voirDetails(projet._id)">Voir</button>
     </td>
   </tr>
   </tbody>

@@ -1,154 +1,22 @@
 <div class="app-container">
   <header class="app-header">
     <div class="logo-container">
-      <img src="assets/PROGEASE.png" alt="PROGEASE logo" height="45">
+      <img src="assets/PROGEASE.png" alt="PROGEASE logo" height="45" loading="lazy">
       <h1>{{ titre }}</h1>
     </div>
-    <nav class="main-nav">
-      <a routerLink="/front-office" routerLinkActive="active">Accueil</a>
+    <nav class="main-nav" aria-label="Navigation principale">
+      <a routerLink="/front-office" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Accueil</a>
       <a routerLink="/project" routerLinkActive="active">Projets</a>
       <a routerLink="/deliverable" routerLinkActive="active">Livrables</a>
       <a routerLink="/back-office" routerLinkActive="active">Back office</a>
     </nav>
   </header>
 
-  <main class="app-content">
+  <main class="app-content" tabindex="-1">
     <router-outlet></router-outlet>
   </main>
 
   <footer class="app-footer">
-    <p>&copy; 2025 PROGEASE - Plateforme de Gestion de Projets Académiques</p>
+    <p>&copy; 2025 PROGEASE – Plateforme de Gestion de Projets Académiques</p>
   </footer>
 </div>
-
-<style>
-  :root {
-    /* Palette de couleurs bleu-verdâtre professionnelle */
-    --primary-color: #146D78;
-    --primary-light: #1D8A99;
-    --primary-dark: #0B4D57;
-    --secondary-color: #0CA4A5;
-    --accent-color: #17B5B5;
-
-    --text-primary: #0F3A42;
-    --text-secondary: #546E7A;
-    --background-light: #F7FBFC;
-    --background-medium: #E4F0F2;
-    --background-dark: #CFE0E6;
-
-    --success-color: #4CAF50;
-    --warning-color: #FFC107;
-    --danger-color: #F44336;
-    --info-color: #2196F3;
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol';
-    color: var(--text-primary);
-    background-color: var(--background-light);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  .app-container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .app-header {
-    background-color: var(--primary-color);
-    color: white;
-    padding: 0.8rem 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .logo-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .logo-container h1 {
-    font-size: 1.6rem;
-    font-weight: 500;
-    letter-spacing: -0.02em;
-    font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Helvetica, Arial, sans-serif;
-  }
-
-  .main-nav {
-    display: flex;
-    gap: 1.5rem;
-    align-items: center;
-  }
-
-  .main-nav a {
-    color: white;
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: 500;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-  }
-
-  .main-nav a:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .main-nav a.active {
-    background-color: var(--accent-color);
-    color: white;
-  }
-
-  .app-content {
-    flex: 1;
-    padding: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-    width: 100%;
-  }
-
-  .app-footer {
-    background-color: var(--primary-dark);
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    font-size: 0.85rem;
-  }
-
-  @media (max-width: 768px) {
-    .app-header {
-      flex-direction: column;
-      padding: 1rem;
-      gap: 1rem;
-    }
-
-    .main-nav {
-      width: 100%;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    .main-nav a {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.9rem;
-    }
-
-    .app-content {
-      padding: 1rem;
-    }
-  }
-</style>

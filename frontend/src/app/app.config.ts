@@ -6,7 +6,6 @@ import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { apolloProviders } from './core/apollo.config';
 
-
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
@@ -18,11 +17,3 @@ export const appConfig: ApplicationConfig = {
     ...apolloProviders
   ]
 };
-
-
-
-
-
-
-
-

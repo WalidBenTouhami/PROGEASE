@@ -35,11 +35,29 @@ export class GraphqlService {
     });
   }
 
-  creerProjet(input: any): Observable<any> {
+  creerProjet(data: any): Observable<any> {
     return this.apollo.mutate({
       mutation: gql`
-        mutation($input: ProjetInput!) {
-          creerProjet(input: $input) {
+        mutation(
+          $titre: String!
+          $description: String!
+          $equipe: [ID!]!
+          $tuteur: ID
+          $competences: [String!]!
+          $dateDebut: String!
+          $dateFin: String!
+          $statut: String
+        ) {
+          creerProjet(
+            titre: $titre
+            description: $description
+            equipe: $equipe
+            tuteur: $tuteur
+            competences: $competences
+            dateDebut: $dateDebut
+            dateFin: $dateFin
+            statut: $statut
+          ) {
             _id
             titre
             description
@@ -47,7 +65,16 @@ export class GraphqlService {
           }
         }
       `,
-      variables: { input }
+      variables: {
+        titre: data.titre,
+        description: data.description,
+        equipe: data.equipe,
+        tuteur: data.tuteur,
+        competences: data.competences,
+        dateDebut: data.dateDebut,
+        dateFin: data.dateFin,
+        statut: data.statut
+      }
     });
   }
 }

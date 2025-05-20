@@ -10,7 +10,7 @@ describe('DeliverableManagementComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DeliverableManagementComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DeliverableManagementComponent);
     component = fixture.componentInstance;

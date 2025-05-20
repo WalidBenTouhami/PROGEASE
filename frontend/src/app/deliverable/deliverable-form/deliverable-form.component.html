@@ -1,1 +1,20 @@
-<p>deliverable-form works!</p>
+<form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" autocomplete="off">
+  <label for="nom">Nom :</label>
+  <input id="nom" formControlName="nom" required>
+
+  <label for="description">Description :</label>
+  <textarea id="description" formControlName="description" required></textarea>
+
+  <label for="dateLimite">Date limite :</label>
+  <input type="date" id="dateLimite" formControlName="dateLimite" required>
+
+  <label for="urlDepot">URL du dépôt :</label>
+  <input id="urlDepot" formControlName="urlDepot" required placeholder="https://github.com/monorg/monrepo">
+
+  <label for="statut">Statut :</label>
+  <select id="statut" formControlName="statut" required>
+    <option *ngFor="let statut of statutsLivrable" [value]="statut">{{statut}}</option>
+  </select>
+
+  <button type="submit" [disabled]="!livrableForm.valid">Enregistrer</button>
+</form>

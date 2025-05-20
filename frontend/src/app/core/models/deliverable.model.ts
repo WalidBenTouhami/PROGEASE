@@ -1,17 +1,19 @@
+export type StatutLivrable = 'En retard' | 'En attente' | 'Terminé';
+
 export interface Deliverable {
   _id?: string;
   nom: string;
   description: string;
   dateLimite: Date | string;
   urlDepot: string;
-  statut: 'OVERDUE' | 'PENDING' | 'COMPLETED';
+  statut: StatutLivrable;
   projetId?: string;
   creeLe?: Date | string;
   majLe?: Date | string;
 }
 
 export const DeliverableStatuses = {
-  COMPLETED: 'COMPLETED',
-  PENDING: 'PENDING',
-  OVERDUE: 'OVERDUE'
-};
+  TERMINE: 'Terminé',
+  EN_ATTENTE: 'En attente',
+  EN_RETARD: 'En retard'
+} as const;

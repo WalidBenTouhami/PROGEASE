@@ -1,4 +1,3 @@
-// src/app/deliverable/deliverable-list/deliverable-list.component.ts
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Deliverable } from '../../core/models/deliverable.model';

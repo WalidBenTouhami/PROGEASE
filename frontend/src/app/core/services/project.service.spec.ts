@@ -1,5 +1,3 @@
-// src/app/core/services/project.service.spec.ts
-
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ProjectService } from './project.service';
@@ -21,7 +19,7 @@ describe('ProjectService', () => {
     competences: ['Angular', 'Express'],
     dateDebut: '2023-01-01',
     dateFin: '2023-06-30',
-    statut: 'en_cours'
+    statut: 'Brouillon'
   };
 
   beforeEach(() => {

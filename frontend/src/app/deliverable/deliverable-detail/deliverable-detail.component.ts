@@ -1,5 +1,3 @@
-//src/app/deliverable/deliverable-detail/deliverable-detail.component.ts
-
 import { Component } from '@angular/core';
 
 @Component({
@@ -9,6 +7,4 @@ import { Component } from '@angular/core';
   templateUrl: './deliverable-detail.component.html',
   styleUrl: './deliverable-detail.component.css'
 })
-export class DeliverableDetailComponent {
-
-}
+export class DeliverableDetailComponent {}

@@ -1,5 +1,3 @@
-//src/app/project/project-detail/project-detail.component.ts
-
 import { Component } from '@angular/core';
 
 @Component({
@@ -9,6 +7,4 @@ import { Component } from '@angular/core';
   templateUrl: './project-detail.component.html',
   styleUrl: './project-detail.component.css'
 })
-export class ProjectDetailComponent {
-
-}
+export class ProjectDetailComponent {}

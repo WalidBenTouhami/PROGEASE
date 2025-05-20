@@ -1,1 +1,29 @@
-<p>project-form works!</p>
+<form [formGroup]="projetForm" (ngSubmit)="onSubmit()" autocomplete="off">
+  <label for="titre">Titre :</label>
+  <input id="titre" formControlName="titre" required>
+
+  <label for="description">Description :</label>
+  <textarea id="description" formControlName="description" required></textarea>
+
+  <label for="equipe">Équipe (IDs séparés par des virgules) :</label>
+  <input id="equipe" formControlName="equipe" required placeholder="ex: 664b1f8b...,664b1f8c...">
+
+  <label for="tuteur">Tuteur (ID) :</label>
+  <input id="tuteur" formControlName="tuteur" required>
+
+  <label for="competences">Compétences (séparées par des virgules) :</label>
+  <input id="competences" formControlName="competences" required placeholder="ex: Node.js,Express">
+
+  <label for="dateDebut">Date de début :</label>
+  <input type="date" id="dateDebut" formControlName="dateDebut" required>
+
+  <label for="dateFin">Date de fin :</label>
+  <input type="date" id="dateFin" formControlName="dateFin" required>
+
+  <label for="statut">Statut :</label>
+  <select id="statut" formControlName="statut" required>
+    <option *ngFor="let statut of statutsProjet" [value]="statut">{{statut}}</option>
+  </select>
+
+  <button type="submit" [disabled]="!projetForm.valid">Enregistrer</button>
+</form>

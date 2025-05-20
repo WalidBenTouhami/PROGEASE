@@ -5,9 +5,3 @@ import './polyfills';
 
 // Initialisation de l'application
 bootstrapApplication(AppComponent, appConfig);
-
-
-
-
-
-

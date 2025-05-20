@@ -1,5 +1,3 @@
-//src/app/project/project-detail/project-detail.component.spec.ts
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProjectDetailComponent } from './project-detail.component';
@@ -12,7 +10,7 @@ describe('ProjectDetailComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ProjectDetailComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProjectDetailComponent);
     component = fixture.componentInstance;

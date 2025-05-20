@@ -1,5 +1,3 @@
-//src/app/deliverable/deliverable-form/deliverable-form.component.spec.ts
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { DeliverableFormComponent } from './deliverable-form.component';
@@ -12,7 +10,7 @@ describe('DeliverableFormComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DeliverableFormComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DeliverableFormComponent);
     component = fixture.componentInstance;

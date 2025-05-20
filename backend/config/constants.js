@@ -1,6 +1,6 @@
 require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
 
-const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "OPENAI_API_KEY"];
+const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
 REQUIRED_ENV_VARS.forEach((envVar) => {
     if (!process.env[envVar]) {
         throw new Error(`La variable d'environnement ${envVar} est manquante.`);
@@ -83,7 +83,7 @@ module.exports = {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT || 3000,
     JWT_SECRET: process.env.JWT_SECRET,
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
     Enums,
     ConfigSecurite,
     PaginationDefaut,

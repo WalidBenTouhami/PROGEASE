@@ -1,5 +1,3 @@
-//src/app/project/project-list/project-list.component.spec.ts
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProjectListComponent } from './project-list.component';
@@ -12,7 +10,7 @@ describe('ProjectListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ProjectListComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProjectListComponent);
     component = fixture.componentInstance;

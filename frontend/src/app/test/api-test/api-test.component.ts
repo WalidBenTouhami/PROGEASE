@@ -1,4 +1,3 @@
-// src/app/test/api-test/api-test.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ApiTesterService } from '../../core/services/api-tester.service';

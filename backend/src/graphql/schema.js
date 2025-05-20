@@ -1,127 +1,92 @@
-// src/schema.js
-
 const { gql } = require('apollo-server-express');
-const { Enums } = require('../../config/constants'); // Importation des énumérations depuis constants.js
 
-// Dynamically generate the enum values from constants
-const userRoleEnumValues = Object.keys(Enums.UserRole).join("\n");
-const projectStatusEnumValues = Object.keys(Enums.ProjectStatus).join("\n");
-const deliverableStatusEnumValues = Object.keys(Enums.DeliverableStatus).join("\n");
-
-// Define the GraphQL schema
 const typeDefs = gql`
-    # 📌 Enumération UserRole
-    enum UserRole {
-    ${userRoleEnumValues}
-    },
-
-    # 📌 Enumérations ProjectStatus et DeliverableStatus
-    enum ProjectStatus {
-    ${projectStatusEnumValues}
-    },
-
-    enum DeliverableStatus {
-    ${deliverableStatusEnumValues}
-    },
-
-    # 📌 Type utilisateur
-    type User {
-        _id: ID!
-        name: String!
-        email: String!
-        role: UserRole! # Utilise l'énumération UserRole
-        createdAt: String
-        updatedAt: String
+    # 📌 Enumération StatutLivrable
+    enum StatutLivrable {
+        EN_RETARD
+        EN_ATTENTE
+        TERMINE
     }
 
     # 📌 Type livrable
     type Deliverable {
-        name: String!
+        _id: ID!
+        nom: String!
         description: String!
-        deadline: String!
-        repositoryUrl: String!
-        status: DeliverableStatus! # Utilise l'énumération DeliverableStatus
+        dateLimite: String!
+        urlDepot: String!
+        statut: StatutLivrable!
+        projetId: ID!
+        creeLe: String
+        majLe: String
     }
 
-    # 📌 Type évaluation
-    type Evaluation {
-        _id: ID!
-        projectId: Project! # Référence au projet
-        evaluatorId: User! # Référence à l'évaluateur
-        score: Int!
-        comments: String
-        createdAt: String
-        updatedAt: String
+    # 📌 Type d'entrée pour livrable (corrige l'erreur !)
+    input DeliverableInput {
+        nom: String!
+        description: String!
+        dateLimite: String!
+        urlDepot: String!
+        statut: StatutLivrable
     }
 
     # 📌 Type projet
-    type Project {
+    type Projet {
         _id: ID!
         titre: String!
-        description: String
-        equipe: [User!]!
-        tuteur: User!
-        skills: [String!]!
-        startDate: String!
-        endDate: String!
-        deliverables: [Deliverable!]! # Liste des livrables
-        evaluations: [Evaluation!]! # Liste des évaluations
-        progression: Float
-        predictedPerformance: Float
-        status: ProjectStatus! # Utilise l'énumération ProjectStatus
-        createdAt: String
-        updatedAt: String
+        description: String!
+        equipe: [ID!]!
+        tuteur: ID
+        competences: [String!]!
+        dateDebut: String!
+        dateFin: String!
+        livrables: [Deliverable!]!
+        statut: String!
+        progression: Int
+        creeLe: String
+        majLe: String
     }
 
-    # 📌 Requêtes disponibles
+    # 📌 Type Query
     type Query {
-        projects: [Project!]!
-        project(id: ID!): Project
-        users: [User!]!
-        user(id: ID!): User
-        getProjectProgress(id: ID!): Float
-        getPredictedPerformance(id: ID!): Float
-        getSmartTutor(id: ID!): User
+        projets: [Projet!]!
+        projet(id: ID!): Projet
+        livrables(projetId: ID!): [Deliverable!]!
+        livrable(id: ID!): Deliverable
     }
 
-    # 📌 Mutations disponibles
+    # 📌 Type Mutation
     type Mutation {
-        createProject(
+        creerProjet(
             titre: String!
-            description: String
+            description: String!
             equipe: [ID!]!
-            tuteur: ID!
-            skills: [String!]!
-            startDate: String!
-            endDate: String!
-            deliverables: [DeliverableInput!]! # Entrée pour les livrables
-            status: ProjectStatus! # Utilise l'énumération ProjectStatus
-        ): Project
+            tuteur: ID
+            competences: [String!]!
+            dateDebut: String!
+            dateFin: String!
+            statut: String
+        ): Projet
 
-        addEvaluation(
-            projectId: ID! # Référence au projet
-            evaluation: EvaluationInput! # Entrée pour l'évaluation
-        ): Project
+        mettreAJourProjet(
+            id: ID!
+            titre: String
+            description: String
+            equipe: [ID!]
+            tuteur: ID
+            competences: [String!]
+            dateDebut: String
+            dateFin: String
+            statut: String
+        ): Projet
 
-        predictPerformance(projectId: ID!): Float
-        assignSmartTutor(projectId: ID!): Project
-        setupReminders(projectId: ID!): String
-    }
+        supprimerProjet(id: ID!): Projet
 
-    # 📌 Entrée pour les livrables
-    input DeliverableInput {
-        name: String!
-        deadline: String!
-        status: DeliverableStatus! # Utilise l'énumération DeliverableStatus
-        repositoryUrl: String!
-    }
+        ajouterLivrable(projetId: ID!, input: DeliverableInput!): Deliverable
 
-    # 📌 Entrée pour les évaluations
-    input EvaluationInput {
-        projectId: ID! # Référence au projet
-        evaluatorId: ID! # Référence à l'évaluateur
-        score: Int!
-        comments: String
+        mettreAJourLivrable(livrableId: ID!, input: DeliverableInput!): Deliverable
+
+        supprimerLivrable(livrableId: ID!): Deliverable
     }
 `;
 

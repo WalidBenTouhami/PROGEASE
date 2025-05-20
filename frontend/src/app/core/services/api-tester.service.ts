@@ -1,4 +1,3 @@
-// src/app/core/services/api-tester.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -26,7 +25,7 @@ export class ApiTesterService {
     return this.apollo.query({
       query: gql`
         query {
-          projects {
+          projets {
             _id
             titre
             description
@@ -36,8 +35,8 @@ export class ApiTesterService {
     });
   }
 
-  // Test AI service
+  // Test AI service - correction du nom de la route
   testAIService(prompt: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/ai/generate-text`, { prompt });
+    return this.http.post(`${this.apiUrl}/ai/generer-texte`, { prompt });
   }
 }

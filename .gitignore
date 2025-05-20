@@ -1,7 +1,10 @@
 # Default ignored files
 node_modules/
 shelf/
-workspace.xml
+
+# IntelliJ IDEA files
+.idea/
+.idea/workspace.xml
 
 # Editor-based HTTP Client requests
 httpRequests/
@@ -10,13 +13,11 @@ httpRequests/
 dataSources/
 dataSources.local.xml
 
-# IntelliJ IDEA files
-.idea
-
 # Environment variables
 .env
 
 # Task management files
 todo
 
-
+# Ignorer tous les répertoires node_modules
+**/node_modules/

@@ -10,7 +10,7 @@ describe('ProjectManagementComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ProjectManagementComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ProjectManagementComponent);
     component = fixture.componentInstance;

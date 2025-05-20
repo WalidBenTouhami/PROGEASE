@@ -10,7 +10,7 @@ describe('DeliverableListComponent', () => {
     await TestBed.configureTestingModule({
       imports: [DeliverableListComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(DeliverableListComponent);
     component = fixture.componentInstance;

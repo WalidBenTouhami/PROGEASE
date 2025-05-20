@@ -1,7 +1,4 @@
-//src/app/deliverable/deliverable-detail/deliverable-detail.component.spec.ts
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { DeliverableDetailComponent } from './deliverable-detail.component';
 
 describe('DeliverableDetailComponent', () => {
@@ -11,15 +8,14 @@ describe('DeliverableDetailComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [DeliverableDetailComponent]
-    })
-    .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(DeliverableDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('devrait être créé', () => {
     expect(component).toBeTruthy();
   });
 });

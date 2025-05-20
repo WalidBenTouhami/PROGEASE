@@ -1,6 +1,6 @@
+// src/graphql/resolvers.js
 const Projet = require('../models/project.model');
 const Livrable = require('../models/deliverable.model');
-// const Utilisateur = require('../models/user.model'); // À créer si besoin
 
 function mapProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
@@ -48,7 +48,11 @@ const resolvers = {
         livrables: async (_, { projetId }) => {
             const livrables = await Livrable.find({ projetId });
             return livrables.map(mapLivrableMongoVersGraphQL);
-        }
+        },
+        livrable: async (_, { id }) => {
+            const livrable = await Livrable.findById(id);
+            return mapLivrableMongoVersGraphQL(livrable);
+        },
     },
     Mutation: {
         creerProjet: async (_, args) => {
@@ -77,7 +81,7 @@ const resolvers = {
         supprimerLivrable: async (_, { livrableId }) => {
             const supprime = await Livrable.findByIdAndDelete(livrableId);
             return mapLivrableMongoVersGraphQL(supprime);
-        }
+        },
     },
     Projet: {
         progression: (projet) => {
@@ -90,8 +94,8 @@ const resolvers = {
             const total = fin - debut;
             const ecoule = maintenant - debut;
             return Math.round((ecoule / total) * 100);
-        }
-    }
+        },
+    },
 };
 
-module.exports = { resolvers };
+module.exports = resolvers;

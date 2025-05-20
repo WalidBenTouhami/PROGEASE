@@ -1,76 +1,94 @@
 // src/controllers/deliverable.controller.js
-
-const Livrable = require('../models/deliverable.model');
 const Projet = require('../models/project.model');
+const Livrable = require('../models/deliverable.model');
 
-// Ajouter un livrable
+// Mapping pour conversion MongoDB -> GraphQL, labels FR
+function mapProjetMongoVersGraphQL(doc) {
+    if (!doc) return null;
+    return {
+        _id: doc._id,
+        titre: doc.titre,
+        description: doc.description,
+        equipe: doc.equipe,
+        tuteur: doc.tuteur,
+        competences: doc.competences,
+        dateDebut: doc.dateDebut,
+        dateFin: doc.dateFin,
+        livrables: doc.livrables,
+        statut: doc.statut,
+        creeLe: doc.creeLe,
+        majLe: doc.majLe,
+    };
+}
+
+function mapLivrableMongoVersGraphQL(doc) {
+    if (!doc) return null;
+    return {
+        _id: doc._id,
+        nom: doc.nom,
+        description: doc.description,
+        dateLimite: doc.dateLimite,
+        urlDepot: doc.urlDepot,
+        statut: doc.statut,
+        projetId: doc.projetId,
+        creeLe: doc.creeLe,
+        majLe: doc.majLe,
+    };
+}
+
 exports.ajouterLivrable = async (req, res) => {
     try {
-        const { projetId, nom, description, dateLimite, urlDepot } = req.body;
+        const { projetId, ...data } = req.body;
         const projet = await Projet.findById(projetId);
         if (!projet) {
-            return res.status(404).json({ error: 'Projet introuvable.' });
+            return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
-        const livrable = new Livrable({
-            projetId,
-            nom,
-            description,
-            dateLimite,
-            urlDepot,
-        });
-        const livrableEnregistre = await livrable.save();
-        res.status(201).json(livrableEnregistre);
+        const livrable = new Livrable({ ...data, projetId });
+        const saved = await livrable.save();
+        projet.livrables.push(saved._id);
+        await projet.save();
+        res.status(201).json(mapLivrableMongoVersGraphQL(saved));
     } catch (error) {
-        console.error('Erreur lors de l\'ajout du livrable :', error.message);
-        res.status(500).json({ error: 'Échec de l\'ajout du livrable.' });
+        console.error('Erreur lors de l\'ajout du livrable :', error);
+        res.status(500).json({ erreur: 'Échec de l\'ajout du livrable.' });
     }
 };
 
-// Récupérer tous les livrables d'un projet
 exports.recupererLivrables = async (req, res) => {
     try {
         const { projetId } = req.params;
         const livrables = await Livrable.find({ projetId });
-        if (!livrables.length) {
-            return res.status(404).json({ error: 'Aucun livrable trouvé pour ce projet.' });
-        }
-        res.status(200).json(livrables);
+        res.status(200).json(livrables.map(mapLivrableMongoVersGraphQL));
     } catch (error) {
-        console.error('Erreur lors de la récupération des livrables :', error.message);
-        res.status(500).json({ error: 'Échec de la récupération des livrables.' });
+        console.error('Erreur lors de la récupération des livrables :', error);
+        res.status(500).json({ erreur: 'Échec de la récupération des livrables.' });
     }
 };
 
-// Mettre à jour un livrable
 exports.mettreAJourLivrable = async (req, res) => {
     try {
         const { livrableId } = req.params;
-        const livrableMisAJour = await Livrable.findByIdAndUpdate(
-            livrableId,
-            req.body,
-            { new: true, runValidators: true }
-        );
-        if (!livrableMisAJour) {
-            return res.status(404).json({ error: 'Livrable introuvable.' });
+        const updated = await Livrable.findByIdAndUpdate(livrableId, req.body, { new: true, runValidators: true });
+        if (!updated) {
+            return res.status(404).json({ erreur: 'Livrable introuvable.' });
         }
-        res.status(200).json(livrableMisAJour);
+        res.status(200).json(mapLivrableMongoVersGraphQL(updated));
     } catch (error) {
-        console.error('Erreur lors de la mise à jour du livrable :', error.message);
-        res.status(500).json({ error: 'Échec de la mise à jour du livrable.' });
+        console.error('Erreur lors de la mise à jour du livrable :', error);
+        res.status(500).json({ erreur: 'Échec de la mise à jour du livrable.' });
     }
 };
 
-// Supprimer un livrable
 exports.supprimerLivrable = async (req, res) => {
     try {
         const { livrableId } = req.params;
-        const livrableSupprime = await Livrable.findByIdAndDelete(livrableId);
-        if (!livrableSupprime) {
-            return res.status(404).json({ error: 'Livrable introuvable.' });
+        const deleted = await Livrable.findByIdAndDelete(livrableId);
+        if (!deleted) {
+            return res.status(404).json({ erreur: 'Livrable introuvable.' });
         }
         res.status(204).send();
     } catch (error) {
-        console.error('Erreur lors de la suppression du livrable :', error.message);
-        res.status(500).json({ error: 'Échec de la suppression du livrable.' });
+        console.error('Erreur lors de la suppression du livrable :', error);
+        res.status(500).json({ erreur: 'Échec de la suppression du livrable.' });
     }
 };

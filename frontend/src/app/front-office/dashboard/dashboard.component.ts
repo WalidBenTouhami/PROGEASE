@@ -7,15 +7,19 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
-  styleUrl: './dashboard.component.css'
+  styleUrls: ['./dashboard.component.css'] // Correction: styleUrls (array) et non styleUrl (string)
 })
 export class DashboardComponent {
-  users = [{ name: 'Jean', role: 'Administrateur' }];
+  projects = [];
+  notifications = [];
+  deliverables = [];
+  users = [{ nom: 'Jean', role: 'Administrateur' }]; // Utiliser 'nom' pour cohérence FR
   roles = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projectTemplates = [{ name: 'Template 1' }, { name: 'Template 2' }];
-  stats = { activeProjects: 5, riskGroups: 2, avgTutorPerf: 8.5 };
+  projectTemplates = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }]; // Utiliser 'nom'
+  stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 }; // FR
   tutorPerformance = [];
-  aiConfig = { teamAlgo: '', riskThreshold: 50, enableRecs: true };
+  aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
+
   openUserForm() {}
   updateRole(user: any) {}
   editUser(user: any) {}

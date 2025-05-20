@@ -1,6 +1,6 @@
 <h2>Tableau de bord (Back Office)</h2>
 
-<button (click)="openUserForm()">Créer un utilisateur</button>
+<button type="button" (click)="openUserForm()">Créer un utilisateur</button>
 
 <table>
   <thead>
@@ -12,56 +12,58 @@
   </thead>
   <tbody>
   <tr *ngFor="let user of users">
-    <td>{{ user.name }}</td>
+    <td>{{ user.nom }}</td>
     <td>
       <select [(ngModel)]="user.role" (change)="updateRole(user)">
         <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
       </select>
     </td>
     <td>
-      <button (click)="editUser(user)">✏️</button>
-      <button (click)="deleteUser(user)">🗑️</button>
+      <button type="button" (click)="editUser(user)" title="Éditer"><span aria-hidden="true">✏️</span></button>
+      <button type="button" (click)="deleteUser(user)" title="Supprimer"><span aria-hidden="true">🗑️</span></button>
     </td>
   </tr>
   </tbody>
 </table>
 
-<button (click)="exportUsers()">Exporter</button>
-<button (click)="importUsers()">Importer</button>
+<div class="user-actions">
+  <button type="button" (click)="exportUsers()">Exporter</button>
+  <button type="button" (click)="importUsers()">Importer</button>
+</div>
 
 <h3>Modèles de projet</h3>
-<button (click)="createTemplate()">Nouveau modèle</button>
+<button type="button" (click)="createTemplate()">Nouveau modèle</button>
 <ul>
   <li *ngFor="let template of projectTemplates">
-    {{ template.name }}
-    <button (click)="editTemplate(template)">Éditer</button>
+    {{ template.nom }}
+    <button type="button" (click)="editTemplate(template)">Éditer</button>
   </li>
 </ul>
 
 <h3>Statistiques</h3>
 <ul>
-  <li><strong>Projets en cours :</strong> {{ stats.activeProjects }}</li>
-  <li><strong>Groupes à risque :</strong> {{ stats.riskGroups }}</li>
-  <li><strong>Moyenne perf. tuteurs :</strong> {{ stats.avgTutorPerf }}</li>
+  <li><strong>Projets en cours :</strong> {{ stats.projetsActifs }}</li>
+  <li><strong>Groupes à risque :</strong> {{ stats.groupesRisque }}</li>
+  <li><strong>Moyenne perf. tuteurs :</strong> {{ stats.performanceMoyTuteur }}</li>
 </ul>
 
 <!-- <app-performance-chart [data]="tutorPerformance"></app-performance-chart> -->
 
 <h3>Configuration IA</h3>
-<form (ngSubmit)="updateAICfg()">
+<form (ngSubmit)="updateAICfg()" autocomplete="off">
   <label>
     Algorithme d’équipe :
-    <select [(ngModel)]="aiConfig.teamAlgo" name="teamAlgo">
+    <select [(ngModel)]="aiConfig.algoEquipe" name="algoEquipe">
       <option value="algo1">Algorithme 1</option>
       <option value="algo2">Algorithme 2</option>
     </select>
   </label>
   <label>
     Seuil de risque :
-    <input type="number" [(ngModel)]="aiConfig.riskThreshold" name="riskThreshold" min="0" max="100"/>
+    <input type="number" [(ngModel)]="aiConfig.seuilRisque" name="seuilRisque" min="0" max="100"/>
   </label>
   <label>
-    <input type="checkbox" [(ngModel)]="aiConfig.enableRecs" name="enableRecs"/> Recommandations activées
+    <input type="checkbox" [(ngModel)]="aiConfig.activerRecommandations" name="activerRecommandations"/> Recommandations activées
   </label>
   <button type="submit">Enregistrer</button>
 </form>

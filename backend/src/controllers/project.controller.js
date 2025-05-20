@@ -1,5 +1,4 @@
-// scr/controllers/project.controller.js
-
+// src/controllers/project.controller.js
 const Projet = require('../models/project.model');
 
 // Création d'un nouveau projet
@@ -10,7 +9,7 @@ exports.creerProjet = async (req, res) => {
         res.status(201).json(projetEnregistre);
     } catch (error) {
         console.error('Erreur lors de la création du projet :', error);
-        res.status(500).json({ error: 'Échec de la création du projet.' });
+        res.status(500).json({ erreur: 'Échec de la création du projet.' });
     }
 };
 
@@ -21,7 +20,7 @@ exports.recupererProjets = async (req, res) => {
         res.status(200).json(projets);
     } catch (error) {
         console.error('Erreur lors de la récupération des projets :', error);
-        res.status(500).json({ error: 'Échec de la récupération des projets.' });
+        res.status(500).json({ erreur: 'Échec de la récupération des projets.' });
     }
 };
 
@@ -30,12 +29,12 @@ exports.recupererProjetParId = async (req, res) => {
     try {
         const projet = await Projet.findById(req.params.id);
         if (!projet) {
-            return res.status(404).json({ error: 'Projet introuvable.' });
+            return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
         res.status(200).json(projet);
     } catch (error) {
         console.error('Erreur lors de la récupération du projet :', error);
-        res.status(500).json({ error: 'Échec de la récupération du projet.' });
+        res.status(500).json({ erreur: 'Échec de la récupération du projet.' });
     }
 };
 
@@ -48,12 +47,12 @@ exports.mettreAJourProjet = async (req, res) => {
             { new: true, runValidators: true }
         );
         if (!projetMisAJour) {
-            return res.status(404).json({ error: 'Projet introuvable.' });
+            return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
         res.status(200).json(projetMisAJour);
     } catch (error) {
         console.error('Erreur lors de la mise à jour du projet :', error);
-        res.status(500).json({ error: 'Échec de la mise à jour du projet.' });
+        res.status(500).json({ erreur: 'Échec de la mise à jour du projet.' });
     }
 };
 
@@ -62,11 +61,11 @@ exports.supprimerProjet = async (req, res) => {
     try {
         const projetSupprime = await Projet.findByIdAndDelete(req.params.id);
         if (!projetSupprime) {
-            return res.status(404).json({ error: 'Projet introuvable.' });
+            return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
         res.status(204).send();
     } catch (error) {
         console.error('Erreur lors de la suppression du projet :', error);
-        res.status(500).json({ error: 'Échec de la suppression du projet.' });
+        res.status(500).json({ erreur: 'Échec de la suppression du projet.' });
     }
 };

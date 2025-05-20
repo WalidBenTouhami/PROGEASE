@@ -1,4 +1,4 @@
-const { checkGithubRepoExists } = require('./src/services/github.service'); // Assurez-vous que le chemin est correct
+const { verifierDepotGithubExiste } = require('./src/services/github.service');
 
 (async () => {
     try {
@@ -20,3 +20,5 @@ const { checkGithubRepoExists } = require('./src/services/github.service'); // A
         console.error('Une erreur est survenue :', error.message);
     }
 })();
+
+
