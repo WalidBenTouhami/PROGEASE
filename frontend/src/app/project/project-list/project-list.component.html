@@ -1,26 +1,28 @@
 <div *ngIf="chargement">Chargement...</div>
-<div *ngIf="erreur" class="erreur">{{erreur}}</div>
+<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
 
-<table *ngIf="projets.length > 0">
+<table *ngIf="projets.length">
   <thead>
   <tr>
     <th>Titre</th>
     <th>Description</th>
     <th>Statut</th>
-    <th>Progression</th>
+    <th>Date de début</th>
+    <th>Date de fin</th>
     <th>Actions</th>
   </tr>
   </thead>
   <tbody>
   <tr *ngFor="let projet of projets">
-    <td>{{projet.titre}}</td>
-    <td>{{projet.description}}</td>
-    <td>{{projet.statut}}</td>
-    <td>{{projet.progression || 0}} %</td>
+    <td>{{ projet.titre }}</td>
+    <td>{{ projet.description }}</td>
+    <td>{{ projet.statut }}</td>
+    <td>{{ projet.dateDebut | date:'dd/MM/yyyy' }}</td>
+    <td>{{ projet.dateFin | date:'dd/MM/yyyy' }}</td>
     <td>
-      <button type="button" (click)="voirDetails(projet._id)">Détails</button>
+      <button type="button" (click)="voirDetails(projet._id)">Voir</button>
     </td>
   </tr>
   </tbody>
 </table>
-<div *ngIf="projets.length === 0 && !chargement">Aucun projet trouvé.</div>
+<div *ngIf="!projets.length && !chargement">Aucun projet trouvé.</div>

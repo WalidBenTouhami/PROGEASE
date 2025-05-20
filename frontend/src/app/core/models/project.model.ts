@@ -3,7 +3,7 @@ import { Deliverable } from './deliverable.model';
 export type StatutProjet = 'Brouillon' | 'En cours' | 'Terminé' | 'Archivé';
 
 export interface Project {
-  _id?: string;
+  _id: string;
   titre: string;
   description: string;
   equipe: string[];
