@@ -1,6 +1,5 @@
 <section class="dashboard-container" aria-labelledby="dashboard-title">
   <h2 id="dashboard-title" class="title">Tableau de bord étudiant</h2>
-
   <div class="stats-grid" role="list" aria-label="Statistiques principales">
     <div class="stat-card" role="listitem">
       <h3>Projets en cours</h3>
@@ -15,14 +14,11 @@
       <span class="stat-value">{{ feedbackCount }}</span>
     </div>
   </div>
-
   <section aria-labelledby="recent-title">
     <h3 id="recent-title">Projets récents</h3>
     <ul>
       <li *ngFor="let project of recentProjects">
-        <a [routerLink]="['/project', project.id]">
-          {{ project.name }}
-        </a>
+        <a [routerLink]="['/project', project.id]">{{ project.name }}</a>
         <span class="sr-only">, projet récent</span>
       </li>
     </ul>

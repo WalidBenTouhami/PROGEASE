@@ -1,10 +1,8 @@
+<a href="#main-content" class="skip-link">Aller au contenu principal</a>
 <div class="app-container">
-  <!-- Skip link tout en haut -->
-  <a href="#main-content" class="skip-link">Aller au contenu principal</a>
-
   <header class="app-header">
     <div class="logo-container">
-      <img src="../../assets/PROGEASE.png" alt="Logo PROGEASE" height="45" loading="lazy">
+      <img ngSrc="../../assets/PROGEASE.png" alt="Logo PROGEASE" width="150" height="45" priority>
       <h1>{{ titre }}</h1>
     </div>
     <nav class="main-nav" aria-label="Navigation principale">
@@ -24,11 +22,9 @@
       </ul>
     </nav>
   </header>
-
   <main id="main-content" class="app-content" tabindex="-1">
     <router-outlet></router-outlet>
   </main>
-
   <footer class="app-footer">
     <p>&copy; 2025 PROGEASE – Plateforme de Gestion de Projets Académiques</p>
   </footer>

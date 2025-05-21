@@ -62,7 +62,7 @@ run();
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-const routes: Routes = [
+export const routes: Routes = [
   { path: 'back-office', loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule) },
   { path: 'front-office', loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule) },
   { path: 'deliverable', loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule) },
@@ -80,129 +80,87 @@ export class AppRoutingModule {}
 
 // ======= Contenu de src/app/app.component.css =======
 
-:root {
-  --primary-color: #146D78;
-  --primary-light: #1D8A99;
-  --primary-dark: #0B4D57;
-  --accent-color: #17B5B5;
-  --background-light: #f7fbfc;
-  --background-medium: #e4f0f2;
-  --background-dark: #cfe0e6;
-}
-
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--background-light);
 }
-
 .app-header {
-  background-color: var(--primary-color);
+  background: var(--primary-color);
   color: #fff;
-  padding: 0.8rem 2rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+  padding: 1rem 0;
+  box-shadow: 0 2px 8px #0001;
 }
-
 .logo-container {
   display: flex;
   align-items: center;
   gap: 1rem;
+  margin-left: 2rem;
 }
-
 .logo-container h1 {
-  font-size: 1.6rem;
-  font-weight: 500;
-  letter-spacing: -0.02em;
+  font-size: 1.5rem;
+  margin: 0;
 }
-
-.main-nav {
+.main-nav ul {
   display: flex;
-  gap: 1.5rem;
-  align-items: center;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0 2rem;
 }
-
 .main-nav a {
-  color: white;
-  text-decoration: none;
-  font-size: 1rem;
-  font-weight: 500;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  transition: background 0.2s, color 0.2s;
-  outline: none;
-}
-
-.main-nav a:focus {
-  box-shadow: 0 0 0 2px var(--accent-color);
-}
-
-.main-nav a:hover,
-.main-nav a.active {
-  background-color: var(--accent-color);
   color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
 }
-
+.main-nav a.active,
+.main-nav a:focus {
+  text-decoration: underline;
+  color: var(--accent-color);
+}
 .app-content {
   flex: 1;
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
+  padding: 2rem 0;
+  background: var(--background-light);
 }
-
 .app-footer {
-  background-color: var(--primary-dark);
+  background: var(--primary-dark);
   color: #fff;
   text-align: center;
   padding: 1rem;
-  font-size: 0.85rem;
-}
-
-@media (max-width: 768px) {
-  .app-header {
-    flex-direction: column;
-    padding: 1rem;
-    gap: 1rem;
-  }
-  .main-nav {
-    width: 100%;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .main-nav a {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-  }
-  .app-content {
-    padding: 1rem;
-  }
 }
 
 
 // ======= Contenu de src/app/app.component.html =======
 
+<a href="#main-content" class="skip-link">Aller au contenu principal</a>
 <div class="app-container">
   <header class="app-header">
     <div class="logo-container">
-      <img src="assets/PROGEASE.png" alt="PROGEASE logo" height="45" loading="lazy">
+      <img ngSrc="../../assets/PROGEASE.png" alt="Logo PROGEASE" width="150" height="45" priority>
       <h1>{{ titre }}</h1>
     </div>
     <nav class="main-nav" aria-label="Navigation principale">
-      <a routerLink="/front-office" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Accueil</a>
-      <a routerLink="/project" routerLinkActive="active">Projets</a>
-      <a routerLink="/deliverable" routerLinkActive="active">Livrables</a>
-      <a routerLink="/back-office" routerLinkActive="active">Back office</a>
+      <ul>
+        <li>
+          <a routerLink="/front-office" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" aria-current="page">Accueil</a>
+        </li>
+        <li>
+          <a routerLink="/project" routerLinkActive="active">Projets</a>
+        </li>
+        <li>
+          <a routerLink="/deliverable" routerLinkActive="active">Livrables</a>
+        </li>
+        <li>
+          <a routerLink="/back-office" routerLinkActive="active">Back office</a>
+        </li>
+      </ul>
     </nav>
   </header>
-
-  <main class="app-content" tabindex="-1">
+  <main id="main-content" class="app-content" tabindex="-1">
     <router-outlet></router-outlet>
   </main>
-
   <footer class="app-footer">
     <p>&copy; 2025 PROGEASE – Plateforme de Gestion de Projets Académiques</p>
   </footer>
@@ -294,28 +252,20 @@ export const appConfig: ApplicationConfig = {
 
 // ======= Contenu de src/app/app.module.ts =======
 
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app.component';
-import { AppRoutingModule } from './app-routing.module';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
+import { routes } from './app-routing.module';
 import { apolloProviders } from './core/apollo.config';
 
-@NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    HttpClientModule,
-    AppRoutingModule
-  ],
-  providers: [
-    ...apolloProviders
-  ],
-  bootstrap: [AppComponent]
-})
-export class AppModule {}
+    bootstrapApplication(AppComponent, {
+      providers: [
+        provideHttpClient(),
+        provideRouter(routes),
+        ...apolloProviders,
+      ],
+    }).catch(err => console.error(err));
 
 
 // ======= Contenu de src/app/app.routes.ts =======
@@ -437,75 +387,34 @@ button:hover { background: #174bb3; }
 
 // ======= Contenu de src/app/back-office/dashboard/dashboard.component.html =======
 
-<h2>Tableau de bord (Back Office)</h2>
+<section class="dashboard-container" aria-labelledby="backoffice-dashboard-title">
+  <h2 id="backoffice-dashboard-title" class="title">Tableau de bord enseignant</h2>
 
-<button type="button" (click)="openUserForm()">Créer un utilisateur</button>
+  <div class="stats-grid" role="list" aria-label="Statistiques de gestion">
+    <div class="stat-card" role="listitem">
+      <h3>Projets à valider</h3>
+      <span class="stat-value">{{ toValidateProjects }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Livrables à corriger</h3>
+      <span class="stat-value">{{ toCheckDeliverables }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Étudiants inscrits</h3>
+      <span class="stat-value">{{ studentCount }}</span>
+    </div>
+  </div>
 
-<table>
-  <thead>
-  <tr>
-    <th>Nom</th>
-    <th>Rôle</th>
-    <th>Actions</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let user of users">
-    <td>{{ user.nom }}</td>
-    <td>
-      <select [(ngModel)]="user.role" (change)="updateRole(user)">
-        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
-      </select>
-    </td>
-    <td>
-      <button type="button" (click)="editUser(user)" title="Éditer"><span aria-hidden="true">✏️</span></button>
-      <button type="button" (click)="deleteUser(user)" title="Supprimer"><span aria-hidden="true">🗑️</span></button>
-    </td>
-  </tr>
-  </tbody>
-</table>
-
-<div class="user-actions">
-  <button type="button" (click)="exportUsers()">Exporter</button>
-  <button type="button" (click)="importUsers()">Importer</button>
-</div>
-
-<h3>Modèles de projet</h3>
-<button type="button" (click)="createTemplate()">Nouveau modèle</button>
-<ul>
-  <li *ngFor="let template of projectTemplates">
-    {{ template.nom }}
-    <button type="button" (click)="editTemplate(template)">Éditer</button>
-  </li>
-</ul>
-
-<h3>Statistiques</h3>
-<ul>
-  <li><strong>Projets en cours :</strong> {{ stats.projetsActifs }}</li>
-  <li><strong>Groupes à risque :</strong> {{ stats.groupesRisque }}</li>
-  <li><strong>Moyenne perf. tuteurs :</strong> {{ stats.performanceMoyTuteur }}</li>
-</ul>
-
-<!-- <app-performance-chart [data]="tutorPerformance"></app-performance-chart> -->
-
-<h3>Configuration IA</h3>
-<form (ngSubmit)="updateAICfg()" autocomplete="off">
-  <label>
-    Algorithme d’équipe :
-    <select [(ngModel)]="aiConfig.algoEquipe" name="algoEquipe">
-      <option value="algo1">Algorithme 1</option>
-      <option value="algo2">Algorithme 2</option>
-    </select>
-  </label>
-  <label>
-    Seuil de risque :
-    <input type="number" [(ngModel)]="aiConfig.seuilRisque" name="seuilRisque" min="0" max="100"/>
-  </label>
-  <label>
-    <input type="checkbox" [(ngModel)]="aiConfig.activerRecommandations" name="activerRecommandations"/> Recommandations activées
-  </label>
-  <button type="submit">Enregistrer</button>
-</form>
+  <section aria-labelledby="recent-admin-title">
+    <h3 id="recent-admin-title">Dernières actions</h3>
+    <ul>
+      <li *ngFor="let action of recentActions">
+        {{ action.description }}
+        <time [attr.datetime]="action.date">{{ action.date | date:'shortDate' }}</time>
+      </li>
+    </ul>
+  </section>
+</section>
 
 
 // ======= Contenu de src/app/back-office/dashboard/dashboard.component.spec.ts =======
@@ -767,7 +676,7 @@ import { Deliverable } from './deliverable.model';
 export type StatutProjet = 'Brouillon' | 'En cours' | 'Terminé' | 'Archivé';
 
 export interface Project {
-  _id?: string;
+  _id: string;
   titre: string;
   description: string;
   equipe: string[];
@@ -795,8 +704,10 @@ export const ProjectStatuses = {
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Apollo, gql } from 'apollo-angular';
+import { AlertService } from './atert.service';
 
 @Injectable({
   providedIn: 'root'
@@ -806,12 +717,15 @@ export class ApiTesterService {
 
   constructor(
     private http: HttpClient,
-    private apollo: Apollo
+    private apollo: Apollo,
+    private alertService: AlertService
   ) {}
 
   // Test REST API
   testRestConnection(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/projects`);
+    return this.http.get(`${this.apiUrl}/projects`).pipe(
+      catchError((error) => this.handleError(error))
+    );
   }
 
   // Test GraphQL
@@ -826,12 +740,71 @@ export class ApiTesterService {
           }
         }
       `
-    });
+    }).pipe(
+      catchError((error) => this.handleError(error))
+    );
   }
 
-  // Test AI service - correction du nom de la route
+  // Test AI service
   testAIService(prompt: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/ai/generer-texte`, { prompt });
+    return this.http.post(`${this.apiUrl}/ai/generer-texte`, { prompt }).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  // Gestion des erreurs
+  private handleError(error: any): Observable<never> {
+    const errorMessage = 'Erreur lors de la requête API : ' + (error.message || error.statusText);
+    this.alertService.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
+}
+
+
+// ======= Contenu de src/app/core/services/atert.service.ts =======
+
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AlertService {
+  private alertSubject = new BehaviorSubject<string | null>(null);
+  private alertTypeSubject = new BehaviorSubject<'success' | 'error' | 'info' | null>(null);
+
+  // Observable pour le message d'alerte
+  get alert$(): Observable<string | null> {
+    return this.alertSubject.asObservable();
+  }
+
+  // Observable pour le type d'alerte
+  get alertType$(): Observable<'success' | 'error' | 'info' | null> {
+    return this.alertTypeSubject.asObservable();
+  }
+
+  // Affiche une alerte de succès
+  success(message: string): void {
+    this.alertTypeSubject.next('success');
+    this.alertSubject.next(message);
+  }
+
+  // Affiche une alerte d'erreur
+  error(message: string): void {
+    this.alertTypeSubject.next('error');
+    this.alertSubject.next(message);
+  }
+
+  // Affiche une alerte d'information
+  info(message: string): void {
+    this.alertTypeSubject.next('info');
+    this.alertSubject.next(message);
+  }
+
+  // Réinitialise les alertes
+  clear(): void {
+    this.alertTypeSubject.next(null);
+    this.alertSubject.next(null);
   }
 }
 
@@ -1112,7 +1085,6 @@ export class ProjectService {
 
   recupererProjet(id: string): Observable<Project> {
     return this.http.get<Project>(`${this.baseUrl}/${id}`).pipe(
-      retry(1),
       catchError(this.handleError)
     );
   }
@@ -1136,7 +1108,7 @@ export class ProjectService {
     );
   }
 
-  private handleError(error: any) {
+  private handleError(error: any): Observable<never> {
     let message = 'Une erreur est survenue';
 
     if (error.error instanceof ErrorEvent) {
@@ -1146,10 +1118,7 @@ export class ProjectService {
     }
 
     console.error(`[ProjectService] ${message}`);
-    return throwError(() => ({
-      status: error.status,
-      message
-    }));
+    return throwError(() => new Error(message));
   }
 }
 
@@ -1255,25 +1224,90 @@ button[type="submit"]:hover {
 
 // ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.html =======
 
-<form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" autocomplete="off">
-  <label for="nom">Nom :</label>
-  <input id="nom" formControlName="nom" required>
+<form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" autocomplete="off" aria-labelledby="deliverable-form-title">
+  <h2 id="deliverable-form-title">Ajouter un livrable</h2>
 
-  <label for="description">Description :</label>
-  <textarea id="description" formControlName="description" required></textarea>
+  <div class="form-group">
+    <label for="nom">Nom :</label>
+    <input
+      id="nom"
+      formControlName="nom"
+      required
+      aria-required="true"
+    >
+    <div *ngIf="livrableForm.get('nom')?.invalid && livrableForm.get('nom')?.touched" class="error">
+      Le nom est requis.
+    </div>
+  </div>
 
-  <label for="dateLimite">Date limite :</label>
-  <input type="date" id="dateLimite" formControlName="dateLimite" required>
+  <div class="form-group">
+    <label for="description">Description :</label>
+    <textarea
+      id="description"
+      formControlName="description"
+      required
+      aria-required="true"
+    ></textarea>
+    <div *ngIf="livrableForm.get('description')?.invalid && livrableForm.get('description')?.touched" class="error">
+      La description est requise.
+    </div>
+  </div>
 
-  <label for="urlDepot">URL du dépôt :</label>
-  <input id="urlDepot" formControlName="urlDepot" required placeholder="https://github.com/monorg/monrepo">
+  <div class="form-group">
+    <label for="dateLimite">Date limite :</label>
+    <input
+      type="date"
+      id="dateLimite"
+      formControlName="dateLimite"
+      required
+      aria-required="true"
+    >
+    <div *ngIf="livrableForm.get('dateLimite')?.invalid && livrableForm.get('dateLimite')?.touched" class="error">
+      La date limite est requise.
+    </div>
+  </div>
 
-  <label for="statut">Statut :</label>
-  <select id="statut" formControlName="statut" required>
-    <option *ngFor="let statut of statutsLivrable" [value]="statut">{{statut}}</option>
-  </select>
+  <div class="form-group">
+    <label for="urlDepot">URL du dépôt :</label>
+    <input
+      id="urlDepot"
+      formControlName="urlDepot"
+      required
+      placeholder="https://github.com/monorg/monrepo"
+      aria-required="true"
+    >
+    <div *ngIf="livrableForm.get('urlDepot')?.invalid && livrableForm.get('urlDepot')?.touched" class="error">
+      L'URL du dépôt est requise.
+    </div>
+  </div>
 
-  <button type="submit" [disabled]="!livrableForm.valid">Enregistrer</button>
+  <div class="form-group">
+    <label for="statut">Statut :</label>
+    <select
+      id="statut"
+      formControlName="statut"
+      required
+      aria-required="true"
+    >
+      <option *ngFor="let statut of statutsLivrable" [value]="statut">{{ statut }}</option>
+    </select>
+    <div *ngIf="livrableForm.get('statut')?.invalid && livrableForm.get('statut')?.touched" class="error">
+      Le statut est requis.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="file">Fichier :</label>
+    <input
+      type="file"
+      id="file"
+      (change)="onFileSelected($event)"
+      required
+      aria-required="true"
+    >
+  </div>
+
+  <button type="submit" [disabled]="livrableForm.invalid">Enregistrer</button>
 </form>
 
 
@@ -1395,33 +1429,39 @@ a:hover {
 
 // ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.html =======
 
-<h3>Liste des livrables</h3>
-<div *ngIf="chargement">Chargement...</div>
-<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+<h2 id="deliverable-list-title">Liste des livrables</h2>
 
-<table *ngIf="livrables.length">
-  <thead>
-  <tr>
-    <th>Nom</th>
-    <th>Description</th>
-    <th>Date limite</th>
-    <th>Statut</th>
-    <th>URL dépôt</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let livrable of livrables">
-    <td>{{ livrable.nom }}</td>
-    <td>{{ livrable.description }}</td>
-    <td>{{ livrable.dateLimite | date:'dd/MM/yyyy' }}</td>
-    <td>{{ livrable.statut }}</td>
-    <td>
-      <a [href]="livrable.urlDepot" target="_blank" rel="noopener noreferrer">Voir sur GitHub</a>
-    </td>
-  </tr>
-  </tbody>
-</table>
-<div *ngIf="!livrables.length && !chargement">Aucun livrable trouvé.</div>
+  <div *ngIf="chargement" class="loading">Chargement...</div>
+  <div *ngIf="erreur" class="erreur" role="alert">{{ erreur }}</div>
+
+  <div *ngIf="!chargement && livrables?.length; else noDeliverables">
+    <table class="deliverable-table" aria-labelledby="deliverable-list-title">
+      <thead>
+        <tr>
+          <th scope="col">Nom</th>
+          <th scope="col">Description</th>
+          <th scope="col">Date limite</th>
+          <th scope="col">Statut</th>
+          <th scope="col">URL dépôt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let livrable of livrables">
+          <td>{{ livrable.nom }}</td>
+          <td>{{ livrable.description }}</td>
+          <td>{{ livrable.dateLimite | date:'dd/MM/yyyy' }}</td>
+          <td>{{ livrable.statut }}</td>
+          <td>
+            <a [href]="livrable.urlDepot" target="_blank" rel="noopener noreferrer">Voir sur GitHub</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noDeliverables>
+    <p class="no-data">Aucun livrable trouvé.</p>
+  </ng-template>
 
 
 // ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.spec.ts =======
@@ -1544,38 +1584,31 @@ li {
 
 // ======= Contenu de src/app/front-office/dashboard/dashboard.component.html =======
 
-<h2>Tableau de bord (Front Office)</h2>
-
-<section>
-  <h3>Mes Projets</h3>
-  <div *ngIf="projects?.length; else noProjects">
+<section class="dashboard-container" aria-labelledby="dashboard-title">
+  <h2 id="dashboard-title" class="title">Tableau de bord étudiant</h2>
+  <div class="stats-grid" role="list" aria-label="Statistiques principales">
+    <div class="stat-card" role="listitem">
+      <h3>Projets en cours</h3>
+      <span class="stat-value">{{ ongoingProjects }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Livrables soumis</h3>
+      <span class="stat-value">{{ deliveredItems }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Feedback reçus</h3>
+      <span class="stat-value">{{ feedbackCount }}</span>
+    </div>
+  </div>
+  <section aria-labelledby="recent-title">
+    <h3 id="recent-title">Projets récents</h3>
     <ul>
-      <li *ngFor="let project of projects">
-        {{ project.titre }} ({{ project.progression || 0 }}%)
+      <li *ngFor="let project of recentProjects">
+        <a [routerLink]="['/project', project.id]">{{ project.name }}</a>
+        <span class="sr-only">, projet récent</span>
       </li>
     </ul>
-  </div>
-  <ng-template #noProjects>
-    <p>Aucun projet attribué.</p>
-  </ng-template>
-</section>
-
-<section>
-  <h3>Notifications</h3>
-  <ul>
-    <li *ngFor="let notif of notifications">
-      {{ notif.message }} — <span>{{ notif.date | date:'short' }}</span>
-    </li>
-  </ul>
-</section>
-
-<section>
-  <h3>Livrables</h3>
-  <ul>
-    <li *ngFor="let livrable of deliverables">
-      {{ livrable.nom }} - {{ livrable.statut }} ({{ livrable.dateLimite | date:'dd/MM/yyyy' }})
-    </li>
-  </ul>
+  </section>
 </section>
 
 
@@ -1612,33 +1645,76 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+interface Project {
+  _id: string;
+  titre: string;
+  progression?: number;
+}
+
+interface Notification {
+  message: string;
+  date: Date | string;
+}
+
+interface Deliverable {
+  nom: string;
+  statut: string;
+  dateLimite: Date | string;
+}
+
+interface User {
+  nom: string;
+  role: string;
+}
+
+interface Template {
+  nom: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css'] // Correction: styleUrls (array) et non styleUrl (string)
+  styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent {
-  projects = [];
-  notifications = [];
-  deliverables = [];
-  users = [{ nom: 'Jean', role: 'Administrateur' }]; // Utiliser 'nom' pour cohérence FR
-  roles = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projectTemplates = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }]; // Utiliser 'nom'
-  stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 }; // FR
-  tutorPerformance = [];
+  projects: Project[] = [];
+  notifications: Notification[] = [];
+  deliverables: Deliverable[] = [];
+  users: User[] = [{ nom: 'Jean', role: 'Administrateur' }];
+  roles: string[] = ['Administrateur', 'Tuteur', 'Étudiant'];
+  projectTemplates: Template[] = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
+  stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
+  tutorPerformance: { nom?: string; score?: number }[] = [];
   aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
 
-  openUserForm() {}
-  updateRole(user: any) {}
-  editUser(user: any) {}
-  deleteUser(user: any) {}
-  exportUsers() {}
-  importUsers() {}
-  createTemplate() {}
-  editTemplate(template: any) {}
-  updateAICfg() {}
+  // Ouvre le formulaire pour ajouter un utilisateur
+  openUserForm(): void {}
+
+  // Met à jour le rôle d'un utilisateur
+  updateRole(user: User): void {}
+
+  // Modifie les informations d'un utilisateur
+  editUser(user: User): void {}
+
+  // Supprime un utilisateur
+  deleteUser(user: User): void {}
+
+  // Exporte la liste des utilisateurs
+  exportUsers(): void {}
+
+  // Importe une liste d'utilisateurs
+  importUsers(): void {}
+
+  // Crée un nouveau modèle de projet
+  createTemplate(): void {}
+
+  // Modifie un modèle de projet existant
+  editTemplate(template: Template): void {}
+
+  // Met à jour la configuration de l'IA
+  updateAICfg(): void {}
 }
 
 
@@ -2001,7 +2077,33 @@ p {
 // ======= Contenu de src/app/project/project-detail/project-detail.component.html =======
 
 <h2>Détail du projet</h2>
-<p>À compléter : affichage détaillé du projet sélectionné.</p>
+<article class="project-detail" *ngIf="project" aria-labelledby="project-title">
+  <h2 id="project-title">{{ project?.titre }}</h2>
+  <p>Description : {{ project?.description }}</p>
+  <p>Date limite :
+    <time *ngIf="project?.deadline" [attr.datetime]="project?.deadline">
+      {{ project?.deadline | date:'longDate' }}
+    </time>
+    <span *ngIf="!project?.deadline">Non définie</span>
+  </p>
+
+  <section *ngIf="project?.members?.length" aria-labelledby="members-title">
+    <h3 id="members-title">Membres du projet</h3>
+    <ul>
+      <li *ngFor="let member of project?.members">{{ member?.fullName }}</li>
+    </ul>
+  </section>
+
+  <section *ngIf="project?.deliverables?.length" aria-labelledby="deliverables-title">
+    <h3 id="deliverables-title">Livrables associés</h3>
+    <ul>
+      <li *ngFor="let deliverable of project?.deliverables">
+        <a [routerLink]="['/deliverable', deliverable?.id]">{{ deliverable?.title }}</a>
+      </li>
+    </ul>
+  </section>
+</article>
+<div *ngIf="!project" class="error">Aucun projet trouvé.</div>
 
 
 // ======= Contenu de src/app/project/project-detail/project-detail.component.spec.ts =======
@@ -2091,34 +2193,58 @@ button[type="submit"]:hover {
 
 // ======= Contenu de src/app/project/project-form/project-form.component.html =======
 
-<form [formGroup]="projetForm" (ngSubmit)="onSubmit()" autocomplete="off">
-  <label for="titre">Titre :</label>
-  <input id="titre" formControlName="titre" required>
+<form (ngSubmit)="onSubmit()" #projectForm="ngForm" aria-labelledby="project-form-title">
+  <h2 id="project-form-title">Créer ou modifier un projet</h2>
 
-  <label for="description">Description :</label>
-  <textarea id="description" formControlName="description" required></textarea>
+  <div class="form-group">
+    <label for="name">Nom du projet</label>
+    <input
+      type="text"
+      id="name"
+      name="name"
+      [(ngModel)]="project.name"
+      required
+      aria-required="true"
+      #nameInput="ngModel"
+    >
+    <div *ngIf="nameInput.invalid && nameInput.touched" class="error">
+      Le nom est requis.
+    </div>
+  </div>
 
-  <label for="equipe">Équipe (IDs séparés par des virgules) :</label>
-  <input id="equipe" formControlName="equipe" required placeholder="ex: 664b1f8b...,664b1f8c...">
+  <div class="form-group">
+    <label for="description">Description</label>
+    <textarea
+      id="description"
+      name="description"
+      [(ngModel)]="project.description"
+      rows="4"
+      required
+      aria-required="true"
+      #descInput="ngModel"
+    ></textarea>
+    <div *ngIf="descInput.invalid && descInput.touched" class="error">
+      La description est requise.
+    </div>
+  </div>
 
-  <label for="tuteur">Tuteur (ID) :</label>
-  <input id="tuteur" formControlName="tuteur" required>
+  <div class="form-group">
+    <label for="deadline">Date limite</label>
+    <input
+      type="date"
+      id="deadline"
+      name="deadline"
+      [(ngModel)]="project.deadline"
+      required
+      aria-required="true"
+      #deadlineInput="ngModel"
+    >
+    <div *ngIf="deadlineInput.invalid && deadlineInput.touched" class="error">
+      La date limite est requise.
+    </div>
+  </div>
 
-  <label for="competences">Compétences (séparées par des virgules) :</label>
-  <input id="competences" formControlName="competences" required placeholder="ex: Node.js,Express">
-
-  <label for="dateDebut">Date de début :</label>
-  <input type="date" id="dateDebut" formControlName="dateDebut" required>
-
-  <label for="dateFin">Date de fin :</label>
-  <input type="date" id="dateFin" formControlName="dateFin" required>
-
-  <label for="statut">Statut :</label>
-  <select id="statut" formControlName="statut" required>
-    <option *ngFor="let statut of statutsProjet" [value]="statut">{{statut}}</option>
-  </select>
-
-  <button type="submit" [disabled]="!projetForm.valid">Enregistrer</button>
+  <button type="submit" [disabled]="projectForm.invalid">Enregistrer</button>
 </form>
 
 
@@ -2254,32 +2380,50 @@ button:hover { background: #174bb3; }
 
 // ======= Contenu de src/app/project/project-list/project-list.component.html =======
 
-<div *ngIf="chargement">Chargement...</div>
-<div *ngIf="erreur" class="erreur">{{erreur}}</div>
+<div *ngIf="chargement" class="loading">Chargement...</div>
+<div *ngIf="erreur" class="erreur" role="alert">{{ erreur }}</div>
 
-<table *ngIf="projets.length > 0">
-  <thead>
-  <tr>
-    <th>Titre</th>
-    <th>Description</th>
-    <th>Statut</th>
-    <th>Progression</th>
-    <th>Actions</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let projet of projets">
-    <td>{{projet.titre}}</td>
-    <td>{{projet.description}}</td>
-    <td>{{projet.statut}}</td>
-    <td>{{projet.progression || 0}} %</td>
-    <td>
-      <button type="button" (click)="voirDetails(projet._id)">Détails</button>
-    </td>
-  </tr>
-  </tbody>
-</table>
-<div *ngIf="projets.length === 0 && !chargement">Aucun projet trouvé.</div>
+<div *ngIf="!chargement && projets?.length; else noProjects">
+  <table class="project-table" aria-labelledby="project-list-title">
+    <thead>
+      <tr>
+        <th scope="col">Titre</th>
+        <th scope="col">Description</th>
+        <th scope="col">Statut</th>
+        <th scope="col">Date de début</th>
+        <th scope="col">Date de fin</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let projet of projets">
+        <td>{{ projet.titre }}</td>
+        <td>{{ projet.description }}</td>
+        <td>{{ projet.statut }}</td>
+        <td>{{ projet.dateDebut | date:'dd/MM/yyyy' }}</td>
+        <td>{{ projet.dateFin | date:'dd/MM/yyyy' }}</td>
+        <td>
+          <button type="button" (click)="voirDetails(projet._id)">Voir</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<ng-template #noProjects>
+  <p class="no-data">Aucun projet trouvé.</p>
+</ng-template>
+
+<section aria-labelledby="project-list-title">
+  <h2 id="project-list-title">Liste des projets</h2>
+  <ul class="project-list">
+    <li *ngFor="let projet of projets">
+      <a [routerLink]="['/project', projet.id]">{{ projet.titre }}</a>
+      <span *ngIf="projet.statut === 'ongoing'" class="status ongoing">En cours</span>
+      <span *ngIf="projet.statut === 'completed'" class="status completed">Terminé</span>
+    </li>
+  </ul>
+</section>
 
 
 // ======= Contenu de src/app/project/project-list/project-list.component.spec.ts =======
@@ -2312,36 +2456,50 @@ describe('ProjectListComponent', () => {
 // ======= Contenu de src/app/project/project-list/project-list.component.ts =======
 
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { ProjectService } from '../../core/services/project.service';
 import { Project } from '../../core/models/project.model';
-import { CommonModule } from '@angular/common'; // <-- à importer !
 
 @Component({
   selector: 'app-project-list',
   standalone: true,
-  imports: [CommonModule], // <-- ajoute CommonModule ici
+  imports: [CommonModule],
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css']
 })
 export class ProjectListComponent implements OnInit {
-  projets: Project[] = [];
+  projets: (Project & { _id: string })[] = []; // Garantit que _id existe et est de type string
   chargement = false;
   erreur = '';
 
-  constructor(private projectService: ProjectService) {}
+  constructor(
+    private projectService: ProjectService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
+    this.chargerProjets();
+  }
+
+  chargerProjets() {
     this.chargement = true;
     this.projectService.recupererProjets().subscribe({
       next: (projets) => {
-        this.projets = projets;
+        // Filtre les projets sans _id et effectue un cast
+        this.projets = projets.filter(p => !!p._id) as (Project & { _id: string })[];
         this.chargement = false;
       },
       error: (err) => {
         this.erreur = "Erreur lors du chargement des projets.";
         this.chargement = false;
+        console.error('Erreur:', err);
       }
     });
+  }
+
+  voirDetails(id: string) {
+    this.router.navigate(['/project', id]);
   }
 }
 
@@ -2378,6 +2536,61 @@ import { ProjectListComponent } from './project-list/project-list.component';
   ]
 })
 export class ProjectModule {}
+
+
+// ======= Contenu de src/app/test/api-test/api-test.component.html =======
+
+<section class="api-test-section" aria-labelledby="api-test-title">
+  <h2 id="api-test-title">Testeur d'API</h2>
+
+  <form (ngSubmit)="onSubmit()" #apiForm="ngForm" aria-label="Formulaire de test API">
+    <div class="form-group">
+      <label for="endpoint">Endpoint</label>
+      <input
+        id="endpoint"
+        name="endpoint"
+        type="text"
+        [(ngModel)]="endpoint"
+        required
+        aria-required="true"
+        #endpointInput="ngModel"
+      >
+    </div>
+    <div class="form-group">
+      <label for="method">Méthode</label>
+      <select
+        id="method"
+        name="method"
+        [(ngModel)]="method"
+        required
+        aria-required="true"
+      >
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="DELETE">DELETE</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="body">Corps (JSON)</label>
+      <textarea
+        id="body"
+        name="body"
+        [(ngModel)]="body"
+        rows="4"
+        placeholder='{"key": "value"}'
+        aria-label="Corps de la requête"
+      ></textarea>
+    </div>
+
+    <button type="submit" [disabled]="apiForm.invalid">Envoyer</button>
+  </form>
+
+  <section *ngIf="response" aria-labelledby="response-title">
+    <h3 id="response-title">Réponse</h3>
+    <pre>{{ response | json }}</pre>
+  </section>
+</section>
 
 
 // ======= Contenu de src/app/test/api-test/api-test.component.ts =======
@@ -2586,10 +2799,11 @@ export const environment = {
   <title>PROGEASE</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="./assets/favicon_io/favicon.ico">
+  <meta name="theme-color" content="#146D78">
 </head>
 <body>
-<app-root></app-root>
+<app-root role="main"></app-root>
 </body>
 </html>
 
@@ -2614,7 +2828,7 @@ import { AppComponent } from './app/app.component';
 import './polyfills';
 
 // Initialisation de l'application
-bootstrapApplication(AppComponent, appConfig);
+bootstrapApplication(AppComponent, appConfig).catch(err => console.error(err));
 
 
 // ======= Contenu de src/polyfills.ts =======
@@ -2627,96 +2841,106 @@ import 'zone.js';  // Included with Angular CLI.
 
 // ======= Contenu de src/styles.css =======
 
+:root {
+  --primary-color: #146D78;
+  --primary-light: #1D8A99;
+  --primary-dark: #0B4D57;
+  --accent-color: #17B5B5;
+  --background-light: #f7fbfc;
+  --background-medium: #e4f0f2;
+  --error-color: #b00020;
+}
+
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: #f5f7fa;
+  background: var(--background-light);
   color: #222;
   margin: 0;
 }
 
-.dashboard-container {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 2rem;
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:focus, a:hover {
+  color: var(--accent-color);
+  text-decoration: underline;
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
   background: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 4px 18px #0001;
+  color: var(--primary-color);
+  padding: 0.5em;
+  border-radius: 0 0 0.5em 0.5em;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 0;
+  top: 0;
+  width: auto;
+  height: auto;
+  font-size: 1rem;
+  outline: 2px solid var(--primary-color);
 }
 
-.title {
-  font-size: 2rem;
-  margin-bottom: 1.5rem;
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: .3em;
+  border: 1px solid #ccc;
+  padding: .5em;
+  margin-bottom: .5em;
+  box-sizing: border-box;
 }
 
-.stats-grid {
-  display: flex;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-.stat-card {
-  flex: 1;
-  background: #e3eefe;
-  border-radius: .8rem;
-  padding: 1.2rem 1rem;
-  text-align: center;
-  font-size: 1.1rem;
-  box-shadow: 0 2px 8px #0001;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-.btn-primary {
-  background: #2563eb;
+button {
+  background: var(--primary-color);
   color: #fff;
   border: none;
-  padding: .5rem 1rem;
-  border-radius: .4rem;
-  font-weight: 600;
   cursor: pointer;
-  transition: background .2s;
+  transition: background 0.2s;
 }
-.btn-primary:focus {
-  outline: 2px solid #17B5B5;
+button:focus, button:hover {
+  background: var(--primary-dark);
 }
-.btn-primary:hover { background: #174bb3; }
 
-.ninja-table {
-  width: 100%;
-  border-collapse: collapse;
-  box-shadow: 0 2px 10px #0001;
-  background: #fff;
+.form-group {
+  margin-bottom: 1em;
 }
-.ninja-table th, .ninja-table td {
-  padding: .7rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
+
+.error {
+  color: var(--error-color);
+  font-size: .95em;
 }
-.ninja-table th {
-  background: #f1f5f9;
-  text-align: left;
-  font-weight: bold;
-}
-.badge {
+
+.status {
   display: inline-block;
-  padding: 0.3em 1em;
-  border-radius: 1em;
   font-size: 0.85em;
-  font-weight: 600;
+  margin-left: 0.5em;
+  padding: 0.2em 0.6em;
+  border-radius: 1em;
 }
-.badge.en_cours { background: #e0f2fe; color: #0369a1; }
-.badge.termine { background: #bbf7d0; color: #166534; }
-.badge.archive { background: #e5e7eb; color: #6b7280; }
-.badge.brouillon { background: #fef9c3; color: #ca8a04; }
-.action-link {
-  color: #2563eb;
-  text-decoration: underline;
-  cursor: pointer;
+.status.completed { background: #c8e6c9; color: #256029; }
+.status.ongoing { background: #ffe082; color: #996c00; }
+.status.submitted { background: #bbdefb; color: #0d47a1; }
+.status.pending { background: #fff3e0; color: #bf360c; }
+
+@media (max-width: 600px) {
+  .dashboard-container, .form-container {
+    padding: 1rem;
+  }
+  .stats-grid {
+    flex-direction: column;
+    gap: 1rem;
+  }
 }
-.action-link:focus {
-  outline: 2px solid #17B5B5;
-}
-.action-link:hover { color: #174bb3; }
 

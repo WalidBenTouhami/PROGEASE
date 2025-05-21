@@ -21,7 +21,6 @@ export class ProjectService {
 
   recupererProjet(id: string): Observable<Project> {
     return this.http.get<Project>(`${this.baseUrl}/${id}`).pipe(
-      retry(1),
       catchError(this.handleError)
     );
   }
@@ -45,7 +44,7 @@ export class ProjectService {
     );
   }
 
-  private handleError(error: any) {
+  private handleError(error: any): Observable<never> {
     let message = 'Une erreur est survenue';
 
     if (error.error instanceof ErrorEvent) {
@@ -55,9 +54,6 @@ export class ProjectService {
     }
 
     console.error(`[ProjectService] ${message}`);
-    return throwError(() => ({
-      status: error.status,
-      message
-    }));
+    return throwError(() => new Error(message));
   }
 }

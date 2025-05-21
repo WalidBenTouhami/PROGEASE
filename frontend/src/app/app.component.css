@@ -1,55 +1,50 @@
-:root {
-  --primary-color: #146D78;
-  --primary-light: #1D8A99;
-  --primary-dark: #0B4D57;
-  --accent-color: #17B5B5;
-  --background-light: #f7fbfc;
-  --background-medium: #e4f0f2;
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
-
-nav {
+.app-header {
   background: var(--primary-color);
-  padding: 1rem;
+  color: #fff;
+  padding: 1rem 0;
+  box-shadow: 0 2px 8px #0001;
 }
-
-nav ul {
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 2rem;
+}
+.logo-container h1 {
+  font-size: 1.5rem;
+  margin: 0;
+}
+.main-nav ul {
   display: flex;
   gap: 2rem;
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: 0 2rem;
 }
-
-nav a {
+.main-nav a {
   color: #fff;
   text-decoration: none;
   font-weight: 500;
+  position: relative;
 }
-
-nav a.active,
-nav a:focus {
+.main-nav a.active,
+.main-nav a:focus {
   text-decoration: underline;
   color: var(--accent-color);
 }
-
-.skip-link {
-  position: absolute;
-  left: -999px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  z-index: 100;
-  background: #fff;
-  color: #146D78;
-  padding: 0.5em;
-  border-radius: 0 0 0.5em 0.5em;
+.app-content {
+  flex: 1;
+  padding: 2rem 0;
+  background: var(--background-light);
 }
-.skip-link:focus {
-  left: 0;
-  top: 0;
-  width: auto;
-  height: auto;
-  font-size: 1rem;
-  outline: 2px solid #146D78;
+.app-footer {
+  background: var(--primary-dark);
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
 }
