@@ -1,60 +1,4 @@
 
-// ======= Contenu de src/app/app.component.css =======
-
-.app-container {
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.app-header {
-  background: var(--primary-color);
-  color: #fff;
-  padding: 1rem 0;
-  box-shadow: 0 2px 8px #0001;
-}
-.logo-container {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-left: 2rem;
-}
-.logo-container h1 {
-  font-size: 1.5rem;
-  margin: 0;
-  font-weight: 700;
-  letter-spacing: 1px;
-}
-.main-nav ul {
-  display: flex;
-  gap: 2rem;
-  list-style: none;
-  margin: 0;
-  padding: 0 2rem;
-}
-.main-nav a {
-  color: #fff;
-  text-decoration: none;
-  font-weight: 500;
-  position: relative;
-}
-.main-nav a.active,
-.main-nav a:focus {
-  text-decoration: underline;
-  color: var(--accent-color);
-}
-.app-content {
-  flex: 1;
-  padding: 2rem 0;
-  background: var(--background-light);
-}
-.app-footer {
-  background: var(--primary-dark);
-  color: #fff;
-  text-align: center;
-  padding: 1rem;
-}
-
-
 // ======= Contenu de src/app/app.component.html =======
 
 <a href="#contenu-principal" class="skip-link">Aller au contenu principal</a>
@@ -90,59 +34,6 @@
 </div>
 
 
-// ======= Contenu de src/app/back-office/dashboard/dashboard.component.css =======
-
-.dashboard-container {
-  max-width: 900px;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 4px 18px #0001;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-  background: #fff;
-  box-shadow: 0 2px 10px #0001;
-}
-
-th, td {
-  padding: 0.7rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-th {
-  background: #f1f5f9;
-  text-align: left;
-  font-weight: bold;
-}
-
-button {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
-  font-weight: 600;
-  cursor: pointer;
-  margin-right: 0.4rem;
-  transition: background 0.2s;
-}
-button:focus {
-  outline: 2px solid var(--accent-color, #17B5B5);
-}
-button:hover { background: #174bb3; }
-
-.user-actions {
-  margin: 1rem 0;
-  display: flex;
-  gap: 1rem;
-}
-
-
 // ======= Contenu de src/app/back-office/dashboard/dashboard.component.html =======
 
 <section class="dashboard-container" aria-labelledby="tableau-bord-admin-titre">
@@ -173,36 +64,10 @@ button:hover { background: #174bb3; }
 </section>
 
 
-// ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.css =======
-
-.section-header {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
-}
-
-p {
-  color: #555;
-}
-
-
 // ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.html =======
 
 <h2>Gestion des livrables</h2>
 <p>Section pour la gestion et le suivi des livrables.</p>
-
-
-// ======= Contenu de src/app/back-office/project-management/project-management.component.css =======
-
-.section-header {
-  font-size: 1.3rem;
-  font-weight: 600;
-  margin-bottom: 0.8rem;
-}
-
-p {
-  color: #555;
-}
 
 
 // ======= Contenu de src/app/back-office/project-management/project-management.component.html =======
@@ -242,156 +107,93 @@ p {
 </section>
 
 
-// ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.css =======
-
-h2 {
-  margin-bottom: 1rem;
-}
-p {
-  color: #555;
-}
-
-
 // ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.html =======
 
-<h2>Détail du livrable</h2>
-<p>Ici s'affichera le détail du livrable sélectionné.</p>
-
-
-// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.css =======
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 600px;
-  background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  margin: 2rem auto;
-  box-shadow: 0 2px 10px #0001;
-}
-
-label {
-  font-weight: 500;
-}
-
-input, textarea, select {
-  padding: 0.5rem 0.7rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-button[type="submit"] {
-  align-self: flex-end;
-  background: #146D78;
-  color: #fff;
-  padding: 0.6rem 1.2rem;
-  border-radius: 4px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-button[type="submit"]:focus {
-  outline: 2px solid var(--accent-color, #17B5B5);
-}
-button[type="submit"]:hover {
-  background: #0B4D57;
-}
+<ng-container *ngIf="livrable; else loading">
+  <article class="deliverable-detail" aria-labelledby="livrable-titre">
+    <h2 id="livrable-titre">{{ livrable.nom }}
+      <span [class]="statutClass(livrable.statut)">{{ livrable.statut }}</span>
+    </h2>
+    <p><strong>Description&nbsp;:</strong> {{ livrable.description }}</p>
+    <p><strong>Date limite&nbsp;:</strong> <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'longDate' }}</time></p>
+    <p *ngIf="livrable.urlDepot"><strong>URL de dépôt&nbsp;:</strong> <a [href]="livrable.urlDepot" rel="noopener" target="_blank">{{ livrable.urlDepot }}</a></p>
+    <p *ngIf="livrable.projetId"><strong>Projet associé</strong>&nbsp;: {{ livrable.projetId }}</p>
+  </article>
+</ng-container>
+<ng-template #loading>
+  <p>Chargement du livrable...</p>
+</ng-template>
 
 
 // ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.html =======
 
-<form (ngSubmit)="soumettreLivrable()" #livrableForm="ngForm" aria-labelledby="formulaire-livrable-titre" class="form-container">
-  <h2 id="formulaire-livrable-titre">Ajouter un livrable</h2>
+<form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" aria-labelledby="formulaire-livrable-titre" class="form-container">
+  <h2 id="formulaire-livrable-titre">Ajouter ou modifier un livrable</h2>
+
   <div class="form-group">
-    <label for="titre">Titre</label>
-    <input type="text" id="titre" name="titre" [(ngModel)]="livrable.titre" required aria-required="true" #titreInput="ngModel">
-    <div *ngIf="titreInput.invalid && titreInput.touched" class="error">Le titre est requis.</div>
+    <label for="nom">Titre du livrable</label>
+    <input id="nom" formControlName="nom" type="text" required aria-required="true">
+    <div *ngIf="livrableForm.get('nom')?.invalid && livrableForm.get('nom')?.touched" class="error">
+      Le titre est requis.
+    </div>
   </div>
+
   <div class="form-group">
-    <label for="fichier">Fichier</label>
-    <input type="file" id="fichier" name="fichier" (change)="chargerFichier($event)" required aria-required="true">
+    <label for="description">Description</label>
+    <textarea id="description" formControlName="description" rows="4" required aria-required="true"></textarea>
+    <div *ngIf="livrableForm.get('description')?.invalid && livrableForm.get('description')?.touched" class="error">
+      La description est requise.
+    </div>
   </div>
-  <button type="submit" [disabled]="livrableForm.invalid">Soumettre</button>
+
+  <div class="form-group">
+    <label for="dateLimite">Date limite</label>
+    <input id="dateLimite" formControlName="dateLimite" type="date" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="urlDepot">URL de dépôt</label>
+    <input id="urlDepot" formControlName="urlDepot" type="url" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="statut">Statut</label>
+    <select id="statut" formControlName="statut" required aria-required="true">
+      <option *ngFor="let statut of statutsLivrable" [value]="statut">{{ statut }}</option>
+    </select>
+  </div>
+
+  <button type="submit" [disabled]="livrableForm.invalid">Enregistrer</button>
 </form>
-
-
-// ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.css =======
-
-h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-  background: #fff;
-  box-shadow: 0 2px 10px #0001;
-}
-
-th, td {
-  padding: 0.7rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-th {
-  background: #f1f5f9;
-  text-align: left;
-  font-weight: bold;
-}
-
-a {
-  color: #2563eb;
-  text-decoration: underline;
-}
-
-a:focus {
-  outline: 2px solid var(--accent-color, #17B5B5);
-}
-
-a:hover {
-  color: #174bb3;
-}
-
-.erreur {
-  color: #F44336;
-  margin-bottom: 1rem;
-}
 
 
 // ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.html =======
 
-<section aria-labelledby="deliverable-list-title">
-  <h2 id="deliverable-list-title">Liste des livrables</h2>
-  <ul class="deliverable-list">
-    <li *ngFor="let deliverable of deliverables">
-      <a [routerLink]="['/deliverable', deliverable.id]">{{ deliverable.title }}</a>
-      <span *ngIf="deliverable.status === 'submitted'" class="status submitted">Soumis</span>
-      <span *ngIf="deliverable.status === 'pending'" class="status pending">En attente</span>
+<section aria-labelledby="liste-livrables-titre">
+  <h2 id="liste-livrables-titre">Liste des livrables</h2>
+
+  <div *ngIf="chargement" class="info">Chargement des livrables...</div>
+  <div *ngIf="erreur" class="error">{{ erreur }}</div>
+
+  <ul class="deliverable-list" *ngIf="!chargement && livrables.length">
+    <li *ngFor="let livrable of livrables">
+      <span class="livrable-nom">{{ livrable.nom }}</span>
+      <span class="status" [ngClass]="{
+        'termine': livrable.statut === 'Terminé',
+        'attente': livrable.statut === 'En attente',
+        'retard': livrable.statut === 'En retard'
+      }">{{ livrable.statut }}</span>
+      <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant le <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
+      <span *ngIf="livrable.urlDepot">
+        &nbsp;| <a [href]="livrable.urlDepot" target="_blank" rel="noopener">Dépôt</a>
+      </span>
     </li>
   </ul>
+
+  <div *ngIf="!chargement && !livrables.length && !erreur" class="info">
+    Aucun livrable à afficher.
+  </div>
 </section>
-
-
-// ======= Contenu de src/app/front-office/dashboard/dashboard.component.css =======
-
-h2 {
-  margin-bottom: 1.5rem;
-}
-section {
-  margin-bottom: 2rem;
-}
-ul {
-  padding-left: 1.2rem;
-}
-li {
-  margin: 0.5rem 0;
-}
 
 
 // ======= Contenu de src/app/front-office/dashboard/dashboard.component.html =======
@@ -424,51 +226,6 @@ li {
 </section>
 
 
-// ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.css =======
-
-h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-  background: #fff;
-  box-shadow: 0 2px 10px #0001;
-}
-
-th, td {
-  padding: 0.7rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-th {
-  background: #f1f5f9;
-  text-align: left;
-  font-weight: bold;
-}
-
-a {
-  color: #2563eb;
-  text-decoration: underline;
-}
-
-a:focus {
-  outline: 2px solid var(--accent-color, #17B5B5);
-}
-
-a:hover {
-  color: #174bb3;
-}
-
-.erreur {
-  color: #F44336;
-  margin-bottom: 1rem;
-}
-
-
 // ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.html =======
 
 <section aria-labelledby="liste-livrables-titre">
@@ -481,47 +238,6 @@ a:hover {
     </li>
   </ul>
 </section>
-
-
-// ======= Contenu de src/app/front-office/project-list/project-list.component.css =======
-
-h2 {
-  margin-bottom: 1.5rem;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-  background: #fff;
-  box-shadow: 0 2px 10px #0001;
-}
-th, td {
-  padding: 0.7rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-th {
-  background: #f1f5f9;
-  text-align: left;
-  font-weight: bold;
-}
-button {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: .5rem 1rem;
-  border-radius: .4rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .2s;
-}
-button:focus {
-  outline: 2px solid var(--accent-color, #17B5B5);
-}
-button:hover { background: #174bb3; }
-.erreur {
-  color: #F44336;
-  margin-bottom: 1rem;
-}
 
 
 // ======= Contenu de src/app/front-office/project-list/project-list.component.html =======
@@ -558,155 +274,119 @@ button:hover { background: #174bb3; }
 <div *ngIf="!projets.length && !chargement">Aucun projet trouvé.</div>
 
 
-// ======= Contenu de src/app/project/project-detail/project-detail.component.css =======
-
-h2 {
-  margin-bottom: 1rem;
-}
-p {
-  color: #555;
-}
-
-
 // ======= Contenu de src/app/project/project-detail/project-detail.component.html =======
 
-<article class="project-detail" aria-labelledby="projet-titre">
-  <h2 id="projet-titre">{{ projet.nom }}</h2>
-  <p>Description : {{ projet.description }}</p>
-  <p>Date limite : <time [attr.datetime]="projet.echeance">{{ projet.echeance | date:'longDate' }}</time></p>
-  <section aria-labelledby="membres-titre">
-    <h3 id="membres-titre">Membres du projet</h3>
-    <ul>
-      <li *ngFor="let membre of projet.membres">{{ membre.nomComplet }}</li>
-    </ul>
-  </section>
-  <section aria-labelledby="livrables-associes-titre">
-    <h3 id="livrables-associes-titre">Livrables associés</h3>
-    <ul>
-      <li *ngFor="let livrable of projet.livrables">
-        <a [routerLink]="['/livrables', livrable.id]">{{ livrable.titre }}</a>
-      </li>
-    </ul>
-  </section>
-</article>
-
-
-// ======= Contenu de src/app/project/project-form/project-form.component.css =======
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 600px;
-  background: #fff;
-  padding: 2rem;
-  border-radius: 8px;
-  margin: 2rem auto;
-  box-shadow: 0 2px 10px #0001;
-}
-
-label {
-  font-weight: 500;
-}
-
-input, textarea, select {
-  padding: 0.5rem 0.7rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  font-size: 1rem;
-}
-
-button[type="submit"] {
-  align-self: flex-end;
-  background: #146D78;
-  color: #fff;
-  padding: 0.6rem 1.2rem;
-  border-radius: 4px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-button[type="submit"]:focus {
-  outline: 2px solid var(--accent-color, #17B5B5);
-}
-button[type="submit"]:hover {
-  background: #0B4D57;
-}
+<ng-container *ngIf="projet; else loading">
+  <article class="project-detail" aria-labelledby="projet-titre">
+    <h2 id="projet-titre">{{ projet.titre }}
+      <span [class]="statutClass(projet.statut)">{{ projet.statut }}</span>
+    </h2>
+    <p><strong>Description&nbsp;:</strong> {{ projet.description }}</p>
+    <p><strong>Date de début&nbsp;:</strong> <time [attr.datetime]="projet.dateDebut">{{ projet.dateDebut | date:'longDate' }}</time></p>
+    <p><strong>Date de fin&nbsp;:</strong> <time [attr.datetime]="projet.dateFin">{{ projet.dateFin | date:'longDate' }}</time></p>
+    <section aria-labelledby="membres-titre">
+      <h3 id="membres-titre">Membres du projet</h3>
+      <ul>
+        <li *ngFor="let membre of projet.equipe">{{ membre }}</li>
+      </ul>
+    </section>
+    <section aria-labelledby="livrables-titre">
+      <h3 id="livrables-titre">Livrables associés</h3>
+      <ul>
+        <li *ngFor="let livrable of projet.livrables">
+          <strong>{{ livrable.nom }}</strong>
+          <span class="status" [class]="livrable.statut.toLowerCase()">{{ livrable.statut }}</span>
+          <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant le <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
+        </li>
+      </ul>
+    </section>
+  </article>
+</ng-container>
+<ng-template #loading>
+  <p>Chargement du projet...</p>
+</ng-template>
 
 
 // ======= Contenu de src/app/project/project-form/project-form.component.html =======
 
-<form (ngSubmit)="soumettreProjet()" #projetForm="ngForm" aria-labelledby="formulaire-projet-titre" class="form-container">
+<form [formGroup]="projetForm" (ngSubmit)="onSubmit()" aria-labelledby="formulaire-projet-titre" class="form-container">
   <h2 id="formulaire-projet-titre">Créer ou modifier un projet</h2>
+
   <div class="form-group">
-    <label for="nom">Nom du projet</label>
-    <input type="text" id="nom" name="nom" [(ngModel)]="projet.nom" required aria-required="true" #nomInput="ngModel">
-    <div *ngIf="nomInput.invalid && nomInput.touched" class="error">Le nom est requis.</div>
+    <label for="titre">Titre du projet</label>
+    <input id="titre" formControlName="titre" type="text" required aria-required="true">
+    <div *ngIf="projetForm.get('titre')?.invalid && projetForm.get('titre')?.touched" class="error">
+      Le titre est requis.
+    </div>
   </div>
+
   <div class="form-group">
     <label for="description">Description</label>
-    <textarea id="description" name="description" [(ngModel)]="projet.description" rows="4" required aria-required="true" #descInput="ngModel"></textarea>
-    <div *ngIf="descInput.invalid && descInput.touched" class="error">La description est requise.</div>
+    <textarea id="description" formControlName="description" rows="4" required aria-required="true"></textarea>
+    <div *ngIf="projetForm.get('description')?.invalid && projetForm.get('description')?.touched" class="error">
+      La description est requise.
+    </div>
   </div>
+
   <div class="form-group">
-    <label for="echeance">Date limite</label>
-    <input type="date" id="echeance" name="echeance" [(ngModel)]="projet.echeance" required aria-required="true" #echeanceInput="ngModel">
-    <div *ngIf="echeanceInput.invalid && echeanceInput.touched" class="error">La date limite est requise.</div>
+    <label for="equipe">Membres de l'équipe (séparés par une virgule)</label>
+    <input id="equipe" formControlName="equipe" type="text" required aria-required="true" placeholder="Ex: Alice,Bob,Charlie">
   </div>
+
+  <div class="form-group">
+    <label for="tuteur">Tuteur</label>
+    <input id="tuteur" formControlName="tuteur" type="text" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="competences">Compétences requises (séparées par une virgule)</label>
+    <input id="competences" formControlName="competences" type="text" required aria-required="true" placeholder="Ex: Angular,Node.js,Agilité">
+  </div>
+
+  <div class="form-group">
+    <label for="dateDebut">Date de début</label>
+    <input id="dateDebut" formControlName="dateDebut" type="date" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="dateFin">Date de fin</label>
+    <input id="dateFin" formControlName="dateFin" type="date" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="statut">Statut</label>
+    <select id="statut" formControlName="statut" required aria-required="true">
+      <option *ngFor="let statut of statutsProjet" [value]="statut">{{ statut }}</option>
+    </select>
+  </div>
+
   <button type="submit" [disabled]="projetForm.invalid">Enregistrer</button>
 </form>
-
-
-// ======= Contenu de src/app/project/project-list/project-list.component.css =======
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-  background: #fff;
-  box-shadow: 0 2px 10px #0001;
-}
-th, td {
-  padding: 0.7rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-th {
-  background: #f1f5f9;
-  text-align: left;
-  font-weight: bold;
-}
-button {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: .5rem 1rem;
-  border-radius: .4rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .2s;
-}
-button:focus {
-  outline: 2px solid var(--accent-color, #17B5B5);
-}
-button:hover { background: #174bb3; }
-.erreur {
-  color: #F44336;
-  margin-bottom: 1rem;
-}
 
 
 // ======= Contenu de src/app/project/project-list/project-list.component.html =======
 
 <section aria-labelledby="liste-projets-titre">
   <h2 id="liste-projets-titre">Liste des projets</h2>
-  <ul class="project-list">
+
+  <div *ngIf="chargement" class="info">Chargement des projets...</div>
+  <div *ngIf="erreur" class="error">{{ erreur }}</div>
+
+  <ul class="project-list" *ngIf="!chargement && projets.length">
     <li *ngFor="let projet of projets">
-      <a [routerLink]="['/projets', projet.id]">{{ projet.nom }}</a>
-      <span *ngIf="projet.statut === 'encours'" class="status encours">En cours</span>
-      <span *ngIf="projet.statut === 'termine'" class="status termine">Terminé</span>
+      <a (click)="voirDetails(projet._id)" tabindex="0">{{ projet.titre }}</a>
+      <span class="status" [ngClass]="{
+        'encours': projet.statut === 'En cours',
+        'termine': projet.statut === 'Terminé',
+        'brouillon': projet.statut === 'Brouillon',
+        'archive': projet.statut === 'Archivé'
+      }">{{ projet.statut }}</span>
     </li>
   </ul>
+
+  <div *ngIf="!chargement && !projets.length && !erreur" class="info">
+    Aucun projet à afficher.
+  </div>
 </section>
 
 
@@ -726,103 +406,4 @@ button:hover { background: #174bb3; }
 <app-root role="main"></app-root>
 </body>
 </html>
-
-
-// ======= Contenu de src/styles.css =======
-
-:root {
-  --primary-color: #146D78;
-  --primary-light: #1D8A99;
-  --primary-dark: #0B4D57;
-  --accent-color: #17B5B5;
-  --background-light: #f7fbfc;
-  --background-medium: #e4f0f2;
-  --error-color: #b00020;
-}
-
-body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: var(--background-light);
-  color: #222;
-  margin: 0;
-}
-a {
-  color: var(--primary-color);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-a:focus, a:hover {
-  color: var(--accent-color);
-  text-decoration: underline;
-  outline: 2px solid var(--accent-color);
-  outline-offset: 2px;
-}
-.skip-link {
-  position: absolute;
-  left: -999px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  background: #fff;
-  color: var(--primary-color);
-  padding: 0.5em;
-  border-radius: 0 0 0.5em 0.5em;
-  z-index: 100;
-}
-.skip-link:focus {
-  left: 0;
-  top: 0;
-  width: auto;
-  height: auto;
-  font-size: 1rem;
-  outline: 2px solid var(--primary-color);
-}
-button, input, select, textarea {
-  font-family: inherit;
-  font-size: 1rem;
-  border-radius: .3em;
-  border: 1px solid #ccc;
-  padding: .5em;
-  margin-bottom: .5em;
-  box-sizing: border-box;
-}
-button {
-  background: var(--primary-color);
-  color: #fff;
-  border: none;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-button:focus, button:hover {
-  background: var(--primary-dark);
-}
-.form-group {
-  margin-bottom: 1em;
-}
-.error {
-  color: var(--error-color);
-  font-size: .95em;
-}
-.status {
-  display: inline-block;
-  font-size: 0.85em;
-  margin-left: 0.5em;
-  padding: 0.2em 0.6em;
-  border-radius: 1em;
-}
-.status.termine { background: #c8e6c9; color: #256029; }
-.status.encours { background: #ffe082; color: #996c00; }
-.status.soumis { background: #bbdefb; color: #0d47a1; }
-.status.attente { background: #fff3e0; color: #bf360c; }
-
-@media (max-width: 600px) {
-  .dashboard-container, .form-container {
-    padding: 1rem;
-  }
-  .stats-grid {
-    flex-direction: column;
-    gap: 1rem;
-  }
-}
 

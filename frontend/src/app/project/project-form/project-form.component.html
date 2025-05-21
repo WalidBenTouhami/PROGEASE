@@ -1,19 +1,53 @@
-<form (ngSubmit)="soumettreProjet()" #projetForm="ngForm" aria-labelledby="formulaire-projet-titre" class="form-container">
+<form [formGroup]="projetForm" (ngSubmit)="onSubmit()" aria-labelledby="formulaire-projet-titre" class="form-container">
   <h2 id="formulaire-projet-titre">Créer ou modifier un projet</h2>
+
   <div class="form-group">
-    <label for="nom">Nom du projet</label>
-    <input type="text" id="nom" name="nom" [(ngModel)]="projet.nom" required aria-required="true" #nomInput="ngModel">
-    <div *ngIf="nomInput.invalid && nomInput.touched" class="error">Le nom est requis.</div>
+    <label for="titre">Titre du projet</label>
+    <input id="titre" formControlName="titre" type="text" required aria-required="true">
+    <div *ngIf="projetForm.get('titre')?.invalid && projetForm.get('titre')?.touched" class="error">
+      Le titre est requis.
+    </div>
   </div>
+
   <div class="form-group">
     <label for="description">Description</label>
-    <textarea id="description" name="description" [(ngModel)]="projet.description" rows="4" required aria-required="true" #descInput="ngModel"></textarea>
-    <div *ngIf="descInput.invalid && descInput.touched" class="error">La description est requise.</div>
+    <textarea id="description" formControlName="description" rows="4" required aria-required="true"></textarea>
+    <div *ngIf="projetForm.get('description')?.invalid && projetForm.get('description')?.touched" class="error">
+      La description est requise.
+    </div>
   </div>
+
   <div class="form-group">
-    <label for="echeance">Date limite</label>
-    <input type="date" id="echeance" name="echeance" [(ngModel)]="projet.echeance" required aria-required="true" #echeanceInput="ngModel">
-    <div *ngIf="echeanceInput.invalid && echeanceInput.touched" class="error">La date limite est requise.</div>
+    <label for="equipe">Membres de l'équipe (séparés par une virgule)</label>
+    <input id="equipe" formControlName="equipe" type="text" required aria-required="true" placeholder="Ex: Alice,Bob,Charlie">
   </div>
+
+  <div class="form-group">
+    <label for="tuteur">Tuteur</label>
+    <input id="tuteur" formControlName="tuteur" type="text" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="competences">Compétences requises (séparées par une virgule)</label>
+    <input id="competences" formControlName="competences" type="text" required aria-required="true" placeholder="Ex: Angular,Node.js,Agilité">
+  </div>
+
+  <div class="form-group">
+    <label for="dateDebut">Date de début</label>
+    <input id="dateDebut" formControlName="dateDebut" type="date" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="dateFin">Date de fin</label>
+    <input id="dateFin" formControlName="dateFin" type="date" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="statut">Statut</label>
+    <select id="statut" formControlName="statut" required aria-required="true">
+      <option *ngFor="let statut of statutsProjet" [value]="statut">{{ statut }}</option>
+    </select>
+  </div>
+
   <button type="submit" [disabled]="projetForm.invalid">Enregistrer</button>
 </form>

@@ -1,10 +1,22 @@
 <section aria-labelledby="liste-projets-titre">
   <h2 id="liste-projets-titre">Liste des projets</h2>
-  <ul class="project-list">
+
+  <div *ngIf="chargement" class="info">Chargement des projets...</div>
+  <div *ngIf="erreur" class="error">{{ erreur }}</div>
+
+  <ul class="project-list" *ngIf="!chargement && projets.length">
     <li *ngFor="let projet of projets">
-      <a [routerLink]="['/projets', projet.id]">{{ projet.nom }}</a>
-      <span *ngIf="projet.statut === 'encours'" class="status encours">En cours</span>
-      <span *ngIf="projet.statut === 'termine'" class="status termine">Terminé</span>
+      <a (click)="voirDetails(projet._id)" tabindex="0">{{ projet.titre }}</a>
+      <span class="status" [ngClass]="{
+        'encours': projet.statut === 'En cours',
+        'termine': projet.statut === 'Terminé',
+        'brouillon': projet.statut === 'Brouillon',
+        'archive': projet.statut === 'Archivé'
+      }">{{ projet.statut }}</span>
     </li>
   </ul>
+
+  <div *ngIf="!chargement && !projets.length && !erreur" class="info">
+    Aucun projet à afficher.
+  </div>
 </section>
