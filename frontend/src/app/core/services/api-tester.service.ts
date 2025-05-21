@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { Apollo, gql } from 'apollo-angular';
+import { AlertService } from '../services/atert.service'; 
 
 @Injectable({
   providedIn: 'root'
@@ -12,12 +14,15 @@ export class ApiTesterService {
 
   constructor(
     private http: HttpClient,
-    private apollo: Apollo
+    private apollo: Apollo,
+    private alertService: AlertService
   ) {}
 
   // Test REST API
   testRestConnection(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/projects`);
+    return this.http.get(`${this.apiUrl}/projects`).pipe(
+      catchError((error) => this.handleError(error))
+    );
   }
 
   // Test GraphQL
@@ -32,11 +37,22 @@ export class ApiTesterService {
           }
         }
       `
-    });
+    }).pipe(
+      catchError((error) => this.handleError(error))
+    );
   }
 
-  // Test AI service - correction du nom de la route
+  // Test AI service
   testAIService(prompt: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/ai/generer-texte`, { prompt });
+    return this.http.post(`${this.apiUrl}/ai/generer-texte`, { prompt }).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  // Gestion des erreurs
+  private handleError(error: any): Observable<never> {
+    const errorMessage = 'Erreur lors de la requête API : ' + (error.message || error.statusText);
+    this.alertService.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
   }
 }
