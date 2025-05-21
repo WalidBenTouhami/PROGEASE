@@ -1,2 +1,28 @@
 <h2>Détail du projet</h2>
-<p>À compléter : affichage détaillé du projet sélectionné.</p>
+<article class="project-detail" *ngIf="project" aria-labelledby="project-title">
+  <h2 id="project-title">{{ project?.name }}</h2>
+  <p>Description : {{ project?.description }}</p>
+  <p>Date limite :
+    <time *ngIf="project?.deadline" [attr.datetime]="project?.deadline">
+      {{ project?.deadline | date:'longDate' }}
+    </time>
+    <span *ngIf="!project?.deadline">Non définie</span>
+  </p>
+
+  <section *ngIf="project?.members?.length" aria-labelledby="members-title">
+    <h3 id="members-title">Membres du projet</h3>
+    <ul>
+      <li *ngFor="let member of project?.members">{{ member?.fullName }}</li>
+    </ul>
+  </section>
+
+  <section *ngIf="project?.deliverables?.length" aria-labelledby="deliverables-title">
+    <h3 id="deliverables-title">Livrables associés</h3>
+    <ul>
+      <li *ngFor="let deliverable of project?.deliverables">
+        <a [routerLink]="['/deliverable', deliverable?.id]">{{ deliverable?.title }}</a>
+      </li>
+    </ul>
+  </section>
+</article>
+<div *ngIf="!project" class="error">Aucun projet trouvé.</div>

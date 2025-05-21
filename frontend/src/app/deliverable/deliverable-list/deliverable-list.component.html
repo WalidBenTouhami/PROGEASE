@@ -1,27 +1,33 @@
-<h3>Liste des livrables</h3>
-<div *ngIf="chargement">Chargement...</div>
-<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+<h2 id="deliverable-list-title">Liste des livrables</h2>
 
-<table *ngIf="livrables.length">
-  <thead>
-  <tr>
-    <th>Nom</th>
-    <th>Description</th>
-    <th>Date limite</th>
-    <th>Statut</th>
-    <th>URL dépôt</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let livrable of livrables">
-    <td>{{ livrable.nom }}</td>
-    <td>{{ livrable.description }}</td>
-    <td>{{ livrable.dateLimite | date:'dd/MM/yyyy' }}</td>
-    <td>{{ livrable.statut }}</td>
-    <td>
-      <a [href]="livrable.urlDepot" target="_blank" rel="noopener noreferrer">Voir sur GitHub</a>
-    </td>
-  </tr>
-  </tbody>
-</table>
-<div *ngIf="!livrables.length && !chargement">Aucun livrable trouvé.</div>
+  <div *ngIf="chargement" class="loading">Chargement...</div>
+  <div *ngIf="erreur" class="erreur" role="alert">{{ erreur }}</div>
+
+  <div *ngIf="!chargement && livrables?.length; else noDeliverables">
+    <table class="deliverable-table" aria-labelledby="deliverable-list-title">
+      <thead>
+        <tr>
+          <th scope="col">Nom</th>
+          <th scope="col">Description</th>
+          <th scope="col">Date limite</th>
+          <th scope="col">Statut</th>
+          <th scope="col">URL dépôt</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let livrable of livrables">
+          <td>{{ livrable.nom }}</td>
+          <td>{{ livrable.description }}</td>
+          <td>{{ livrable.dateLimite | date:'dd/MM/yyyy' }}</td>
+          <td>{{ livrable.statut }}</td>
+          <td>
+            <a [href]="livrable.urlDepot" target="_blank" rel="noopener noreferrer">Voir sur GitHub</a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #noDeliverables>
+    <p class="no-data">Aucun livrable trouvé.</p>
+  </ng-template>

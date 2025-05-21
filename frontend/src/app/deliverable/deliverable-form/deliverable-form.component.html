@@ -1,20 +1,85 @@
-<form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" autocomplete="off">
-  <label for="nom">Nom :</label>
-  <input id="nom" formControlName="nom" required>
+<form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" autocomplete="off" aria-labelledby="deliverable-form-title">
+  <h2 id="deliverable-form-title">Ajouter un livrable</h2>
 
-  <label for="description">Description :</label>
-  <textarea id="description" formControlName="description" required></textarea>
+  <div class="form-group">
+    <label for="nom">Nom :</label>
+    <input
+      id="nom"
+      formControlName="nom"
+      required
+      aria-required="true"
+    >
+    <div *ngIf="livrableForm.get('nom')?.invalid && livrableForm.get('nom')?.touched" class="error">
+      Le nom est requis.
+    </div>
+  </div>
 
-  <label for="dateLimite">Date limite :</label>
-  <input type="date" id="dateLimite" formControlName="dateLimite" required>
+  <div class="form-group">
+    <label for="description">Description :</label>
+    <textarea
+      id="description"
+      formControlName="description"
+      required
+      aria-required="true"
+    ></textarea>
+    <div *ngIf="livrableForm.get('description')?.invalid && livrableForm.get('description')?.touched" class="error">
+      La description est requise.
+    </div>
+  </div>
 
-  <label for="urlDepot">URL du dépôt :</label>
-  <input id="urlDepot" formControlName="urlDepot" required placeholder="https://github.com/monorg/monrepo">
+  <div class="form-group">
+    <label for="dateLimite">Date limite :</label>
+    <input
+      type="date"
+      id="dateLimite"
+      formControlName="dateLimite"
+      required
+      aria-required="true"
+    >
+    <div *ngIf="livrableForm.get('dateLimite')?.invalid && livrableForm.get('dateLimite')?.touched" class="error">
+      La date limite est requise.
+    </div>
+  </div>
 
-  <label for="statut">Statut :</label>
-  <select id="statut" formControlName="statut" required>
-    <option *ngFor="let statut of statutsLivrable" [value]="statut">{{statut}}</option>
-  </select>
+  <div class="form-group">
+    <label for="urlDepot">URL du dépôt :</label>
+    <input
+      id="urlDepot"
+      formControlName="urlDepot"
+      required
+      placeholder="https://github.com/monorg/monrepo"
+      aria-required="true"
+    >
+    <div *ngIf="livrableForm.get('urlDepot')?.invalid && livrableForm.get('urlDepot')?.touched" class="error">
+      L'URL du dépôt est requise.
+    </div>
+  </div>
 
-  <button type="submit" [disabled]="!livrableForm.valid">Enregistrer</button>
+  <div class="form-group">
+    <label for="statut">Statut :</label>
+    <select
+      id="statut"
+      formControlName="statut"
+      required
+      aria-required="true"
+    >
+      <option *ngFor="let statut of statutsLivrable" [value]="statut">{{ statut }}</option>
+    </select>
+    <div *ngIf="livrableForm.get('statut')?.invalid && livrableForm.get('statut')?.touched" class="error">
+      Le statut est requis.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="file">Fichier :</label>
+    <input
+      type="file"
+      id="file"
+      (change)="onFileSelected($event)"
+      required
+      aria-required="true"
+    >
+  </div>
+
+  <button type="submit" [disabled]="livrableForm.invalid">Enregistrer</button>
 </form>

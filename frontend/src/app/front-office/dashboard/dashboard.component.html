@@ -1,33 +1,30 @@
-<h2>Tableau de bord (Front Office)</h2>
+<section class="dashboard-container" aria-labelledby="dashboard-title">
+  <h2 id="dashboard-title" class="title">Tableau de bord étudiant</h2>
 
-<section>
-  <h3>Mes Projets</h3>
-  <div *ngIf="projects?.length; else noProjects">
+  <div class="stats-grid" role="list" aria-label="Statistiques principales">
+    <div class="stat-card" role="listitem">
+      <h3>Projets en cours</h3>
+      <span class="stat-value">{{ ongoingProjects }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Livrables soumis</h3>
+      <span class="stat-value">{{ deliveredItems }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Feedback reçus</h3>
+      <span class="stat-value">{{ feedbackCount }}</span>
+    </div>
+  </div>
+
+  <section aria-labelledby="recent-title">
+    <h3 id="recent-title">Projets récents</h3>
     <ul>
-      <li *ngFor="let project of projects">
-        {{ project.titre }} ({{ project.progression || 0 }}%)
+      <li *ngFor="let project of recentProjects">
+        <a [routerLink]="['/project', project.id]">
+          {{ project.name }}
+        </a>
+        <span class="sr-only">, projet récent</span>
       </li>
     </ul>
-  </div>
-  <ng-template #noProjects>
-    <p>Aucun projet attribué.</p>
-  </ng-template>
-</section>
-
-<section>
-  <h3>Notifications</h3>
-  <ul>
-    <li *ngFor="let notif of notifications">
-      {{ notif.message }} — <span>{{ notif.date | date:'short' }}</span>
-    </li>
-  </ul>
-</section>
-
-<section>
-  <h3>Livrables</h3>
-  <ul>
-    <li *ngFor="let livrable of deliverables">
-      {{ livrable.nom }} - {{ livrable.statut }} ({{ livrable.dateLimite | date:'dd/MM/yyyy' }})
-    </li>
-  </ul>
+  </section>
 </section>

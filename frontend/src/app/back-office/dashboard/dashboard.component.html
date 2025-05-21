@@ -1,69 +1,28 @@
-<h2>Tableau de bord (Back Office)</h2>
+<section class="dashboard-container" aria-labelledby="backoffice-dashboard-title">
+  <h2 id="backoffice-dashboard-title" class="title">Tableau de bord enseignant</h2>
 
-<button type="button" (click)="openUserForm()">Créer un utilisateur</button>
+  <div class="stats-grid" role="list" aria-label="Statistiques de gestion">
+    <div class="stat-card" role="listitem">
+      <h3>Projets à valider</h3>
+      <span class="stat-value">{{ toValidateProjects }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Livrables à corriger</h3>
+      <span class="stat-value">{{ toCheckDeliverables }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Étudiants inscrits</h3>
+      <span class="stat-value">{{ studentCount }}</span>
+    </div>
+  </div>
 
-<table>
-  <thead>
-  <tr>
-    <th>Nom</th>
-    <th>Rôle</th>
-    <th>Actions</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let user of users">
-    <td>{{ user.nom }}</td>
-    <td>
-      <select [(ngModel)]="user.role" (change)="updateRole(user)">
-        <option *ngFor="let role of roles" [value]="role">{{ role }}</option>
-      </select>
-    </td>
-    <td>
-      <button type="button" (click)="editUser(user)" title="Éditer"><span aria-hidden="true">✏️</span></button>
-      <button type="button" (click)="deleteUser(user)" title="Supprimer"><span aria-hidden="true">🗑️</span></button>
-    </td>
-  </tr>
-  </tbody>
-</table>
-
-<div class="user-actions">
-  <button type="button" (click)="exportUsers()">Exporter</button>
-  <button type="button" (click)="importUsers()">Importer</button>
-</div>
-
-<h3>Modèles de projet</h3>
-<button type="button" (click)="createTemplate()">Nouveau modèle</button>
-<ul>
-  <li *ngFor="let template of projectTemplates">
-    {{ template.nom }}
-    <button type="button" (click)="editTemplate(template)">Éditer</button>
-  </li>
-</ul>
-
-<h3>Statistiques</h3>
-<ul>
-  <li><strong>Projets en cours :</strong> {{ stats.projetsActifs }}</li>
-  <li><strong>Groupes à risque :</strong> {{ stats.groupesRisque }}</li>
-  <li><strong>Moyenne perf. tuteurs :</strong> {{ stats.performanceMoyTuteur }}</li>
-</ul>
-
-<!-- <app-performance-chart [data]="tutorPerformance"></app-performance-chart> -->
-
-<h3>Configuration IA</h3>
-<form (ngSubmit)="updateAICfg()" autocomplete="off">
-  <label>
-    Algorithme d’équipe :
-    <select [(ngModel)]="aiConfig.algoEquipe" name="algoEquipe">
-      <option value="algo1">Algorithme 1</option>
-      <option value="algo2">Algorithme 2</option>
-    </select>
-  </label>
-  <label>
-    Seuil de risque :
-    <input type="number" [(ngModel)]="aiConfig.seuilRisque" name="seuilRisque" min="0" max="100"/>
-  </label>
-  <label>
-    <input type="checkbox" [(ngModel)]="aiConfig.activerRecommandations" name="activerRecommandations"/> Recommandations activées
-  </label>
-  <button type="submit">Enregistrer</button>
-</form>
+  <section aria-labelledby="recent-admin-title">
+    <h3 id="recent-admin-title">Dernières actions</h3>
+    <ul>
+      <li *ngFor="let action of recentActions">
+        {{ action.description }}
+        <time [attr.datetime]="action.date">{{ action.date | date:'shortDate' }}</time>
+      </li>
+    </ul>
+  </section>
+</section>
