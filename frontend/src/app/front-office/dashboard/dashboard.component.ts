@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 
 interface Project {
-  _id: string;
-  titre: string;
+  id: string;
+  nom: string;
   progression?: number;
 }
 
@@ -31,11 +32,11 @@ interface Template {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnInit {
   projects: Project[] = [];
   notifications: Notification[] = [];
   deliverables: Deliverable[] = [];
@@ -45,6 +46,23 @@ export class DashboardComponent {
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
   tutorPerformance: { nom?: string; score?: number }[] = [];
   aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
+
+  // Adding missing properties used in template
+  projetsEnCours: number = 0;
+  livrablesSoumis: number = 0;
+  retoursRecus: number = 0;
+  projetsRecents: Project[] = [];
+
+  ngOnInit() {
+    // Initialize dashboard data
+    this.projetsEnCours = 3;
+    this.livrablesSoumis = 7;
+    this.retoursRecus = 4;
+    this.projetsRecents = [
+      { id: '1', nom: 'Projet A' },
+      { id: '2', nom: 'Projet B' }
+    ];
+  }
 
   // Ouvre le formulaire pour ajouter un utilisateur
   openUserForm(): void {}

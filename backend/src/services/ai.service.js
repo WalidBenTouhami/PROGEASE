@@ -1,21 +1,28 @@
-const deepseek = require('deepseek');
+const axios = require('axios');
 const dotenv = require('dotenv');
 
 dotenv.config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
 
-const CLE_API_DEEPSEEK = process.env.DEEPSEEK_API_KEY;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
-if (!CLE_API_DEEPSEEK) {
+if (!DEEPSEEK_API_KEY) {
   throw new Error('❌ La variable DEEPSEEK_API_KEY est manquante. Vérifiez votre fichier .env.');
 }
 
+console.log('deepseek api client');
 console.log('✅ Clé API Deepseek chargée avec succès.');
 
-const client = deepseek.createClient({ apiKey: CLE_API_DEEPSEEK });
+const client = axios.create({
+  baseURL: 'https://api.deepseek.com',
+  headers: {
+    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
+});
 
 const CONFIG = {
-  MODELE: 'gpt-3.5-turbo',
-  NB_MAX_TOKENS: 200,
+  MODEL: 'deepseek-chat',
+  MAX_TOKENS: 200,
 };
 
 async function gererErreurIA(erreur, reponse = null) {
@@ -23,17 +30,18 @@ async function gererErreurIA(erreur, reponse = null) {
   if (reponse) {
     console.error('❌ Réponse IA :', reponse);
   }
-  throw new Error('La réponse de l’IA est invalide ou n’a pas pu être traitée.');
+  throw new Error('La réponse de l\'IA est invalide ou n\'a pas pu être traitée.');
 }
 
 async function genererTexte(prompt) {
   try {
-    const reponse = await client.generateText({
-      model: CONFIG.MODELE,
-      prompt,
-      maxTokens: CONFIG.NB_MAX_TOKENS,
+    const response = await client.post('/chat/completions', {
+      model: CONFIG.MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: CONFIG.MAX_TOKENS,
+      stream: false
     });
-    return reponse.text.trim();
+    return response.data.choices[0].message.content.trim();
   } catch (erreur) {
     await gererErreurIA(erreur);
   }
@@ -43,7 +51,7 @@ function validerReponseJSON(reponse) {
   try {
     return JSON.parse(reponse);
   } catch (erreur) {
-    throw new Error('La réponse de l’IA n’est pas un JSON valide.');
+    throw new Error('La réponse de l\'IA n\'est pas un JSON valide.');
   }
 }
 
@@ -55,7 +63,7 @@ function extraireJSONDepuisReponse(reponse) {
     }
     throw new Error('Aucun JSON trouvé dans la réponse.');
   } catch (erreur) {
-    throw new Error('Impossible d’extraire le JSON de la réponse IA.');
+    throw new Error('Impossible d\'extraire le JSON de la réponse IA.');
   }
 }
 
@@ -64,7 +72,7 @@ async function traiterReponseIA(prompt) {
   try {
     return validerReponseJSON(reponse);
   } catch (erreur) {
-    console.warn('⚠️ Tentative d’extraction JSON depuis la réponse IA.');
+    console.warn('⚠️ Tentative d\'extraction JSON depuis la réponse IA.');
     return extraireJSONDepuisReponse(reponse);
   }
 }
@@ -119,7 +127,7 @@ async function creerEquipes(membres) {
 
 async function associerTuteurs(membres) {
   if (!membres || membres.length === 0) {
-    throw new Error('❌ La liste des membres est vide. Impossible d’associer les tuteurs.');
+    throw new Error('❌ La liste des membres est vide. Impossible d\'associer les tuteurs.');
   }
   const prompt = `Associe les mentors et mentorés selon leurs compétences et besoins. Retourne seulement au format JSON : ${JSON.stringify(membres)}`;
   return traiterReponseIA(prompt);
@@ -129,7 +137,7 @@ async function recommanderApprentissage(competences) {
   if (!competences || competences.length === 0) {
     throw new Error('❌ Liste des compétences vide. Impossible de recommander des ressources.');
   }
-  const prompt = `Recommande des ressources d’apprentissage pour les compétences suivantes. Retourne seulement au format JSON : ${competences.join(', ')}`;
+  const prompt = `Recommande des ressources d'apprentissage pour les compétences suivantes. Retourne seulement au format JSON : ${competences.join(', ')}`;
   return traiterReponseIA(prompt);
 }
 

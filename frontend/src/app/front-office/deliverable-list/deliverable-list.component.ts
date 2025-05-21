@@ -1,12 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Deliverable } from '../../core/models/deliverable.model';
+import { RouterModule } from '@angular/router';
+import { Deliverable, StatutLivrable } from '../../core/models/deliverable.model';
 import { DeliverableService } from '../../core/services/deliverable.service';
 
 @Component({
   selector: 'app-deliverable-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './deliverable-list.component.html',
   styleUrl: './deliverable-list.component.css'
 })
@@ -15,7 +16,9 @@ export class DeliverableListComponent implements OnInit {
   livrables: Deliverable[] = [];
   chargement = false;
   erreur = '';
+
   constructor(private deliverableService: DeliverableService) {}
+
   ngOnInit() {
     if (this.projetId) {
       this.chargement = true;
@@ -30,5 +33,10 @@ export class DeliverableListComponent implements OnInit {
         }
       });
     }
+  }
+
+  // Helper method to check status
+  isStatus(status: StatutLivrable, expectedStatus: string): boolean {
+    return status.toLowerCase() === expectedStatus.toLowerCase();
   }
 }
