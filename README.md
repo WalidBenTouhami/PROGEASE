@@ -180,16 +180,14 @@ backend
 frontend
 |-- README.md
 |-- angular.json
-|-- exportCode.js
-|-- exported_code.txt
-|-- filesList.js
-|-- filesList.txt
 |-- package-lock.json
 |-- package.json
+|-- proxy.conf.json
 |-- public
 |   `-- favicon.ico
 |-- server.ts
 |-- src
+|   |-- android-chrome-512x512.png
 |   |-- app
 |   |   |-- app-routing.module.ts
 |   |   |-- app.component.css
@@ -201,20 +199,48 @@ frontend
 |   |   |-- app.module.ts
 |   |   |-- app.routes.ts
 |   |   |-- back-office
+|   |   |   |-- back-office-routing.module.ts
+|   |   |   |-- back-office.module.ts
+|   |   |   |-- dashboard
+|   |   |   |-- deliverable-management
+|   |   |   `-- project-management
 |   |   |-- core
+|   |   |   |-- api-test
+|   |   |   |-- apollo.config.ts
+|   |   |   |-- interceptors
+|   |   |   |-- models
+|   |   |   `-- services
 |   |   |-- deliverable
+|   |   |   |-- deliverable-detail
+|   |   |   |-- deliverable-form
+|   |   |   |-- deliverable-list
+|   |   |   |-- deliverable-routing.module.ts
+|   |   |   `-- deliverable.module.ts
 |   |   |-- front-office
+|   |   |   |-- dashboard
+|   |   |   |-- deliverable-list
+|   |   |   |-- front-office-routing.module.ts
+|   |   |   |-- front-office.module.ts
+|   |   |   `-- project-list
 |   |   `-- project
+|   |       |-- project-detail
+|   |       |-- project-form
+|   |       |-- project-list
+|   |       |-- project-routing.module.ts
+|   |       `-- project.module.ts
 |   |-- environments
 |   |   |-- environment.prod.ts
 |   |   `-- environment.ts
 |   |-- index.html
 |   |-- main.server.ts
 |   |-- main.ts
+|   |-- polyfills.ts
 |   `-- styles.css
 |-- tsconfig.app.json
 |-- tsconfig.json
 `-- tsconfig.spec.json
+
+
 
 ```
 
