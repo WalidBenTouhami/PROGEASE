@@ -4,7 +4,7 @@ import { environment } from '../../../environments/environment';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Apollo, gql } from 'apollo-angular';
-import { AlertService } from '../services/atert.service'; 
+import { AlertService } from './atert.service';
 
 @Injectable({
   providedIn: 'root'
