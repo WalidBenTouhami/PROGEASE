@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProjectService } from '../../core/services/project.service';
 import { Project } from '../../core/models/project.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-project-list',
@@ -11,10 +12,11 @@ import { Project } from '../../core/models/project.model';
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.css']
 })
-export class ProjectListComponent implements OnInit {
-  projets: (Project & { _id: string })[] = []; // Garantit que _id existe et est de type string
+export class ProjectListComponent implements OnInit, OnDestroy {
+  projets: (Project & { _id: string })[] = [];
   chargement = false;
   erreur = '';
+  private subscription?: Subscription;
 
   constructor(
     private projectService: ProjectService,
@@ -27,9 +29,8 @@ export class ProjectListComponent implements OnInit {
 
   chargerProjets() {
     this.chargement = true;
-    this.projectService.recupererProjets().subscribe({
+    this.subscription = this.projectService.recupererProjets().subscribe({
       next: (projets) => {
-        // Filtre les projets sans _id et effectue un cast
         this.projets = projets.filter(p => !!p._id) as (Project & { _id: string })[];
         this.chargement = false;
       },
@@ -43,5 +44,11 @@ export class ProjectListComponent implements OnInit {
 
   voirDetails(id: string) {
     this.router.navigate(['/project', id]);
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }

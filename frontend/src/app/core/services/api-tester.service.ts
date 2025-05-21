@@ -18,14 +18,12 @@ export class ApiTesterService {
     private alertService: AlertService
   ) {}
 
-  // Test REST API
   testRestConnection(): Observable<any> {
     return this.http.get(`${this.apiUrl}/projects`).pipe(
       catchError((error) => this.handleError(error))
     );
   }
 
-  // Test GraphQL
   testGraphQLConnection(): Observable<any> {
     return this.apollo.query({
       query: gql`
@@ -42,14 +40,12 @@ export class ApiTesterService {
     );
   }
 
-  // Test AI service
   testAIService(prompt: string): Observable<any> {
     return this.http.post(`${this.apiUrl}/ai/generer-texte`, { prompt }).pipe(
       catchError((error) => this.handleError(error))
     );
   }
 
-  // Gestion des erreurs
   private handleError(error: any): Observable<never> {
     const errorMessage = 'Erreur lors de la requête API : ' + (error.message || error.statusText);
     this.alertService.error(errorMessage);

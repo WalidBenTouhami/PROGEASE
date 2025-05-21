@@ -2,7 +2,7 @@ const fs = require('fs').promises;
       const path = require('path');
 
       /**
-       * Fonction récursive pour récupérer tous les fichiers `.ts` d'un répertoire donné.
+       * Fonction récursive pour récupérer tous les fichiers `.css` et `.html` d'un répertoire donné.
        * Exclut certains répertoires et fichiers indésirables.
        * @param {string} dirPath - Chemin du répertoire à parcourir.
        * @param {string[]} filesList - Tableau pour stocker les fichiers trouvés.
@@ -26,7 +26,7 @@ const fs = require('fs').promises;
 
             if (file.isDirectory()) {
               await getAllFiles(fullPath, filesList);
-            } else if (file.name.endsWith('.ts')) {
+            } else if (file.name.endsWith('.css') || file.name.endsWith('.html') ) {
               filesList.push(path.relative('.', fullPath).replace(/\\/g, '/'));
             }
           }
@@ -38,11 +38,11 @@ const fs = require('fs').promises;
       }
 
       /**
-       * Fonction principale pour récupérer les fichiers `.ts` et écrire la liste dans un fichier.
+       * Fonction principale pour récupérer les fichiers `.css`, `.html` et écrire la liste dans un fichier.
        */
       async function main() {
         const directoryPath = path.resolve('.'); // Répertoire actuel
-        const outputFilePath = path.resolve('filesList.txt'); // Fichier de sortie
+        const outputFilePath = path.resolve('filesListhtml.txt'); // Fichier de sortie
 
         try {
           // Vérifier si le répertoire existe
@@ -56,7 +56,7 @@ const fs = require('fs').promises;
           const formattedList = `[\n${filesList.map(file => `    '${file}'`).join(',\n')}\n];`;
           await fs.writeFile(outputFilePath, formattedList, 'utf8');
 
-          console.log(`✅ Liste des fichiers '.ts' écrite dans ${outputFilePath}`);
+          console.log(`✅ Liste des fichiers '.css', '.html' écrite dans ${outputFilePath}`);
         } catch (error) {
           console.error(`❌ Erreur: ${error.message}`);
         }

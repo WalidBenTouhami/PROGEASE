@@ -7,7 +7,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   standalone: true,
   imports: [],
   templateUrl: './project-form.component.html',
-  styleUrls: ['./project-form.component.css'] // Correction : styleUrls (array), pas styleUrl
+  styleUrls: ['./project-form.component.css']
 })
 export class ProjectFormComponent implements OnInit {
   @Input() projet?: Project;
@@ -36,9 +36,6 @@ export class ProjectFormComponent implements OnInit {
     });
   }
 
-  /**
-   * S'assure que la date soit bien au format "YYYY-MM-DD" pour l'input[type=date]
-   */
   toDateInputValue(date: string | Date): string {
     if (!date) return '';
     const d = new Date(date);
