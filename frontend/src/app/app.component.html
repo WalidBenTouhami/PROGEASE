@@ -1,31 +1,31 @@
-<a href="#main-content" class="skip-link">Aller au contenu principal</a>
+<a href="#contenu-principal" class="skip-link">Aller au contenu principal</a>
 <div class="app-container">
   <header class="app-header">
     <div class="logo-container">
-      <img ngSrc="../../assets/PROGEASE.png" alt="Logo PROGEASE" width="150" height="45" priority>
-      <h1>{{ titre }}</h1>
+      <img src="assets/PROGEASE.png" alt="Logo PROGEASE" height="45" loading="lazy" />
+      <h1>PROGEASE</h1>
     </div>
-    <nav class="main-nav" aria-label="Navigation principale">
+    <nav class="main-nav" aria-label="Menu principal">
       <ul>
         <li>
           <a routerLink="/front-office" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" aria-current="page">Accueil</a>
         </li>
         <li>
-          <a routerLink="/project" routerLinkActive="active">Projets</a>
+          <a routerLink="/projets" routerLinkActive="active">Projets</a>
         </li>
         <li>
-          <a routerLink="/deliverable" routerLinkActive="active">Livrables</a>
+          <a routerLink="/livrables" routerLinkActive="active">Livrables</a>
         </li>
         <li>
-          <a routerLink="/back-office" routerLinkActive="active">Back office</a>
+          <a routerLink="/back-office" routerLinkActive="active">Administration</a>
         </li>
       </ul>
     </nav>
   </header>
-  <main id="main-content" class="app-content" tabindex="-1">
+  <main id="contenu-principal" class="app-content" tabindex="-1">
     <router-outlet></router-outlet>
   </main>
   <footer class="app-footer">
-    <p>&copy; 2025 PROGEASE – Plateforme de Gestion de Projets Académiques</p>
+    <p>&copy; 2025 PROGEASE – Plateforme de gestion de projets académiques</p>
   </footer>
 </div>

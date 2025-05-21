@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ApiTesterService } from '../../core/services/api-tester.service';
+import { ApiTesterService } from '../services/api-tester.service';
 
 @Component({
   selector: 'app-api-test',

@@ -1,53 +1,19 @@
-<form (ngSubmit)="onSubmit()" #projectForm="ngForm" aria-labelledby="project-form-title">
-  <h2 id="project-form-title">Créer ou modifier un projet</h2>
-
+<form (ngSubmit)="soumettreProjet()" #projetForm="ngForm" aria-labelledby="formulaire-projet-titre" class="form-container">
+  <h2 id="formulaire-projet-titre">Créer ou modifier un projet</h2>
   <div class="form-group">
-    <label for="name">Nom du projet</label>
-    <input
-      type="text"
-      id="name"
-      name="name"
-      [(ngModel)]="project.name"
-      required
-      aria-required="true"
-      #nameInput="ngModel"
-    >
-    <div *ngIf="nameInput.invalid && nameInput.touched" class="error">
-      Le nom est requis.
-    </div>
+    <label for="nom">Nom du projet</label>
+    <input type="text" id="nom" name="nom" [(ngModel)]="projet.nom" required aria-required="true" #nomInput="ngModel">
+    <div *ngIf="nomInput.invalid && nomInput.touched" class="error">Le nom est requis.</div>
   </div>
-
   <div class="form-group">
     <label for="description">Description</label>
-    <textarea
-      id="description"
-      name="description"
-      [(ngModel)]="project.description"
-      rows="4"
-      required
-      aria-required="true"
-      #descInput="ngModel"
-    ></textarea>
-    <div *ngIf="descInput.invalid && descInput.touched" class="error">
-      La description est requise.
-    </div>
+    <textarea id="description" name="description" [(ngModel)]="projet.description" rows="4" required aria-required="true" #descInput="ngModel"></textarea>
+    <div *ngIf="descInput.invalid && descInput.touched" class="error">La description est requise.</div>
   </div>
-
   <div class="form-group">
-    <label for="deadline">Date limite</label>
-    <input
-      type="date"
-      id="deadline"
-      name="deadline"
-      [(ngModel)]="project.deadline"
-      required
-      aria-required="true"
-      #deadlineInput="ngModel"
-    >
-    <div *ngIf="deadlineInput.invalid && deadlineInput.touched" class="error">
-      La date limite est requise.
-    </div>
+    <label for="echeance">Date limite</label>
+    <input type="date" id="echeance" name="echeance" [(ngModel)]="projet.echeance" required aria-required="true" #echeanceInput="ngModel">
+    <div *ngIf="echeanceInput.invalid && echeanceInput.touched" class="error">La date limite est requise.</div>
   </div>
-
-  <button type="submit" [disabled]="projectForm.invalid">Enregistrer</button>
+  <button type="submit" [disabled]="projetForm.invalid">Enregistrer</button>
 </form>

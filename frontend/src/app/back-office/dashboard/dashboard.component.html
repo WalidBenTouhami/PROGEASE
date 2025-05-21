@@ -1,25 +1,23 @@
-<section class="dashboard-container" aria-labelledby="backoffice-dashboard-title">
-  <h2 id="backoffice-dashboard-title" class="title">Tableau de bord enseignant</h2>
-
+<section class="dashboard-container" aria-labelledby="tableau-bord-admin-titre">
+  <h2 id="tableau-bord-admin-titre" class="title">Tableau de bord administration</h2>
   <div class="stats-grid" role="list" aria-label="Statistiques de gestion">
     <div class="stat-card" role="listitem">
       <h3>Projets à valider</h3>
-      <span class="stat-value">{{ toValidateProjects }}</span>
+      <span class="stat-value">{{ projetsAValider }}</span>
     </div>
     <div class="stat-card" role="listitem">
       <h3>Livrables à corriger</h3>
-      <span class="stat-value">{{ toCheckDeliverables }}</span>
+      <span class="stat-value">{{ livrablesACorriger }}</span>
     </div>
     <div class="stat-card" role="listitem">
       <h3>Étudiants inscrits</h3>
-      <span class="stat-value">{{ studentCount }}</span>
+      <span class="stat-value">{{ nbEtudiants }}</span>
     </div>
   </div>
-
-  <section aria-labelledby="recent-admin-title">
-    <h3 id="recent-admin-title">Dernières actions</h3>
+  <section aria-labelledby="dernieres-actions-titre">
+    <h3 id="dernieres-actions-titre">Dernières actions</h3>
     <ul>
-      <li *ngFor="let action of recentActions">
+      <li *ngFor="let action of dernieresActions">
         {{ action.description }}
         <time [attr.datetime]="action.date">{{ action.date | date:'shortDate' }}</time>
       </li>

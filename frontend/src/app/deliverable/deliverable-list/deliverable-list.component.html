@@ -1,33 +1,10 @@
-<h2 id="deliverable-list-title">Liste des livrables</h2>
-
-  <div *ngIf="chargement" class="loading">Chargement...</div>
-  <div *ngIf="erreur" class="erreur" role="alert">{{ erreur }}</div>
-
-  <div *ngIf="!chargement && livrables?.length; else noDeliverables">
-    <table class="deliverable-table" aria-labelledby="deliverable-list-title">
-      <thead>
-        <tr>
-          <th scope="col">Nom</th>
-          <th scope="col">Description</th>
-          <th scope="col">Date limite</th>
-          <th scope="col">Statut</th>
-          <th scope="col">URL dépôt</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let livrable of livrables">
-          <td>{{ livrable.nom }}</td>
-          <td>{{ livrable.description }}</td>
-          <td>{{ livrable.dateLimite | date:'dd/MM/yyyy' }}</td>
-          <td>{{ livrable.statut }}</td>
-          <td>
-            <a [href]="livrable.urlDepot" target="_blank" rel="noopener noreferrer">Voir sur GitHub</a>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <ng-template #noDeliverables>
-    <p class="no-data">Aucun livrable trouvé.</p>
-  </ng-template>
+<section aria-labelledby="deliverable-list-title">
+  <h2 id="deliverable-list-title">Liste des livrables</h2>
+  <ul class="deliverable-list">
+    <li *ngFor="let deliverable of deliverables">
+      <a [routerLink]="['/deliverable', deliverable.id]">{{ deliverable.title }}</a>
+      <span *ngIf="deliverable.status === 'submitted'" class="status submitted">Soumis</span>
+      <span *ngIf="deliverable.status === 'pending'" class="status pending">En attente</span>
+    </li>
+  </ul>
+</section>

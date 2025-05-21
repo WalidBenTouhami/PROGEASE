@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { ApiTestComponent } from '../app/test/api-test/api-test.component';
+import { ApiTestComponent } from './core/api-test/api-test.component';
 
 export const routes: Routes = [
   { path: 'back-office', loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule) },

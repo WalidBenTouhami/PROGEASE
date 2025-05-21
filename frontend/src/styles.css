@@ -14,7 +14,6 @@ body {
   color: #222;
   margin: 0;
 }
-
 a {
   color: var(--primary-color);
   text-decoration: none;
@@ -26,7 +25,6 @@ a:focus, a:hover {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
-
 .skip-link {
   position: absolute;
   left: -999px;
@@ -48,7 +46,6 @@ a:focus, a:hover {
   font-size: 1rem;
   outline: 2px solid var(--primary-color);
 }
-
 button, input, select, textarea {
   font-family: inherit;
   font-size: 1rem;
@@ -58,7 +55,6 @@ button, input, select, textarea {
   margin-bottom: .5em;
   box-sizing: border-box;
 }
-
 button {
   background: var(--primary-color);
   color: #fff;
@@ -69,16 +65,13 @@ button {
 button:focus, button:hover {
   background: var(--primary-dark);
 }
-
 .form-group {
   margin-bottom: 1em;
 }
-
 .error {
   color: var(--error-color);
   font-size: .95em;
 }
-
 .status {
   display: inline-block;
   font-size: 0.85em;
@@ -86,10 +79,10 @@ button:focus, button:hover {
   padding: 0.2em 0.6em;
   border-radius: 1em;
 }
-.status.completed { background: #c8e6c9; color: #256029; }
-.status.ongoing { background: #ffe082; color: #996c00; }
-.status.submitted { background: #bbdefb; color: #0d47a1; }
-.status.pending { background: #fff3e0; color: #bf360c; }
+.status.termine { background: #c8e6c9; color: #256029; }
+.status.encours { background: #ffe082; color: #996c00; }
+.status.soumis { background: #bbdefb; color: #0d47a1; }
+.status.attente { background: #fff3e0; color: #bf360c; }
 
 @media (max-width: 600px) {
   .dashboard-container, .form-container {

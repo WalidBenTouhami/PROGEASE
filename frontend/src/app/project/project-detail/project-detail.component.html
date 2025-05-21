@@ -1,28 +1,19 @@
-<h2>Détail du projet</h2>
-<article class="project-detail" *ngIf="project" aria-labelledby="project-title">
-  <h2 id="project-title">{{ project?.titre }}</h2>
-  <p>Description : {{ project?.description }}</p>
-  <p>Date limite :
-    <time *ngIf="project?.deadline" [attr.datetime]="project?.deadline">
-      {{ project?.deadline | date:'longDate' }}
-    </time>
-    <span *ngIf="!project?.deadline">Non définie</span>
-  </p>
-
-  <section *ngIf="project?.members?.length" aria-labelledby="members-title">
-    <h3 id="members-title">Membres du projet</h3>
+<article class="project-detail" aria-labelledby="projet-titre">
+  <h2 id="projet-titre">{{ projet.nom }}</h2>
+  <p>Description : {{ projet.description }}</p>
+  <p>Date limite : <time [attr.datetime]="projet.echeance">{{ projet.echeance | date:'longDate' }}</time></p>
+  <section aria-labelledby="membres-titre">
+    <h3 id="membres-titre">Membres du projet</h3>
     <ul>
-      <li *ngFor="let member of project?.members">{{ member?.fullName }}</li>
+      <li *ngFor="let membre of projet.membres">{{ membre.nomComplet }}</li>
     </ul>
   </section>
-
-  <section *ngIf="project?.deliverables?.length" aria-labelledby="deliverables-title">
-    <h3 id="deliverables-title">Livrables associés</h3>
+  <section aria-labelledby="livrables-associes-titre">
+    <h3 id="livrables-associes-titre">Livrables associés</h3>
     <ul>
-      <li *ngFor="let deliverable of project?.deliverables">
-        <a [routerLink]="['/deliverable', deliverable?.id]">{{ deliverable?.title }}</a>
+      <li *ngFor="let livrable of projet.livrables">
+        <a [routerLink]="['/livrables', livrable.id]">{{ livrable.titre }}</a>
       </li>
     </ul>
   </section>
 </article>
-<div *ngIf="!project" class="error">Aucun projet trouvé.</div>

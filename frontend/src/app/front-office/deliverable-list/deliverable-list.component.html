@@ -1,27 +1,10 @@
-<h3>Livrables du projet</h3>
-<div *ngIf="chargement">Chargement...</div>
-<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
-
-<table *ngIf="livrables.length">
-  <thead>
-  <tr>
-    <th>Nom</th>
-    <th>Description</th>
-    <th>Date limite</th>
-    <th>Statut</th>
-    <th>URL dépôt</th>
-  </tr>
-  </thead>
-  <tbody>
-  <tr *ngFor="let livrable of livrables">
-    <td>{{ livrable.nom }}</td>
-    <td>{{ livrable.description }}</td>
-    <td>{{ livrable.dateLimite | date:'dd/MM/yyyy' }}</td>
-    <td>{{ livrable.statut }}</td>
-    <td>
-      <a [href]="livrable.urlDepot" target="_blank" rel="noopener noreferrer">Voir sur GitHub</a>
-    </td>
-  </tr>
-  </tbody>
-</table>
-<div *ngIf="!livrables.length && !chargement">Aucun livrable trouvé.</div>
+<section aria-labelledby="liste-livrables-titre">
+  <h2 id="liste-livrables-titre">Liste des livrables</h2>
+  <ul class="deliverable-list">
+    <li *ngFor="let livrable of livrables">
+      <a [routerLink]="['/livrables', livrable.id]">{{ livrable.titre }}</a>
+      <span *ngIf="livrable.statut === 'soumis'" class="status soumis">Soumis</span>
+      <span *ngIf="livrable.statut === 'attente'" class="status attente">En attente</span>
+    </li>
+  </ul>
+</section>

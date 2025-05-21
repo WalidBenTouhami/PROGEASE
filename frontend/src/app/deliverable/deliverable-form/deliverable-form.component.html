@@ -1,85 +1,13 @@
-<form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" autocomplete="off" aria-labelledby="deliverable-form-title">
-  <h2 id="deliverable-form-title">Ajouter un livrable</h2>
-
+<form (ngSubmit)="soumettreLivrable()" #livrableForm="ngForm" aria-labelledby="formulaire-livrable-titre" class="form-container">
+  <h2 id="formulaire-livrable-titre">Ajouter un livrable</h2>
   <div class="form-group">
-    <label for="nom">Nom :</label>
-    <input
-      id="nom"
-      formControlName="nom"
-      required
-      aria-required="true"
-    >
-    <div *ngIf="livrableForm.get('nom')?.invalid && livrableForm.get('nom')?.touched" class="error">
-      Le nom est requis.
-    </div>
+    <label for="titre">Titre</label>
+    <input type="text" id="titre" name="titre" [(ngModel)]="livrable.titre" required aria-required="true" #titreInput="ngModel">
+    <div *ngIf="titreInput.invalid && titreInput.touched" class="error">Le titre est requis.</div>
   </div>
-
   <div class="form-group">
-    <label for="description">Description :</label>
-    <textarea
-      id="description"
-      formControlName="description"
-      required
-      aria-required="true"
-    ></textarea>
-    <div *ngIf="livrableForm.get('description')?.invalid && livrableForm.get('description')?.touched" class="error">
-      La description est requise.
-    </div>
+    <label for="fichier">Fichier</label>
+    <input type="file" id="fichier" name="fichier" (change)="chargerFichier($event)" required aria-required="true">
   </div>
-
-  <div class="form-group">
-    <label for="dateLimite">Date limite :</label>
-    <input
-      type="date"
-      id="dateLimite"
-      formControlName="dateLimite"
-      required
-      aria-required="true"
-    >
-    <div *ngIf="livrableForm.get('dateLimite')?.invalid && livrableForm.get('dateLimite')?.touched" class="error">
-      La date limite est requise.
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="urlDepot">URL du dépôt :</label>
-    <input
-      id="urlDepot"
-      formControlName="urlDepot"
-      required
-      placeholder="https://github.com/monorg/monrepo"
-      aria-required="true"
-    >
-    <div *ngIf="livrableForm.get('urlDepot')?.invalid && livrableForm.get('urlDepot')?.touched" class="error">
-      L'URL du dépôt est requise.
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="statut">Statut :</label>
-    <select
-      id="statut"
-      formControlName="statut"
-      required
-      aria-required="true"
-    >
-      <option *ngFor="let statut of statutsLivrable" [value]="statut">{{ statut }}</option>
-    </select>
-    <div *ngIf="livrableForm.get('statut')?.invalid && livrableForm.get('statut')?.touched" class="error">
-      Le statut est requis.
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="file">Fichier :</label>
-    <input
-      type="file"
-      id="file"
-      (change)="onFileSelected($event)"
-      required
-      aria-required="true"
-    >
-  </div>
-
-  <button type="submit" [disabled]="livrableForm.invalid">Enregistrer</button>
+  <button type="submit" [disabled]="livrableForm.invalid">Soumettre</button>
 </form>

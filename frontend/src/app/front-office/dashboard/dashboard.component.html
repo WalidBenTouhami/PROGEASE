@@ -1,24 +1,24 @@
-<section class="dashboard-container" aria-labelledby="dashboard-title">
-  <h2 id="dashboard-title" class="title">Tableau de bord étudiant</h2>
+<section class="dashboard-container" aria-labelledby="tableau-bord-titre">
+  <h2 id="tableau-bord-titre" class="title">Tableau de bord étudiant</h2>
   <div class="stats-grid" role="list" aria-label="Statistiques principales">
     <div class="stat-card" role="listitem">
       <h3>Projets en cours</h3>
-      <span class="stat-value">{{ ongoingProjects }}</span>
+      <span class="stat-value">{{ projetsEnCours }}</span>
     </div>
     <div class="stat-card" role="listitem">
       <h3>Livrables soumis</h3>
-      <span class="stat-value">{{ deliveredItems }}</span>
+      <span class="stat-value">{{ livrablesSoumis }}</span>
     </div>
     <div class="stat-card" role="listitem">
-      <h3>Feedback reçus</h3>
-      <span class="stat-value">{{ feedbackCount }}</span>
+      <h3>Retours reçus</h3>
+      <span class="stat-value">{{ retoursRecus }}</span>
     </div>
   </div>
-  <section aria-labelledby="recent-title">
-    <h3 id="recent-title">Projets récents</h3>
+  <section aria-labelledby="projets-recents-titre">
+    <h3 id="projets-recents-titre">Projets récents</h3>
     <ul>
-      <li *ngFor="let project of recentProjects">
-        <a [routerLink]="['/project', project.id]">{{ project.name }}</a>
+      <li *ngFor="let projet of projetsRecents">
+        <a [routerLink]="['/projets', projet.id]">{{ projet.nom }}</a>
         <span class="sr-only">, projet récent</span>
       </li>
     </ul>

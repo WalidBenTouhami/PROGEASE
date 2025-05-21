@@ -1,44 +1,10 @@
-<div *ngIf="chargement" class="loading">Chargement...</div>
-<div *ngIf="erreur" class="erreur" role="alert">{{ erreur }}</div>
-
-<div *ngIf="!chargement && projets?.length; else noProjects">
-  <table class="project-table" aria-labelledby="project-list-title">
-    <thead>
-      <tr>
-        <th scope="col">Titre</th>
-        <th scope="col">Description</th>
-        <th scope="col">Statut</th>
-        <th scope="col">Date de début</th>
-        <th scope="col">Date de fin</th>
-        <th scope="col">Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let projet of projets">
-        <td>{{ projet.titre }}</td>
-        <td>{{ projet.description }}</td>
-        <td>{{ projet.statut }}</td>
-        <td>{{ projet.dateDebut | date:'dd/MM/yyyy' }}</td>
-        <td>{{ projet.dateFin | date:'dd/MM/yyyy' }}</td>
-        <td>
-          <button type="button" (click)="voirDetails(projet._id)">Voir</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<ng-template #noProjects>
-  <p class="no-data">Aucun projet trouvé.</p>
-</ng-template>
-
-<section aria-labelledby="project-list-title">
-  <h2 id="project-list-title">Liste des projets</h2>
+<section aria-labelledby="liste-projets-titre">
+  <h2 id="liste-projets-titre">Liste des projets</h2>
   <ul class="project-list">
     <li *ngFor="let projet of projets">
-      <a [routerLink]="['/project', projet.id]">{{ projet.titre }}</a>
-      <span *ngIf="projet.statut === 'ongoing'" class="status ongoing">En cours</span>
-      <span *ngIf="projet.statut === 'completed'" class="status completed">Terminé</span>
+      <a [routerLink]="['/projets', projet.id]">{{ projet.nom }}</a>
+      <span *ngIf="projet.statut === 'encours'" class="status encours">En cours</span>
+      <span *ngIf="projet.statut === 'termine'" class="status termine">Terminé</span>
     </li>
   </ul>
 </section>
