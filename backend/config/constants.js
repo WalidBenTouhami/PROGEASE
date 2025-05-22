@@ -1,6 +1,6 @@
 // config/constants.js
 
-require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const VARIABLES_ENV_OBLIGATOIRES = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
 VARIABLES_ENV_OBLIGATOIRES.forEach((varEnv) => {

@@ -152,7 +152,7 @@ backend
     |   |-- evaluation.router.js
     |   |-- formation&certification.router.js
     |   |-- forum.router.js
-    |   |-- projet.router.js
+    |   |-- projet.routes.js
     |   `-- user.router.js
     |-- schema.js
     |-- services

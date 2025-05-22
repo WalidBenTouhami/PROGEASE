@@ -1,16 +1,18 @@
 
 // ======= Contenu de config/constants.js =======
 
+// config/constants.js
+
 require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
 
-const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
-REQUIRED_ENV_VARS.forEach((envVar) => {
-    if (!process.env[envVar]) {
-        throw new Error(`La variable d'environnement ${envVar} est manquante.`);
+const VARIABLES_ENV_OBLIGATOIRES = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
+VARIABLES_ENV_OBLIGATOIRES.forEach((varEnv) => {
+    if (!process.env[varEnv]) {
+        throw new Error(`La variable d'environnement ${varEnv} est manquante.`);
     }
 });
 
-const Enums = Object.freeze({
+const Enum = Object.freeze({
     StatutProjet: {
         BROUILLON: "Brouillon",
         EN_COURS: "En cours",
@@ -36,13 +38,13 @@ const ConfigSecurite = Object.freeze({
     },
     MOT_DE_PASSE: {
         LONGUEUR_MIN: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10,
-        NOMBRE_SALT: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
+        NB_SALT: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
         NB_MAX_ESSAIS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5,
         MINUTES_VERROUILLAGE: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30,
     },
 });
 
-const PaginationDefaut = Object.freeze({
+const PaginationParDefaut = Object.freeze({
     PAGE: 1,
     LIMITE: 20,
     LIMITE_MAX: 100,
@@ -87,31 +89,29 @@ module.exports = {
     PORT: process.env.PORT || 3000,
     JWT_SECRET: process.env.JWT_SECRET,
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
-    Enums,
+    Enum,
     ConfigSecurite,
-    PaginationDefaut,
+    PaginationParDefaut,
     MessagesErreur,
     StatutHttp,
 };
 
 // ======= Contenu de config/db.js =======
 
-// config/db.js
-
 const mongoose = require('mongoose');
 
-// ✅ Connexion à MongoDB (messages en français)
-async function connectToDatabase(mongoUri) {
+// Connexion à MongoDB (messages en français)
+async function connecterBD(uriMongo) {
     try {
-        await mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoose.connect(uriMongo);
         console.log('✅ Connecté à MongoDB');
-    } catch (error) {
-        console.error('❌ Erreur de connexion MongoDB :', error.message);
+    } catch (erreur) {
+        console.error('❌ Erreur de connexion MongoDB :', erreur.message);
         process.exit(1); // Arrêt du processus si la connexion échoue
     }
 }
 
-module.exports = connectToDatabase;
+module.exports = connecterBD;
 
 // ======= Contenu de config/env.js =======
 
@@ -121,15 +121,14 @@ require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
 
-const dbConfigPath = path.resolve(__dirname, 'db.json');
+const cheminConfigDB = path.resolve(__dirname, 'db.json');
 
-// ✅ Chargement des variables d'environnement depuis db.json
-if (fs.existsSync(dbConfigPath)) {
-    const envConfig = JSON.parse(fs.readFileSync(dbConfigPath, 'utf-8')).env;
-
-    process.env.PORT = envConfig.PORT || process.env.PORT;
-    process.env.MONGO_URI = envConfig.MONGO_URI || process.env.MONGO_URI;
-    process.env.JWT_SECRET = envConfig.JWT_SECRET || process.env.JWT_SECRET;
+// Chargement des variables d'environnement depuis db.json
+if (fs.existsSync(cheminConfigDB)) {
+    const configEnv = JSON.parse(fs.readFileSync(cheminConfigDB, 'utf-8')).env;
+    process.env.PORT = configEnv.PORT || process.env.PORT;
+    process.env.MONGO_URI = configEnv.MONGO_URI || process.env.MONGO_URI;
+    process.env.JWT_SECRET = configEnv.JWT_SECRET || process.env.JWT_SECRET;
 }
 
 // ======= Contenu de exportCode.js =======
@@ -149,13 +148,14 @@ const filesToExport = [
     'src/controllers/projet.controller.js',
     'src/graphql/resolvers.js',
     'src/graphql/schema.js',
+    'src/middleware/errorHandlers.js',
     'src/middlewares/projet.middleware.js',
     'src/middlewares/validate.Request.js',
     'src/models/livrable.model.js',
     'src/models/projet.model.js',
     'src/routers/ai.router.js',
-    'src/routers/livrable.router.js',
-    'src/routers/projet.router.js',
+    'src/routers/livrable.routes.js',
+    'src/routers/projet.routes.js',
     'src/services/ai.service.js',
     'src/services/github.service.js',
     'src/services/projet.service.js',
@@ -280,101 +280,198 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
+const helmet = require('helmet');
+const compression = require('compression');
+const rateLimit = require('express-rate-limit');
+const { ApolloServer } = require('apollo-server-express');
+const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
+const { GraphQLError } = require('graphql');
+const http = require('http');
 require('dotenv').config();
 
-const { ApolloServer } = require('apollo-server-express');
 const { typeDefs } = require('./src/graphql/schema');
 const { resolvers } = require('./src/graphql/resolvers');
-const projectRouter = require('./src/routers/project.router');
-const deliverableRouter = require('./src/routers/deliverable.router');
-const aiRouter = require('./src/routers/ai.router'); // ✅ Import du routeur IA
+const projetRouter = require('./src/routers/projet.router');
+const livrableRouter = require('./src/routers/livrable.router');
+const aiRouter = require('./src/routers/ai.router');
+const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandlers');
 
 const app = express();
+const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
+const NODE_ENV = process.env.NODE_ENV || 'development';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
+// Configuration du rate limiter
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false
+});
 
-app.use(cors({
-    origin: 'http://localhost:4200',
-    credentials: true
-}));
+// Configuration CORS plus stricte
+const corsOptions = {
+    origin: [FRONTEND_URL, 'http://localhost:4200'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
 
-
-// ✅ Vérification des variables d'environnement critiques
+// Vérification des variables d'environnement critiques
 if (!MONGO_URI) {
     console.error('❌ Erreur : MONGO_URI manquante dans les variables d\'environnement.');
     process.exit(1);
 }
 
-// ✅ Middlewares
-app.use(morgan('dev')); // Journalisation
-app.use(cors()); // Autoriser les requêtes cross-origin
-app.use(express.json()); // Parseur JSON
+// Middlewares de base
+app.use(helmet({
+    contentSecurityPolicy: NODE_ENV === 'production',
+    crossOriginEmbedderPolicy: false
+}));
+app.use(morgan('combined'));
+app.use(cors(corsOptions));
+app.use(compression());
+app.use(limiter);
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// ✅ Initialisation Apollo Server
-const apolloServer = new ApolloServer({
-    typeDefs,
-    resolvers,
-    formatError: (err) => {
-        console.error('Erreur GraphQL :', err.message);
-        return {
-            message: err.message,
-            code: err.extensions?.code || 'ERREUR_INTERNE',
-        };
-    },
-});
-
-// ✅ Fonction pour démarrer Apollo Server
-async function startApolloServer() {
-    await apolloServer.start();
-    apolloServer.applyMiddleware({ app });
+// Configuration du cache pour l'environnement de production
+if (NODE_ENV === 'production') {
+    app.set('trust proxy', 1);
+    app.use((_req, res, next) => {
+        res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
+        next();
+    });
 }
 
-// ✅ Connexion à MongoDB
-mongoose
-    .connect(MONGO_URI)
-    .then(() => console.log('✅ Connecté à MongoDB'))
-    .catch((err) => {
+// Route de test
+app.get('/', (_req, res) => {
+    res.json({ message: 'PROGEASE API is running' });
+});
+
+// Route de santé
+app.get('/health', (_req, res) => {
+    res.status(200).json({
+        status: 'OK',
+        timestamp: new Date(),
+        uptime: process.uptime(),
+        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+    });
+});
+
+// Routes API REST
+app.use('/api/projets', projetRouter);
+app.use('/api/livrables', livrableRouter);
+app.use('/api/ai', aiRouter);
+
+// Connexion à MongoDB
+async function connectToMongoDB() {
+    try {
+        await mongoose.connect(MONGO_URI, {
+            maxPoolSize: 10,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+            family: 4
+        });
+        console.log('✅ Connecté à MongoDB');
+    } catch (err) {
         console.error('❌ Erreur de connexion MongoDB :', err.message);
         process.exit(1);
+    }
+}
+
+// Initialisation Apollo Server
+async function startApolloServer() {
+    const server = new ApolloServer({
+        typeDefs,
+        resolvers,
+        plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+        context: async ({ req }) => ({ req }),
+        formatError: (err) => {
+            console.error('Erreur GraphQL :', err);
+            return new GraphQLError(
+                NODE_ENV === 'production' 
+                    ? 'Une erreur est survenue' 
+                    : err.message
+            );
+        },
+        playground: true,
+        introspection: true
     });
 
-// ✅ Définition des routes
-app.get('/', (req, res) => {
-    res.send('API PROGEASE fonctionne correctement.');
-});
-app.use('/api/projects', projectRouter);
-app.use('/api/deliverables', deliverableRouter);
-app.use('/api/ai', aiRouter); // ✅ Route IA
+    await server.start();
 
-// ✅ Gestion globale des erreurs
-app.use((req, res) => res.status(404).json({ error: 'Route introuvable' }));
-app.use((err, req, res, next) => {
-    console.error('Erreur non gérée :', err.stack);
-    res.status(err.status || 500).json({ error: err.message || 'Erreur serveur interne' });
+    server.applyMiddleware({
+        app,
+        path: '/graphql',
+        cors: false
+    });
+
+    return server;
+}
+
+// Gestion des événements MongoDB
+mongoose.connection.on('error', (err) => {
+    console.error('Erreur MongoDB :', err);
 });
 
-// ✅ Démarrage de l'application
-(async () => {
+mongoose.connection.on('disconnected', () => {
+    console.warn('Déconnecté de MongoDB');
+});
+
+// Middlewares de gestion d'erreurs (doivent être après toutes les routes)
+app.use(notFoundHandler);
+app.use(errorHandler);
+
+// Fonction principale de démarrage
+async function startServer() {
     try {
-        await startApolloServer();
-        app.listen(PORT, () => {
-            console.log(`🚀 Serveur Apollo lancé sur http://localhost:${PORT}${apolloServer.graphqlPath}`);
-            console.log(`✅ Serveur Express démarré sur le port ${PORT}`);
-        });
+        await connectToMongoDB();
+        const apolloServer = await startApolloServer();
+        
+        await new Promise(resolve => httpServer.listen({ port: PORT }, resolve));
+        
+        console.log(`🚀 Serveur Express démarré sur le port ${PORT} en mode ${NODE_ENV}`);
+        console.log(`📊 GraphQL disponible sur http://localhost:${PORT}${apolloServer.graphqlPath}`);
+
+        // Gestion de l'arrêt gracieux
+        const gracefulShutdown = async () => {
+            console.log('Signal d\'arrêt reçu. Arrêt gracieux...');
+            try {
+                await apolloServer.stop();
+                await new Promise(resolve => httpServer.close(resolve));
+                await mongoose.connection.close(false);
+                console.log('✅ Serveur arrêté avec succès');
+                process.exit(0);
+            } catch (error) {
+                console.error('❌ Erreur lors de l\'arrêt :', error);
+                process.exit(1);
+            }
+        };
+
+        process.on('SIGTERM', gracefulShutdown);
+        process.on('SIGINT', gracefulShutdown);
+
     } catch (error) {
-        console.error('❌ Échec du démarrage du serveur :', error.message);
+        console.error('❌ Échec du démarrage du serveur :', error);
         process.exit(1);
     }
-})();
+}
+
+// Démarrage de l'application
+startServer();
 
 // ======= Contenu de src/controllers/livrable.controller.js =======
 
-const Projet = require('../models/project.model');
-const Livrable = require('../models/deliverable.model');
+// src/controllers/livrable.controller.js
 
-// Mapping pour conversion MongoDB -> GraphQL, labels FR
-function mapProjetMongoVersGraphQL(doc) {
+const Projet = require('../models/projet.model');
+const Livrable = require('../models/livrable.model');
+
+// Mapping MongoDB -> GraphQL (nomenclature FR)
+function mapperProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
         _id: doc._id.toString(),
@@ -392,7 +489,7 @@ function mapProjetMongoVersGraphQL(doc) {
     };
 }
 
-function mapLivrableMongoVersGraphQL(doc) {
+function mapperLivrableMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
         _id: doc._id.toString(),
@@ -409,21 +506,21 @@ function mapLivrableMongoVersGraphQL(doc) {
 
 exports.ajouterLivrable = async (req, res) => {
     try {
-        const { projetId, ...data } = req.body;
-        if (!projetId || !data.nom || !data.description) {
+        const { projetId, ...donnees } = req.body;
+        if (!projetId || !donnees.nom || !donnees.description) {
             return res.status(400).json({ erreur: 'Données manquantes pour créer un livrable.' });
         }
         const projet = await Projet.findById(projetId);
         if (!projet) {
             return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
-        const livrable = new Livrable({ ...data, projetId });
-        const saved = await livrable.save();
-        projet.livrables.push(saved._id);
+        const livrable = new Livrable({ ...donnees, projetId });
+        const enregistre = await livrable.save();
+        projet.livrables.push(enregistre._id);
         await projet.save();
-        res.status(201).json(mapLivrableMongoVersGraphQL(saved));
-    } catch (error) {
-        console.error('Erreur lors de l\'ajout du livrable :', error);
+        res.status(201).json(mapperLivrableMongoVersGraphQL(enregistre));
+    } catch (erreur) {
+        console.error('Erreur lors de l\'ajout du livrable :', erreur);
         res.status(500).json({ erreur: 'Échec de l\'ajout du livrable.' });
     }
 };
@@ -435,9 +532,9 @@ exports.recupererLivrables = async (req, res) => {
             return res.status(400).json({ erreur: 'ID du projet manquant.' });
         }
         const livrables = await Livrable.find({ projetId });
-        res.status(200).json(livrables.map(mapLivrableMongoVersGraphQL));
-    } catch (error) {
-        console.error('Erreur lors de la récupération des livrables :', error);
+        res.status(200).json(livrables.map(mapperLivrableMongoVersGraphQL));
+    } catch (erreur) {
+        console.error('Erreur lors de la récupération des livrables :', erreur);
         res.status(500).json({ erreur: 'Échec de la récupération des livrables.' });
     }
 };
@@ -448,13 +545,13 @@ exports.mettreAJourLivrable = async (req, res) => {
         if (!livrableId) {
             return res.status(400).json({ erreur: 'ID du livrable manquant.' });
         }
-        const updated = await Livrable.findByIdAndUpdate(livrableId, req.body, { new: true, runValidators: true });
-        if (!updated) {
+        const maj = await Livrable.findByIdAndUpdate(livrableId, req.body, { new: true, runValidators: true });
+        if (!maj) {
             return res.status(404).json({ erreur: 'Livrable introuvable.' });
         }
-        res.status(200).json(mapLivrableMongoVersGraphQL(updated));
-    } catch (error) {
-        console.error('Erreur lors de la mise à jour du livrable :', error);
+        res.status(200).json(mapperLivrableMongoVersGraphQL(maj));
+    } catch (erreur) {
+        console.error('Erreur lors de la mise à jour du livrable :', erreur);
         res.status(500).json({ erreur: 'Échec de la mise à jour du livrable.' });
     }
 };
@@ -465,21 +562,61 @@ exports.supprimerLivrable = async (req, res) => {
         if (!livrableId) {
             return res.status(400).json({ erreur: 'ID du livrable manquant.' });
         }
-        const deleted = await Livrable.findByIdAndDelete(livrableId);
-        if (!deleted) {
+        const supprime = await Livrable.findByIdAndDelete(livrableId);
+        if (!supprime) {
             return res.status(404).json({ erreur: 'Livrable introuvable.' });
         }
         res.status(204).send();
-    } catch (error) {
-        console.error('Erreur lors de la suppression du livrable :', error);
+    } catch (erreur) {
+        console.error('Erreur lors de la suppression du livrable :', erreur);
         res.status(500).json({ erreur: 'Échec de la suppression du livrable.' });
+    }
+};
+
+exports.recupererTousLivrables = async (req, res) => {
+    try {
+        const livrables = await Livrable.find();
+        res.status(200).json(livrables.map(mapperLivrableMongoVersGraphQL));
+    } catch (erreur) {
+        console.error('Erreur lors de la récupération des livrables :', erreur);
+        res.status(500).json({ erreur: 'Échec de la récupération des livrables.' });
+    }
+};
+
+exports.recupererLivrableParId = async (req, res) => {
+    try {
+        const { livrableId } = req.params;
+        if (!livrableId) {
+            return res.status(400).json({ erreur: 'ID du livrable manquant.' });
+        }
+        const livrable = await Livrable.findById(livrableId);
+        if (!livrable) {
+            return res.status(404).json({ erreur: 'Livrable introuvable.' });
+        }
+        res.status(200).json(mapperLivrableMongoVersGraphQL(livrable));
+    } catch (erreur) {
+        console.error('Erreur lors de la récupération du livrable :', erreur);
+        res.status(500).json({ erreur: 'Échec de la récupération du livrable.' });
     }
 };
 
 // ======= Contenu de src/controllers/projet.controller.js =======
 
 // src/controllers/projet.controller.js
-const Projet = require('../models/project.model');
+const Projet = require('../models/projet.model');
+
+// Fonction utilitaire pour gérer les erreurs MongoDB
+const handleMongoError = (error) => {
+    if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return { status: 400, message: errors.join(', ') };
+    }
+    if (error.name === 'CastError') {
+        return { status: 400, message: 'ID de projet invalide.' };
+    }
+    console.error('Erreur MongoDB :', error);
+    return { status: 500, message: 'Erreur interne du serveur.' };
+};
 
 // Création d'un nouveau projet
 exports.creerProjet = async (req, res) => {
@@ -488,33 +625,53 @@ exports.creerProjet = async (req, res) => {
         const projetEnregistre = await projet.save();
         res.status(201).json(projetEnregistre);
     } catch (error) {
-        console.error('Erreur lors de la création du projet :', error);
-        res.status(500).json({ erreur: 'Échec de la création du projet.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };
 
 // Récupération de tous les projets
 exports.recupererProjets = async (req, res) => {
     try {
-        const projets = await Projet.find();
-        res.status(200).json(projets);
+        const { page = 1, limit = 10, statut, tri = '-creeLe' } = req.query;
+        const query = statut ? { statut } : {};
+        
+        const [projets, total] = await Promise.all([
+            Projet.find(query)
+                .sort(tri)
+                .limit(Number(limit))
+                .skip((Number(page) - 1) * Number(limit))
+                .populate('tuteur', 'nom prenom email')
+                .populate('livrables', 'titre statut'),
+            Projet.countDocuments(query)
+        ]);
+
+        res.status(200).json({
+            projets,
+            total,
+            page: Number(page),
+            pages: Math.ceil(total / Number(limit))
+        });
     } catch (error) {
-        console.error('Erreur lors de la récupération des projets :', error);
-        res.status(500).json({ erreur: 'Échec de la récupération des projets.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };
 
 // Récupération d'un projet par ID
 exports.recupererProjetParId = async (req, res) => {
     try {
-        const projet = await Projet.findById(req.params.id);
+        const projet = await Projet.findById(req.params.id)
+            .populate('tuteur', 'nom prenom email')
+            .populate('livrables', 'titre statut');
+            
         if (!projet) {
             return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
         res.status(200).json(projet);
     } catch (error) {
-        console.error('Erreur lors de la récupération du projet :', error);
-        res.status(500).json({ erreur: 'Échec de la récupération du projet.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };
 
@@ -523,16 +680,18 @@ exports.mettreAJourProjet = async (req, res) => {
     try {
         const projetMisAJour = await Projet.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            { ...req.body, majLe: new Date() },
             { new: true, runValidators: true }
-        );
+        ).populate('tuteur', 'nom prenom email')
+         .populate('livrables', 'titre statut');
+
         if (!projetMisAJour) {
             return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
         res.status(200).json(projetMisAJour);
     } catch (error) {
-        console.error('Erreur lors de la mise à jour du projet :', error);
-        res.status(500).json({ erreur: 'Échec de la mise à jour du projet.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };
 
@@ -543,17 +702,17 @@ exports.supprimerProjet = async (req, res) => {
         if (!projetSupprime) {
             return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
-        res.status(204).send();
+        res.status(200).json({ message: 'Projet supprimé avec succès.' });
     } catch (error) {
-        console.error('Erreur lors de la suppression du projet :', error);
-        res.status(500).json({ erreur: 'Échec de la suppression du projet.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };
 
 // ======= Contenu de src/graphql/resolvers.js =======
 
-const Projet = require('../models/project.model');
-const Livrable = require('../models/deliverable.model');
+const Projet = require('../models/projet.model');
+const Livrable = require('../models/livrable.model');
 
 function mapProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
@@ -749,6 +908,89 @@ const { gql } = require('apollo-server-express');
 
     module.exports = { typeDefs };
 
+// ======= Contenu de src/middleware/errorHandlers.js =======
+
+// ./src/middleware/errorHandlers.js
+
+class AppError extends Error {
+    constructor(message, statusCode) {
+        super(message);
+        this.statusCode = statusCode;
+        this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
+        this.isOperational = true;
+
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
+
+const notFoundHandler = (req, res, next) => {
+    const error = new AppError(`Route introuvable - ${req.originalUrl}`, 404);
+    next(error);
+};
+
+const errorHandler = (err, req, res, next) => {
+    err.statusCode = err.statusCode || 500;
+    err.status = err.status || 'error';
+
+    // Log l'erreur en développement
+    if (process.env.NODE_ENV === 'development') {
+        console.error('Erreur :', {
+            message: err.message,
+            stack: err.stack,
+            statusCode: err.statusCode
+        });
+    }
+
+    // Gestion des erreurs de validation MongoDB
+    if (err.name === 'ValidationError') {
+        const errors = Object.values(err.errors).map(el => el.message);
+        err.message = `Données invalides. ${errors.join('. ')}`;
+        err.statusCode = 400;
+    }
+
+    // Gestion des erreurs de doublons MongoDB
+    if (err.code === 11000) {
+        const value = err.errmsg.match(/(["'])(\\?.)*?\1/)[0];
+        err.message = `Valeur en doublon: ${value}. Veuillez utiliser une autre valeur`;
+        err.statusCode = 400;
+    }
+
+    // Gestion des erreurs de cast MongoDB
+    if (err.name === 'CastError') {
+        err.message = `ID invalide: ${err.value}`;
+        err.statusCode = 400;
+    }
+
+    // Réponse en production
+    if (process.env.NODE_ENV === 'production') {
+        if (err.isOperational) {
+            return res.status(err.statusCode).json({
+                status: err.status,
+                message: err.message
+            });
+        }
+        // Erreurs de programmation ou inconnues
+        return res.status(500).json({
+            status: 'error',
+            message: 'Une erreur inattendue est survenue'
+        });
+    }
+
+    // Réponse en développement
+    return res.status(err.statusCode).json({
+        status: err.status,
+        error: err,
+        message: err.message,
+        stack: err.stack
+    });
+};
+
+module.exports = {
+    AppError,
+    notFoundHandler,
+    errorHandler
+}; 
+
 // ======= Contenu de src/middlewares/projet.middleware.js =======
 
 const { validationResult } = require('express-validator');
@@ -778,7 +1020,7 @@ module.exports = (req, res, next) => {
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const deliverableSchema = new Schema({
+const livrableSchema = new Schema({
     nom: {
         type: String,
         required: [true, 'Le nom du livrable est requis.'],
@@ -793,8 +1035,11 @@ const deliverableSchema = new Schema({
         type: Date,
         required: [true, 'La date limite est requise.'],
         validate: {
-            validator: (v) => v > Date.now() + 86400000,
-            message: 'La date limite doit être au moins 24h dans le futur.',
+            validator: function(v) {
+                // Permet les dates futures et la date d'aujourd'hui
+                return v >= new Date().setHours(0, 0, 0, 0);
+            },
+            message: 'La date limite doit être aujourd\'hui ou dans le futur.',
         },
     },
     urlDepot: {
@@ -825,14 +1070,20 @@ const deliverableSchema = new Schema({
     },
 });
 
-module.exports = mongoose.model('Livrable', deliverableSchema);
+// Middleware pour mettre à jour la date de modification
+livrableSchema.pre('save', function(next) {
+    this.majLe = new Date();
+    next();
+});
+
+module.exports = mongoose.model('Livrable', livrableSchema);
 
 // ======= Contenu de src/models/projet.model.js =======
 
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const projectSchema = new Schema({
+const projetSchema = new Schema({
     titre: {
         type: String,
         required: [true, 'Le titre du projet est requis.'],
@@ -866,6 +1117,12 @@ const projectSchema = new Schema({
     dateFin: {
         type: Date,
         required: [true, 'La date de fin est requise.'],
+        validate: {
+            validator: function(value) {
+                return value > this.dateDebut;
+            },
+            message: 'La date de fin doit être postérieure à la date de début.'
+        }
     },
     livrables: [{
         type: Schema.Types.ObjectId,
@@ -886,7 +1143,19 @@ const projectSchema = new Schema({
     },
 });
 
-module.exports = mongoose.model('Projet', projectSchema);
+// Middleware pour mettre à jour automatiquement majLe
+projetSchema.pre('save', function(next) {
+    this.majLe = new Date();
+    next();
+});
+
+// Middleware pour mettre à jour majLe lors des mises à jour
+projetSchema.pre(['updateOne', 'findOneAndUpdate'], function(next) {
+    this.set({ majLe: new Date() });
+    next();
+});
+
+module.exports = mongoose.model('Projet', projetSchema);
 
 // ======= Contenu de src/routers/ai.router.js =======
 
@@ -901,7 +1170,8 @@ const {
     genererPlanning,
     creerEquipes,
     associerTuteurs,
-    recommanderApprentissage
+    recommanderApprentissage,
+    analyserProjet
 } = require('../services/ai.service');
 
 const catchAsync = (fn) => (req, res, next) => {
@@ -915,6 +1185,13 @@ const validerChamp = (champ, req, res) => {
     }
     return true;
 };
+
+// Route d'analyse générale
+router.post('/analyze', catchAsync(async (req, res) => {
+    if (!validerChamp('donnees', req, res)) return;
+    const resultat = await analyserProjet(req.body.donnees);
+    res.status(200).json({ resultat });
+}));
 
 // Générer du texte avec l'IA
 router.post('/generer-texte', catchAsync(async (req, res) => {
@@ -973,17 +1250,23 @@ router.use((err, req, res, next) => {
 
 module.exports = router;
 
-// ======= Contenu de src/routers/livrable.router.js =======
+// ======= Contenu de src/routers/livrable.routes.js =======
 
 const express = require('express');
 const router = express.Router();
-const deliverableController = require('../controllers/deliverable.controller');
+const deliverableController = require('../controllers/livrable.controller');
+
+// Récupérer tous les livrables
+router.get('/', deliverableController.recupererTousLivrables);
 
 // Ajouter un livrable
 router.post('/', deliverableController.ajouterLivrable);
 
 // Récupérer tous les livrables d'un projet
-router.get('/:projetId', deliverableController.recupererLivrables);
+router.get('/projet/:projetId', deliverableController.recupererLivrables);
+
+// Récupérer un livrable par ID
+router.get('/:livrableId', deliverableController.recupererLivrableParId);
 
 // Mettre à jour un livrable
 router.put('/:livrableId', deliverableController.mettreAJourLivrable);
@@ -993,37 +1276,77 @@ router.delete('/:livrableId', deliverableController.supprimerLivrable);
 
 module.exports = router;
 
-// ======= Contenu de src/routers/projet.router.js =======
+// ======= Contenu de src/routers/projet.routes.js =======
 
 const express = require('express');
 const router = express.Router();
-const projectController = require('../controllers/project.controller');
-const { analyserRisques, suiviTaches } = require('../services/project.service');
+const projetController = require('../controllers/projet.controller');
+const { analyserRisques, suiviTaches } = require('../services/projet.service');
 
-// Création d'un projet
-router.post('/', projectController.creerProjet);
+// Middleware de validation
+const validateProjetId = (req, res, next) => {
+    const { id } = req.params;
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        return res.status(400).json({ erreur: 'ID de projet invalide.' });
+    }
+    next();
+};
 
-// Récupération de tous les projets
-router.get('/', projectController.recupererProjets);
+// Middleware de validation du corps de la requête
+const validateProjetBody = (req, res, next) => {
+    const { titre, description, dateDebut, dateFin } = req.body;
+    
+    if (!titre || !description || !dateDebut || !dateFin) {
+        return res.status(400).json({
+            erreur: 'Les champs titre, description, dateDebut et dateFin sont requis.'
+        });
+    }
 
-// Récupération d'un projet par ID
-router.get('/:id', projectController.recupererProjetParId);
+    // Validation des dates
+    const debut = new Date(dateDebut);
+    const fin = new Date(dateFin);
+    
+    if (isNaN(debut.getTime()) || isNaN(fin.getTime())) {
+        return res.status(400).json({
+            erreur: 'Les dates de début et de fin doivent être valides.'
+        });
+    }
 
-// Mise à jour d'un projet
-router.put('/:id', projectController.mettreAJourProjet);
+    if (fin <= debut) {
+        return res.status(400).json({
+            erreur: 'La date de fin doit être postérieure à la date de début.'
+        });
+    }
 
-// Suppression d'un projet
-router.delete('/:id', projectController.supprimerProjet);
+    next();
+};
+
+// Routes
+router.post('/', validateProjetBody, projetController.creerProjet);
+router.get('/', projetController.recupererProjets);
+router.get('/:id', validateProjetId, projetController.recupererProjetParId);
+router.put('/:id', [validateProjetId, validateProjetBody], projetController.mettreAJourProjet);
+router.delete('/:id', validateProjetId, projetController.supprimerProjet);
 
 // Analyse de risques
 router.post('/analyse-risques', async (req, res) => {
     try {
         const { descriptionProjet, jalons, ressources } = req.body;
+        
+        if (!descriptionProjet || !jalons || !ressources) {
+            return res.status(400).json({
+                erreur: 'Description du projet, jalons et ressources sont requis.'
+            });
+        }
+
         const risques = await analyserRisques({ descriptionProjet, jalons, ressources });
         res.status(200).json(risques);
     } catch (error) {
         console.error('Erreur lors de l\'analyse des risques :', error.message);
-        res.status(500).json({ error: 'Échec de l\'analyse des risques.' });
+        res.status(500).json({ 
+            erreur: 'Échec de l\'analyse des risques.',
+            details: error.message
+        });
     }
 });
 
@@ -1031,11 +1354,21 @@ router.post('/analyse-risques', async (req, res) => {
 router.post('/suivi-taches', async (req, res) => {
     try {
         const { taches, filtre } = req.body;
+        
+        if (!Array.isArray(taches) || taches.length === 0) {
+            return res.status(400).json({
+                erreur: 'Un tableau de tâches non vide est requis.'
+            });
+        }
+
         const rapportTaches = await suiviTaches(taches, filtre);
         res.status(200).json(rapportTaches);
     } catch (error) {
         console.error('Erreur lors du suivi des tâches :', error.message);
-        res.status(500).json({ error: 'Échec du suivi des tâches.' });
+        res.status(500).json({ 
+            erreur: 'Échec du suivi des tâches.',
+            details: error.message
+        });
     }
 });
 
@@ -1045,8 +1378,10 @@ module.exports = router;
 
 const axios = require('axios');
 const dotenv = require('dotenv');
+const path = require('path');
 
-dotenv.config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
+// Charger les variables d'environnement depuis le fichier .env à la racine du projet
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
@@ -1058,7 +1393,7 @@ console.log('deepseek api client');
 console.log('✅ Clé API Deepseek chargée avec succès.');
 
 const client = axios.create({
-  baseURL: 'https://api.deepseek.com',
+  baseURL: 'https://api.deepseek.com/v1',
   headers: {
     'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
     'Content-Type': 'application/json'
@@ -1067,7 +1402,8 @@ const client = axios.create({
 
 const CONFIG = {
   MODEL: 'deepseek-chat',
-  MAX_TOKENS: 200,
+  MAX_TOKENS: 1000,
+  TEMPERATURE: 0.7
 };
 
 async function gererErreurIA(erreur, reponse = null) {
@@ -1186,7 +1522,45 @@ async function recommanderApprentissage(competences) {
   return traiterReponseIA(prompt);
 }
 
+async function analyserProjet(donnees) {
+  try {
+    const prompt = `
+      Analyser le projet suivant et fournir des recommandations :
+      
+      ${JSON.stringify(donnees, null, 2)}
+      
+      Points à analyser :
+      1. Risques potentiels
+      2. Points d'amélioration
+      3. Recommandations
+      4. Estimation de la progression
+      5. Prochaines étapes suggérées
+    `;
+
+    const response = await client.post('/chat/completions', {
+      model: CONFIG.MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: CONFIG.MAX_TOKENS,
+      temperature: CONFIG.TEMPERATURE
+    });
+
+    if (!response.data || !response.data.choices || !response.data.choices[0]) {
+      throw new Error('Réponse IA invalide');
+    }
+
+    return {
+      analyse: response.data.choices[0].message.content,
+      timestamp: new Date(),
+      status: 'success'
+    };
+  } catch (error) {
+    console.error('Erreur lors de l\'analyse du projet :', error);
+    throw new Error('Échec de l\'analyse du projet : ' + error.message);
+  }
+}
+
 module.exports = {
+  analyserProjet,
   genererTexte,
   suiviProgression,
   predirePerformance,
@@ -1242,7 +1616,7 @@ module.exports = { verifierDepotGithubExiste };
 
 // ======= Contenu de src/services/projet.service.js =======
 
-const Projet = require('../models/project.model');
+const Projet = require('../models/projet.model');
 
 exports.creerProjet = async (data) => {
     const projet = new Projet(data);
@@ -1434,7 +1808,7 @@ const ProjetUtils = {
     }
 };
 
-module.exports = { ProjetUtils };
+module.exports = { ProjectUtils: ProjetUtils };
 
 // ======= Contenu de src/validations/projet.validation.js =======
 

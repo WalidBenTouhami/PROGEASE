@@ -31,14 +31,16 @@ exports.recupererProjets = async (req, res) => {
     try {
         const { page = 1, limit = 10, statut, tri = '-creeLe' } = req.query;
         const query = statut ? { statut } : {};
-        
+
+        // Utilisation de lean() pour des documents plus légers
         const [projets, total] = await Promise.all([
             Projet.find(query)
                 .sort(tri)
                 .limit(Number(limit))
                 .skip((Number(page) - 1) * Number(limit))
                 .populate('tuteur', 'nom prenom email')
-                .populate('livrables', 'titre statut'),
+                .populate('livrables', 'titre statut')
+                .lean(),
             Projet.countDocuments(query)
         ]);
 

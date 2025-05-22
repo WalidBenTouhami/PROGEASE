@@ -1,24 +1,23 @@
+// testGithubService.js
 const { verifierDepotGithubExiste } = require('./src/services/github.service');
 
 (async () => {
-    try {
-        // Exemple d'URL valide
-        const urlValid = 'https://github.com/WalidBenTouhami/PROGEASE';
-        const existsValid = await checkGithubRepoExists(urlValid);
-        console.log(`Le dépôt "${urlValid}" existe ?`, existsValid);
+  try {
+    // URL valide
+    const urlValid = 'https://github.com/WalidBenTouhami/PROGEASE';
+    const existsValid = await verifierDepotGithubExiste(urlValid);
+    console.log(`Le dépôt "${urlValid}" existe ?`, existsValid);
 
-        // Exemple d'URL invalide (dépôt inexistant)
-        const urlInvalid = 'https://github.com/WalidBenTouhami/NonExistentRepo';
-        const existsInvalid = await checkGithubRepoExists(urlInvalid);
-        console.log(`Le dépôt "${urlInvalid}" existe ?`, existsInvalid);
+    // URL invalide
+    const urlInvalid = 'https://github.com/WalidBenTouhami/NonExistentRepo';
+    const existsInvalid = await verifierDepotGithubExiste(urlInvalid);
+    console.log(`Le dépôt "${urlInvalid}" existe ?`, existsInvalid);
 
-        // Exemple d'URL mal formatée
-        const urlMalformed = 'https://github.com/Invalid/URL/';
-        const existsMalformed = await checkGithubRepoExists(urlMalformed);
-        console.log(`Le dépôt "${urlMalformed}" existe ?`, existsMalformed);
-    } catch (error) {
-        console.error('Une erreur est survenue :', error.message);
-    }
+    // URL mal formatée
+    const urlMalformed = 'https://github.com/Invalid/URL/';
+    const existsMalformed = await verifierDepotGithubExiste(urlMalformed);
+    console.log(`Le dépôt "${urlMalformed}" existe ?`, existsMalformed);
+  } catch (error) {
+    console.error('Une erreur est survenue :', error.message);
+  }
 })();
-
-
