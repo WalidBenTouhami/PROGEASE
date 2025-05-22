@@ -1,19 +1,18 @@
-// src/graphql/resolvers.js
 const Projet = require('../models/project.model');
 const Livrable = require('../models/deliverable.model');
 
 function mapProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
-        _id: doc._id,
+        _id: doc._id.toString(),
         titre: doc.titre,
         description: doc.description,
-        equipe: doc.equipe,
-        tuteur: doc.tuteur,
+        equipe: doc.equipe.map((id) => id.toString()),
+        tuteur: doc.tuteur?.toString() || null,
         competences: doc.competences,
         dateDebut: doc.dateDebut,
         dateFin: doc.dateFin,
-        livrables: doc.livrables,
+        livrables: doc.livrables.map((id) => id.toString()),
         statut: doc.statut,
         creeLe: doc.creeLe,
         majLe: doc.majLe,
@@ -23,13 +22,13 @@ function mapProjetMongoVersGraphQL(doc) {
 function mapLivrableMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
-        _id: doc._id,
+        _id: doc._id.toString(),
         nom: doc.nom,
         description: doc.description,
         dateLimite: doc.dateLimite,
         urlDepot: doc.urlDepot,
         statut: doc.statut,
-        projetId: doc.projetId,
+        projetId: doc.projetId.toString(),
         creeLe: doc.creeLe,
         majLe: doc.majLe,
     };

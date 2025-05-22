@@ -1,4 +1,3 @@
-// src/controllers/deliverable.controller.js
 const Projet = require('../models/project.model');
 const Livrable = require('../models/deliverable.model');
 
@@ -6,15 +5,15 @@ const Livrable = require('../models/deliverable.model');
 function mapProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
-        _id: doc._id,
+        _id: doc._id.toString(),
         titre: doc.titre,
         description: doc.description,
-        equipe: doc.equipe,
-        tuteur: doc.tuteur,
+        equipe: doc.equipe.map((id) => id.toString()),
+        tuteur: doc.tuteur?.toString() || null,
         competences: doc.competences,
         dateDebut: doc.dateDebut,
         dateFin: doc.dateFin,
-        livrables: doc.livrables,
+        livrables: doc.livrables.map((id) => id.toString()),
         statut: doc.statut,
         creeLe: doc.creeLe,
         majLe: doc.majLe,
@@ -24,13 +23,13 @@ function mapProjetMongoVersGraphQL(doc) {
 function mapLivrableMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
-        _id: doc._id,
+        _id: doc._id.toString(),
         nom: doc.nom,
         description: doc.description,
         dateLimite: doc.dateLimite,
         urlDepot: doc.urlDepot,
         statut: doc.statut,
-        projetId: doc.projetId,
+        projetId: doc.projetId.toString(),
         creeLe: doc.creeLe,
         majLe: doc.majLe,
     };
@@ -39,6 +38,9 @@ function mapLivrableMongoVersGraphQL(doc) {
 exports.ajouterLivrable = async (req, res) => {
     try {
         const { projetId, ...data } = req.body;
+        if (!projetId || !data.nom || !data.description) {
+            return res.status(400).json({ erreur: 'Données manquantes pour créer un livrable.' });
+        }
         const projet = await Projet.findById(projetId);
         if (!projet) {
             return res.status(404).json({ erreur: 'Projet introuvable.' });
@@ -57,6 +59,9 @@ exports.ajouterLivrable = async (req, res) => {
 exports.recupererLivrables = async (req, res) => {
     try {
         const { projetId } = req.params;
+        if (!projetId) {
+            return res.status(400).json({ erreur: 'ID du projet manquant.' });
+        }
         const livrables = await Livrable.find({ projetId });
         res.status(200).json(livrables.map(mapLivrableMongoVersGraphQL));
     } catch (error) {
@@ -68,6 +73,9 @@ exports.recupererLivrables = async (req, res) => {
 exports.mettreAJourLivrable = async (req, res) => {
     try {
         const { livrableId } = req.params;
+        if (!livrableId) {
+            return res.status(400).json({ erreur: 'ID du livrable manquant.' });
+        }
         const updated = await Livrable.findByIdAndUpdate(livrableId, req.body, { new: true, runValidators: true });
         if (!updated) {
             return res.status(404).json({ erreur: 'Livrable introuvable.' });
@@ -82,6 +90,9 @@ exports.mettreAJourLivrable = async (req, res) => {
 exports.supprimerLivrable = async (req, res) => {
     try {
         const { livrableId } = req.params;
+        if (!livrableId) {
+            return res.status(400).json({ erreur: 'ID du livrable manquant.' });
+        }
         const deleted = await Livrable.findByIdAndDelete(livrableId);
         if (!deleted) {
             return res.status(404).json({ erreur: 'Livrable introuvable.' });

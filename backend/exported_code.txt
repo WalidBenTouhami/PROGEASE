@@ -370,7 +370,6 @@ app.use((err, req, res, next) => {
 
 // ======= Contenu de src/controllers/deliverable.controller.js =======
 
-// src/controllers/deliverable.controller.js
 const Projet = require('../models/project.model');
 const Livrable = require('../models/deliverable.model');
 
@@ -378,15 +377,15 @@ const Livrable = require('../models/deliverable.model');
 function mapProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
-        _id: doc._id,
+        _id: doc._id.toString(),
         titre: doc.titre,
         description: doc.description,
-        equipe: doc.equipe,
-        tuteur: doc.tuteur,
+        equipe: doc.equipe.map((id) => id.toString()),
+        tuteur: doc.tuteur?.toString() || null,
         competences: doc.competences,
         dateDebut: doc.dateDebut,
         dateFin: doc.dateFin,
-        livrables: doc.livrables,
+        livrables: doc.livrables.map((id) => id.toString()),
         statut: doc.statut,
         creeLe: doc.creeLe,
         majLe: doc.majLe,
@@ -396,13 +395,13 @@ function mapProjetMongoVersGraphQL(doc) {
 function mapLivrableMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
-        _id: doc._id,
+        _id: doc._id.toString(),
         nom: doc.nom,
         description: doc.description,
         dateLimite: doc.dateLimite,
         urlDepot: doc.urlDepot,
         statut: doc.statut,
-        projetId: doc.projetId,
+        projetId: doc.projetId.toString(),
         creeLe: doc.creeLe,
         majLe: doc.majLe,
     };
@@ -411,6 +410,9 @@ function mapLivrableMongoVersGraphQL(doc) {
 exports.ajouterLivrable = async (req, res) => {
     try {
         const { projetId, ...data } = req.body;
+        if (!projetId || !data.nom || !data.description) {
+            return res.status(400).json({ erreur: 'Données manquantes pour créer un livrable.' });
+        }
         const projet = await Projet.findById(projetId);
         if (!projet) {
             return res.status(404).json({ erreur: 'Projet introuvable.' });
@@ -429,6 +431,9 @@ exports.ajouterLivrable = async (req, res) => {
 exports.recupererLivrables = async (req, res) => {
     try {
         const { projetId } = req.params;
+        if (!projetId) {
+            return res.status(400).json({ erreur: 'ID du projet manquant.' });
+        }
         const livrables = await Livrable.find({ projetId });
         res.status(200).json(livrables.map(mapLivrableMongoVersGraphQL));
     } catch (error) {
@@ -440,6 +445,9 @@ exports.recupererLivrables = async (req, res) => {
 exports.mettreAJourLivrable = async (req, res) => {
     try {
         const { livrableId } = req.params;
+        if (!livrableId) {
+            return res.status(400).json({ erreur: 'ID du livrable manquant.' });
+        }
         const updated = await Livrable.findByIdAndUpdate(livrableId, req.body, { new: true, runValidators: true });
         if (!updated) {
             return res.status(404).json({ erreur: 'Livrable introuvable.' });
@@ -454,6 +462,9 @@ exports.mettreAJourLivrable = async (req, res) => {
 exports.supprimerLivrable = async (req, res) => {
     try {
         const { livrableId } = req.params;
+        if (!livrableId) {
+            return res.status(400).json({ erreur: 'ID du livrable manquant.' });
+        }
         const deleted = await Livrable.findByIdAndDelete(livrableId);
         if (!deleted) {
             return res.status(404).json({ erreur: 'Livrable introuvable.' });
@@ -541,22 +552,21 @@ exports.supprimerProjet = async (req, res) => {
 
 // ======= Contenu de src/graphql/resolvers.js =======
 
-// src/graphql/resolvers.js
 const Projet = require('../models/project.model');
 const Livrable = require('../models/deliverable.model');
 
 function mapProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
-        _id: doc._id,
+        _id: doc._id.toString(),
         titre: doc.titre,
         description: doc.description,
-        equipe: doc.equipe,
-        tuteur: doc.tuteur,
+        equipe: doc.equipe.map((id) => id.toString()),
+        tuteur: doc.tuteur?.toString() || null,
         competences: doc.competences,
         dateDebut: doc.dateDebut,
         dateFin: doc.dateFin,
-        livrables: doc.livrables,
+        livrables: doc.livrables.map((id) => id.toString()),
         statut: doc.statut,
         creeLe: doc.creeLe,
         majLe: doc.majLe,
@@ -566,13 +576,13 @@ function mapProjetMongoVersGraphQL(doc) {
 function mapLivrableMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
-        _id: doc._id,
+        _id: doc._id.toString(),
         nom: doc.nom,
         description: doc.description,
         dateLimite: doc.dateLimite,
         urlDepot: doc.urlDepot,
         statut: doc.statut,
-        projetId: doc.projetId,
+        projetId: doc.projetId.toString(),
         creeLe: doc.creeLe,
         majLe: doc.majLe,
     };
@@ -647,64 +657,39 @@ module.exports = resolvers;
 
 const { gql } = require('apollo-server-express');
 
-const typeDefs = gql`
-    # 📌 Enumération StatutLivrable
-    enum StatutLivrable {
-        EN_RETARD
-        EN_ATTENTE
-        TERMINE
-    }
-
-    # 📌 Type livrable
-    type Deliverable {
-        _id: ID!
-        nom: String!
-        description: String!
-        dateLimite: String!
-        urlDepot: String!
-        statut: StatutLivrable!
-        projetId: ID!
-        creeLe: String
-        majLe: String
-    }
-
-    # 📌 Type d'entrée pour livrable (corrige l'erreur !)
-    input DeliverableInput {
-        nom: String!
-        description: String!
-        dateLimite: String!
-        urlDepot: String!
-        statut: StatutLivrable
-    }
-
-    # 📌 Type projet
-    type Projet {
-        _id: ID!
-        titre: String!
-        description: String!
-        equipe: [ID!]!
-        tuteur: ID
-        competences: [String!]!
-        dateDebut: String!
-        dateFin: String!
-        livrables: [Deliverable!]!
-        statut: String!
-        progression: Int
-        creeLe: String
-        majLe: String
-    }
-
-    # 📌 Type Query
-    type Query {
-        projets: [Projet!]!
-        projet(id: ID!): Projet
-        livrables(projetId: ID!): [Deliverable!]!
-        livrable(id: ID!): Deliverable
-    }
-
-    # 📌 Type Mutation
-    type Mutation {
-        creerProjet(
+    const typeDefs = gql`
+        # 📌 Enumération StatutLivrable
+        enum StatutLivrable {
+            EN_RETARD
+            EN_ATTENTE
+            TERMINE
+        }
+    
+        # 📌 Type Livrable
+        type Livrable {
+            _id: ID!
+            nom: String!
+            description: String!
+            dateLimite: String!
+            urlDepot: String!
+            statut: StatutLivrable!
+            projetId: ID!
+            creeLe: String
+            majLe: String
+        }
+    
+        # 📌 Type d'entrée pour Livrable
+        input LivrableInput {
+            nom: String!
+            description: String!
+            dateLimite: String!
+            urlDepot: String!
+            statut: StatutLivrable
+        }
+    
+        # 📌 Type Projet
+        type Projet {
+            _id: ID!
             titre: String!
             description: String!
             equipe: [ID!]!
@@ -712,32 +697,57 @@ const typeDefs = gql`
             competences: [String!]!
             dateDebut: String!
             dateFin: String!
-            statut: String
-        ): Projet
+            livrables: [Livrable!]!
+            statut: String!
+            progression: Int
+            creeLe: String
+            majLe: String
+        }
+    
+        # 📌 Type Query
+        type Query {
+            projets: [Projet!]!
+            projet(id: ID!): Projet
+            livrables(projetId: ID!): [Livrable!]!
+            livrable(id: ID!): Livrable
+        }
+    
+        # 📌 Type Mutation
+        type Mutation {
+            creerProjet(
+                titre: String!
+                description: String!
+                equipe: [ID!]!
+                tuteur: ID
+                competences: [String!]!
+                dateDebut: String!
+                dateFin: String!
+                statut: String
+            ): Projet
+    
+            mettreAJourProjet(
+                id: ID!
+                titre: String
+                description: String
+                equipe: [ID!]
+                tuteur: ID
+                competences: [String!]
+                dateDebut: String
+                dateFin: String
+                statut: String
+            ): Projet
+    
+            supprimerProjet(id: ID!): Projet
+    
+            ajouterLivrable(projetId: ID!, input: LivrableInput!): Livrable
+    
+            mettreAJourLivrable(livrableId: ID!, input: LivrableInput!): Livrable
+    
+            supprimerLivrable(livrableId: ID!): Livrable
+        }
+    `;
 
-        mettreAJourProjet(
-            id: ID!
-            titre: String
-            description: String
-            equipe: [ID!]
-            tuteur: ID
-            competences: [String!]
-            dateDebut: String
-            dateFin: String
-            statut: String
-        ): Projet
-
-        supprimerProjet(id: ID!): Projet
-
-        ajouterLivrable(projetId: ID!, input: DeliverableInput!): Deliverable
-
-        mettreAJourLivrable(livrableId: ID!, input: DeliverableInput!): Deliverable
-
-        supprimerLivrable(livrableId: ID!): Deliverable
-    }
-`;
-
-module.exports = { typeDefs };
+    module.exports = { typeDefs };
 
 // ======= Contenu de src/middlewares/project.middleware.js =======
 
@@ -1033,24 +1043,31 @@ module.exports = router;
 
 // ======= Contenu de src/services/ai.service.js =======
 
-const deepseek = require('deepseek');
+const axios = require('axios');
 const dotenv = require('dotenv');
 
 dotenv.config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
 
-const CLE_API_DEEPSEEK = process.env.DEEPSEEK_API_KEY;
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
-if (!CLE_API_DEEPSEEK) {
+if (!DEEPSEEK_API_KEY) {
   throw new Error('❌ La variable DEEPSEEK_API_KEY est manquante. Vérifiez votre fichier .env.');
 }
 
+console.log('deepseek api client');
 console.log('✅ Clé API Deepseek chargée avec succès.');
 
-const client = deepseek.createClient({ apiKey: CLE_API_DEEPSEEK });
+const client = axios.create({
+  baseURL: 'https://api.deepseek.com',
+  headers: {
+    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+    'Content-Type': 'application/json'
+  }
+});
 
 const CONFIG = {
-  MODELE: 'gpt-3.5-turbo',
-  NB_MAX_TOKENS: 200,
+  MODEL: 'deepseek-chat',
+  MAX_TOKENS: 200,
 };
 
 async function gererErreurIA(erreur, reponse = null) {
@@ -1058,17 +1075,18 @@ async function gererErreurIA(erreur, reponse = null) {
   if (reponse) {
     console.error('❌ Réponse IA :', reponse);
   }
-  throw new Error('La réponse de l’IA est invalide ou n’a pas pu être traitée.');
+  throw new Error('La réponse de l\'IA est invalide ou n\'a pas pu être traitée.');
 }
 
 async function genererTexte(prompt) {
   try {
-    const reponse = await client.generateText({
-      model: CONFIG.MODELE,
-      prompt,
-      maxTokens: CONFIG.NB_MAX_TOKENS,
+    const response = await client.post('/chat/completions', {
+      model: CONFIG.MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: CONFIG.MAX_TOKENS,
+      stream: false
     });
-    return reponse.text.trim();
+    return response.data.choices[0].message.content.trim();
   } catch (erreur) {
     await gererErreurIA(erreur);
   }
@@ -1078,7 +1096,7 @@ function validerReponseJSON(reponse) {
   try {
     return JSON.parse(reponse);
   } catch (erreur) {
-    throw new Error('La réponse de l’IA n’est pas un JSON valide.');
+    throw new Error('La réponse de l\'IA n\'est pas un JSON valide.');
   }
 }
 
@@ -1090,7 +1108,7 @@ function extraireJSONDepuisReponse(reponse) {
     }
     throw new Error('Aucun JSON trouvé dans la réponse.');
   } catch (erreur) {
-    throw new Error('Impossible d’extraire le JSON de la réponse IA.');
+    throw new Error('Impossible d\'extraire le JSON de la réponse IA.');
   }
 }
 
@@ -1099,7 +1117,7 @@ async function traiterReponseIA(prompt) {
   try {
     return validerReponseJSON(reponse);
   } catch (erreur) {
-    console.warn('⚠️ Tentative d’extraction JSON depuis la réponse IA.');
+    console.warn('⚠️ Tentative d\'extraction JSON depuis la réponse IA.');
     return extraireJSONDepuisReponse(reponse);
   }
 }
@@ -1154,7 +1172,7 @@ async function creerEquipes(membres) {
 
 async function associerTuteurs(membres) {
   if (!membres || membres.length === 0) {
-    throw new Error('❌ La liste des membres est vide. Impossible d’associer les tuteurs.');
+    throw new Error('❌ La liste des membres est vide. Impossible d\'associer les tuteurs.');
   }
   const prompt = `Associe les mentors et mentorés selon leurs compétences et besoins. Retourne seulement au format JSON : ${JSON.stringify(membres)}`;
   return traiterReponseIA(prompt);
@@ -1164,7 +1182,7 @@ async function recommanderApprentissage(competences) {
   if (!competences || competences.length === 0) {
     throw new Error('❌ Liste des compétences vide. Impossible de recommander des ressources.');
   }
-  const prompt = `Recommande des ressources d’apprentissage pour les compétences suivantes. Retourne seulement au format JSON : ${competences.join(', ')}`;
+  const prompt = `Recommande des ressources d'apprentissage pour les compétences suivantes. Retourne seulement au format JSON : ${competences.join(', ')}`;
   return traiterReponseIA(prompt);
 }
 
