@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const projectController = require('../controllers/projet.controller');
+const projetController = require('../controllers/projet.controller');
 const { analyserRisques, suiviTaches } = require('../services/projet.service');
 
 // Middleware de validation
@@ -42,11 +42,11 @@ const validateProjetBody = (req, res, next) => {
 };
 
 // Routes
-router.post('/', validateProjetBody, projectController.creerProjet);
-router.get('/', projectController.recupererProjets);
-router.get('/:id', validateProjetId, projectController.recupererProjetParId);
-router.put('/:id', [validateProjetId, validateProjetBody], projectController.mettreAJourProjet);
-router.delete('/:id', validateProjetId, projectController.supprimerProjet);
+router.post('/', validateProjetBody, projetController.creerProjet);
+router.get('/', projetController.recupererProjets);
+router.get('/:id', validateProjetId, projetController.recupererProjetParId);
+router.put('/:id', [validateProjetId, validateProjetBody], projetController.mettreAJourProjet);
+router.delete('/:id', validateProjetId, projetController.supprimerProjet);
 
 // Analyse de risques
 router.post('/analyse-risques', async (req, res) => {

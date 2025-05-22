@@ -52,7 +52,7 @@
                             "listen": "prerequest",
                             "script": {
                                 "exec": [
-                                    "pm.variables.set(\"projetName\", \"Projet Test \" + Date.now());",
+                                    "pm.variables.set(\"projetTitre\", \"Projet Test \" + Date.now());",
                                     "pm.variables.set(\"projetDescription\", \"Description détaillée du projet de test\");"
                                 ],
                                 "type": "text/javascript"
@@ -69,7 +69,7 @@
                                     "pm.test(\"Projet is created with correct data\", function () {",
                                     "    const jsonData = pm.response.json();",
                                     "    pm.expect(jsonData).to.have.property('_id');",
-                                    "    pm.expect(jsonData.titre).to.eql(pm.variables.get(\"projetName\"));",
+                                    "    pm.expect(jsonData.titre).to.eql(pm.variables.get(\"projetTitre\"));",
                                     "    pm.expect(jsonData.description).to.eql(pm.variables.get(\"projetDescription\"));",
                                     "    ",
                                     "    // Sauvegarder l'ID pour les tests suivants",
@@ -90,7 +90,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"titre\": \"{{projetName}}\",\n    \"description\": \"{{projetDescription}}\",\n    \"dateDebut\": \"2024-03-20T00:00:00.000Z\",\n    \"dateFin\": \"2024-06-20T00:00:00.000Z\",\n    \"competences\": [\"Node.js\", \"MongoDB\", \"Express\"],\n    \"statut\": \"Brouillon\",\n    \"equipe\": [],\n    \"livrables\": []\n}"
+                            "raw": "{\n    \"titre\": \"{{projetTitre}}\",\n    \"description\": \"{{projetDescription}}\",\n    \"dateDebut\": \"2024-03-20T00:00:00.000Z\",\n    \"dateFin\": \"2024-06-20T00:00:00.000Z\",\n    \"competences\": [\"Node.js\", \"MongoDB\", \"Express\"],\n    \"statut\": \"Brouillon\",\n    \"equipe\": [],\n    \"livrables\": []\n}"
                         },
                         "url": {
                             "raw": "{{baseUrl}}/api/projets",
@@ -110,10 +110,13 @@
                                     "    pm.response.to.have.status(200);",
                                     "});",
                                     "",
-                                    "pm.test(\"Response is an array\", function () {",
+                                    "pm.test(\"Response has correct structure\", function () {",
                                     "    const jsonData = pm.response.json();",
-                                    "    pm.expect(jsonData).to.be.an('array');",
-                                    "    pm.expect(jsonData.length).to.be.at.least(1);",
+                                    "    pm.expect(jsonData).to.have.property('projets');",
+                                    "    pm.expect(jsonData.projets).to.be.an('array');",
+                                    "    pm.expect(jsonData).to.have.property('total');",
+                                    "    pm.expect(jsonData).to.have.property('page');",
+                                    "    pm.expect(jsonData).to.have.property('pages');",
                                     "});"
                                 ],
                                 "type": "text/javascript"
@@ -142,8 +145,8 @@
                                     "",
                                     "pm.test(\"Project data is correct\", function () {",
                                     "    const jsonData = pm.response.json();",
-                                    "    pm.expect(jsonData.id).to.eql(pm.environment.get(\"projectId\"));",
-                                    "    pm.expect(jsonData.name).to.eql(pm.variables.get(\"projectName\"));",
+                                    "    pm.expect(jsonData._id).to.eql(pm.environment.get(\"projetId\"));",
+                                    "    pm.expect(jsonData.titre).to.eql(pm.variables.get(\"projetTitre\"));",
                                     "});"
                                 ],
                                 "type": "text/javascript"
@@ -153,9 +156,9 @@
                     "request": {
                         "method": "GET",
                         "url": {
-                            "raw": "{{baseUrl}}/api/projets/{{projectId}}",
+                            "raw": "{{baseUrl}}/api/projets/{{projetId}}",
                             "host": ["{{baseUrl}}"],
-                            "path": ["api", "projets", "{{projectId}}"]
+                            "path": ["api", "projets", "{{projetId}}"]
                         }
                     }
                 },
@@ -172,8 +175,8 @@
                                     "",
                                     "pm.test(\"Project is updated correctly\", function () {",
                                     "    const jsonData = pm.response.json();",
-                                    "    pm.expect(jsonData.name).to.eql(pm.variables.get(\"updatedProjectName\"));",
-                                    "    pm.expect(jsonData.description).to.eql(pm.variables.get(\"updatedProjectDescription\"));",
+                                    "    pm.expect(jsonData.titre).to.eql(pm.variables.get(\"projetTitreModifie\"));",
+                                    "    pm.expect(jsonData.description).to.eql(pm.variables.get(\"projetDescriptionModifiee\"));",
                                     "});"
                                 ],
                                 "type": "text/javascript"
@@ -183,8 +186,8 @@
                             "listen": "prerequest",
                             "script": {
                                 "exec": [
-                                    "pm.variables.set(\"updatedProjectName\", \"Projet Test Modifié \" + Date.now());",
-                                    "pm.variables.set(\"updatedProjectDescription\", \"Description modifiée\");"
+                                    "pm.variables.set(\"projetTitreModifie\", \"Projet Test Modifié \" + Date.now());",
+                                    "pm.variables.set(\"projetDescriptionModifiee\", \"Description modifiée\");"
                                 ],
                                 "type": "text/javascript"
                             }
@@ -200,12 +203,12 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n    \"name\": \"{{updatedProjectName}}\",\n    \"description\": \"{{updatedProjectDescription}}\"\n}"
+                            "raw": "{\n    \"titre\": \"{{projetTitreModifie}}\",\n    \"description\": \"{{projetDescriptionModifiee}}\"\n}"
                         },
                         "url": {
-                            "raw": "{{baseUrl}}/api/projets/{{projectId}}",
+                            "raw": "{{baseUrl}}/api/projets/{{projetId}}",
                             "host": ["{{baseUrl}}"],
-                            "path": ["api", "projets", "{{projectId}}"]
+                            "path": ["api", "projets", "{{projetId}}"]
                         }
                     }
                 },
@@ -233,9 +236,9 @@
                     "request": {
                         "method": "DELETE",
                         "url": {
-                            "raw": "{{baseUrl}}/api/projets/{{projectId}}",
+                            "raw": "{{baseUrl}}/api/projets/{{projetId}}",
                             "host": ["{{baseUrl}}"],
-                            "path": ["api", "projets", "{{projectId}}"]
+                            "path": ["api", "projets", "{{projetId}}"]
                         }
                     }
                 }

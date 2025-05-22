@@ -1,5 +1,13 @@
 {
+  "name": "progease",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm start\"",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "clean": "rimraf node_modules && cd backend && rimraf node_modules && cd ../frontend && rimraf node_modules"
+  },
   "devDependencies": {
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.0.1",
+    "concurrently": "^8.2.2"
   }
 }
