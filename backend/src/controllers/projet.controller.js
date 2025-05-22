@@ -1,6 +1,19 @@
 // src/controllers/projet.controller.js
 const Projet = require('../models/projet.model');
 
+// Fonction utilitaire pour gérer les erreurs MongoDB
+const handleMongoError = (error) => {
+    if (error.name === 'ValidationError') {
+        const errors = Object.values(error.errors).map(err => err.message);
+        return { status: 400, message: errors.join(', ') };
+    }
+    if (error.name === 'CastError') {
+        return { status: 400, message: 'ID de projet invalide.' };
+    }
+    console.error('Erreur MongoDB :', error);
+    return { status: 500, message: 'Erreur interne du serveur.' };
+};
+
 // Création d'un nouveau projet
 exports.creerProjet = async (req, res) => {
     try {
@@ -8,33 +21,53 @@ exports.creerProjet = async (req, res) => {
         const projetEnregistre = await projet.save();
         res.status(201).json(projetEnregistre);
     } catch (error) {
-        console.error('Erreur lors de la création du projet :', error);
-        res.status(500).json({ erreur: 'Échec de la création du projet.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };
 
 // Récupération de tous les projets
 exports.recupererProjets = async (req, res) => {
     try {
-        const projets = await Projet.find();
-        res.status(200).json(projets);
+        const { page = 1, limit = 10, statut, tri = '-creeLe' } = req.query;
+        const query = statut ? { statut } : {};
+        
+        const [projets, total] = await Promise.all([
+            Projet.find(query)
+                .sort(tri)
+                .limit(Number(limit))
+                .skip((Number(page) - 1) * Number(limit))
+                .populate('tuteur', 'nom prenom email')
+                .populate('livrables', 'titre statut'),
+            Projet.countDocuments(query)
+        ]);
+
+        res.status(200).json({
+            projets,
+            total,
+            page: Number(page),
+            pages: Math.ceil(total / Number(limit))
+        });
     } catch (error) {
-        console.error('Erreur lors de la récupération des projets :', error);
-        res.status(500).json({ erreur: 'Échec de la récupération des projets.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };
 
 // Récupération d'un projet par ID
 exports.recupererProjetParId = async (req, res) => {
     try {
-        const projet = await Projet.findById(req.params.id);
+        const projet = await Projet.findById(req.params.id)
+            .populate('tuteur', 'nom prenom email')
+            .populate('livrables', 'titre statut');
+            
         if (!projet) {
             return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
         res.status(200).json(projet);
     } catch (error) {
-        console.error('Erreur lors de la récupération du projet :', error);
-        res.status(500).json({ erreur: 'Échec de la récupération du projet.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };
 
@@ -43,16 +76,18 @@ exports.mettreAJourProjet = async (req, res) => {
     try {
         const projetMisAJour = await Projet.findByIdAndUpdate(
             req.params.id,
-            req.body,
+            { ...req.body, majLe: new Date() },
             { new: true, runValidators: true }
-        );
+        ).populate('tuteur', 'nom prenom email')
+         .populate('livrables', 'titre statut');
+
         if (!projetMisAJour) {
             return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
         res.status(200).json(projetMisAJour);
     } catch (error) {
-        console.error('Erreur lors de la mise à jour du projet :', error);
-        res.status(500).json({ erreur: 'Échec de la mise à jour du projet.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };
 
@@ -63,9 +98,9 @@ exports.supprimerProjet = async (req, res) => {
         if (!projetSupprime) {
             return res.status(404).json({ erreur: 'Projet introuvable.' });
         }
-        res.status(204).send();
+        res.status(200).json({ message: 'Projet supprimé avec succès.' });
     } catch (error) {
-        console.error('Erreur lors de la suppression du projet :', error);
-        res.status(500).json({ erreur: 'Échec de la suppression du projet.' });
+        const { status, message } = handleMongoError(error);
+        res.status(status).json({ erreur: message });
     }
 };

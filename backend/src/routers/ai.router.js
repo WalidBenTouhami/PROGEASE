@@ -9,7 +9,8 @@ const {
     genererPlanning,
     creerEquipes,
     associerTuteurs,
-    recommanderApprentissage
+    recommanderApprentissage,
+    analyserProjet
 } = require('../services/ai.service');
 
 const catchAsync = (fn) => (req, res, next) => {
@@ -23,6 +24,13 @@ const validerChamp = (champ, req, res) => {
     }
     return true;
 };
+
+// Route d'analyse générale
+router.post('/analyze', catchAsync(async (req, res) => {
+    if (!validerChamp('donnees', req, res)) return;
+    const resultat = await analyserProjet(req.body.donnees);
+    res.status(200).json({ resultat });
+}));
 
 // Générer du texte avec l'IA
 router.post('/generer-texte', catchAsync(async (req, res) => {

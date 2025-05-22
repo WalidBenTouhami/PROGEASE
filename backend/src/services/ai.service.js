@@ -1,7 +1,9 @@
 const axios = require('axios');
 const dotenv = require('dotenv');
+const path = require('path');
 
-dotenv.config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
+// Charger les variables d'environnement depuis le fichier .env à la racine du projet
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
@@ -13,7 +15,7 @@ console.log('deepseek api client');
 console.log('✅ Clé API Deepseek chargée avec succès.');
 
 const client = axios.create({
-  baseURL: 'https://api.deepseek.com',
+  baseURL: 'https://api.deepseek.com/v1',
   headers: {
     'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
     'Content-Type': 'application/json'
@@ -22,7 +24,8 @@ const client = axios.create({
 
 const CONFIG = {
   MODEL: 'deepseek-chat',
-  MAX_TOKENS: 200,
+  MAX_TOKENS: 1000,
+  TEMPERATURE: 0.7
 };
 
 async function gererErreurIA(erreur, reponse = null) {
@@ -141,7 +144,45 @@ async function recommanderApprentissage(competences) {
   return traiterReponseIA(prompt);
 }
 
+async function analyserProjet(donnees) {
+  try {
+    const prompt = `
+      Analyser le projet suivant et fournir des recommandations :
+      
+      ${JSON.stringify(donnees, null, 2)}
+      
+      Points à analyser :
+      1. Risques potentiels
+      2. Points d'amélioration
+      3. Recommandations
+      4. Estimation de la progression
+      5. Prochaines étapes suggérées
+    `;
+
+    const response = await client.post('/chat/completions', {
+      model: CONFIG.MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: CONFIG.MAX_TOKENS,
+      temperature: CONFIG.TEMPERATURE
+    });
+
+    if (!response.data || !response.data.choices || !response.data.choices[0]) {
+      throw new Error('Réponse IA invalide');
+    }
+
+    return {
+      analyse: response.data.choices[0].message.content,
+      timestamp: new Date(),
+      status: 'success'
+    };
+  } catch (error) {
+    console.error('Erreur lors de l\'analyse du projet :', error);
+    throw new Error('Échec de l\'analyse du projet : ' + error.message);
+  }
+}
+
 module.exports = {
+  analyserProjet,
   genererTexte,
   suiviProgression,
   predirePerformance,

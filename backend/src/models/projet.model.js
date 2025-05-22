@@ -35,6 +35,12 @@ const projetSchema = new Schema({
     dateFin: {
         type: Date,
         required: [true, 'La date de fin est requise.'],
+        validate: {
+            validator: function(value) {
+                return value > this.dateDebut;
+            },
+            message: 'La date de fin doit être postérieure à la date de début.'
+        }
     },
     livrables: [{
         type: Schema.Types.ObjectId,
@@ -53,6 +59,18 @@ const projetSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+});
+
+// Middleware pour mettre à jour automatiquement majLe
+projetSchema.pre('save', function(next) {
+    this.majLe = new Date();
+    next();
+});
+
+// Middleware pour mettre à jour majLe lors des mises à jour
+projetSchema.pre(['updateOne', 'findOneAndUpdate'], function(next) {
+    this.set({ majLe: new Date() });
+    next();
 });
 
 module.exports = mongoose.model('Projet', projetSchema);
