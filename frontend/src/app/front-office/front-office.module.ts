@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FrontOfficeRoutingModule } from './front-office-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectListComponent } from './project-list/project-list.component';
-import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
+import { ProjetListComponent } from './projet-list/projet-list.component';
+import { LivrableListComponent } from './livrable-list/livrable-list.component';
 
 @NgModule({
   imports: [
@@ -13,8 +13,8 @@ import { DeliverableListComponent } from './deliverable-list/deliverable-list.co
     ReactiveFormsModule,
     FrontOfficeRoutingModule,
     DashboardComponent, // standalone components
-    ProjectListComponent,
-    DeliverableListComponent
+    ProjetListComponent,
+    LivrableListComponent
   ]
 })
 export class FrontOfficeModule {}

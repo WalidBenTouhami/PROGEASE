@@ -107,25 +107,25 @@
      ```
 
 [ ] 6. **Configurer le routage pour le module Project**
-   - Ajoutez les routes dans le fichier `project-routing.module.ts` :
+   - Ajoutez les routes dans le fichier `projet-routing.module.ts` :
      ```typescript
      import { NgModule } from '@angular/core';
      import { RouterModule, Routes } from '@angular/router';
-     import { ProjectListComponent } from './project-list/project-list.component';
-     import { ProjectDetailComponent } from './project-detail/project-detail.component';
-     import { ProjectFormComponent } from './project-form/project-form.component';
+     import { ProjetListComponent } from './project-list/project-list.component';
+     import { ProjetDetailComponent } from './project-detail/project-detail.component';
+     import { ProjetFormComponent } from './project-form/project-form.component';
 
      const routes: Routes = [
-       { path: '', component: ProjectListComponent },
-       { path: ':id', component: ProjectDetailComponent },
-       { path: ':id/edit', component: ProjectFormComponent },
+       { path: '', component: ProjetListComponent },
+       { path: ':id', component: ProjetDetailComponent },
+       { path: ':id/edit', component: ProjetFormComponent },
      ];
 
      @NgModule({
        imports: [RouterModule.forChild(routes)],
        exports: [RouterModule]
      })
-     export class ProjectRoutingModule {}
+     export class ProjetRoutingModule {}
      ```
 
 ---
@@ -153,25 +153,25 @@
      ```
 
 [ ] 9. **Configurer le routage pour le module Deliverable**
-   - Ajoutez les routes dans le fichier `deliverable-routing.module.ts` :
+   - Ajoutez les routes dans le fichier `livrable-routing.module.ts` :
      ```typescript
      import { NgModule } from '@angular/core';
      import { RouterModule, Routes } from '@angular/router';
-     import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
-     import { DeliverableDetailComponent } from './deliverable-detail/deliverable-detail.component';
-     import { DeliverableFormComponent } from './deliverable-form/deliverable-form.component';
+     import { LivrableListComponent } from './deliverable-list/deliverable-list.component';
+     import { LivrableDetailComponent } from './deliverable-detail/deliverable-detail.component';
+     import { LivrableFormComponent } from './deliverable-form/deliverable-form.component';
 
      const routes: Routes = [
-       { path: '', component: DeliverableListComponent },
-       { path: ':id', component: DeliverableDetailComponent },
-       { path: ':id/edit', component: DeliverableFormComponent },
+       { path: '', component: LivrableListComponent },
+       { path: ':id', component: LivrableDetailComponent },
+       { path: ':id/edit', component: LivrableFormComponent },
      ];
 
      @NgModule({
        imports: [RouterModule.forChild(routes)],
        exports: [RouterModule]
      })
-     export class DeliverableRoutingModule {}
+     export class LivrableRoutingModule {}
      ```
 
 ---
@@ -223,5 +223,5 @@
                                         Notes
 --------------------------------------------------------------------------------------------
 les services
-- **ProjectService** : Gère les appels API pour les projets.
-- **DeliverableService** : Gère les appels API pour les livrables.
+- **ProjetService** : Gère les appels API pour les projets.
+- **LivrableService** : Gère les appels API pour les livrables.

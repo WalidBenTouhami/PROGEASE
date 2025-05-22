@@ -145,25 +145,25 @@ const filesToExport = [
     'exportCode.js',
     'filesList.js',
     'server.js',
-    'src/controllers/deliverable.controller.js',
-    'src/controllers/project.controller.js',
+    'src/controllers/livrable.controller.js',
+    'src/controllers/projet.controller.js',
     'src/graphql/resolvers.js',
     'src/graphql/schema.js',
-    'src/middlewares/project.middleware.js',
+    'src/middlewares/projet.middleware.js',
     'src/middlewares/validate.Request.js',
-    'src/models/deliverable.model.js',
-    'src/models/project.model.js',
+    'src/models/livrable.model.js',
+    'src/models/projet.model.js',
     'src/routers/ai.router.js',
-    'src/routers/deliverable.router.js',
-    'src/routers/project.router.js',
+    'src/routers/livrable.router.js',
+    'src/routers/projet.router.js',
     'src/services/ai.service.js',
     'src/services/github.service.js',
-    'src/services/project.service.js',
+    'src/services/projet.service.js',
     'src/utils/date.util.js',
     'src/utils/github.util.js',
-    'src/utils/project.class.js',
-    'src/utils/project.utils.js',
-    'src/validations/project.validation.js',
+    'src/utils/projet.class.js',
+    'src/utils/projet.utils.js',
+    'src/validations/projet.validation.js',
     'test-env.js',
     'testGithubService.js'
 ];
@@ -368,7 +368,7 @@ app.use((err, req, res, next) => {
     }
 })();
 
-// ======= Contenu de src/controllers/deliverable.controller.js =======
+// ======= Contenu de src/controllers/livrable.controller.js =======
 
 const Projet = require('../models/project.model');
 const Livrable = require('../models/deliverable.model');
@@ -476,9 +476,9 @@ exports.supprimerLivrable = async (req, res) => {
     }
 };
 
-// ======= Contenu de src/controllers/project.controller.js =======
+// ======= Contenu de src/controllers/projet.controller.js =======
 
-// src/controllers/project.controller.js
+// src/controllers/projet.controller.js
 const Projet = require('../models/project.model');
 
 // Création d'un nouveau projet
@@ -749,7 +749,7 @@ const { gql } = require('apollo-server-express');
 
     module.exports = { typeDefs };
 
-// ======= Contenu de src/middlewares/project.middleware.js =======
+// ======= Contenu de src/middlewares/projet.middleware.js =======
 
 const { validationResult } = require('express-validator');
 
@@ -773,7 +773,7 @@ module.exports = (req, res, next) => {
     next();
 };
 
-// ======= Contenu de src/models/deliverable.model.js =======
+// ======= Contenu de src/models/livrable.model.js =======
 
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
@@ -827,7 +827,7 @@ const deliverableSchema = new Schema({
 
 module.exports = mongoose.model('Livrable', deliverableSchema);
 
-// ======= Contenu de src/models/project.model.js =======
+// ======= Contenu de src/models/projet.model.js =======
 
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
@@ -973,7 +973,7 @@ router.use((err, req, res, next) => {
 
 module.exports = router;
 
-// ======= Contenu de src/routers/deliverable.router.js =======
+// ======= Contenu de src/routers/livrable.router.js =======
 
 const express = require('express');
 const router = express.Router();
@@ -993,7 +993,7 @@ router.delete('/:livrableId', deliverableController.supprimerLivrable);
 
 module.exports = router;
 
-// ======= Contenu de src/routers/project.router.js =======
+// ======= Contenu de src/routers/projet.router.js =======
 
 const express = require('express');
 const router = express.Router();
@@ -1240,7 +1240,7 @@ async function verifierDepotGithubExiste(url) {
 
 module.exports = { verifierDepotGithubExiste };
 
-// ======= Contenu de src/services/project.service.js =======
+// ======= Contenu de src/services/projet.service.js =======
 
 const Projet = require('../models/project.model');
 
@@ -1382,7 +1382,7 @@ module.exports = {
     estUrlDepotGithub,
 };
 
-// ======= Contenu de src/utils/project.class.js =======
+// ======= Contenu de src/utils/projet.class.js =======
 
 class Projet {
     constructor(id, titre, description, dateDebut, dateFin, statut) {
@@ -1415,9 +1415,9 @@ class Projet {
 
 module.exports = Projet;
 
-// ======= Contenu de src/utils/project.utils.js =======
+// ======= Contenu de src/utils/projet.utils.js =======
 
-const ProjectUtils = {
+const ProjetUtils = {
     genererCodeProjet: (tailleEquipe) => {
         const partieAleatoire = Math.random().toString(16).slice(2, 8).toUpperCase();
         const timestamp = Date.now();
@@ -1434,9 +1434,9 @@ const ProjectUtils = {
     }
 };
 
-module.exports = { ProjectUtils };
+module.exports = { ProjetUtils };
 
-// ======= Contenu de src/validations/project.validation.js =======
+// ======= Contenu de src/validations/projet.validation.js =======
 
 const yup = require('yup');
 

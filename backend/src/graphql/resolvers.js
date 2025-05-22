@@ -1,5 +1,5 @@
-const Projet = require('../models/project.model');
-const Livrable = require('../models/deliverable.model');
+const Projet = require('../models/projet.model');
+const Livrable = require('../models/livrable.model');
 
 function mapProjetMongoVersGraphQL(doc) {
     if (!doc) return null;

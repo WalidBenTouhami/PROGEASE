@@ -1,13 +1,15 @@
+// config/constants.js
+
 require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
 
-const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
-REQUIRED_ENV_VARS.forEach((envVar) => {
-    if (!process.env[envVar]) {
-        throw new Error(`La variable d'environnement ${envVar} est manquante.`);
+const VARIABLES_ENV_OBLIGATOIRES = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
+VARIABLES_ENV_OBLIGATOIRES.forEach((varEnv) => {
+    if (!process.env[varEnv]) {
+        throw new Error(`La variable d'environnement ${varEnv} est manquante.`);
     }
 });
 
-const Enums = Object.freeze({
+const Enum = Object.freeze({
     StatutProjet: {
         BROUILLON: "Brouillon",
         EN_COURS: "En cours",
@@ -33,13 +35,13 @@ const ConfigSecurite = Object.freeze({
     },
     MOT_DE_PASSE: {
         LONGUEUR_MIN: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10,
-        NOMBRE_SALT: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
+        NB_SALT: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
         NB_MAX_ESSAIS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5,
         MINUTES_VERROUILLAGE: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30,
     },
 });
 
-const PaginationDefaut = Object.freeze({
+const PaginationParDefaut = Object.freeze({
     PAGE: 1,
     LIMITE: 20,
     LIMITE_MAX: 100,
@@ -84,9 +86,9 @@ module.exports = {
     PORT: process.env.PORT || 3000,
     JWT_SECRET: process.env.JWT_SECRET,
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
-    Enums,
+    Enum,
     ConfigSecurite,
-    PaginationDefaut,
+    PaginationParDefaut,
     MessagesErreur,
     StatutHttp,
 };

@@ -1,13 +1,13 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectListComponent } from './project-list/project-list.component';
-import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
+import { ProjetListComponent } from './projet-list/projet-list.component';
+import { LivrableListComponent } from './livrable-list/livrable-list.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
-  { path: 'projects', component: ProjectListComponent },
-  { path: 'deliverables', component: DeliverableListComponent },
+  { path: 'projects', component: ProjetListComponent },
+  { path: 'deliverables', component: LivrableListComponent },
 ];
 
 @NgModule({

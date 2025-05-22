@@ -65,8 +65,8 @@ import { RouterModule, Routes } from '@angular/router';
 export const routes: Routes = [
   { path: 'back-office', loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule) },
   { path: 'front-office', loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule) },
-  { path: 'deliverable', loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule) },
-  { path: 'project', loadChildren: () => import('./project/project.module').then(m => m.ProjectModule) },
+  { path: 'deliverable', loadChildren: () => import('./deliverable/deliverable.module').then(m => m.LivrableModule) },
+  { path: 'project', loadChildren: () => import('./project/project.module').then(m => m.ProjetModule) },
   { path: '', redirectTo: 'front-office', pathMatch: 'full' },
   { path: '**', redirectTo: 'front-office' }
 ];
@@ -243,8 +243,8 @@ import { ApiTestComponent } from './core/api-test/api-test.component';
 export const routes: Routes = [
   { path: 'back-office', loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule) },
   { path: 'front-office', loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule) },
-  { path: 'deliverable', loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule) },
-  { path: 'project', loadChildren: () => import('./project/project.module').then(m => m.ProjectModule) },
+  { path: 'deliverable', loadChildren: () => import('./deliverable/deliverable.module').then(m => m.LivrableModule) },
+  { path: 'project', loadChildren: () => import('./project/project.module').then(m => m.ProjetModule) },
   { path: '', redirectTo: 'front-office', pathMatch: 'full' },
   { path: '**', redirectTo: 'front-office' },
   // Route de test
@@ -257,13 +257,13 @@ export const routes: Routes = [
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectManagementComponent } from './project-management/project-management.component';
-import { DeliverableManagementComponent } from './deliverable-management/deliverable-management.component';
+import { ProjetManagementComponent } from './project-management/project-management.component';
+import { LivrableManagementComponent } from './deliverable-management/deliverable-management.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
-  { path: 'projects', component: ProjectManagementComponent },
-  { path: 'deliverables', component: DeliverableManagementComponent },
+  { path: 'projects', component: ProjetManagementComponent },
+  { path: 'deliverables', component: LivrableManagementComponent },
 ];
 
 @NgModule({
@@ -279,14 +279,14 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BackOfficeRoutingModule } from './back-office-routing.module';
-import { ProjectManagementComponent } from './project-management/project-management.component';
-import { DeliverableManagementComponent } from './deliverable-management/deliverable-management.component';
+import { ProjetManagementComponent } from './project-management/project-management.component';
+import { LivrableManagementComponent } from './deliverable-management/deliverable-management.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
-    ProjectManagementComponent,
-    DeliverableManagementComponent
+    ProjetManagementComponent,
+    LivrableManagementComponent
   ],
   imports: [
     CommonModule,
@@ -425,23 +425,23 @@ p {
 }
 
 
-// ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.spec.ts =======
+// ======= Contenu de src/app/back-office/deliverable-management/livrable-management.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeliverableManagementComponent } from './deliverable-management.component';
+import { LivrableManagementComponent } from './deliverable-management.component';
 
-describe('DeliverableManagementComponent', () => {
-  let component: DeliverableManagementComponent;
-  let fixture: ComponentFixture<DeliverableManagementComponent>;
+describe('LivrableManagementComponent', () => {
+  let component: LivrableManagementComponent;
+  let fixture: ComponentFixture<LivrableManagementComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DeliverableManagementComponent]
+      imports: [LivrableManagementComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(DeliverableManagementComponent);
+    fixture = TestBed.createComponent(LivrableManagementComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -452,19 +452,19 @@ describe('DeliverableManagementComponent', () => {
 });
 
 
-// ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.ts =======
+// ======= Contenu de src/app/back-office/deliverable-management/livrable-management.component.ts =======
 
 import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-deliverable-management',
-  templateUrl: './deliverable-management.component.html',
+  templateUrl: './livrable-management.component.html',
   styleUrls: ['./deliverable-management.component.css']
 })
-export class DeliverableManagementComponent {}
+export class LivrableManagementComponent {}
 
 
-// ======= Contenu de src/app/back-office/project-management/project-management.component.css =======
+// ======= Contenu de src/app/back-office/project-management/projet-management.component.css =======
 
 .section-header {
   font-size: 1.3rem;
@@ -477,23 +477,23 @@ p {
 }
 
 
-// ======= Contenu de src/app/back-office/project-management/project-management.component.spec.ts =======
+// ======= Contenu de src/app/back-office/project-management/projet-management.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectManagementComponent } from './project-management.component';
+import { ProjetManagementComponent } from './project-management.component';
 
-describe('ProjectManagementComponent', () => {
-  let component: ProjectManagementComponent;
-  let fixture: ComponentFixture<ProjectManagementComponent>;
+describe('ProjetManagementComponent', () => {
+  let component: ProjetManagementComponent;
+  let fixture: ComponentFixture<ProjetManagementComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProjectManagementComponent]
+      imports: [ProjetManagementComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(ProjectManagementComponent);
+    fixture = TestBed.createComponent(ProjetManagementComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -504,16 +504,16 @@ describe('ProjectManagementComponent', () => {
 });
 
 
-// ======= Contenu de src/app/back-office/project-management/project-management.component.ts =======
+// ======= Contenu de src/app/back-office/project-management/projet-management.component.ts =======
 
 import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-project-management',
-  templateUrl: './project-management.component.html',
-  styleUrls: ['./project-management.component.css']
+  templateUrl: './projet-management.component.html',
+  styleUrls: ['./projet-management.component.css']
 })
-export class ProjectManagementComponent {}
+export class ProjetManagementComponent {}
 
 
 // ======= Contenu de src/app/core/api-test/api-test.component.ts =======
@@ -744,7 +744,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 };
 
 
-// ======= Contenu de src/app/core/models/deliverable.model.ts =======
+// ======= Contenu de src/app/core/models/livrable.model.ts =======
 
 export type StatutLivrable = 'En retard' | 'En attente' | 'Terminé';
 
@@ -767,7 +767,7 @@ export const DeliverableStatuses = {
 } as const;
 
 
-// ======= Contenu de src/app/core/models/project.model.ts =======
+// ======= Contenu de src/app/core/models/projet.model.ts =======
 
 import { Deliverable } from './deliverable.model';
 
@@ -897,18 +897,18 @@ export class AlertService {
 }
 
 
-// ======= Contenu de src/app/core/services/deliverable.service.spec.ts =======
+// ======= Contenu de src/app/core/services/livrable.service.spec.ts =======
 
 import { TestBed } from '@angular/core/testing';
 
-import { DeliverableService } from './deliverable.service';
+import { LivrableService } from './deliverable.service';
 
-describe('DeliverableService', () => {
-  let service: DeliverableService;
+describe('LivrableService', () => {
+  let service: LivrableService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({});
-    service = TestBed.inject(DeliverableService);
+    service = TestBed.inject(LivrableService);
   });
 
   it('should be created', () => {
@@ -917,7 +917,7 @@ describe('DeliverableService', () => {
 });
 
 
-// ======= Contenu de src/app/core/services/deliverable.service.ts =======
+// ======= Contenu de src/app/core/services/livrable.service.ts =======
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -927,7 +927,7 @@ import { Deliverable } from '../models/deliverable.model';
 @Injectable({
   providedIn: 'root'
 })
-export class DeliverableService {
+export class LivrableService {
   private baseUrl = `${environment.apiUrl}/deliverables`;
 
   constructor(private http: HttpClient) {}
@@ -1034,16 +1034,16 @@ export class GraphqlService {
 }
 
 
-// ======= Contenu de src/app/core/services/project.service.spec.ts =======
+// ======= Contenu de src/app/core/services/projet.service.spec.ts =======
 
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ProjectService } from './project.service';
+import { ProjetService } from './project.service';
 import { environment } from '../../../environments/environment';
 import { Project } from '../models/project.model';
 
-describe('ProjectService', () => {
-  let service: ProjectService;
+describe('ProjetService', () => {
+  let service: ProjetService;
   let httpMock: HttpTestingController;
 
   const API = `${environment.apiUrl}/projects`;
@@ -1063,10 +1063,10 @@ describe('ProjectService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ProjectService]
+      providers: [ProjetService]
     });
 
-    service = TestBed.inject(ProjectService);
+    service = TestBed.inject(ProjetService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -1148,7 +1148,7 @@ describe('ProjectService', () => {
 });
 
 
-// ======= Contenu de src/app/core/services/project.service.ts =======
+// ======= Contenu de src/app/core/services/projet.service.ts =======
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
@@ -1159,7 +1159,7 @@ import { Project } from '../models/project.model';
 @Injectable({
   providedIn: 'root'
 })
-export class ProjectService {
+export class ProjetService {
   private baseUrl = `${environment.apiUrl}/projects`;
 
   constructor(private http: HttpClient) {}
@@ -1205,13 +1205,13 @@ export class ProjectService {
       message = `Erreur serveur - code : ${error.status}, message : ${error.message}`;
     }
 
-    console.error(`[ProjectService] ${message}`);
+    console.error(`[ProjetService] ${message}`);
     return throwError(() => new Error(message));
   }
 }
 
 
-// ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.css =======
+// ======= Contenu de src/app/deliverable/deliverable-detail/livrable-detail.component.css =======
 
 .deliverable-detail {
   max-width: 700px;
@@ -1233,21 +1233,21 @@ export class ProjectService {
 .status.retard { background: #ffebee; color: #b71c1c; }
 
 
-// ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.spec.ts =======
+// ======= Contenu de src/app/deliverable/deliverable-detail/livrable-detail.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DeliverableDetailComponent } from './deliverable-detail.component';
+import { LivrableDetailComponent } from './deliverable-detail.component';
 
-describe('DeliverableDetailComponent', () => {
-  let component: DeliverableDetailComponent;
-  let fixture: ComponentFixture<DeliverableDetailComponent>;
+describe('LivrableDetailComponent', () => {
+  let component: LivrableDetailComponent;
+  let fixture: ComponentFixture<LivrableDetailComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DeliverableDetailComponent]
+      imports: [LivrableDetailComponent]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DeliverableDetailComponent);
+    fixture = TestBed.createComponent(LivrableDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -1258,7 +1258,7 @@ describe('DeliverableDetailComponent', () => {
 });
 
 
-// ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.ts =======
+// ======= Contenu de src/app/deliverable/deliverable-detail/livrable-detail.component.ts =======
 
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -1268,10 +1268,10 @@ import { Deliverable } from '../../core/models/deliverable.model';
   selector: 'app-deliverable-detail',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './deliverable-detail.component.html',
-  styleUrls: ['./deliverable-detail.component.css']
+  templateUrl: './livrable-detail.component.html',
+  styleUrls: ['./livrable-detail.component.css']
 })
-export class DeliverableDetailComponent implements OnInit {
+export class LivrableDetailComponent implements OnInit {
   @Input() livrable?: Deliverable;
 
   ngOnInit(): void {}
@@ -1287,7 +1287,7 @@ export class DeliverableDetailComponent implements OnInit {
 }
 
 
-// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.css =======
+// ======= Contenu de src/app/deliverable/deliverable-form/livrable-form.component.css =======
 
 form {
   display: flex;
@@ -1331,23 +1331,23 @@ button[type="submit"]:hover {
 }
 
 
-// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.spec.ts =======
+// ======= Contenu de src/app/deliverable/deliverable-form/livrable-form.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeliverableFormComponent } from './deliverable-form.component';
+import { LivrableFormComponent } from './deliverable-form.component';
 
-describe('DeliverableFormComponent', () => {
-  let component: DeliverableFormComponent;
-  let fixture: ComponentFixture<DeliverableFormComponent>;
+describe('LivrableFormComponent', () => {
+  let component: LivrableFormComponent;
+  let fixture: ComponentFixture<LivrableFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DeliverableFormComponent]
+      imports: [LivrableFormComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(DeliverableFormComponent);
+    fixture = TestBed.createComponent(LivrableFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -1358,7 +1358,7 @@ describe('DeliverableFormComponent', () => {
 });
 
 
-// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.ts =======
+// ======= Contenu de src/app/deliverable/deliverable-form/livrable-form.component.ts =======
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Deliverable, DeliverableStatuses } from '../../core/models/deliverable.model';
@@ -1370,10 +1370,10 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
   imports: [
     ReactiveFormsModule
   ],
-  templateUrl: './deliverable-form.component.html',
-  styleUrl: './deliverable-form.component.css'
+  templateUrl: './livrable-form.component.html',
+  styleUrl: './livrable-form.component.css'
 })
-export class DeliverableFormComponent implements OnInit {
+export class LivrableFormComponent implements OnInit {
   @Input() livrable?: Deliverable;
   @Output() formSubmit = new EventEmitter<Deliverable>();
 
@@ -1404,7 +1404,7 @@ export class DeliverableFormComponent implements OnInit {
 }
 
 
-// ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.css =======
+// ======= Contenu de src/app/deliverable/deliverable-list/livrable-list.component.css =======
 
 h3 {
   margin-top: 1.5rem;
@@ -1449,25 +1449,25 @@ a:hover {
 }
 
 
-// ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.spec.ts =======
+// ======= Contenu de src/app/deliverable/deliverable-list/livrable-list.component.spec.ts =======
 
-//src/app/deliverable/deliverable-list/deliverable-list.component.spec.ts
+//src/app/deliverable/deliverable-list/livrable-list.component.spec.ts
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeliverableListComponent } from './deliverable-list.component';
+import { LivrableListComponent } from './deliverable-list.component';
 
-describe('DeliverableListComponent', () => {
-  let component: DeliverableListComponent;
-  let fixture: ComponentFixture<DeliverableListComponent>;
+describe('LivrableListComponent', () => {
+  let component: LivrableListComponent;
+  let fixture: ComponentFixture<LivrableListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DeliverableListComponent]
+      imports: [LivrableListComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(DeliverableListComponent);
+    fixture = TestBed.createComponent(LivrableListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -1478,27 +1478,27 @@ describe('DeliverableListComponent', () => {
 });
 
 
-// ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.ts =======
+// ======= Contenu de src/app/deliverable/deliverable-list/livrable-list.component.ts =======
 
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Deliverable } from '../../core/models/deliverable.model';
-import { DeliverableService } from '../../core/services/deliverable.service';
+import { LivrableService } from '../../core/services/deliverable.service';
 
 @Component({
   selector: 'app-deliverable-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './deliverable-list.component.html',
-  styleUrls: ['./deliverable-list.component.css']
+  templateUrl: './livrable-list.component.html',
+  styleUrls: ['./livrable-list.component.css']
 })
-export class DeliverableListComponent implements OnInit {
+export class LivrableListComponent implements OnInit {
   @Input() projetId!: string;
   livrables: Deliverable[] = [];
   chargement = false;
   erreur = '';
 
-  constructor(private deliverableService: DeliverableService) {}
+  constructor(private deliverableService: LivrableService) {}
 
   ngOnInit() {
     if (this.projetId) {
@@ -1518,37 +1518,37 @@ export class DeliverableListComponent implements OnInit {
 }
 
 
-// ======= Contenu de src/app/deliverable/deliverable-routing.module.ts =======
+// ======= Contenu de src/app/deliverable/livrable-routing.module.ts =======
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
+import { LivrableListComponent } from './deliverable-list/deliverable-list.component';
 
 const routes: Routes = [
-  { path: '', component: DeliverableListComponent }
+  { path: '', component: LivrableListComponent }
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class DeliverableRoutingModule {}
+export class LivrableRoutingModule {}
 
 
-// ======= Contenu de src/app/deliverable/deliverable.module.ts =======
+// ======= Contenu de src/app/deliverable/livrable.module.ts =======
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DeliverableRoutingModule } from './deliverable-routing.module';
+import { LivrableRoutingModule } from './deliverable-routing.module';
 
 @NgModule({
   declarations: [],
   imports: [
     CommonModule,
-    DeliverableRoutingModule
+    LivrableRoutingModule
   ]
 })
-export class DeliverableModule {}
+export class LivrableModule {}
 
 
 // ======= Contenu de src/app/front-office/dashboard/dashboard.component.css =======
@@ -1673,7 +1673,7 @@ export class DashboardComponent {
 }
 
 
-// ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.css =======
+// ======= Contenu de src/app/front-office/deliverable-list/livrable-list.component.css =======
 
 h3 {
   margin-top: 1.5rem;
@@ -1718,23 +1718,23 @@ a:hover {
 }
 
 
-// ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.spec.ts =======
+// ======= Contenu de src/app/front-office/deliverable-list/livrable-list.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeliverableListComponent } from './deliverable-list.component';
+import { LivrableListComponent } from './deliverable-list.component';
 
-describe('DeliverableListComponent', () => {
-  let component: DeliverableListComponent;
-  let fixture: ComponentFixture<DeliverableListComponent>;
+describe('LivrableListComponent', () => {
+  let component: LivrableListComponent;
+  let fixture: ComponentFixture<LivrableListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DeliverableListComponent]
+      imports: [LivrableListComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(DeliverableListComponent);
+    fixture = TestBed.createComponent(LivrableListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -1745,26 +1745,26 @@ describe('DeliverableListComponent', () => {
 });
 
 
-// ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.ts =======
+// ======= Contenu de src/app/front-office/deliverable-list/livrable-list.component.ts =======
 
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Deliverable } from '../../core/models/deliverable.model';
-import { DeliverableService } from '../../core/services/deliverable.service';
+import { LivrableService } from '../../core/services/deliverable.service';
 
 @Component({
   selector: 'app-deliverable-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './deliverable-list.component.html',
-  styleUrl: './deliverable-list.component.css'
+  templateUrl: './livrable-list.component.html',
+  styleUrl: './livrable-list.component.css'
 })
-export class DeliverableListComponent implements OnInit {
+export class LivrableListComponent implements OnInit {
   @Input() projetId!: string;
   livrables: Deliverable[] = [];
   chargement = false;
   erreur = '';
-  constructor(private deliverableService: DeliverableService) {}
+  constructor(private deliverableService: LivrableService) {}
   ngOnInit() {
     if (this.projetId) {
       this.chargement = true;
@@ -1788,13 +1788,13 @@ export class DeliverableListComponent implements OnInit {
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectListComponent } from './project-list/project-list.component';
-import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
+import { ProjetListComponent } from './project-list/project-list.component';
+import { LivrableListComponent } from './deliverable-list/deliverable-list.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
-  { path: 'projects', component: ProjectListComponent },
-  { path: 'deliverables', component: DeliverableListComponent },
+  { path: 'projects', component: ProjetListComponent },
+  { path: 'deliverables', component: LivrableListComponent },
 ];
 
 @NgModule({
@@ -1811,8 +1811,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FrontOfficeRoutingModule } from './front-office-routing.module';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjectListComponent } from './project-list/project-list.component';
-import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
+import { ProjetListComponent } from './project-list/project-list.component';
+import { LivrableListComponent } from './deliverable-list/deliverable-list.component';
 
 @NgModule({
   imports: [
@@ -1821,14 +1821,14 @@ import { DeliverableListComponent } from './deliverable-list/deliverable-list.co
     ReactiveFormsModule,
     FrontOfficeRoutingModule,
     DashboardComponent, // standalone components
-    ProjectListComponent,
-    DeliverableListComponent
+    ProjetListComponent,
+    LivrableListComponent
   ]
 })
 export class FrontOfficeModule {}
 
 
-// ======= Contenu de src/app/front-office/project-list/project-list.component.css =======
+// ======= Contenu de src/app/front-office/project-list/projet-list.component.css =======
 
 h2 {
   margin-bottom: 1.5rem;
@@ -1869,23 +1869,23 @@ button:hover { background: #174bb3; }
 }
 
 
-// ======= Contenu de src/app/front-office/project-list/project-list.component.spec.ts =======
+// ======= Contenu de src/app/front-office/project-list/projet-list.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectListComponent } from './project-list.component';
+import { ProjetListComponent } from './project-list.component';
 
-describe('ProjectListComponent', () => {
-  let component: ProjectListComponent;
-  let fixture: ComponentFixture<ProjectListComponent>;
+describe('ProjetListComponent', () => {
+  let component: ProjetListComponent;
+  let fixture: ComponentFixture<ProjetListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProjectListComponent]
+      imports: [ProjetListComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(ProjectListComponent);
+    fixture = TestBed.createComponent(ProjetListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -1896,12 +1896,12 @@ describe('ProjectListComponent', () => {
 });
 
 
-// ======= Contenu de src/app/front-office/project-list/project-list.component.ts =======
+// ======= Contenu de src/app/front-office/project-list/projet-list.component.ts =======
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ProjectService } from '../../core/services/project.service';
+import { ProjetService } from '../../core/services/project.service';
 import { Project } from '../../core/models/project.model';
 import { Subscription } from 'rxjs';
 
@@ -1909,17 +1909,17 @@ import { Subscription } from 'rxjs';
   selector: 'app-project-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './project-list.component.html',
-  styleUrls: ['./project-list.component.css']
+  templateUrl: './projet-list.component.html',
+  styleUrls: ['./projet-list.component.css']
 })
-export class ProjectListComponent implements OnInit, OnDestroy {
+export class ProjetListComponent implements OnInit, OnDestroy {
   projets: Project[] = [];
   chargement = false;
   erreur = '';
   private subscription?: Subscription;
 
   constructor(
-    private projectService: ProjectService,
+    private projectService: ProjetService,
     private router: Router
   ) {}
 
@@ -1954,7 +1954,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 }
 
 
-// ======= Contenu de src/app/project/project-detail/project-detail.component.css =======
+// ======= Contenu de src/app/project/project-detail/projet-detail.component.css =======
 
 .project-detail {
   max-width: 900px;
@@ -1983,23 +1983,23 @@ ul {
 }
 
 
-// ======= Contenu de src/app/project/project-detail/project-detail.component.spec.ts =======
+// ======= Contenu de src/app/project/project-detail/projet-detail.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectDetailComponent } from './project-detail.component';
+import { ProjetDetailComponent } from './project-detail.component';
 
-describe('ProjectDetailComponent', () => {
-  let component: ProjectDetailComponent;
-  let fixture: ComponentFixture<ProjectDetailComponent>;
+describe('ProjetDetailComponent', () => {
+  let component: ProjetDetailComponent;
+  let fixture: ComponentFixture<ProjetDetailComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProjectDetailComponent]
+      imports: [ProjetDetailComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(ProjectDetailComponent);
+    fixture = TestBed.createComponent(ProjetDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -2010,7 +2010,7 @@ describe('ProjectDetailComponent', () => {
 });
 
 
-// ======= Contenu de src/app/project/project-detail/project-detail.component.ts =======
+// ======= Contenu de src/app/project/project-detail/projet-detail.component.ts =======
 
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -2021,10 +2021,10 @@ import { Deliverable } from '../../core/models/deliverable.model';
   selector: 'app-project-detail',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './project-detail.component.html',
-  styleUrls: ['./project-detail.component.css']
+  templateUrl: './projet-detail.component.html',
+  styleUrls: ['./projet-detail.component.css']
 })
-export class ProjectDetailComponent implements OnInit {
+export class ProjetDetailComponent implements OnInit {
   @Input() projet?: Project;
 
   ngOnInit(): void {}
@@ -2041,7 +2041,7 @@ export class ProjectDetailComponent implements OnInit {
 }
 
 
-// ======= Contenu de src/app/project/project-form/project-form.component.css =======
+// ======= Contenu de src/app/project/project-form/projet-form.component.css =======
 
 .form-container {
   max-width: 600px;
@@ -2082,23 +2082,23 @@ button[type="submit"]:focus {
 }
 
 
-// ======= Contenu de src/app/project/project-form/project-form.component.spec.ts =======
+// ======= Contenu de src/app/project/project-form/projet-form.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectFormComponent } from './project-form.component';
+import { ProjetFormComponent } from './project-form.component';
 
-describe('ProjectFormComponent', () => {
-  let component: ProjectFormComponent;
-  let fixture: ComponentFixture<ProjectFormComponent>;
+describe('ProjetFormComponent', () => {
+  let component: ProjetFormComponent;
+  let fixture: ComponentFixture<ProjetFormComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProjectFormComponent]
+      imports: [ProjetFormComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(ProjectFormComponent);
+    fixture = TestBed.createComponent(ProjetFormComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -2109,7 +2109,7 @@ describe('ProjectFormComponent', () => {
 });
 
 
-// ======= Contenu de src/app/project/project-form/project-form.component.ts =======
+// ======= Contenu de src/app/project/project-form/projet-form.component.ts =======
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Project, ProjectStatuses } from '../../core/models/project.model';
@@ -2119,10 +2119,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   selector: 'app-project-form',
   standalone: true,
   imports: [],
-  templateUrl: './project-form.component.html',
-  styleUrls: ['./project-form.component.css']
+  templateUrl: './projet-form.component.html',
+  styleUrls: ['./projet-form.component.css']
 })
-export class ProjectFormComponent implements OnInit {
+export class ProjetFormComponent implements OnInit {
   @Input() projet?: Project;
   @Output() formSubmit = new EventEmitter<Project>();
 
@@ -2171,7 +2171,7 @@ export class ProjectFormComponent implements OnInit {
 }
 
 
-// ======= Contenu de src/app/project/project-list/project-list.component.css =======
+// ======= Contenu de src/app/project/project-list/projet-list.component.css =======
 
 .project-list {
   list-style: none;
@@ -2193,23 +2193,23 @@ export class ProjectFormComponent implements OnInit {
 }
 
 
-// ======= Contenu de src/app/project/project-list/project-list.component.spec.ts =======
+// ======= Contenu de src/app/project/project-list/projet-list.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ProjectListComponent } from './project-list.component';
+import { ProjetListComponent } from './project-list.component';
 
-describe('ProjectListComponent', () => {
-  let component: ProjectListComponent;
-  let fixture: ComponentFixture<ProjectListComponent>;
+describe('ProjetListComponent', () => {
+  let component: ProjetListComponent;
+  let fixture: ComponentFixture<ProjetListComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProjectListComponent]
+      imports: [ProjetListComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(ProjectListComponent);
+    fixture = TestBed.createComponent(ProjetListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
@@ -2220,12 +2220,12 @@ describe('ProjectListComponent', () => {
 });
 
 
-// ======= Contenu de src/app/project/project-list/project-list.component.ts =======
+// ======= Contenu de src/app/project/project-list/projet-list.component.ts =======
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { ProjectService } from '../../core/services/project.service';
+import { ProjetService } from '../../core/services/project.service';
 import { Project } from '../../core/models/project.model';
 import { Subscription } from 'rxjs';
 
@@ -2233,17 +2233,17 @@ import { Subscription } from 'rxjs';
   selector: 'app-project-list',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './project-list.component.html',
-  styleUrls: ['./project-list.component.css']
+  templateUrl: './projet-list.component.html',
+  styleUrls: ['./projet-list.component.css']
 })
-export class ProjectListComponent implements OnInit, OnDestroy {
+export class ProjetListComponent implements OnInit, OnDestroy {
   projets: (Project & { _id: string })[] = [];
   chargement = false;
   erreur = '';
   private subscription?: Subscription;
 
   constructor(
-    private projectService: ProjectService,
+    private projectService: ProjetService,
     private router: Router
   ) {}
 
@@ -2278,38 +2278,38 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 }
 
 
-// ======= Contenu de src/app/project/project-routing.module.ts =======
+// ======= Contenu de src/app/project/projet-routing.module.ts =======
 
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { ProjectListComponent } from './project-list/project-list.component';
+import { ProjetListComponent } from './project-list/project-list.component';
 
 const routes: Routes = [
-  { path: '', component: ProjectListComponent }
+  { path: '', component: ProjetListComponent }
 ];
 
 @NgModule({
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule]
 })
-export class ProjectRoutingModule {}
+export class ProjetRoutingModule {}
 
 
-// ======= Contenu de src/app/project/project.module.ts =======
+// ======= Contenu de src/app/project/projet.module.ts =======
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ProjectRoutingModule } from './project-routing.module';
-import { ProjectListComponent } from './project-list/project-list.component';
+import { ProjetRoutingModule } from './project-routing.module';
+import { ProjetListComponent } from './project-list/project-list.component';
 
 @NgModule({
   imports: [
     CommonModule,
-    ProjectRoutingModule,
-    ProjectListComponent
+    ProjetRoutingModule,
+    ProjetListComponent
   ]
 })
-export class ProjectModule {}
+export class ProjetModule {}
 
 
 // ======= Contenu de src/environments/environment.prod.ts =======

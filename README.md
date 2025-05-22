@@ -134,32 +134,32 @@ backend
     |   |-- evaluation.controller.js
     |   |-- formation&certification.controller.js
     |   |-- forum.controller.js
-    |   |-- project.controller.js
+    |   |-- projet.controller.js
     |   `-- user.controller.js
     |-- middlewares
     |   |-- evaluation.middleware.js
     |   |-- formation&certification.middleware.js
     |   |-- forum.middleware.js
-    |   |-- project.middleware.js
+    |   |-- projet.middleware.js
     |   `-- user.middleware.js
     |-- models
     |   |-- evaluation.model.js
     |   |-- formation&certification.model.js
     |   |-- forum.model.js
-    |   |-- project.model.js
+    |   |-- projet.model.js
     |   `-- user.model.js
     |-- routers
     |   |-- evaluation.router.js
     |   |-- formation&certification.router.js
     |   |-- forum.router.js
-    |   |-- project.router.js
+    |   |-- projet.router.js
     |   `-- user.router.js
     |-- schema.js
     |-- services
     |   |-- evaluation.service.js
     |   |-- formation&certification.service.js
     |   |-- forum.service.js
-    |   |-- project.service.js
+    |   |-- projet.service.js
     |   `-- user.service.js
     `-- utils
         |-- date.util.js
@@ -214,8 +214,8 @@ frontend
 |   |   |   |-- deliverable-detail
 |   |   |   |-- deliverable-form
 |   |   |   |-- deliverable-list
-|   |   |   |-- deliverable-routing.module.ts
-|   |   |   `-- deliverable.module.ts
+|   |   |   |-- livrable-routing.module.ts
+|   |   |   `-- livrable.module.ts
 |   |   |-- front-office
 |   |   |   |-- dashboard
 |   |   |   |-- deliverable-list
@@ -226,8 +226,8 @@ frontend
 |   |       |-- project-detail
 |   |       |-- project-form
 |   |       |-- project-list
-|   |       |-- project-routing.module.ts
-|   |       `-- project.module.ts
+|   |       |-- projet-routing.module.ts
+|   |       `-- projet.module.ts
 |   |-- environments
 |   |   |-- environment.prod.ts
 |   |   `-- environment.ts

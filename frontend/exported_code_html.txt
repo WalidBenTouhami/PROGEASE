@@ -64,13 +64,13 @@
 </section>
 
 
-// ======= Contenu de src/app/back-office/deliverable-management/deliverable-management.component.html =======
+// ======= Contenu de src/app/back-office/deliverable-management/livrable-management.component.html =======
 
 <h2>Gestion des livrables</h2>
 <p>Section pour la gestion et le suivi des livrables.</p>
 
 
-// ======= Contenu de src/app/back-office/project-management/project-management.component.html =======
+// ======= Contenu de src/app/back-office/project-management/projet-management.component.html =======
 
 <h2>Gestion des projets</h2>
 <p>Section pour la gestion et le suivi des projets.</p>
@@ -107,7 +107,7 @@
 </section>
 
 
-// ======= Contenu de src/app/deliverable/deliverable-detail/deliverable-detail.component.html =======
+// ======= Contenu de src/app/deliverable/deliverable-detail/livrable-detail.component.html =======
 
 <ng-container *ngIf="livrable; else loading">
   <article class="deliverable-detail" aria-labelledby="livrable-titre">
@@ -125,7 +125,7 @@
 </ng-template>
 
 
-// ======= Contenu de src/app/deliverable/deliverable-form/deliverable-form.component.html =======
+// ======= Contenu de src/app/deliverable/deliverable-form/livrable-form.component.html =======
 
 <form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" aria-labelledby="formulaire-livrable-titre" class="form-container">
   <h2 id="formulaire-livrable-titre">Ajouter ou modifier un livrable</h2>
@@ -167,7 +167,7 @@
 </form>
 
 
-// ======= Contenu de src/app/deliverable/deliverable-list/deliverable-list.component.html =======
+// ======= Contenu de src/app/deliverable/deliverable-list/livrable-list.component.html =======
 
 <section aria-labelledby="liste-livrables-titre">
   <h2 id="liste-livrables-titre">Liste des livrables</h2>
@@ -226,7 +226,7 @@
 </section>
 
 
-// ======= Contenu de src/app/front-office/deliverable-list/deliverable-list.component.html =======
+// ======= Contenu de src/app/front-office/deliverable-list/livrable-list.component.html =======
 
 <section aria-labelledby="liste-livrables-titre">
   <h2 id="liste-livrables-titre">Liste des livrables</h2>
@@ -240,7 +240,7 @@
 </section>
 
 
-// ======= Contenu de src/app/front-office/project-list/project-list.component.html =======
+// ======= Contenu de src/app/front-office/project-list/projet-list.component.html =======
 
 <h2>Liste des projets</h2>
 
@@ -274,7 +274,7 @@
 <div *ngIf="!projets.length && !chargement">Aucun projet trouvé.</div>
 
 
-// ======= Contenu de src/app/project/project-detail/project-detail.component.html =======
+// ======= Contenu de src/app/project/project-detail/projet-detail.component.html =======
 
 <ng-container *ngIf="projet; else loading">
   <article class="project-detail" aria-labelledby="projet-titre">
@@ -307,7 +307,7 @@
 </ng-template>
 
 
-// ======= Contenu de src/app/project/project-form/project-form.component.html =======
+// ======= Contenu de src/app/project/project-form/projet-form.component.html =======
 
 <form [formGroup]="projetForm" (ngSubmit)="onSubmit()" aria-labelledby="formulaire-projet-titre" class="form-container">
   <h2 id="formulaire-projet-titre">Créer ou modifier un projet</h2>
@@ -364,7 +364,7 @@
 </form>
 
 
-// ======= Contenu de src/app/project/project-list/project-list.component.html =======
+// ======= Contenu de src/app/project/project-list/projet-list.component.html =======
 
 <section aria-labelledby="liste-projets-titre">
   <h2 id="liste-projets-titre">Liste des projets</h2>
