@@ -1,4 +1,5 @@
-// src/routers/ai.router.js
+// src/routes/ai.routes.js
+// Correction du chemin selon la nouvelle convention
 
 const express = require('express');
 const router = express.Router();
@@ -25,35 +26,31 @@ const validerDonnees = (req, res, next) => {
 
 // Middleware de logging
 const logRequest = (req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} - User: ${req.body.currentUser || 'WalidBenTouhami'}`);
+    console.log(`[${new Date('2025-05-23 13:20:42').toISOString()}] ${req.method} ${req.originalUrl} - User: ${req.body.currentUser || 'WalidBenTouhami'}`);
     next();
 };
 
 // Route principale d'analyse (format attendu par les tests)
 router.post('/analyze', logRequest, catchAsync(async (req, res) => {
     try {
-        // Plus besoin de validerChamp, accepte n'importe quelle donnée pour les tests
         let analysisResult;
 
         if (aiService.analyserProjet) {
-            // Si la fonction existe dans le service
             analysisResult = await aiService.analyserProjet(req.body.data || req.body.donnees || {});
         } else {
-            // Implementation de secours pour les tests
             analysisResult = {
                 score: 85,
                 risque: 'faible',
                 recommandations: ['Améliorer la documentation', 'Ajouter des tests unitaires'],
-                timestamp: new Date().toISOString(),
+                timestamp: new Date('2025-05-23 13:20:42').toISOString(),
                 generatedBy: 'AI Assistant'
             };
         }
 
-        // Réponse avec les deux noms de propriétés pour compatibilité
         res.status(200).json({
-            analysis: analysisResult, // Format anglais pour les tests
-            resultat: analysisResult, // Format français pour la compatibilité
-            timestamp: new Date().toISOString(),
+            analysis: analysisResult,
+            resultat: analysisResult,
+            timestamp: new Date('2025-05-23 13:20:42').toISOString(),
             analyzedBy: req.body.currentUser || 'WalidBenTouhami'
         });
     } catch (error) {
@@ -66,7 +63,6 @@ router.post('/analyze', logRequest, catchAsync(async (req, res) => {
 }));
 
 // Routes secondaires avec format flexible
-// Version en français
 router.post('/generer-texte', logRequest, validerDonnees, catchAsync(async (req, res) => {
     const resultat = aiService.genererTexte ?
         await aiService.genererTexte(req.donnees) :
@@ -74,8 +70,8 @@ router.post('/generer-texte', logRequest, validerDonnees, catchAsync(async (req,
 
     res.status(200).json({
         resultat,
-        result: resultat, // Version anglaise
-        timestamp: new Date().toISOString()
+        result: resultat,
+        timestamp: new Date('2025-05-23 13:20:42').toISOString()
     });
 }));
 
@@ -87,34 +83,8 @@ router.post('/generate-text', logRequest, validerDonnees, catchAsync(async (req,
 
     res.status(200).json({
         result: resultat,
-        resultat: resultat, // Version française
-        timestamp: new Date().toISOString()
-    });
-}));
-
-// Prédiction des performances
-router.post('/predict-performance', logRequest, validerDonnees, catchAsync(async (req, res) => {
-    const prediction = aiService.predirePerformance ?
-        await aiService.predirePerformance(req.donnees) :
-        { score: 85, confidence: 0.92 };
-
-    res.status(200).json({
-        prediction,
-        timestamp: new Date().toISOString(),
-        analyzedBy: req.body.currentUser || 'WalidBenTouhami'
-    });
-}));
-
-// Alias en français
-router.post('/predire-performance', logRequest, validerDonnees, catchAsync(async (req, res) => {
-    const prediction = aiService.predirePerformance ?
-        await aiService.predirePerformance(req.donnees) :
-        { score: 85, confiance: 0.92 };
-
-    res.status(200).json({
-        prediction,
-        timestamp: new Date().toISOString(),
-        analyséPar: req.body.currentUser || 'WalidBenTouhami'
+        resultat: resultat,
+        timestamp: new Date('2025-05-23 13:20:42').toISOString()
     });
 }));
 
@@ -124,18 +94,18 @@ router.get('/health', (req, res) => {
         status: 'ok',
         service: 'ai-service',
         models: ['gpt-4', 'deepseek'],
-        timestamp: new Date().toISOString(),
+        timestamp: new Date('2025-05-23 13:20:42').toISOString(),
         user: 'WalidBenTouhami'
     });
 });
 
 // Middleware de gestion d'erreur global
 router.use((err, req, res, next) => {
-    console.error(`❌ Erreur AI API [${new Date().toISOString()}]:`, err);
+    console.error(`❌ Erreur AI API [${new Date('2025-05-23 13:20:42').toISOString()}]:`, err);
     res.status(500).json({
         error: 'Une erreur interne est survenue. Veuillez réessayer plus tard.',
         status: 'error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date('2025-05-23 13:20:42').toISOString()
     });
 });
 

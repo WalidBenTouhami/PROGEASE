@@ -1,0 +1,7 @@
+{
+  "timestamp": "2025-05-23T14:24:10.000Z",
+  "user": "WalidBenTouhami",
+  "version": "2.0.0",
+  "subgraph": "progease-projets",
+  "endpoint": "http://products.prod.svc.cluster.local:4001/graphql"
+}

@@ -9,11 +9,15 @@ const filesToExport = [
     'exportCode.js',
     'filesList.js',
     'newman-tests.js',
+    'scripts/publish-schema.js',
     'server.js',
     'src/controllers/livrable.controller.js',
     'src/controllers/projet.controller.js',
+    'src/graphql/apollo.js',
+    'src/graphql/federation.js',
     'src/graphql/resolvers.js',
     'src/graphql/schema.js',
+    'src/graphql/standalone-server.js',
     'src/middleware/errorHandlers.js',
     'src/middlewares/livrable.middleware.js',
     'src/middlewares/projet.middleware.js',
@@ -36,6 +40,7 @@ const filesToExport = [
     'test-env.js',
     'test-logs.js',
     'testGithubService.js',
+    'tests/unit/livrable.model.test.js',
     'tests/unit/project.model.test.js',
     'tests/unit/sample.test.js'
 ];

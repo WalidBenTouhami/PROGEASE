@@ -16,3 +16,7 @@
 {"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
 {"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
 {"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:57:41"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 14:02:54"}
+{"level":"error","message":"Erreur de configuration GraphQL v4: cors is not defined","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}
+{"level":"error","message":"ReferenceError: cors is not defined\n    at setupGraphQL (D:\\pi\\PROGEASE\\backend\\src\\graphql\\apollo.js:35:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async startServer (D:\\pi\\PROGEASE\\backend\\server.js:79:30)","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}

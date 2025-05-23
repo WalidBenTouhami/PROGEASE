@@ -1,5 +1,5 @@
 // src/graphql/schema.js
-
+// Compatible avec Apollo Server 4+ et Apollo Federation
 const { GraphQLScalarType, Kind } = require('graphql');
 
 // Définition du schéma GraphQL

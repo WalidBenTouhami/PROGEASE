@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GraphQL Explorer - PROGEASE v2</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: #f7f8fa;
+        }
+
+        header {
+            background: #1C2452;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        main {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sandbox-link {
+            background: #4D61FC;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+        }
+
+        .sandbox-link:hover {
+            background: #3D4EE7;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .test-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        button {
+            padding: 10px 16px;
+            background: #1C2452;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            align-self: flex-start;
+        }
+
+        pre {
+            background: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 6px;
+            overflow: auto;
+            margin: 0;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+        }
+
+        .status-bar {
+            height: 8px;
+            width: 100%;
+            background: #eaeaea;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .status-bar div {
+            height: 100%;
+            background: #4D61FC;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        footer {
+            background: #f1f1f1;
+            padding: 15px 20px;
+            text-align: center;
+            border-top: 1px solid #ddd;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+<header>
+    <h1>PROGEASE GraphQL v4</h1>
+    <div>
+        <a href="/graphql" class="sandbox-link" target="_blank">📊 Ouvrir Apollo Sandbox</a>
+    </div>
+</header>
+
+<main>
+    <div class="card">
+        <h2>Informations</h2>
+        <p>Cette interface vous permet de tester l'API GraphQL de PROGEASE.</p>
+        <p>Pour une expérience complète, utilisez Apollo Sandbox en cliquant sur le bouton ci-dessus.</p>
+        <div class="status-bar"><div id="status" style="width:0%"></div></div>
+    </div>
+
+    <div class="card test-area">
+        <h2>Test Rapide</h2>
+        <button id="queryBtn">Exécuter la requête de test</button>
+        <pre id="output">// Résultat de la requête s'affichera ici...</pre>
+    </div>
+</main>
+
+<footer>
+    PROGEASE v2 | Utilisateur: WalidBenTouhami | Date: 2025-05-23 13:16:52
+</footer>
+
+<script>
+    document.getElementById('queryBtn').addEventListener('click', function() {
+        const output = document.getElementById('output');
+        const status = document.getElementById('status');
+        output.textContent = '// Chargement...';
+        status.style.width = '30%';
+
+        fetch('/graphql', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                query: `
+            query TestQuery {
+              health {
+                status
+                timestamp
+                user
+              }
+              projets {
+                _id
+                titre
+                description
+              }
+            }
+          `
+            })
+        })
+            .then(res => {
+                status.style.width = '70%';
+                return res.json();
+            })
+            .then(data => {
+                status.style.width = '100%';
+                output.textContent = JSON.stringify(data, null, 2);
+                setTimeout(() => {
+                    status.style.width = '0%';
+                }, 2000);
+            })
+            .catch(err => {
+                status.style.width = '100%';
+                status.style.background = '#d32f2f';
+                output.textContent = '// Erreur: ' + err.message;
+            });
+    });
+</script>
+</body>
+</html>

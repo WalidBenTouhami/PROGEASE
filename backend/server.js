@@ -1,225 +1,122 @@
-// ./backend/server.js
-
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const morgan = require('morgan');
-const helmet = require('helmet');
-const compression = require('compression');
-const rateLimit = require('express-rate-limit');
-const { ApolloServer } = require('apollo-server-express');
-const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
-const { GraphQLError } = require('graphql');
-const http = require('http');
+// REDÉMARRAGE À ZÉRO - server.js
 require('dotenv').config();
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');
+const morgan = require('morgan');
+const path = require('path');
+const http = require('http');
 const logger = require('./src/utils/logger');
-
-
-// Générer des logs de test pour chaque niveau
-logger.error('Erreur de test');
-logger.warn('Avertissement de test');
-logger.info('Information de test');
-logger.debug('Debug de test');
-
-console.log('Logs de test générés dans le dossier logs/');
-
-// Import des typeDefs et resolvers (attention à la façon dont ils sont exportés)
-let typeDefs, resolvers;
-try {
-    const schema = require('./src/graphql/schema');
-    const resolversModule = require('./src/graphql/resolvers');
-    typeDefs = schema.typeDefs || schema;
-    resolvers = resolversModule.resolvers || resolversModule;
-} catch (error) {
-    logger.error('Erreur lors de l\'import GraphQL:', error);
-    typeDefs = [];
-    resolvers = {};
-}
-
-// Import des routes
-const projetRouter = require('./src/routes/projet.routes');
-const livrableRouter = require('./src/routes/livrable.routes');
-const aiRouter = require('./src/routes/ai.routes');
-const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandlers');
+const { createStandaloneServer } = require('./src/graphql/standalone-server');
 
 const app = express();
 const httpServer = http.createServer(app);
-const PORT = process.env.PORT || 3000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/progease';
+const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
-// Middleware de journalisation pour déboguer les requêtes
+// Middlewares
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'src', 'public')));
+if (NODE_ENV === 'development') app.use(morgan('dev'));
 app.use((req, res, next) => {
-    logger.debug(`${req.method} ${req.originalUrl}`, {
-        ip: req.ip,
-        userAgent: req.get('User-Agent')
-    });
+    req.currentUser = 'WalidBenTouhami';
+    req.timestamp = new Date('2025-05-23 13:37:20').toISOString();
     next();
 });
 
-// Configuration du rate limiter
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 100,
-    standardHeaders: true,
-    legacyHeaders: false
-});
+// Routes API
+const projetRoutes = require('./src/routes/projet.routes');
+const livrableRoutes = require('./src/routes/livrable.routes');
+const aiRoutes = require('./src/routes/ai.routes');
 
-// Configuration CORS plus flexible pour les tests
-const corsOptions = {
-    origin: NODE_ENV === 'production'
-        ? [FRONTEND_URL] // Liste blanche en production
-        : '*', // Permissif en développement
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
-};
+app.use('/api/projets', projetRoutes);
+app.use('/api/livrables', livrableRoutes);
+app.use('/api/ai', aiRoutes);
 
-// Middlewares de base
-app.use(helmet({
-    contentSecurityPolicy: false, // Désactivé pour faciliter les tests
-    crossOriginEmbedderPolicy: false
-}));
-app.use(morgan('combined'));
-app.use(cors(corsOptions));
-app.use(compression());
-app.use(limiter);
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-
-// Configuration du cache pour l'environnement de production
-if (NODE_ENV === 'production') {
-    app.set('trust proxy', 1);
-    app.use((_req, res, next) => {
-        res.set('Cache-Control', 'public, max-age=300, s-maxage=600');
-        next();
-    });
-}
-
-// Route de test
-app.get('/', (_req, res) => {
-    res.json({ message: 'PROGEASE API is running' });
-});
-
-// Route de santé
-app.get('/health', (_req, res) => {
-    res.status(200).json({
-        status: 'OK',
-        timestamp: new Date(),
-        uptime: process.uptime(),
-        mongodb: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+app.get('/api', (req, res) => {
+    res.json({
+        status: 'ok',
+        message: 'PROGEASE API v2',
+        timestamp: req.timestamp,
+        user: 'WalidBenTouhami',
+        endpoints: ['/api/projets', '/api/livrables', '/api/ai', '/graphql']
     });
 });
 
-// Routes API REST
-app.use('/api/projets', projetRouter);
-app.use('/api/livrables', livrableRouter);
-app.use('/api/ai', aiRouter);
-
-// Connexion à MongoDB
-async function connectToMongoDB() {
-    try {
-        await mongoose.connect(MONGO_URI, {
-            maxPoolSize: 10,
-            serverSelectionTimeoutMS: 5000,
-            socketTimeoutMS: 45000,
-            family: 4
-        });
-        logger.info('Connecté à MongoDB avec succès');
-    } catch (err) {
-        logger.error('Erreur de connexion MongoDB:', err);
-        process.exit(1);
-    }
-}
-
-// Initialisation Apollo Server
-async function startApolloServer() {
-    const server = new ApolloServer({
-        typeDefs,
-        resolvers,
-        plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-        context: async ({ req }) => ({ req }),
-        formatError: (err) => {
-            logger.error('Erreur GraphQL:', {
-                message: err.message,
-                path: err.path,
-                extensions: err.extensions
-            });
-
-            if (err.extensions?.code === 'UNAUTHENTICATED') {
-                return new GraphQLError('Authentification requise');
-            }
-            return new GraphQLError(
-                NODE_ENV === 'production'
-                    ? 'Une erreur est survenue'
-                    : err.message
-            );
-        },
-        playground: true,
-        introspection: true
+app.get('/health', (req, res) => {
+    res.json({
+        status: 'ok',
+        timestamp: req.timestamp,
+        user: 'WalidBenTouhami',
+        version: '2.0.0',
+        graphqlVersion: '4.0'
     });
-
-    await server.start();
-
-    server.applyMiddleware({
-        app,
-        path: '/graphql',
-        cors: false
-    });
-
-    return server;
-}
-
-// Gestion des événements MongoDB
-mongoose.connection.on('error', (err) => {
-    logger.error('Erreur MongoDB:', err);
 });
 
-mongoose.connection.on('disconnected', () => {
-    logger.warn('Déconnecté de MongoDB');
-});
-
-// Middlewares de gestion d'erreurs (doivent être après toutes les routes)
-app.use(notFoundHandler);
-app.use(errorHandler);
-
-// Fonction principale de démarrage
+// Serveur principal
 async function startServer() {
     try {
-        logger.info('Démarrage du serveur PROGEASE...');
-        await connectToMongoDB();
-        const apolloServer = await startApolloServer();
+        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/progease');
+        logger.info('Connecté à MongoDB avec succès');
 
-        await new Promise(resolve => httpServer.listen({ port: PORT }, resolve));
+        await createStandaloneServer(app, httpServer);
+        logger.info('Serveur Apollo Standalone configuré');
 
-        logger.info(`Serveur Express démarré sur le port ${PORT} en mode ${NODE_ENV}`);
-        logger.info(`GraphQL disponible sur http://localhost:${PORT}${apolloServer.graphqlPath}`);
-        logger.info(`API REST disponible sur http://localhost:${PORT}/api`);
+        // Middlewares d'erreur, APRES le montage GraphQL
+        app.use((req, res, next) => {
+            logger.warn(`Route non trouvée: ${req.originalUrl}`);
+            res.status(404).json({
+                status: 'fail',
+                message: `Route non trouvée: ${req.originalUrl}`,
+                timestamp: req.timestamp
+            });
+        });
 
-        // Gestion de l'arrêt gracieux
-        const gracefulShutdown = async () => {
-            logger.info('Signal d\'arrêt reçu. Arrêt gracieux...');
-            try {
-                await apolloServer.stop();
-                await new Promise(resolve => httpServer.close(resolve));
-                await mongoose.connection.close(false);
-                logger.info('Serveur arrêté avec succès');
-                process.exit(0);
-            } catch (error) {
-                logger.error('Erreur lors de l\'arrêt:', error);
-                process.exit(1);
-            }
-        };
+        app.use((err, req, res, next) => {
+            logger.error(`Erreur serveur: ${err.message}`);
+            res.status(err.statusCode || 500).json({
+                status: 'error',
+                message: err.message,
+                timestamp: req.timestamp
+            });
+        });
 
-        process.on('SIGTERM', gracefulShutdown);
-        process.on('SIGINT', gracefulShutdown);
+        await new Promise(resolve => {
+            httpServer.listen({ port: PORT }, () => {
+                logger.info(`Serveur Express démarré sur le port ${PORT} en mode ${NODE_ENV}`);
+                logger.info(`API REST disponible sur http://localhost:${PORT}/api`);
+                logger.info(`GraphQL v4 disponible sur http://localhost:${PORT}/graphql`);
+
+                console.log(`
+=======================================================
+🚀 PROGEASE Server (Apollo v4 Standalone)
+=======================================================
+📅 Date: ${new Date('2025-05-23 13:37:20').toISOString()}
+👤 User: WalidBenTouhami
+🌐 Port: ${PORT}
+🔧 Mode: ${NODE_ENV}
+🔗 API: http://localhost:${PORT}/api
+🔗 GraphQL v4: http://localhost:${PORT}/graphql
+🔗 Health: http://localhost:${PORT}/health
+=======================================================
+                `);
+
+                resolve();
+            });
+        });
 
     } catch (error) {
-        logger.error('Échec du démarrage du serveur:', error);
+        logger.error(`Erreur de démarrage du serveur: ${error.message}`);
+        logger.error(error.stack);
         process.exit(1);
     }
 }
 
-// Démarrage de l'application
-startServer();
+startServer().catch(err => {
+    logger.error(`Erreur fatale: ${err.message}`);
+    process.exit(1);
+});
+
+module.exports = app;

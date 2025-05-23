@@ -270,3 +270,98 @@
 {"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:40:48","userAgent":"PostmanRuntime/7.39.1"}
 {"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:40:48","userAgent":"PostmanRuntime/7.39.1"}
 {"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:40:48","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:57:41"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 13:57:41"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 13:57:41"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 13:57:41"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 13:57:42"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 13:57:42"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 13:57:42"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 13:57:42"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"GET","service":"progease-backend","timestamp":"2025-05-23 13:57:47","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /favicon.ico","method":"GET","service":"progease-backend","timestamp":"2025-05-23 13:57:47","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 14:02:54"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 14:02:54"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 14:02:54"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 14:02:54"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:02:54"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:02:54"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:02:54"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:02:54"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"GET","service":"progease-backend","timestamp":"2025-05-23 14:02:56","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api","method":"GET","service":"progease-backend","timestamp":"2025-05-23 14:03:07","userAgent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:07:49"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:07:49"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:07:49"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:07:49"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:08:07"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:08:24"}
+{"level":"info","message":"Apollo Server 4 initialisé avec succès","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}
+{"level":"error","message":"Erreur de configuration GraphQL v4: cors is not defined","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}
+{"level":"error","message":"ReferenceError: cors is not defined\n    at setupGraphQL (D:\\pi\\PROGEASE\\backend\\src\\graphql\\apollo.js:35:13)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)\n    at async startServer (D:\\pi\\PROGEASE\\backend\\server.js:79:30)","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}
+{"level":"warn","message":"GraphQL v4 n'a pas pu être configuré correctement","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:21:13"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:21:21"}
+{"level":"info","message":"Apollo Server 4 initialisé avec succès","service":"progease-backend","timestamp":"2025-05-23 14:23:59"}
+{"level":"info","message":"GraphQL v4 configuré sur /graphql","service":"progease-backend","timestamp":"2025-05-23 14:23:59"}
+{"level":"info","message":"GraphQL v4 prêt à être utilisé","service":"progease-backend","timestamp":"2025-05-23 14:23:59"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:23:59"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:23:59"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:23:59"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:23:59"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:24:02"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:24:31"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:30:22"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:30:22"}
+{"level":"info","message":"Apollo Server 4 initialisé avec succès","service":"progease-backend","timestamp":"2025-05-23 14:30:22"}
+{"level":"info","message":"GraphQL v4 configuré sur /graphql","service":"progease-backend","timestamp":"2025-05-23 14:30:22"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:30:22"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:30:22"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:30:29"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:31:24"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:31:24"}
+{"level":"info","message":"Apollo Server 4 initialisé avec succès","service":"progease-backend","timestamp":"2025-05-23 14:31:24"}
+{"level":"info","message":"GraphQL v4 configuré sur /graphql","service":"progease-backend","timestamp":"2025-05-23 14:31:24"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:31:24"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:31:24"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:31:28"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:39:00"}
+{"level":"info","message":"Apollo Server 4 standalone démarré avec succès","service":"progease-backend","timestamp":"2025-05-23 14:39:00"}
+{"level":"info","message":"Middleware GraphQL monté sur /graphql","service":"progease-backend","timestamp":"2025-05-23 14:39:00"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 14:39:00"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:39:00"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:39:00"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:39:00"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:39:06"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:41:06"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:42:09"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:42:11"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 14:42:19"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:46:50"}
+{"level":"info","message":"Apollo Server 4 standalone démarré avec succès","service":"progease-backend","timestamp":"2025-05-23 14:46:50"}
+{"level":"info","message":"Middleware GraphQL monté sur /graphql","service":"progease-backend","timestamp":"2025-05-23 14:46:50"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 14:46:50"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:46:50"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:46:50"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:46:50"}
+{"level":"warn","message":"Route non trouvée: /favicon.ico","service":"progease-backend","timestamp":"2025-05-23 14:46:53"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:48:05"}
+{"level":"info","message":"Apollo Server 4 standalone démarré avec succès","service":"progease-backend","timestamp":"2025-05-23 14:48:05"}
+{"level":"info","message":"Middleware GraphQL monté sur /graphql","service":"progease-backend","timestamp":"2025-05-23 14:48:05"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 14:48:05"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:48:05"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:48:05"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:48:05"}
+{"level":"warn","message":"Route non trouvée: /favicon.ico","service":"progease-backend","timestamp":"2025-05-23 14:48:16"}
+{"level":"warn","message":"Route non trouvée: /favicon.ico","service":"progease-backend","timestamp":"2025-05-23 14:50:18"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 14:51:01"}
+{"level":"info","message":"Apollo Server 4 standalone démarré avec succès","service":"progease-backend","timestamp":"2025-05-23 14:51:01"}
+{"level":"info","message":"Middleware GraphQL monté sur /graphql","service":"progease-backend","timestamp":"2025-05-23 14:51:01"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 14:51:01"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 14:51:01"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 14:51:01"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 14:51:01"}
+{"level":"warn","message":"Route non trouvée: /favicon.ico","service":"progease-backend","timestamp":"2025-05-23 14:51:05"}
