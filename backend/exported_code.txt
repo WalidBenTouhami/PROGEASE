@@ -155,7 +155,7 @@ const filesToExport = [
     'src/middlewares/projet.middleware.js',
     'src/models/livrable.model.js',
     'src/models/projet.model.js',
-    'src/routes/ai.router.js',
+    'src/routes/ai.routes.js',
     'src/routes/livrable.routes.js',
     'src/routes/projet.routes.js',
     'src/services/ai.service.js',
@@ -1278,9 +1278,9 @@ module.exports = mongoose.model('Livrable', livrableSchema);
 
     module.exports = mongoose.model('Projet', projetSchema);
 
-// ======= Contenu de src/routes/ai.router.js =======
+// ======= Contenu de src/routes/ai.routes.js =======
 
-// src/routers/ai.router.js
+// src/routers/ai.routes.js
 
 const express = require('express');
 const router = express.Router();

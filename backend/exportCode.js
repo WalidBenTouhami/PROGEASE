@@ -19,7 +19,7 @@ const filesToExport = [
     'src/middlewares/projet.middleware.js',
     'src/models/livrable.model.js',
     'src/models/projet.model.js',
-    'src/routes/ai.router.js',
+    'src/routes/ai.routes.js',
     'src/routes/livrable.routes.js',
     'src/routes/projet.routes.js',
     'src/services/ai.service.js',

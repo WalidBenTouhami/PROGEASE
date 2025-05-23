@@ -120,6 +120,8 @@
 Pour exécuter les tests Jest, utilisez la commande suivante :
 ```bash
 npm test
+npm run test:api
+
 ```
 
 ### **Tests API avec Newman**

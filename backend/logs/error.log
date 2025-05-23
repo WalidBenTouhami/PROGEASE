@@ -14,3 +14,5 @@
 {"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
 {"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
 {"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}

@@ -248,3 +248,25 @@
 {"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:09:11","userAgent":"PostmanRuntime/7.39.1"}
 {"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:09:11","userAgent":"PostmanRuntime/7.39.1"}
 {"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:09:11","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 13:34:39"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 13:39:37"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:40:47","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:40:47","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:40:48","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:40:48","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:40:48","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:40:48","userAgent":"PostmanRuntime/7.39.1"}

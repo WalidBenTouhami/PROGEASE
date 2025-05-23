@@ -39,7 +39,7 @@ try {
 // Import des routes
 const projetRouter = require('./src/routes/projet.routes');
 const livrableRouter = require('./src/routes/livrable.routes');
-const aiRouter = require('./src/routes/ai.router');
+const aiRouter = require('./src/routes/ai.routes');
 const { errorHandler, notFoundHandler } = require('./src/middleware/errorHandlers');
 
 const app = express();
