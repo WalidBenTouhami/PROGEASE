@@ -6,7 +6,7 @@ const { gql } = require('graphql-tag');
 const path = require('path');
 const logger = require('../utils/logger');
 
-// Importez les resolvers depuis le bon chemin
+// Importez-les resolvers depuis le bon chemin
 const resolvers = require('./resolvers');
 
 async function createStandaloneServer(app, httpServer) {
