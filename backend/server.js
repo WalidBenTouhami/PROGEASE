@@ -24,13 +24,11 @@ const aiRoutes = require('./src/routes/ai.routes');
 process.on('uncaughtException', (error) => {
     logger.error(`Exception non capturée: ${error.message}`);
     logger.error(error.stack);
-    // Ne pas terminer le processus immédiatement pour permettre la journalisation
 });
 
 process.on('unhandledRejection', (reason, _) => {
     logger.error(`Promesse rejetée non gérée: ${reason}`);
     try {
-        // Extraction d'informations utiles de la promesse
         const promiseInfo = {
             state: 'rejected',
             reason: String(reason)
@@ -83,52 +81,35 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Middleware d'erreurs 404 - doit être après toutes les routes
-app.use((req, res, _next) => {
-    logger.warn(`Route non trouvée: ${req.originalUrl}`);
-    res.status(404).json({
-        status: 'fail',
-        message: `Route non trouvée: ${req.originalUrl}`,
-        timestamp: req.timestamp || new Date().toISOString()
-    });
-});
-
-// Middleware de gestion des erreurs-doit être le dernier middleware
-app.use((err, req, res, _next) => {
-    logger.error(`Erreur serveur: ${err.message}`);
-    res.status(err.statusCode || 500).json({
-        status: 'error',
-        message: err.message,
-        timestamp: req.timestamp || new Date().toISOString()
-    });
-});
-
-// Ajout d'un gestionnaire d'erreurs pour le serveur HTTP
-httpServer.on('error', (error) => {
-    // Définition explicite de toutes les variables nécessaires
-    const errorCode = error.code || 'UNKNOWN_ERROR';
-    const timestamp = new Date().toISOString();
-    const errorMessage = error.message || 'Erreur inconnue';
-
-    // Journalisation avec toutes les variables clairement définies
-    if (errorCode === 'EADDRINUSE') {
-        logger.error(`Le port ${PORT} est déjà utilisé par une autre application`);
-    } else {
-        logger.error(`Erreur du serveur HTTP: ${errorMessage} (Code: ${errorCode})`);
-    }
-
-    // Utilisation explicite de la variable timestamp définie plus haut
-    logger.error(`Horodatage de l'erreur: ${timestamp}`);
-});
-
 // Serveur principal
 async function startServer() {
     try {
         await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/progease');
         logger.info('Connecté à MongoDB avec succès');
 
+        // Configuration du serveur GraphQL avant les middlewares d'erreur
         await createStandaloneServer(app, httpServer);
         logger.info('Serveur Apollo Standalone configuré');
+
+        // Middleware d'erreurs 404 - doit être après les routes ET après Apollo
+        app.use((req, res, _next) => {
+            logger.warn(`Route non trouvée: ${req.originalUrl}`);
+            res.status(404).json({
+                status: 'fail',
+                message: `Route non trouvée: ${req.originalUrl}`,
+                timestamp: req.timestamp || new Date().toISOString()
+            });
+        });
+
+        // Middleware de gestion des erreurs
+        app.use((err, req, res, _next) => {
+            logger.error(`Erreur serveur: ${err.message}`);
+            res.status(err.statusCode || 500).json({
+                status: 'error',
+                message: err.message,
+                timestamp: req.timestamp || new Date().toISOString()
+            });
+        });
 
         await new Promise(resolve => {
             httpServer.listen(PORT, () => {
@@ -159,6 +140,21 @@ async function startServer() {
         process.exit(1);
     }
 }
+
+// Ajout d'un gestionnaire d'erreurs pour le serveur HTTP
+httpServer.on('error', (error) => {
+    const errorCode = error.code || 'UNKNOWN_ERROR';
+    const timestamp = new Date().toISOString();
+    const errorMessage = error.message || 'Erreur inconnue';
+
+    if (errorCode === 'EADDRINUSE') {
+        logger.error(`Le port ${PORT} est déjà utilisé par une autre application`);
+    } else {
+        logger.error(`Erreur du serveur HTTP: ${errorMessage} (Code: ${errorCode})`);
+    }
+
+    logger.error(`Horodatage de l'erreur: ${timestamp}`);
+});
 
 startServer().catch(err => {
     logger.error(`Erreur fatale: ${err.message}`);

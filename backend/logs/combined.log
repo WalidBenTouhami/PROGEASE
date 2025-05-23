@@ -439,3 +439,17 @@
 {"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 23:30:29"}
 {"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 23:30:29"}
 {"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 23:30:29"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 23:38:04"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-23 23:38:04"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 23:38:04"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 23:38:04"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 23:38:04"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 23:38:04"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 23:38:11"}
+{"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 23:38:31"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 23:40:36"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-23 23:40:36"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 23:40:36"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 23:40:36"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 23:40:36"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 23:40:36"}
