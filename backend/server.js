@@ -9,16 +9,25 @@ const http = require('http');
 const logger = require('./src/utils/logger');
 const { createStandaloneServer } = require('./src/graphql/standalone-server');
 
+// Gestionnaires d'erreurs globaux pour éviter les arrêts inattendus
+process.on('uncaughtException', (error) => {
+    logger.error(`Exception non capturée: ${error.message}`);
+    logger.error(error.stack);
+    // Ne pas terminer le processus immédiatement pour permettre la journalisation
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    logger.error(`Promesse rejetée non gérée: ${reason}`);
+    // Ne pas terminer le processus immédiatement
+});
+
 const app = express();
 const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-
-
 // Middlewares
 app.use(cors());
-app.use('/favicon.ico', express.static(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'src', 'public')));
@@ -27,6 +36,11 @@ app.use((req, res, next) => {
     req.currentUser = 'WalidBenTouhami';
     req.timestamp = new Date('2025-05-23 13:37:20').toISOString();
     next();
+});
+
+// Gestion simple du favicon pour éviter les 404
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end();
 });
 
 // Routes API
@@ -47,12 +61,6 @@ app.get('/api', (req, res) => {
         endpoints: ['/api/projets', '/api/livrables', '/api/ai', '/graphql']
     });
 });
-
-
-app.get('/favicon.ico', (req, res) => {
-  res.status(204).end(); // Réponse vide avec code 204 (No Content)
-});
-
 
 app.get('/health', (req, res) => {
     res.json({
@@ -90,6 +98,15 @@ async function startServer() {
                 message: err.message,
                 timestamp: req.timestamp
             });
+        });
+
+        // Ajout d'un gestionnaire d'erreurs pour le serveur HTTP
+        httpServer.on('error', (error) => {
+            if (error.code === 'EADDRINUSE') {
+                logger.error(`Le port ${PORT} est déjà utilisé par une autre application`);
+            } else {
+                logger.error(`Erreur du serveur HTTP: ${error.message}`);
+            }
         });
 
         await new Promise(resolve => {
