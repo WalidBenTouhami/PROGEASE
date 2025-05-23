@@ -1,9 +1,9 @@
 // ../backend/config/constants.js
 
-require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
+require('dotenv').config();
 
 // ✅ Validation des variables d'environnement critiques
-const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "OPENAI_API_KEY"];
+const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
 REQUIRED_ENV_VARS.forEach((envVar) => {
     if (!process.env[envVar]) {
         throw new Error(`La variable d'environnement ${envVar} est manquante.`);
@@ -13,20 +13,20 @@ REQUIRED_ENV_VARS.forEach((envVar) => {
 // ✅ Énumérations globales
 const Enums = Object.freeze({
     ProjectStatus: {
-        DRAFT: "brouillon",
-        IN_PROGRESS: "en_cours",
-        COMPLETED: "termine",
-        ARCHIVED: "archive",
+        DRAFT: "DRAFT",
+        IN_PROGRESS: "IN_PROGRESS",
+        COMPLETED: "COMPLETED",
+        ARCHIVED: "ARCHIVED",
     },
     UserRole: {
-        STUDENT: "etudiant",
-        TUTOR: "tuteur",
-        ADMIN: "admin",
+        ETUDIANT: "ETUDIANT",
+        TUTEUR: "TUTEUR",
+        ADMIN: "ADMIN",
     },
     DeliverableStatus: {
-        COMPLETED: "Terminé",
-        PENDING: "En attente",
-        OVERDUE: "En retard",
+        COMPLETED: "COMPLETED",
+        PENDING: "PENDING",
+        OVERDUE: "OVERDUE",
     },
 });
 
@@ -61,7 +61,7 @@ const ErrorMessages = Object.freeze({
         INVALID_ID: "ID invalide.",
     },
     PROJECT: {
-        INVALID_TEAM_MEMBER: "Un membre de l’équipe est invalide.",
+        INVALID_TEAM_MEMBER: "Un membre de l'équipe est invalide.",
         NOT_FOUND: "Projet introuvable.",
     },
     USER: {
@@ -87,7 +87,7 @@ module.exports = {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT || 3000,
     JWT_SECRET: process.env.JWT_SECRET,
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
+    DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
     Enums,
     SecurityConfig,
     PaginationDefaults,

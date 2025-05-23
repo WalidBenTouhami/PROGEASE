@@ -14,6 +14,11 @@ const projectSchema = new Schema({
         required: [true, 'Project description is required.'],
         trim: true,
     },
+    status: {
+        type: String,
+        enum: ['DRAFT', 'IN_PROGRESS', 'COMPLETED', 'ARCHIVED'],
+        default: 'DRAFT'
+    },
     team: {
         type: [Schema.Types.ObjectId], // Tableau d'ObjectId
         ref: 'User', // Référence au modèle User
@@ -38,6 +43,42 @@ const projectSchema = new Schema({
         type: Date,
         required: [true, 'End date is required.'],
     },
+    deliverables: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Deliverable'
+    }],
+    evaluations: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Evaluation'
+    }],
+    progression: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 100
+    },
+    averageScore: {
+        type: Number,
+        default: 0
+    },
+    predictedPerformance: {
+        type: Number,
+        default: 0
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+// Update the updatedAt timestamp before saving
+projectSchema.pre('save', function(next) {
+    this.updatedAt = new Date();
+    next();
 });
 
 module.exports = mongoose.model('Project', projectSchema);

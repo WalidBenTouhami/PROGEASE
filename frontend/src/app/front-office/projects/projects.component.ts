@@ -1,12 +1,10 @@
-//src/app/project/project-list/project-list.component.ts
-
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
 import { ProjectService, Project } from '../../core/services/project.service';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'app-project-list',
+  selector: 'app-projects',
   standalone: true,
   imports: [CommonModule],
   template: `
@@ -14,7 +12,7 @@ import { ProjectService, Project } from '../../core/services/project.service';
       <h2>Projets</h2>
       <div class="projects-list">
         @for (project of projects; track project.id) {
-          <div class="project-card">
+          <div class="project-card" (click)="viewProject(project.id)">
             <div class="project-header">
               <h3>{{ project.title }}</h3>
               <span class="status-badge" [class]="project.status.toLowerCase()">
@@ -72,25 +70,6 @@ import { ProjectService, Project } from '../../core/services/project.service';
                 <span>{{ project.startDate | date:'dd/MM/yyyy' }} - {{ project.endDate | date:'dd/MM/yyyy' }}</span>
               </div>
             </div>
-
-            <div class="project-actions">
-              <button class="btn-details" (click)="viewProject(project.id)">
-                Voir les détails
-              </button>
-              <button class="btn-evaluate" (click)="evaluateProject(project.id)">
-                Évaluer le projet
-              </button>
-            </div>
-
-            @if (project.evaluations.length > 0) {
-              <div class="latest-evaluation">
-                <h4>Dernière évaluation</h4>
-                <div class="evaluation-info">
-                  <span class="score">Score: {{ project.evaluations[project.evaluations.length - 1].score }}/20</span>
-                  <span class="date">{{ project.evaluations[project.evaluations.length - 1].createdAt | date:'dd/MM/yyyy' }}</span>
-                </div>
-              </div>
-            }
           </div>
         } @empty {
           <p>Aucun projet trouvé.</p>
@@ -114,8 +93,9 @@ import { ProjectService, Project } from '../../core/services/project.service';
       padding: 20px;
       border: 1px solid #ddd;
       border-radius: 8px;
-      background: white;
+      cursor: pointer;
       transition: transform 0.2s, box-shadow 0.2s;
+      background: white;
     }
 
     .project-card:hover {
@@ -262,67 +242,9 @@ import { ProjectService, Project } from '../../core/services/project.service';
       font-size: 0.875rem;
       color: #666;
     }
-
-    .project-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-
-    .btn-details, .btn-evaluate {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .btn-details {
-      background-color: #e3f2fd;
-      color: #1976d2;
-    }
-
-    .btn-details:hover {
-      background-color: #bbdefb;
-    }
-
-    .btn-evaluate {
-      background-color: #2196f3;
-      color: white;
-    }
-
-    .btn-evaluate:hover {
-      background-color: #1976d2;
-    }
-
-    .latest-evaluation {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-
-    .evaluation-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 5px;
-    }
-
-    .score {
-      font-weight: 500;
-      color: #2196f3;
-    }
-
-    .date {
-      font-size: 0.875rem;
-      color: #666;
-    }
   `]
 })
-export class ProjectListComponent implements OnInit {
+export class ProjectsComponent implements OnInit {
   projects: Project[] = [];
 
   constructor(
@@ -346,11 +268,7 @@ export class ProjectListComponent implements OnInit {
   }
 
   viewProject(id: string): void {
-    this.router.navigate(['/projects', id]);
-  }
-
-  evaluateProject(id: string): void {
-    this.router.navigate(['/evaluations/new'], { queryParams: { projectId: id } });
+    this.router.navigate(['/projets', id]);
   }
 
   getStatusLabel(status: string): string {
@@ -362,4 +280,4 @@ export class ProjectListComponent implements OnInit {
     };
     return statusMap[status] || status;
   }
-}
+} 

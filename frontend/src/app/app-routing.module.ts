@@ -3,29 +3,32 @@ import { RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: 'back-office',
-    loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule)
-  },
-  {
-    path: 'front-office',
-    loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule)
-  },
-  {
-    path: 'deliverable',
-    loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule)
-  },
-  {
-    path: 'project',
+    path: 'projects',
     loadChildren: () => import('./project/project.module').then(m => m.ProjectModule)
   },
   {
+    path: 'deliverables',
+    loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule)
+  },
+  {
+    path: 'evaluations',
+    loadChildren: () => import('./front-office/evaluations/evaluations.module').then(m => m.EvaluationsModule)
+  },
+  {
+    path: 'profile',
+    loadChildren: () => import('./front-office/profile/profile.module').then(m => m.ProfileModule)
+  },
+  {
+    path: 'login',
+    loadChildren: () => import('./front-office/auth/auth.module').then(m => m.AuthModule)
+  },
+  {
     path: '',
-    redirectTo: 'front-office',
-    pathMatch: 'full'
+    loadChildren: () => import('./front-office/welcome/welcome.module').then(m => m.WelcomeModule)
   },
   {
     path: '**',
-    redirectTo: 'front-office'
+    redirectTo: ''
   }
 ];
 
@@ -33,4 +36,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule]
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

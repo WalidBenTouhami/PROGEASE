@@ -25,7 +25,8 @@ const deliverableSchema = new Schema({
     },
     repositoryUrl: {
         type: String,
-        required: true,
+        required: [true, 'Repository URL is required.'],
+        trim: true,
         validate: {
             validator: (url) => /^https:\/\/github\.com\/[^/]+\/[^/]+$/.test(url),
             message: 'Invalid GitHub repository URL.',
@@ -33,13 +34,13 @@ const deliverableSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['OVERDUE', 'PENDING', 'COMPLETED'],
+        enum: ['PENDING', 'IN_PROGRESS', 'COMPLETED', 'LATE'],
         default: 'PENDING',
     },
     projectId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Project',
-        required: true,
+        required: [true, 'Project ID is required.'],
     },
     createdAt: {
         type: Date,
@@ -49,6 +50,12 @@ const deliverableSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+});
+
+// Update the updatedAt timestamp before saving
+deliverableSchema.pre('save', function(next) {
+    this.updatedAt = new Date();
+    next();
 });
 
 module.exports = mongoose.model('Deliverable', deliverableSchema);

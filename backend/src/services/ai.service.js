@@ -2,12 +2,12 @@ const deepseek = require('deepseek'); // Import the library
 const dotenv = require('dotenv');
 
 // Load environment variables
-dotenv.config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
+dotenv.config();
 
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
 if (!DEEPSEEK_API_KEY) {
-  throw new Error('❌ DEEPSEEK_API_KEY is missing. Please check your .env file.');
+  throw new Error('❌ DEEPSEEK_API_KEY est manquante. Veuillez vérifier votre fichier .env.');
 }
 
 console.log('✅ DEEPSEEK_API_KEY loaded successfully.');
@@ -116,20 +116,174 @@ async function trackProgress(tasks) {
 }
 
 /**
- * Performance Predictor: Predicts performance based on historical data.
- * @param {Array} history - Array of past task durations (e.g., [2, 3, 1.5]).
- * @returns {Object} - Predicted performance metrics.
+ * Génère une analyse IA pour une évaluation
+ * @param {Object} params - Paramètres pour l'analyse
+ * @param {Object} params.project - Objet projet
+ * @param {number} params.score - Score d'évaluation
+ * @param {Array} params.criteria - Critères d'évaluation
+ * @returns {string} - Analyse générée par l'IA
+ */
+async function generateAIAnalysis({ project, score, criteria }) {
+  try {
+    const prompt = `
+      Analysez cette évaluation de projet :
+      Projet : ${project.titre}
+      Description : ${project.description}
+      Compétences : ${project.skills.join(', ')}
+      Score : ${score}/20
+      Critères : ${JSON.stringify(criteria)}
+      
+      Fournissez :
+      1. Analyse de performance
+      2. Points d'amélioration
+      3. Recommandations d'apprentissage
+      4. Suggestions de développement des compétences
+    `;
+
+    const response = await client.chat.completions.create({
+      model: CONFIG.MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: CONFIG.MAX_TOKENS
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error('Erreur lors de la génération de l\'analyse IA:', error);
+    return 'Impossible de générer l\'analyse IA pour le moment.';
+  }
+}
+
+/**
+ * Prédit la performance du projet basée sur les données historiques
+ * @param {Array} history - Tableau des évaluations précédentes
+ * @returns {Object} - Métriques de performance prédites
  */
 async function predictPerformance(history) {
-  if (!history || history.length === 0) {
-    throw new Error('❌ Historical data is required for performance prediction.');
-  }
+  try {
+    if (!history || history.length === 0) {
+      throw new Error('Les données historiques sont nécessaires pour la prédiction de performance.');
+    }
 
-  const averageTime = history.reduce((sum, time) => sum + time, 0) / history.length;
-  return {
-    averageCompletionTime: averageTime.toFixed(2),
-    predictedCompletion: `Estimated completion time for the next task: ${averageTime.toFixed(2)} hours.`,
-  };
+    const prompt = `
+      Basé sur ces évaluations historiques :
+      ${JSON.stringify(history)}
+      
+      Prédisez :
+      1. Score final attendu
+      2. Tendance de performance
+      3. Facteurs de risque
+      4. Probabilité de succès
+    `;
+
+    const response = await client.chat.completions.create({
+      model: CONFIG.MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: CONFIG.MAX_TOKENS
+    });
+
+    const confidence = calculateConfidence(history);
+    const confidenceLevel = getConfidenceLevel(confidence);
+
+    return {
+      prediction: response.choices[0].message.content,
+      confidence: confidence,
+      niveauConfiance: confidenceLevel
+    };
+  } catch (error) {
+    console.error('Erreur lors de la prédiction de performance:', error);
+    return {
+      prediction: 'Impossible de générer la prédiction pour le moment.',
+      confidence: 0,
+      niveauConfiance: 'FAIBLE'
+    };
+  }
+}
+
+/**
+ * Calcule le score de confiance pour les prédictions
+ * @param {Array} history - Données d'évaluation historiques
+ * @returns {number} - Score de confiance (0-1)
+ */
+function calculateConfidence(history) {
+  const recentEvaluations = history.slice(-3);
+  const scoreVariance = calculateVariance(recentEvaluations.map(e => e.score));
+  return Math.max(0, 1 - (scoreVariance / 100));
+}
+
+/**
+ * Détermine le niveau de confiance en français
+ * @param {number} confidence - Score de confiance (0-1)
+ * @returns {string} - Niveau de confiance
+ */
+function getConfidenceLevel(confidence) {
+  if (confidence >= 0.9) return 'TRÈS ÉLEVÉ';
+  if (confidence >= 0.7) return 'ÉLEVÉ';
+  if (confidence >= 0.5) return 'MOYEN';
+  if (confidence >= 0.3) return 'FAIBLE';
+  return 'TRÈS FAIBLE';
+}
+
+/**
+ * Calcule la variance des scores
+ * @param {Array} scores - Tableau des scores
+ * @returns {number} - Variance
+ */
+function calculateVariance(scores) {
+  const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+  return scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length;
+}
+
+/**
+ * Génère des recommandations d'apprentissage basées sur les compétences et les scores
+ * @param {Object} project - Objet projet
+ * @param {Array} evaluations - Évaluations du projet
+ * @returns {Object} - Recommandations d'apprentissage
+ */
+async function generateLearningRecommendations(project, evaluations) {
+  try {
+    const prompt = `
+      Basé sur ce projet et ses évaluations :
+      Projet : ${project.titre}
+      Compétences : ${project.skills.join(', ')}
+      Évaluations : ${JSON.stringify(evaluations)}
+      
+      Fournissez :
+      1. Ressources d'apprentissage recommandées
+      2. Parcours de développement des compétences
+      3. Exercices pratiques
+      4. Prochaines étapes pour l'amélioration
+    `;
+
+    const response = await client.chat.completions.create({
+      model: CONFIG.MODEL,
+      messages: [{ role: 'user', content: prompt }],
+      max_tokens: CONFIG.MAX_TOKENS
+    });
+
+    return {
+      recommendations: response.choices[0].message.content,
+      priorite: calculatePriority(project, evaluations)
+    };
+  } catch (error) {
+    console.error('Erreur lors de la génération des recommandations:', error);
+    return {
+      recommendations: 'Impossible de générer les recommandations pour le moment.',
+      priorite: 'MOYENNE'
+    };
+  }
+}
+
+/**
+ * Calcule le niveau de priorité pour les recommandations
+ * @param {Object} project - Objet projet
+ * @param {Array} evaluations - Évaluations du projet
+ * @returns {string} - Niveau de priorité
+ */
+function calculatePriority(project, evaluations) {
+  const averageScore = evaluations.reduce((sum, eval) => sum + eval.score, 0) / evaluations.length;
+  if (averageScore < 10) return 'HAUTE';
+  if (averageScore < 15) return 'MOYENNE';
+  return 'BASSE';
 }
 
 /**
@@ -201,4 +355,6 @@ module.exports = {
   buildTeams,
   matchTutors,
   recommendLearning,
+  generateAIAnalysis,
+  generateLearningRecommendations
 };

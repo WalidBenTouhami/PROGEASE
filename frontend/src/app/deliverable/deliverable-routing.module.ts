@@ -1,14 +1,18 @@
 //src/app/deliverable/deliverable-list/deliverable-routing.module.ts
 
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { RouterModule, Routes } from '@angular/router';
+import { DeliverableListComponent } from './deliverable-list/deliverable-list.component';
 
-
+const routes: Routes = [
+  {
+    path: '',
+    component: DeliverableListComponent
+  }
+];
 
 @NgModule({
-  declarations: [],
-  imports: [
-    CommonModule
-  ]
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
 })
 export class DeliverableRoutingModule { }

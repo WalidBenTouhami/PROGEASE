@@ -3,84 +3,93 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const morgan = require('morgan');
-require('dotenv').config();
-
 const { ApolloServer } = require('apollo-server-express');
 const { typeDefs } = require('./src/graphql/typeDefs');
 const { resolvers } = require('./src/graphql/resolvers');
+const { MONGO_URI, PORT } = require('./config/constants');
 const projectRouter = require('./src/routers/project.router');
 const deliverableRouter = require('./src/routers/deliverable.router');
 const aiRouter = require('./src/routers/ai.router'); // ✅ Import AI Router
+const evaluationRouter = require('./src/routers/evaluation.router');
 
 const app = express();
-const PORT = process.env.PORT || 3000; // ✅ Fallback for missing PORT
-const MONGO_URI = process.env.MONGO_URI;
 
-// ✅ Check for critical environment variables
-if (!MONGO_URI) {
-    console.error('❌ Error: MONGO_URI is missing in environment variables.');
-    process.exit(1);
-}
+// CORS configuration
+app.use(cors({
+  origin: ['http://localhost:4200', 'http://localhost:3000'],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-// ✅ Middleware
-app.use(morgan('dev')); // Logging
-app.use(cors()); // Enable Cross-Origin Resource Sharing
-app.use(express.json()); // Parse JSON requests
+app.use(express.json());
 
-// ✅ Apollo Server Initialization
+// Connect to MongoDB
+mongoose.connect(MONGO_URI)
+    .then(() => console.log('Connected to MongoDB'))
+    .catch(err => console.error('MongoDB connection error:', err));
+
+// Create Apollo Server
 const apolloServer = new ApolloServer({
     typeDefs,
     resolvers,
-    formatError: (err) => {
-        console.error('GraphQL Error:', err.message);
+    context: ({ req }) => {
+        // Add authentication context here if needed
         return {
-            message: err.message,
-            code: err.extensions?.code || 'INTERNAL_SERVER_ERROR',
+            // Add any context properties here
         };
     },
+    formatError: (error) => {
+        console.error('GraphQL Error:', error); // Add this for debugging
+        // Remove internal server error details from production
+        if (process.env.NODE_ENV === 'production') {
+            return {
+                message: 'Internal server error',
+                path: error.path
+            };
+        }
+        return error;
+    }
 });
 
-// ✅ Function to start Apollo Server
-async function startApolloServer() {
+// Start Apollo Server
+async function startServer() {
     await apolloServer.start();
-    apolloServer.applyMiddleware({ app });
-}
-
-// ✅ Connect to MongoDB
-mongoose
-    .connect(MONGO_URI) // ✅ Removed deprecated options
-    .then(() => console.log('✅ Connected to MongoDB'))
-    .catch((err) => {
-        console.error('❌ MongoDB connection error:', err.message);
-        process.exit(1);
+    apolloServer.applyMiddleware({ 
+        app, 
+        path: '/graphql',
+        cors: false // Disable Apollo Server's CORS as we're handling it with Express
     });
 
-// ✅ Define Routes
-app.get('/', (req, res) => {
-    res.send('API PROGEASE is working correctly.');
-});
-app.use('/api/projects', projectRouter);
-app.use('/api/deliverables', deliverableRouter);
-app.use('/api/ai', aiRouter); // ✅ Register AI routes
+    // Basic route for health check
+    app.get('/health', (req, res) => {
+        res.json({ status: 'ok' });
+    });
 
-// ✅ Global Error Handling
-app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
-app.use((err, req, res, next) => {
-    console.error('Unhandled Error:', err.stack);
-    res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
-});
+    // ✅ Define Routes
+    app.get('/', (req, res) => {
+        res.send('API PROGEASE is working correctly.');
+    });
+    app.use('/api/projects', projectRouter);
+    app.use('/api/deliverables', deliverableRouter);
+    app.use('/api/ai', aiRouter); // ✅ Register AI routes
+    app.use('/api/evaluations', evaluationRouter);
 
-// ✅ Start the Application
-(async () => {
-    try {
-        await startApolloServer();
-        app.listen(PORT, () => {
-            console.log(`🚀 Apollo Server running at http://localhost:${PORT}${apolloServer.graphqlPath}`);
-            console.log(`✅ Express server started on port ${PORT}`);
-        });
-    } catch (error) {
-        console.error('❌ Failed to start server:', error.message);
-        process.exit(1);
-    }
-})();
+    // ✅ Global Error Handling
+    app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
+    app.use((err, req, res, next) => {
+        console.error('Unhandled Error:', err.stack);
+        res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+    });
+
+    // Start Express server
+    app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+        console.log(`GraphQL endpoint: http://localhost:${PORT}${apolloServer.graphqlPath}`);
+    });
+}
+
+startServer().catch(err => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+});
