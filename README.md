@@ -1,7 +1,16 @@
-# PROGEASE Project
 
+# PROGEASE - Plateforme de Gestion des Projets Étudiants
+
+<!--suppress ALL -->
 <p align="center">
   <img src="./assets/PROGEASE.png" alt="PROGEASE logo" width="400"/>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version" />
+  <img src="https://img.shields.io/badge/node-v16+-green.svg" alt="Node" />
+  <img src="https://img.shields.io/badge/mongodb-v5+-yellow.svg" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/license-MIT-orange.svg" alt="License" />
 </p>
 
 ## 🚀 Introduction
@@ -12,40 +21,40 @@
 
 ## 🧑‍💻 Équipe de Développement
 
-| **Développeur**         | **Modules**               |
-|--------------------------|---------------------------|
-| Ghofrane Toukebri        | Formation & Certification |
-| Yosr Ben Hammadi         | Système d'Évaluation      |
-| Imen Ferchichi           | Gestion des Utilisateurs  |
-| Karim Troudi             | Gestion du Forum          |
-| Walid Ben Touhami        | Gestion des Projets       |
+| **Développeur**   | **Modules**               |
+|-------------------|---------------------------|
+| Ghofrane Toukebri | Formation & Certification |
+| Yosr Ben Hammadi  | Système d'Évaluation      |
+| Imen Ferchichi    | Gestion des Utilisateurs  |
+| Karim Troudi      | Gestion du Forum          |
+| Walid Ben Touhami | Gestion des Projets       |
 
 ---
 
 ## 🌟 Fonctionnalités Principales
 
 ### **Gestion des Projets**
-- Ajouter, modifier et supprimer des projets.
-- Suivre l'avancement des projets en temps réel.
-- Prédire les performances grâce à des algorithmes d'IA.
+- Ajouter, modifier et supprimer des projets
+- Suivre l'avancement des projets en temps réel
+- Prédire les performances grâce à des algorithmes d'IA
 
 ### **Gestion des Utilisateurs**
-- Gestion des rôles : étudiant, tuteur, administrateur.
-- Authentification et autorisation sécurisées.
+- Gestion des rôles : étudiant, tuteur, administrateur
+- Authentification et autorisation sécurisées
 
 ### **Système d'Évaluation**
-- Ajout et gestion des évaluations pour les projets.
-- Gestion des scores et des commentaires des évaluateurs.
+- Ajout et gestion des évaluations pour les projets
+- Gestion des scores et des commentaires des évaluateurs
 
 ### **Formation et Certification**
-- Gestion des formations et certifications pour les étudiants.
+- Gestion des formations et certifications pour les étudiants
 
 ### **Gestion du Forum**
-- Création et gestion des discussions entre membres des équipes.
+- Création et gestion des discussions entre membres des équipes
 
 ### **Sécurité et Fiabilité**
-- Authentification sécurisée avec validation via **Yup**.
-- Protection des données sensibles côté backend.
+- Authentification sécurisée avec validation via **Yup**
+- Protection des données sensibles côté backend
 
 <p align="center">
   <img src="./assets/Yup.png" alt="Validation Yup" width="400"/>
@@ -55,10 +64,14 @@
 
 ## 🛠️ Technologies Utilisées
 
-- **Backend** : Node.js, Express.js
-- **Base de données** : MongoDB
-- **AI** : TensorFlow.js, scikit-learn
-- **Validation** : Yup
+<p align="center">
+  <img src="https://img.shields.io/badge/Backend-Node.js-43853d" alt="Node.js" />
+  <img src="https://img.shields.io/badge/Backend-Express.js-000000" alt="Express.js" />
+  <img src="https://img.shields.io/badge/Database-MongoDB-47A248" alt="MongoDB" />
+  <img src="https://img.shields.io/badge/AI-TensorFlow.js-FF6F00" alt="TensorFlow.js" />
+  <img src="https://img.shields.io/badge/AI-scikit--learn-F7931E" alt="scikit-learn" />
+  <img src="https://img.shields.io/badge/Validation-Yup-9B59B6" alt="Yup" />
+</p>
 
 ---
 
@@ -73,8 +86,8 @@
 
 1. **Cloner le dépôt :**
    ```bash
-   git clone <URL_DU_DEPOT>
-   cd <NOM_DU_DEPOT>
+   git clone https://github.com/username/progease.git
+   cd progease
    ```
 
 2. **Installer les dépendances :**
@@ -85,7 +98,7 @@
 3. **Configurer les variables d'environnement :**
    Créez un fichier `.env` à la racine du projet et ajoutez les variables suivantes :
    ```env
-   PORT=3000
+   PORT=5000
    NODE_ENV=development
    MONGO_URI=mongodb://localhost:27017/progease
    CORS_ORIGINS=http://localhost:3000
@@ -97,21 +110,34 @@
    ```
 
 5. **Accéder à l'application :**
-   - **API REST** : [http://localhost:4000/api/v1/](http://localhost:4000/api/v1/)
-   - **GraphQL Playground** : [http://localhost:4000/graphql](http://localhost:4000/graphql)
+   - **API REST** : [http://localhost:5000/api](http://localhost:5000/api)
+   - **GraphQL Playground** : [http://localhost:5000/graphql](http://localhost:5000/graphql)
 
 ---
 
 ## 🧪 Tests
 
-Pour exécuter les tests, utilisez la commande suivante :
+Pour exécuter les tests Jest, utilisez la commande suivante :
 ```bash
 npm test
 ```
 
-### **Tests inclus :**
-- Tests unitaires pour les modules principaux.
-- Tests d'intégration pour les routes REST et GraphQL.
+### **Tests API avec Newman**
+
+Pour exécuter les tests API avec la collection Postman :
+```bash
+npm run test:api
+```
+
+Ou manuellement :
+```bash
+newman run tests/postman/PROGEASE.postman_collection.json -e tests/postman/PROGEASE.postman_environment.json --global-var "currentUser=WalidBenTouhami" --global-var "timestamp=2025-05-23 12:23:44" -r cli,htmlextra --reporter-htmlextra-export reports/newman/rapport-$(date +"%Y-%m-%d-%H-%M").html
+```
+
+### **Types de tests inclus :**
+- Tests unitaires pour les modules principaux
+- Tests d'intégration pour les routes REST et GraphQL
+- Tests automatisés via Postman/Newman
 
 ---
 
@@ -126,9 +152,18 @@ backend
 |-- config
 |   |-- constants.js
 |   `-- db.json
+|-- newman-tests.js
 |-- package-lock.json
 |-- package.json
+|-- reports
+|   `-- newman
 |-- server.js
+|-- tests
+|   |-- integration
+|   |-- postman
+|   |   |-- PROGEASE.postman_collection.json
+|   |   `-- PROGEASE.postman_environment.json
+|   `-- unit
 `-- src
     |-- controllers
     |   |-- evaluation.controller.js
@@ -239,9 +274,6 @@ frontend
 |-- tsconfig.app.json
 |-- tsconfig.json
 `-- tsconfig.spec.json
-
-
-
 ```
 
 </details>
@@ -259,12 +291,21 @@ frontend
 ## 🤝 Contributions
 
 Les contributions sont les bienvenues ! Veuillez suivre ces étapes pour proposer des modifications :
-1. **Forkez le dépôt.**
-2. **Créez une branche pour vos modifications.**
+
+1. **Forkez le dépôt**
+2. **Créez une branche pour vos modifications**
    ```bash
    git checkout -b feature/nom-feature
    ```
-3. **Soumettez un pull request.**
+3. **Effectuez vos modifications et commitez**
+   ```bash
+   git commit -m "Description de vos changements"
+   ```
+4. **Poussez vers votre fork**
+   ```bash
+   git push origin feature/nom-feature
+   ```
+5. **Soumettez un pull request**
 
 N'hésitez pas à ouvrir une issue pour discuter des améliorations.
 
@@ -278,6 +319,13 @@ Ce projet est sous licence **MIT**. Consultez le fichier `LICENSE` pour plus de 
 
 ## 🔗 Liens Utiles
 
-- **Documentation API** : [Lien vers la documentation](http://localhost:4000/api-docs)
-- **Documentation GraphQL** : [Lien vers GraphQL Playground](http://localhost:4000/graphql)
-- **Dépôt GitHub** : [Lien vers le dépôt](<URL_DU_DEPOT>)
+- **Documentation API** : [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
+- **Documentation GraphQL** : [http://localhost:5000/graphql](http://localhost:5000/graphql)
+- **Tableau Kanban** : [https://trello.com/b/progease](https://trello.com/b/progease)
+
+---
+
+<p align="center">
+  <sub>Développé avec ❤️ par l'équipe PROGEASE - Dernière mise à jour: 2025-05-23 par WalidBenTouhami</sub>
+</p>
+```

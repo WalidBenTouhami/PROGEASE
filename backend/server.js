@@ -12,6 +12,16 @@ const { ApolloServerPluginDrainHttpServer } = require('apollo-server-core');
 const { GraphQLError } = require('graphql');
 const http = require('http');
 require('dotenv').config();
+const logger = require('./src/utils/logger');
+
+
+// Générer des logs de test pour chaque niveau
+logger.error('Erreur de test');
+logger.warn('Avertissement de test');
+logger.info('Information de test');
+logger.debug('Debug de test');
+
+console.log('Logs de test générés dans le dossier logs/');
 
 // Import des typeDefs et resolvers (attention à la façon dont ils sont exportés)
 let typeDefs, resolvers;
@@ -21,7 +31,7 @@ try {
     typeDefs = schema.typeDefs || schema;
     resolvers = resolversModule.resolvers || resolversModule;
 } catch (error) {
-    console.error('❌ Erreur lors de l\'import GraphQL:', error);
+    logger.error('Erreur lors de l\'import GraphQL:', error);
     typeDefs = [];
     resolvers = {};
 }
@@ -41,7 +51,10 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
 
 // Middleware de journalisation pour déboguer les requêtes
 app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl}`);
+    logger.debug(`${req.method} ${req.originalUrl}`, {
+        ip: req.ip,
+        userAgent: req.get('User-Agent')
+    });
     next();
 });
 
@@ -55,7 +68,9 @@ const limiter = rateLimit({
 
 // Configuration CORS plus flexible pour les tests
 const corsOptions = {
-    origin: '*', // Autorise toutes les origines en mode développement
+    origin: NODE_ENV === 'production'
+        ? [FRONTEND_URL] // Liste blanche en production
+        : '*', // Permissif en développement
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -111,9 +126,9 @@ async function connectToMongoDB() {
             socketTimeoutMS: 45000,
             family: 4
         });
-        console.log('✅ Connecté à MongoDB');
+        logger.info('Connecté à MongoDB avec succès');
     } catch (err) {
-        console.error('❌ Erreur de connexion MongoDB :', err.message);
+        logger.error('Erreur de connexion MongoDB:', err);
         process.exit(1);
     }
 }
@@ -126,7 +141,15 @@ async function startApolloServer() {
         plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
         context: async ({ req }) => ({ req }),
         formatError: (err) => {
-            console.error('Erreur GraphQL :', err);
+            logger.error('Erreur GraphQL:', {
+                message: err.message,
+                path: err.path,
+                extensions: err.extensions
+            });
+
+            if (err.extensions?.code === 'UNAUTHENTICATED') {
+                return new GraphQLError('Authentification requise');
+            }
             return new GraphQLError(
                 NODE_ENV === 'production'
                     ? 'Une erreur est survenue'
@@ -150,11 +173,11 @@ async function startApolloServer() {
 
 // Gestion des événements MongoDB
 mongoose.connection.on('error', (err) => {
-    console.error('Erreur MongoDB :', err);
+    logger.error('Erreur MongoDB:', err);
 });
 
 mongoose.connection.on('disconnected', () => {
-    console.warn('Déconnecté de MongoDB');
+    logger.warn('Déconnecté de MongoDB');
 });
 
 // Middlewares de gestion d'erreurs (doivent être après toutes les routes)
@@ -164,26 +187,27 @@ app.use(errorHandler);
 // Fonction principale de démarrage
 async function startServer() {
     try {
+        logger.info('Démarrage du serveur PROGEASE...');
         await connectToMongoDB();
         const apolloServer = await startApolloServer();
 
         await new Promise(resolve => httpServer.listen({ port: PORT }, resolve));
 
-        console.log(`🚀 Serveur Express démarré sur le port ${PORT} en mode ${NODE_ENV}`);
-        console.log(`📊 GraphQL disponible sur http://localhost:${PORT}${apolloServer.graphqlPath}`);
-        console.log(`📝 API REST disponible sur http://localhost:${PORT}/api`);
+        logger.info(`Serveur Express démarré sur le port ${PORT} en mode ${NODE_ENV}`);
+        logger.info(`GraphQL disponible sur http://localhost:${PORT}${apolloServer.graphqlPath}`);
+        logger.info(`API REST disponible sur http://localhost:${PORT}/api`);
 
         // Gestion de l'arrêt gracieux
         const gracefulShutdown = async () => {
-            console.log('Signal d\'arrêt reçu. Arrêt gracieux...');
+            logger.info('Signal d\'arrêt reçu. Arrêt gracieux...');
             try {
                 await apolloServer.stop();
                 await new Promise(resolve => httpServer.close(resolve));
                 await mongoose.connection.close(false);
-                console.log('✅ Serveur arrêté avec succès');
+                logger.info('Serveur arrêté avec succès');
                 process.exit(0);
             } catch (error) {
-                console.error('❌ Erreur lors de l\'arrêt :', error);
+                logger.error('Erreur lors de l\'arrêt:', error);
                 process.exit(1);
             }
         };
@@ -192,7 +216,7 @@ async function startServer() {
         process.on('SIGINT', gracefulShutdown);
 
     } catch (error) {
-        console.error('❌ Échec du démarrage du serveur :', error);
+        logger.error('Échec du démarrage du serveur:', error);
         process.exit(1);
     }
 }

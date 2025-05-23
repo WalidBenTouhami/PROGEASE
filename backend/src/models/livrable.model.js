@@ -17,8 +17,9 @@ const livrableSchema = new Schema({
         required: [true, 'La date limite est requise.'],
         validate: {
             validator: function(v) {
-                // Permet les dates futures et la date d'aujourd'hui
-                return v >= new Date().setHours(0, 0, 0, 0);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return new Date(v) >= today;
             },
             message: 'La date limite doit être aujourd\'hui ou dans le futur.',
         },

@@ -1,5 +1,6 @@
 // config/constants.js
 
+const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 const VARIABLES_ENV_OBLIGATOIRES = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];

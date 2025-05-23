@@ -1,0 +1,16 @@
+[2025-05-23 12:18:01] [ERROR]: Erreur de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [ERROR]: Erreur de test
+{
+  "service": "progease-backend"
+}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:21:56"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:24:13"}
+{"code":"E001","level":"error","message":"Erreur de test critique","service":"progease-backend","source":"test-script","timestamp":"2025-05-23 12:24:53"}
+{"error":{},"level":"error","message":"Une exception a été capturée","service":"progease-backend","timestamp":"2025-05-23 12:24:53"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:30:58"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}

@@ -44,6 +44,9 @@ exports.recupererProjets = async (req, res) => {
             Projet.countDocuments(query)
         ]);
 
+
+
+
         res.status(200).json({
             projets,
             total,

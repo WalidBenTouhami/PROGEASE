@@ -66,6 +66,8 @@
     projetSchema.index({ titre: 1 });
     projetSchema.index({ statut: 1 });
     projetSchema.index({ creeLe: -1 });
+    projetSchema.index({ statut: 1, creeLe: -1 });
+
 
     // Middleware pour mettre à jour automatiquement majLe
     projetSchema.pre('save', function(next) {

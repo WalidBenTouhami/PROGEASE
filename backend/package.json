@@ -10,7 +10,20 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "prepare": "husky install",
-    "test:api": "node newman-tests.js"
+    "test:api": "node newman-tests.js",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.js",
+      "**/?(*.)+(spec|test).js",
+      "**/tests/**/*.js"
+    ]
   },
   "keywords": [
     "api",
@@ -36,7 +49,8 @@
     "helmet": "^8.1.0",
     "mongoose": "^8.14.0",
     "morgan": "^1.10.0",
-    "winston": "^3.11.0",
+    "reporter": "^0.1.0",
+    "winston": "^3.17.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {

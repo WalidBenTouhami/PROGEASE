@@ -1,0 +1,16 @@
+{
+  "id": "progease-env",
+  "name": "PROGEASE Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "enabled": true
+    },
+    {
+      "key": "authToken",
+      "value": "votre_token_jwt",
+      "enabled": true
+    }
+  ]
+}

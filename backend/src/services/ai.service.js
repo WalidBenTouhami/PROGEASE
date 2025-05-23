@@ -11,7 +11,6 @@ if (!DEEPSEEK_API_KEY) {
   throw new Error('❌ La variable DEEPSEEK_API_KEY est manquante. Vérifiez votre fichier .env.');
 }
 
-console.log('deepseek api client');
 console.log('✅ Clé API Deepseek chargée avec succès.');
 
 const client = axios.create({

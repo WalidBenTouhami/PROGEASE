@@ -1,0 +1,250 @@
+[2025-05-23 12:18:01] [ERROR]: Erreur de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [WARN]: Avertissement de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: Information de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: Démarrage du serveur PROGEASE...
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: Connecté à MongoDB avec succès
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: Serveur Express démarré sur le port 5000 en mode development
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: GraphQL disponible sur http://localhost:5000/graphql
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: API REST disponible sur http://localhost:5000/api
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: Démarrage du serveur PROGEASE...
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: Connecté à MongoDB avec succès
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: Serveur Express démarré sur le port 5000 en mode development
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: GraphQL disponible sur http://localhost:5000/graphql
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: API REST disponible sur http://localhost:5000/api
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: Démarrage du serveur PROGEASE...
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: Connecté à MongoDB avec succès
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: Serveur Express démarré sur le port 5000 en mode development
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: GraphQL disponible sur http://localhost:5000/graphql
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: API REST disponible sur http://localhost:5000/api
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [ERROR]: Erreur de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [WARN]: Avertissement de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: Information de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: Démarrage du serveur PROGEASE...
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: Connecté à MongoDB avec succès
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: Serveur Express démarré sur le port 5000 en mode development
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: GraphQL disponible sur http://localhost:5000/graphql
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: API REST disponible sur http://localhost:5000/api
+{
+  "service": "progease-backend"
+}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:21:56"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 12:21:56"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 12:21:56"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 12:21:56"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 12:21:56"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 12:21:56"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 12:21:56"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 12:21:56"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:24:13"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 12:24:13"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 12:24:13"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 12:24:13"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 12:24:13"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 12:24:13"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 12:24:13"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 12:24:13"}
+{"code":"E001","level":"error","message":"Erreur de test critique","service":"progease-backend","source":"test-script","timestamp":"2025-05-23 12:24:53"}
+{"component":"système de fichiers","level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 12:24:53"}
+{"level":"info","message":"Information de test standard","service":"progease-backend","timestamp":"2025-05-23 12:24:53","user":"admin"}
+{"error":{},"level":"error","message":"Une exception a été capturée","service":"progease-backend","timestamp":"2025-05-23 12:24:53"}
+{"level":"info","message":"Test avec données complexes","service":"progease-backend","statistiques":{"memoireUtilisee":"45MB","tempsExecution":235},"timestamp":"2025-05-23 12:24:53","utilisateur":{"id":1,"nom":"Test User","roles":["admin","développeur"]}}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:30:58"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 12:30:58"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 12:30:58"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 12:30:58"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 12:30:58"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 12:34:40"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:43:38","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:43:38","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:43:38","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:43:39","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:43:39","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:43:39","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:43:52","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:43:52","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:43:52","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:43:52","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:43:52","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:43:53","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:44:30","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:44:31","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:44:31","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:44:31","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:44:31","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:44:31","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:46:11","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:46:11","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:46:11","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:46:11","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:46:11","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:46:11","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 12:50:14"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:50:23","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:50:24","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:50:24","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:50:24","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:50:24","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:50:24","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:51:45","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:51:45","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:51:45","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:51:46","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:51:46","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:51:46","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:55:43","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:55:43","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:55:43","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:55:43","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:55:43","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:55:44","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:55:55","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:55:55","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:55:55","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:55:55","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:55:56","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:55:56","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:57:22","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:57:22","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:57:23","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:57:23","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:57:23","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:57:23","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:57:43","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:57:43","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 12:57:44","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 12:57:44","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:57:44","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 12:57:44","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:00:09","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:00:09","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:00:09","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:00:09","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:00:09","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:00:09","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur de test","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
+{"level":"warn","message":"Avertissement de test","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
+{"level":"info","message":"Information de test","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
+{"level":"info","message":"Démarrage du serveur PROGEASE...","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
+{"level":"info","message":"GraphQL disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 13:03:22"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:03:29","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:03:29","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:03:30","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:03:30","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:03:30","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:03:30","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:05:07","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:05:07","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:05:07","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:05:08","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:05:08","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:05:08","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:05:27","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:05:27","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:05:27","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:05:27","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:05:28","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:05:28","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:08:29","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:08:29","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:08:30","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:08:30","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:08:30","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:08:30","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:09:10","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:09:11","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-23 13:09:11","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-23 13:09:11","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:09:11","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /graphql","method":"POST","service":"progease-backend","timestamp":"2025-05-23 13:09:11","userAgent":"PostmanRuntime/7.39.1"}

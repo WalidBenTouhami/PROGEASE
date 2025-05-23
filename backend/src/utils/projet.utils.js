@@ -15,4 +15,4 @@ const ProjetUtils = {
     }
 };
 
-module.exports = { ProjectUtils: ProjetUtils };
+module.exports = { ProjetUtils };

@@ -1,9 +1,16 @@
 // src/middleware/errorHandlers.js
+const logger = require('../utils/logger');
 
 /**
  * Middleware pour gérer les routes non trouvées (404)
  */
 const notFoundHandler = (req, res, next) => {
+  logger.warn(`Route non trouvée: ${req.originalUrl}`, {
+    method: req.method,
+    ip: req.ip,
+    userAgent: req.get('User-Agent')
+  });
+
   res.status(404).json({
     status: 'fail',
     message: `Route non trouvée: ${req.originalUrl}`
@@ -17,15 +24,21 @@ const errorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
-  // Enregistrer toutes les erreurs
-  console.error(`[${new Date().toISOString()}] ${err.message}`, {
-    path: req.originalUrl,
+  // Utiliser le logger pour enregistrer les erreurs de manière structurée
+  logger.error(`${err.statusCode} - ${err.message}`, {
+    url: req.originalUrl,
     method: req.method,
-    statusCode: err.statusCode,
-    stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+    ip: req.ip,
+    userId: req.user?.id,
+    body: req.body,
+    params: req.params,
+    query: req.query,
+    errorName: err.name,
+    errorCode: err.code,
+    stack: err.stack
   });
 
-  // Gestion des erreurs MongoDB
+  // Traitement spécifique des erreurs MongoDB
   if (err.name === 'ValidationError') {
     const errors = Object.values(err.errors).map(el => el.message);
     err.message = `Données invalides. ${errors.join('. ')}`;
@@ -62,7 +75,6 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-// Exporter les deux middlewares
 module.exports = {
   notFoundHandler,
   errorHandler
