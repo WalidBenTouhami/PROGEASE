@@ -374,3 +374,37 @@
 {"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 21:15:58"}
 {"level":"warn","message":"Route non trouvée: /graphql","service":"progease-backend","timestamp":"2025-05-23 21:17:01"}
 {"level":"warn","message":"Route non trouvée: /favicon.ico","service":"progease-backend","timestamp":"2025-05-23 21:17:01"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 21:45:34"}
+{"level":"error","message":"Erreur Apollo Server: Unknown directive \"@link\".\n\nUnknown directive \"@key\".","service":"progease-backend","timestamp":"2025-05-23 21:45:34"}
+{"level":"error","message":"Error: Unknown directive \"@link\".\n\nUnknown directive \"@key\".\n    at assertValidSDL (D:\\pi\\PROGEASE\\backend\\node_modules\\graphql\\validation\\validate.js:135:11)\n    at buildASTSchema (D:\\pi\\PROGEASE\\backend\\node_modules\\graphql\\utilities\\buildASTSchema.js:44:34)\n    at makeExecutableSchema (D:\\pi\\PROGEASE\\backend\\node_modules\\@graphql-tools\\schema\\cjs\\makeExecutableSchema.js:73:47)\n    at ApolloServer.constructSchema (D:\\pi\\PROGEASE\\backend\\node_modules\\@apollo\\server\\dist\\cjs\\ApolloServer.js:335:50)\n    at new ApolloServer (D:\\pi\\PROGEASE\\backend\\node_modules\\@apollo\\server\\dist\\cjs\\ApolloServer.js:86:49)\n    at createStandaloneServer (D:\\pi\\PROGEASE\\backend\\src\\graphql\\standalone-server.js:18:24)\n    at startServer (D:\\pi\\PROGEASE\\backend\\server.js:64:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","service":"progease-backend","timestamp":"2025-05-23 21:45:34"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 21:45:34"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 21:45:34"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 21:45:34"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 21:45:34"}
+{"level":"warn","message":"Route non trouvée: /graphql.","service":"progease-backend","timestamp":"2025-05-23 21:54:09"}
+{"level":"warn","message":"Route non trouvée: /graphql.","service":"progease-backend","timestamp":"2025-05-23 21:54:46"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 22:13:39"}
+{"level":"error","message":"Erreur Apollo Server: Unknown directive \"@link\".\n\nUnknown directive \"@key\".","service":"progease-backend","timestamp":"2025-05-23 22:13:39"}
+{"level":"error","message":"Error: Unknown directive \"@link\".\n\nUnknown directive \"@key\".\n    at assertValidSDL (D:\\pi\\PROGEASE\\backend\\node_modules\\graphql\\validation\\validate.js:135:11)\n    at buildASTSchema (D:\\pi\\PROGEASE\\backend\\node_modules\\graphql\\utilities\\buildASTSchema.js:44:34)\n    at makeExecutableSchema (D:\\pi\\PROGEASE\\backend\\node_modules\\@graphql-tools\\schema\\cjs\\makeExecutableSchema.js:73:47)\n    at ApolloServer.constructSchema (D:\\pi\\PROGEASE\\backend\\node_modules\\@apollo\\server\\dist\\cjs\\ApolloServer.js:335:50)\n    at new ApolloServer (D:\\pi\\PROGEASE\\backend\\node_modules\\@apollo\\server\\dist\\cjs\\ApolloServer.js:86:49)\n    at createStandaloneServer (D:\\pi\\PROGEASE\\backend\\src\\graphql\\standalone-server.js:18:24)\n    at startServer (D:\\pi\\PROGEASE\\backend\\server.js:64:15)\n    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)","service":"progease-backend","timestamp":"2025-05-23 22:13:39"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 22:13:39"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 22:13:39"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 22:13:39"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 22:13:39"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 22:19:21"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 22:26:23"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 22:28:10"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 22:30:13"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 22:32:54"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-23 22:32:54"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 22:32:54"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 22:32:54"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 22:32:54"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 22:32:54"}
+{"level":"warn","message":"Route non trouvée: /favicon.ico","service":"progease-backend","timestamp":"2025-05-23 22:33:14"}
+{"level":"warn","message":"Route non trouvée: /favicon.ico","service":"progease-backend","timestamp":"2025-05-23 22:33:39"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-23 22:40:19"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-23 22:40:19"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-23 22:40:19"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-23 22:40:19"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-23 22:40:19"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-23 22:40:19"}

@@ -14,8 +14,11 @@ const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+
+
 // Middlewares
 app.use(cors());
+app.use('/favicon.ico', express.static(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'src', 'public')));
@@ -44,6 +47,12 @@ app.get('/api', (req, res) => {
         endpoints: ['/api/projets', '/api/livrables', '/api/ai', '/graphql']
     });
 });
+
+
+app.get('/favicon.ico', (req, res) => {
+  res.status(204).end(); // Réponse vide avec code 204 (No Content)
+});
+
 
 app.get('/health', (req, res) => {
     res.json({

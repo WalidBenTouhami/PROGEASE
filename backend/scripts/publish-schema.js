@@ -10,11 +10,12 @@ const path = require('path');
 const { exec } = require('child_process');
 const { typeDefs, resolvers } = require('../src/graphql/schema');
 // Configuration
+// Configuration
 const CONFIG = {
-  graphRef: 'PROGEASE-fq785@current',
-  apiKey: 'service:PROGEASE-fq785:AnDB1wXqJ7mZxn1MyL7Qlg', // Vérifier qu'il n'y a pas d'espaces
-  endpoint: 'http://products.prod.svc.cluster.local:4001/graphql',
-  subgraphName: 'progease-projets',
+  graphRef: 'PROGEASE-3h73pc@current', // Nouvel identifiant
+  apiKey: 'service:PROGEASE-3h73pc:KMuq6GD4wMolR9x9j9QS3A', // Nouvelle clé
+  subgraphName: 'progease-projets', // Nom du subgraph adapté à votre projet
+  routingUrl: 'http://localhost:5000/graphql', // URL locale pour le développement
   outputDir: path.resolve(__dirname, './schema-output')
 };
 
@@ -114,22 +115,14 @@ async function main() {
 // Publication vers Apollo Studio
 async function publishToApolloStudio(schemaPath) {
   return new Promise((resolve, reject) => {
-    // Créer un fichier de configuration rover
-    const roverConfigDir = path.join(process.env.HOME || process.env.USERPROFILE, '.rover');
-    if (!fs.existsSync(roverConfigDir)) {
-      fs.mkdirSync(roverConfigDir, { recursive: true });
-    }
-
-    // Utiliser la méthode de l'API rover directement
-    const command = `npx rover subgraph publish ${CONFIG.graphRef} --name ${CONFIG.subgraphName} --schema "${schemaPath}"`;
+    const command = `npx rover subgraph publish ${CONFIG.graphRef} --name ${CONFIG.subgraphName} --schema "${schemaPath}" --routing-url ${CONFIG.routingUrl}`;
 
     log(`Exécution: ${command}`);
 
-    // Exécuter avec la variable d'environnement correctement définie
     const execOptions = {
       env: {
         ...process.env,
-        APOLLO_KEY: 'user:gh.b4827a19-4fc2-45d6-b053-e935ff4a406f:--tXDlUNdpITbByFqmAnvw'  // Utiliser la clé qui fonctionne
+        APOLLO_KEY: CONFIG.apiKey
       }
     };
 

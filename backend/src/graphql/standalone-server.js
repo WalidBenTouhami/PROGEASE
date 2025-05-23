@@ -1,65 +1,57 @@
-// src/graphql/standalone-server.js
-const http = require('http');
 const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
-const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
-const { typeDefs, resolvers } = require('./schema');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const { buildSubgraphSchema } = require('@apollo/subgraph');
+const { readFileSync } = require('fs');
+const { gql } = require('graphql-tag');
+const path = require('path');
 const logger = require('../utils/logger');
 
-// Date et utilisateur actuels
-const currentDate = "2025-05-23 14:31:13";
-const currentUser = "WalidBenTouhami";
+// Importez les resolvers depuis le bon chemin
+const resolvers = require('./resolvers');
 
 async function createStandaloneServer(app, httpServer) {
-    try {
-        // Apollo Server + drain plugin
-        const server = new ApolloServer({
-            typeDefs,
-            resolvers,
-            plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-            introspection: true,
-            formatError: (formattedError) => {
-                logger.error(`GraphQL Error: ${formattedError.message}`);
-                return {
-                    ...formattedError,
-                    timestamp: currentDate,
-                    user: currentUser
-                };
-            }
-        });
+  try {
+    // Utiliser la variable d'environnement ou un chemin par défaut
+    const schemaPath = process.env.APOLLO_SCHEMA_PATH || './src/graphql/schema.graphql';
 
-        // Démarrage du serveur Apollo
-        await server.start();
-        logger.info('Apollo Server 4 standalone démarré avec succès');
+    // Résoudre le chemin absolu (en tenant compte du répertoire de travail)
+    const absoluteSchemaPath = path.resolve(process.cwd(), schemaPath);
 
-        // Application du middleware pour la route GraphQL
-        app.use(
-            '/graphql',
-            cors(),
-            bodyParser.json(),
-            expressMiddleware(server, {
-                context: async ({ req }) => ({
-                    user: req.currentUser || currentUser,
-                    timestamp: currentDate,
-                    models: {} // Espace pour les modèles Mongoose
-                }),
-            }),
-        );
+    logger.info(`Chargement du schéma GraphQL depuis: ${absoluteSchemaPath}`);
 
-        // Route pour Apollo Studio
-        app.get('/studio', (req, res) => {
-            res.redirect('/graphql');
-        });
+    // Lire le contenu du fichier
+    const schemaString = readFileSync(absoluteSchemaPath, 'utf-8');
 
-        logger.info('Middleware GraphQL monté sur /graphql');
-        return true;
-    } catch (error) {
-        logger.error(`Erreur Apollo Server: ${error.message}`);
-        logger.error(error.stack);
-        return false;
-    }
+    // Parser le schéma avec gql
+    const typeDefs = gql`${schemaString}`;
+
+    // Créer le schéma de sous-graphe
+    const schema = buildSubgraphSchema({
+      typeDefs,
+      resolvers
+    });
+
+    const server = new ApolloServer({
+      schema,
+      formatError: (error) => {
+        logger.error(`Erreur GraphQL: ${error.message}`);
+        return error;
+      },
+    });
+
+    await server.start();
+    app.use('/graphql', expressMiddleware(server, {
+      context: async ({ req }) => ({
+        user: req.currentUser,
+        timestamp: req.timestamp
+      }),
+    }));
+
+    return server;
+  } catch (error) {
+    logger.error(`Erreur Apollo Server: ${error.message}`);
+    throw error;
+  }
 }
 
 module.exports = { createStandaloneServer };
