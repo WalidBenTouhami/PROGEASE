@@ -1,4 +1,4 @@
-// REDÉMARRAGE À ZÉRO - server.js
+// server.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -8,6 +8,13 @@ const path = require('path');
 const http = require('http');
 const logger = require('./src/utils/logger');
 const { createStandaloneServer } = require('./src/graphql/standalone-server');
+const {
+  ERROR_MESSAGES,
+  setupProcessErrorHandlers,
+  setupHttpErrorHandlers,
+  notFoundHandler,
+  errorHandler
+} = require('./src/middleware/errorHandlers');
 
 // Initialisation des variables principales
 const app = express();
@@ -20,34 +27,25 @@ const projetRoutes = require('./src/routes/projet.routes');
 const livrableRoutes = require('./src/routes/livrable.routes');
 const aiRoutes = require('./src/routes/ai.routes');
 
-// Gestionnaires d'erreurs globaux pour éviter les arrêts inattendus
-process.on('uncaughtException', (error) => {
-    logger.error(`Exception non capturée: ${error.message}`);
-    logger.error(error.stack);
-});
+// Configuration des gestionnaires d'erreurs au niveau du processus
+setupProcessErrorHandlers();
 
-process.on('unhandledRejection', (reason, _) => {
-    logger.error(`Promesse rejetée non gérée: ${reason}`);
-    try {
-        const promiseInfo = {
-            state: 'rejected',
-            reason: String(reason)
-        };
-        logger.error(`Détails de la promesse: ${JSON.stringify(promiseInfo)}`);
-    } catch (e) {
-        logger.error('Impossible de sérialiser les détails de la promesse');
-    }
-});
+// Configuration des gestionnaires d'erreurs HTTP
+setupHttpErrorHandlers(httpServer, PORT);
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || 'http://localhost:4200',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'src', 'public')));
 if (NODE_ENV === 'development') app.use(morgan('dev'));
 app.use((req, res, next) => {
-    req.currentUser = 'WalidBenTouhami';
-    req.timestamp = new Date('2025-05-23 13:37:20').toISOString();
+    req.currentUser = req.headers['x-user'] || 'anonymous';
+    req.timestamp = new Date().toISOString();
     next();
 });
 
@@ -84,7 +82,7 @@ app.get('/health', (req, res) => {
 // Serveur principal
 async function startServer() {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/progease');
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/progease');
         logger.info('Connecté à MongoDB avec succès');
 
         // Configuration du serveur GraphQL avant les middlewares d'erreur
@@ -92,23 +90,13 @@ async function startServer() {
         logger.info('Serveur Apollo Standalone configuré');
 
         // Middleware d'erreurs 404 - doit être après les routes ET après Apollo
-        app.use((req, res, _next) => {
-            logger.warn(`Route non trouvée: ${req.originalUrl}`);
-            res.status(404).json({
-                status: 'fail',
-                message: `Route non trouvée: ${req.originalUrl}`,
-                timestamp: req.timestamp || new Date().toISOString()
-            });
+        app.use((req, res, next) => {
+            notFoundHandler(req, res, next);
         });
 
         // Middleware de gestion des erreurs
-        app.use((err, req, res, _next) => {
-            logger.error(`Erreur serveur: ${err.message}`);
-            res.status(err.statusCode || 500).json({
-                status: 'error',
-                message: err.message,
-                timestamp: req.timestamp || new Date().toISOString()
-            });
+        app.use((req, res, next) => {
+            errorHandler(req, res, next);
         });
 
         await new Promise(resolve => {
@@ -121,7 +109,7 @@ async function startServer() {
 =======================================================
 🚀 PROGEASE Server (Apollo v4 Standalone)
 =======================================================
-📅 Date: ${new Date('2025-05-23 13:37:20').toISOString()}
+📅 Date: ${new Date().toISOString()}
 👤 User: WalidBenTouhami
 🌐 Port: ${PORT}
 🔧 Mode: ${NODE_ENV}
@@ -135,29 +123,14 @@ async function startServer() {
             });
         });
     } catch (error) {
-        logger.error(`Erreur de démarrage du serveur: ${error.message}`);
+        logger.error(ERROR_MESSAGES.STARTUP_ERROR(error.message));
         logger.error(error.stack);
         process.exit(1);
     }
 }
 
-// Ajout d'un gestionnaire d'erreurs pour le serveur HTTP
-httpServer.on('error', (error) => {
-    const errorCode = error.code || 'UNKNOWN_ERROR';
-    const timestamp = new Date().toISOString();
-    const errorMessage = error.message || 'Erreur inconnue';
-
-    if (errorCode === 'EADDRINUSE') {
-        logger.error(`Le port ${PORT} est déjà utilisé par une autre application`);
-    } else {
-        logger.error(`Erreur du serveur HTTP: ${errorMessage} (Code: ${errorCode})`);
-    }
-
-    logger.error(`Horodatage de l'erreur: ${timestamp}`);
-});
-
 startServer().catch(err => {
-    logger.error(`Erreur fatale: ${err.message}`);
+    logger.error(ERROR_MESSAGES.FATAL_ERROR(err.message));
     process.exit(1);
 });
 

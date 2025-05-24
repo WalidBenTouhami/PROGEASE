@@ -1,13 +1,16 @@
 # Directive pour la fédération Apollo v2
 extend schema @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key"])
 
-# Enumération pour les statuts des livrables
-extend enum StatutLivrable {
+# Enumération pour les statuts des livrables (combinée)
+enum StatutLivrable {
   PLANIFIE
   EN_COURS
   A_VALIDER
   VALIDE
   REJETE
+  EN_RETARD
+  EN_ATTENTE
+  TERMINE
 }
 
 # Type Livrable
@@ -49,12 +52,20 @@ type Projet @key(fields: "_id") {
   majLe: String
 }
 
+# Type HealthStatus pour les tests
+type HealthStatus {
+  status: String!
+  timestamp: String!
+  user: String!
+}
+
 # Type Query
 type Query {
   projets: [Projet!]!
   projet(id: ID!): Projet
   livrables(projetId: ID!): [Livrable!]!
   livrable(id: ID!): Livrable
+  health: HealthStatus
 }
 
 # Type Mutation

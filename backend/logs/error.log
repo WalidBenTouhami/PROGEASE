@@ -30,3 +30,5 @@
 {"level":"error","message":"Erreur Apollo Server: doc.definitions is not iterable (cannot read property undefined)","service":"progease-backend","timestamp":"2025-05-23 22:26:23"}
 {"level":"error","message":"Erreur Apollo Server: ENOENT: no such file or directory, open 'D:\\pi\\PROGEASE\\backend\\src\\graphql\\projet-schema.graphql'","service":"progease-backend","timestamp":"2025-05-23 22:28:10"}
 {"level":"error","message":"Erreur Apollo Server: ENOENT: no such file or directory, open 'D:\\pi\\PROGEASE\\backend\\src\\graphql\\projet-schema.graphql'","service":"progease-backend","timestamp":"2025-05-23 22:30:13"}
+{"level":"error","message":"Le port 5000 est déjà utilisé par une autre application","service":"progease-backend","timestamp":"2025-05-24 12:25:57"}
+{"level":"error","message":"Horodatage de l'erreur: 2025-05-24T11:25:57.005Z","service":"progease-backend","timestamp":"2025-05-24 12:25:57"}

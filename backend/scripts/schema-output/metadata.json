@@ -1,6 +1,7 @@
 {
-  "timestamp": "2025-05-23T14:24:10.000Z",
-  "user": "WalidBenTouhami",
+  "timestamp": "2025-05-24T10:59:02.985Z",
+  "user": "defaultUser",
   "version": "2.0.0",
-  "subgraph": "progease-projets"
+  "subgraph": "progease-projets",
+  "routingUrl": "http://localhost:5000/graphql"
 }

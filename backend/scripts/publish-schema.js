@@ -8,28 +8,37 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
-const { typeDefs, resolvers } = require('../src/graphql/schema');
-// Configuration
-// Configuration
+const { typeDefs } = require('../src/graphql/schema');
+// Importer et configurer dotenv en tout premier
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
+// La fonction getCurrentDateTime doit utiliser la date actuelle
+function getCurrentDateTime() {
+  return new Date().toISOString(); // Utilise la date et l'heure actuelles
+}
+
+// Configuration avec les variables d'environnement correctement chargées
 const CONFIG = {
-  graphRef: 'PROGEASE-3h73pc@current', // Nouvel identifiant
-  apiKey: 'service:PROGEASE-3h73pc:KMuq6GD4wMolR9x9j9QS3A', // Nouvelle clé
-  subgraphName: 'progease-projets', // Nom du subgraph adapté à votre projet
-  routingUrl: 'http://localhost:5000/graphql', // URL locale pour le développement
-  outputDir: path.resolve(__dirname, './schema-output')
+  graphRef: process.env.APOLLO_GRAPH_REF || 'PROGEASE-3h73pc@current',
+  apiKey: process.env.APOLLO_KEY,
+  subgraphName: process.env.APOLLO_SUBGRAPH_NAME || 'progease-projets',
+  routingUrl: process.env.APOLLO_ROUTING_URL || 'http://localhost:5000/graphql',
+  schemaPath: path.resolve(__dirname, process.env.APOLLO_SCHEMA_PATH || '../src/graphql/schema.graphql'),
+  outputDir: path.resolve(__dirname, process.env.APOLLO_SCHEMA_OUTPUT_DIR || './schema-output')
 };
+
+// Vérification de la présence de la clé Apollo
+if (!CONFIG.apiKey) {
+  log('APOLLO_KEY non définie dans les variables d\'environnement', 'WARNING');
+}
 
 // Créer le répertoire de sortie s'il n'existe pas
 if (!fs.existsSync(CONFIG.outputDir)) {
   fs.mkdirSync(CONFIG.outputDir, { recursive: true });
 }
 
-// Fonctions utilitaires
-function getCurrentDateTime() {
-  return new Date('2025-05-23 15:24:10').toISOString();
-}
-
 function log(message, type = 'INFO') {
+  // noinspection JSDeprecatedSymbols
   const timestamp = getCurrentDateTime().replace('T', ' ').substr(0, 19);
   const prefix = {
     'INFO': '📝',
@@ -50,9 +59,7 @@ async function main() {
     log('Extraction du schéma SDL...');
     let sdl;
 
-    if (typeof typeDefs === 'string') {
-      sdl = typeDefs;
-    } else {
+    if (typeof typeDefs !== 'string') {
       // Si on ne peut pas accéder directement au SDL, on l'extrait du fichier
       log('Utilisation du fichier schema.graphql');
       try {
@@ -61,11 +68,15 @@ async function main() {
           sdl = fs.readFileSync(schemaFilePath, 'utf8');
           log('Fichier schema.graphql chargé avec succès');
         } else {
+          // noinspection ExceptionCaughtLocallyJS
           throw new Error('Fichier schema.graphql introuvable');
         }
       } catch (e) {
+        // noinspection ExceptionCaughtLocallyJS
         throw new Error(`Impossible d'extraire le schéma: ${e.message}`);
       }
+    } else {
+      sdl = typeDefs;
     }
 
     // 2. Sauvegarde du schéma en fichier
@@ -78,11 +89,11 @@ async function main() {
     log('Génération des métadonnées...');
     const metadataPath = path.join(CONFIG.outputDir, 'metadata.json');
     const metadata = {
-      timestamp: getCurrentDateTime(),
-      user: 'WalidBenTouhami',
+      timestamp: getCurrentDateTime(), // Utiliser la fonction mise à jour
+      user: process.env.USER || 'defaultUser',
       version: '2.0.0',
       subgraph: CONFIG.subgraphName,
-      endpoint: CONFIG.endpoint
+      routingUrl: CONFIG.routingUrl
     };
     fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
     log(`Métadonnées sauvegardées dans ${metadataPath}`, 'SUCCESS');

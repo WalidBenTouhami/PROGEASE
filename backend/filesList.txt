@@ -2,8 +2,6 @@
     'config/constants.js',
     'config/db.js',
     'config/env.js',
-    'exportCode.js',
-    'filesList.js',
     'newman-tests.js',
     'scripts/publish-schema.js',
     'server.js',
