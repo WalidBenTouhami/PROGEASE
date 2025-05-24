@@ -348,14 +348,14 @@ const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
 const { typeDefs, resolvers } = require('../src/graphql/schema');
-
+// Configuration
 // Configuration
 const CONFIG = {
-  graphRef: process.env.APOLLO_GRAPH_REF || 'progease-app@main',
-  apiKey: process.env.APOLLO_KEY || '',
-  endpoint: process.env.APOLLO_ENDPOINT || 'http://localhost:5000/graphql',
-  subgraphName: process.env.APOLLO_SUBGRAPH_NAME || 'progease',
-  outputDir: path.resolve(__dirname, '../schema-output')
+  graphRef: 'PROGEASE-3h73pc@current', // Nouvel identifiant
+  apiKey: 'service:PROGEASE-3h73pc:KMuq6GD4wMolR9x9j9QS3A', // Nouvelle clé
+  subgraphName: 'progease-projets', // Nom du subgraph adapté à votre projet
+  routingUrl: 'http://localhost:5000/graphql', // URL locale pour le développement
+  outputDir: path.resolve(__dirname, './schema-output')
 };
 
 // Créer le répertoire de sortie s'il n'existe pas
@@ -454,11 +454,18 @@ async function main() {
 // Publication vers Apollo Studio
 async function publishToApolloStudio(schemaPath) {
   return new Promise((resolve, reject) => {
-    const command = `npx rover subgraph publish ${CONFIG.graphRef} --name ${CONFIG.subgraphName} --schema ${schemaPath}`;
+    const command = `npx rover subgraph publish ${CONFIG.graphRef} --name ${CONFIG.subgraphName} --schema "${schemaPath}" --routing-url ${CONFIG.routingUrl}`;
 
     log(`Exécution: ${command}`);
 
-    exec(command, { env: { ...process.env, APOLLO_KEY: CONFIG.apiKey } }, (error, stdout, stderr) => {
+    const execOptions = {
+      env: {
+        ...process.env,
+        APOLLO_KEY: CONFIG.apiKey
+      }
+    };
+
+    exec(command, execOptions, (error, stdout, stderr) => {
       if (error) {
         return reject(new Error(`Échec de la publication: ${stderr || error.message}`));
       }
@@ -490,10 +497,35 @@ const http = require('http');
 const logger = require('./src/utils/logger');
 const { createStandaloneServer } = require('./src/graphql/standalone-server');
 
+// Initialisation des variables principales
 const app = express();
 const httpServer = http.createServer(app);
 const PORT = process.env.PORT || 5000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
+
+// Import des routes
+const projetRoutes = require('./src/routes/projet.routes');
+const livrableRoutes = require('./src/routes/livrable.routes');
+const aiRoutes = require('./src/routes/ai.routes');
+
+// Gestionnaires d'erreurs globaux pour éviter les arrêts inattendus
+process.on('uncaughtException', (error) => {
+    logger.error(`Exception non capturée: ${error.message}`);
+    logger.error(error.stack);
+});
+
+process.on('unhandledRejection', (reason, _) => {
+    logger.error(`Promesse rejetée non gérée: ${reason}`);
+    try {
+        const promiseInfo = {
+            state: 'rejected',
+            reason: String(reason)
+        };
+        logger.error(`Détails de la promesse: ${JSON.stringify(promiseInfo)}`);
+    } catch (e) {
+        logger.error('Impossible de sérialiser les détails de la promesse');
+    }
+});
 
 // Middlewares
 app.use(cors());
@@ -507,11 +539,12 @@ app.use((req, res, next) => {
     next();
 });
 
-// Routes API
-const projetRoutes = require('./src/routes/projet.routes');
-const livrableRoutes = require('./src/routes/livrable.routes');
-const aiRoutes = require('./src/routes/ai.routes');
+// Gestion simple du favicon pour éviter les 404
+app.get('/favicon.ico', (req, res) => {
+    res.status(204).end();
+});
 
+// Routes API
 app.use('/api/projets', projetRoutes);
 app.use('/api/livrables', livrableRoutes);
 app.use('/api/ai', aiRoutes);
@@ -542,30 +575,32 @@ async function startServer() {
         await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/progease');
         logger.info('Connecté à MongoDB avec succès');
 
+        // Configuration du serveur GraphQL avant les middlewares d'erreur
         await createStandaloneServer(app, httpServer);
         logger.info('Serveur Apollo Standalone configuré');
 
-        // Middlewares d'erreur, APRES le montage GraphQL
-        app.use((req, res, next) => {
+        // Middleware d'erreurs 404 - doit être après les routes ET après Apollo
+        app.use((req, res, _next) => {
             logger.warn(`Route non trouvée: ${req.originalUrl}`);
             res.status(404).json({
                 status: 'fail',
                 message: `Route non trouvée: ${req.originalUrl}`,
-                timestamp: req.timestamp
+                timestamp: req.timestamp || new Date().toISOString()
             });
         });
 
-        app.use((err, req, res, next) => {
+        // Middleware de gestion des erreurs
+        app.use((err, req, res, _next) => {
             logger.error(`Erreur serveur: ${err.message}`);
             res.status(err.statusCode || 500).json({
                 status: 'error',
                 message: err.message,
-                timestamp: req.timestamp
+                timestamp: req.timestamp || new Date().toISOString()
             });
         });
 
         await new Promise(resolve => {
-            httpServer.listen({ port: PORT }, () => {
+            httpServer.listen(PORT, () => {
                 logger.info(`Serveur Express démarré sur le port ${PORT} en mode ${NODE_ENV}`);
                 logger.info(`API REST disponible sur http://localhost:${PORT}/api`);
                 logger.info(`GraphQL v4 disponible sur http://localhost:${PORT}/graphql`);
@@ -587,7 +622,6 @@ async function startServer() {
                 resolve();
             });
         });
-
     } catch (error) {
         logger.error(`Erreur de démarrage du serveur: ${error.message}`);
         logger.error(error.stack);
@@ -595,13 +629,27 @@ async function startServer() {
     }
 }
 
+// Ajout d'un gestionnaire d'erreurs pour le serveur HTTP
+httpServer.on('error', (error) => {
+    const errorCode = error.code || 'UNKNOWN_ERROR';
+    const timestamp = new Date().toISOString();
+    const errorMessage = error.message || 'Erreur inconnue';
+
+    if (errorCode === 'EADDRINUSE') {
+        logger.error(`Le port ${PORT} est déjà utilisé par une autre application`);
+    } else {
+        logger.error(`Erreur du serveur HTTP: ${errorMessage} (Code: ${errorCode})`);
+    }
+
+    logger.error(`Horodatage de l'erreur: ${timestamp}`);
+});
+
 startServer().catch(err => {
     logger.error(`Erreur fatale: ${err.message}`);
     process.exit(1);
 });
 
 module.exports = app;
-
 
 // ======= Contenu de src/controllers/livrable.controller.js =======
 
@@ -1904,68 +1952,60 @@ module.exports = { typeDefs, resolvers };
 
 // ======= Contenu de src/graphql/standalone-server.js =======
 
-// src/graphql/standalone-server.js
-const http = require('http');
 const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
-const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
-const { typeDefs, resolvers } = require('./schema');
-const cors = require('cors');
-const bodyParser = require('body-parser');
+const { buildSubgraphSchema } = require('@apollo/subgraph');
+const { readFileSync } = require('fs');
+const { gql } = require('graphql-tag');
+const path = require('path');
 const logger = require('../utils/logger');
 
-// Date et utilisateur actuels
-const currentDate = "2025-05-23 14:31:13";
-const currentUser = "WalidBenTouhami";
+// Importez-les resolvers depuis le bon chemin
+const resolvers = require('./resolvers');
 
 async function createStandaloneServer(app, httpServer) {
-    try {
-        // Apollo Server + drain plugin
-        const server = new ApolloServer({
-            typeDefs,
-            resolvers,
-            plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-            introspection: true,
-            formatError: (formattedError) => {
-                logger.error(`GraphQL Error: ${formattedError.message}`);
-                return {
-                    ...formattedError,
-                    timestamp: currentDate,
-                    user: currentUser
-                };
-            }
-        });
+  try {
+    // Utiliser la variable d'environnement ou un chemin par défaut
+    const schemaPath = process.env.APOLLO_SCHEMA_PATH || './src/graphql/schema.graphql';
 
-        // Démarrage du serveur Apollo
-        await server.start();
-        logger.info('Apollo Server 4 standalone démarré avec succès');
+    // Résoudre le chemin absolu (en tenant compte du répertoire de travail)
+    const absoluteSchemaPath = path.resolve(process.cwd(), schemaPath);
 
-        // Application du middleware pour la route GraphQL
-        app.use(
-            '/graphql',
-            cors(),
-            bodyParser.json(),
-            expressMiddleware(server, {
-                context: async ({ req }) => ({
-                    user: req.currentUser || currentUser,
-                    timestamp: currentDate,
-                    models: {} // Espace pour les modèles Mongoose
-                }),
-            }),
-        );
+    logger.info(`Chargement du schéma GraphQL depuis: ${absoluteSchemaPath}`);
 
-        // Route pour Apollo Studio
-        app.get('/studio', (req, res) => {
-            res.redirect('/graphql');
-        });
+    // Lire le contenu du fichier
+    const schemaString = readFileSync(absoluteSchemaPath, 'utf-8');
 
-        logger.info('Middleware GraphQL monté sur /graphql');
-        return true;
-    } catch (error) {
-        logger.error(`Erreur Apollo Server: ${error.message}`);
-        logger.error(error.stack);
-        return false;
-    }
+    // Parser le schéma avec gql
+    const typeDefs = gql`${schemaString}`;
+
+    // Créer le schéma de sous-graphe
+    const schema = buildSubgraphSchema({
+      typeDefs,
+      resolvers
+    });
+
+    const server = new ApolloServer({
+      schema,
+      formatError: (error) => {
+        logger.error(`Erreur GraphQL: ${error.message}`);
+        return error;
+      },
+    });
+
+    await server.start();
+    app.use('/graphql', expressMiddleware(server, {
+      context: async ({ req }) => ({
+        user: req.currentUser,
+        timestamp: req.timestamp
+      }),
+    }));
+
+    return server;
+  } catch (error) {
+    logger.error(`Erreur Apollo Server: ${error.message}`);
+    throw error;
+  }
 }
 
 module.exports = { createStandaloneServer };
