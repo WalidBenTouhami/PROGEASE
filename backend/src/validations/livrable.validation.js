@@ -1,7 +1,7 @@
 const yup = require('yup');
 
 const livrableSchema = yup.object().shape({
-    nom: yup.string().required('Le nom du livrable est obligatoire.'),
+    intitule: yup.string().required('Le intitule du livrable est obligatoire.'),
     description: yup.string().required('La description du livrable est obligatoire.'),
     dateLimite: yup.date().required('La date limite est obligatoire.'),
     urlDepot: yup.string()

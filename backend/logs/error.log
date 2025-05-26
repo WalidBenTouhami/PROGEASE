@@ -32,3 +32,50 @@
 {"level":"error","message":"Erreur Apollo Server: ENOENT: no such file or directory, open 'D:\\pi\\PROGEASE\\backend\\src\\graphql\\projet-schema.graphql'","service":"progease-backend","timestamp":"2025-05-23 22:30:13"}
 {"level":"error","message":"Le port 5000 est déjà utilisé par une autre application","service":"progease-backend","timestamp":"2025-05-24 12:25:57"}
 {"level":"error","message":"Horodatage de l'erreur: 2025-05-24T11:25:57.005Z","service":"progease-backend","timestamp":"2025-05-24 12:25:57"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:18:33"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:18:33"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:19:08"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:19:08"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:19:20"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:19:20"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:28:59"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:28:59"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:31:14"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:31:14"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:31:35"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:31:35"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:31:53"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:31:53"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:38:27"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:38:28"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:39:40"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:39:41"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:42:05"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:42:05"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"nom\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"titre\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"type\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"dateEcheance\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"createProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"deleteProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"nom\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"titre\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"type\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"dateEcheance\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"createProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"deleteProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"nom\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"titre\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"type\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"dateEcheance\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"createProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"deleteProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:12:15"}

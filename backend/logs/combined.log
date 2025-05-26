@@ -488,3 +488,121 @@
 {"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-26 13:53:06"}
 {"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-26 13:53:06"}
 {"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-26 13:53:06"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-26 14:12:19"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-26 14:12:19"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-26 14:12:19"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-26 14:12:19"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-26 14:12:19"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-26 14:12:19"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-26 14:14:47"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-26 14:14:47"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-26 14:14:47"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-26 14:14:47"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-26 14:14:47"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-26 14:14:47"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:18:32","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:18:32","userAgent":"PostmanRuntime/7.41.2"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:18:33"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:18:33"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:19:07","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:19:07","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:19:08"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:19:08"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:19:19","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:19:19","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:19:20"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:19:20"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:28:58","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:28:58","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:28:59"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:28:59"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:31:13","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:31:13","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:31:14"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:31:14"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:31:34","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:31:34","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:31:35"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:31:35"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:31:52","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:31:52","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:31:53"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:31:53"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:38:26","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:38:26","userAgent":"PostmanRuntime/7.41.2"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:38:27"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:38:28"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:39:39","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:39:40","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:39:40"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:39:41"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 14:42:04","userAgent":"PostmanRuntime/7.39.1"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 14:42:04","userAgent":"PostmanRuntime/7.39.1"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" of type \"[Livrable!]!\" must have a selection of subfields. Did you mean \"livrables { ... }\"?","service":"progease-backend","timestamp":"2025-05-26 14:42:05"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 14:42:05"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-26 14:49:42"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-26 14:49:42"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-26 14:49:42"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-26 14:49:42"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-26 14:49:42"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-26 14:49:42"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-26 15:06:06"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-26 15:06:06"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-26 15:06:06"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-26 15:06:06"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-26 15:06:06"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-26 15:06:06"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 15:06:13","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 15:06:13","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 15:06:13","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 15:06:14","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 15:06:14","userAgent":"PostmanRuntime/7.41.2"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"nom\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"titre\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"type\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"dateEcheance\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"createProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"deleteProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:06:16"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 15:07:40","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 15:07:41","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 15:07:41","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 15:07:41","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 15:07:41","userAgent":"PostmanRuntime/7.41.2"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"nom\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"titre\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"type\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"dateEcheance\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"createProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"deleteProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:07:44"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 15:12:11","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 15:12:11","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"PUT","service":"progease-backend","timestamp":"2025-05-26 15:12:12","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/livrables/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 15:12:12","userAgent":"PostmanRuntime/7.41.2"}
+{"ip":"::1","level":"warn","message":"Route non trouvée: /api/projets/","method":"DELETE","service":"progease-backend","timestamp":"2025-05-26 15:12:12","userAgent":"PostmanRuntime/7.41.2"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"nom\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"titre\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"type\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"dateEcheance\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"createProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"deleteProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:12:15"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-26 15:53:27"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-26 15:53:27"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-26 15:53:27"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-26 15:53:27"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-26 15:53:27"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-26 15:53:27"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-backend","timestamp":"2025-05-26 17:06:11"}
+{"level":"info","message":"Chargement du schéma GraphQL depuis: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-26 17:06:11"}
+{"level":"info","message":"Serveur Apollo Standalone configuré","service":"progease-backend","timestamp":"2025-05-26 17:06:11"}
+{"level":"info","message":"Serveur Express démarré sur le port 5000 en mode development","service":"progease-backend","timestamp":"2025-05-26 17:06:11"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-backend","timestamp":"2025-05-26 17:06:11"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-backend","timestamp":"2025-05-26 17:06:11"}

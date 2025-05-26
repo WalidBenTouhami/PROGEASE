@@ -2,9 +2,9 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 const livrableSchema = new Schema({
-    nom: {
+    intitule: {
         type: String,
-        required: [true, 'Le nom du livrable est requis.'],
+        required: [true, 'Le intitule du livrable est requis.'],
         trim: true,
     },
     description: {
@@ -12,7 +12,7 @@ const livrableSchema = new Schema({
         required: [true, 'La description du livrable est requise.'],
         trim: true,
     },
-    dateLimite: {
+    dateEcheance: {
         type: Date,
         required: [true, 'La date limite est requise.'],
         validate: {

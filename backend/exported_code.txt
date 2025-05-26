@@ -267,8 +267,11 @@ async function main() {
     try {
         // Vérifier si le répertoire existe
         const stat = await fs.stat(directoryPath);
+
+        // Utilisation du early return pattern au lieu de throw dans un bloc try
         if (!stat.isDirectory()) {
-            throw new Error(`Le chemin spécifié (${directoryPath}) n'est pas un répertoire valide.`);
+            console.error(`❌ Erreur: Le chemin spécifié (${directoryPath}) n'est pas un répertoire valide.`);
+            return;
         }
 
         const jsFiles = await getAllJsFiles(directoryPath);
@@ -282,8 +285,11 @@ async function main() {
     }
 }
 
-main();
-
+// Gestion de la Promise retournée par main()
+main().catch(error => {
+    console.error(`❌ Erreur non gérée: ${error.message}`);
+    process.exit(1);
+});
 
 // ======= Contenu de newman-tests.js =======
 
@@ -293,7 +299,10 @@ const fs = require('fs');
 
 // Configuration utilisateur
 const currentUser = 'WalidBenTouhami';
-const timestamp = '2025-05-23 12:21:13';
+
+// Obtenir la date et l'heure actuelles
+const now = new Date();
+const dateFormat = now.toISOString().replace(/[T:]/g, '-').replace(/\..+/, '');
 
 // Assurer l'existence du dossier de rapports
 const reportsDir = path.join(__dirname, 'reports', 'newman');
@@ -305,10 +314,10 @@ if (!fs.existsSync(reportsDir)){
 const collection = path.join(__dirname, 'tests', 'postman', 'PROGEASE.postman_collection.json');
 const environment = path.join(__dirname, 'tests', 'postman', 'PROGEASE.postman_environment.json');
 
-// Nom du rapport avec timestamp
-const reportName = `rapport-${timestamp.replace(/:/g, '-').replace(/\s/g, '-')}`;
+// Nom du rapport avec timestamp actuel
+const reportName = `rapport-${dateFormat}`;
 
-console.log(`Exécution des tests Newman par ${currentUser} à ${timestamp}`);
+console.log(`Exécution des tests Newman par ${currentUser} à ${now.toLocaleString()}`);
 
 // Options de Newman
 newman.run({
@@ -325,7 +334,7 @@ newman.run({
   },
   globalVar: [
     { key: "currentUser", value: currentUser },
-    { key: "timestamp", value: timestamp }
+    { key: "timestamp", value: now.toISOString() }  // Timestamp au format ISO pour les tests
   ]
 }, function (err) {
   if (err) {
@@ -347,28 +356,37 @@ newman.run({
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
-const { typeDefs, resolvers } = require('../src/graphql/schema');
-// Configuration
-// Configuration
+const { typeDefs } = require('../src/graphql/schema');
+// Importer et configurer dotenv en tout premier
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
+
+// La fonction getCurrentDateTime doit utiliser la date actuelle
+function getCurrentDateTime() {
+  return new Date().toISOString(); // Utilise la date et l'heure actuelles
+}
+
+// Configuration avec les variables d'environnement correctement chargées
 const CONFIG = {
-  graphRef: 'PROGEASE-3h73pc@current', // Nouvel identifiant
-  apiKey: 'service:PROGEASE-3h73pc:KMuq6GD4wMolR9x9j9QS3A', // Nouvelle clé
-  subgraphName: 'progease-projets', // Nom du subgraph adapté à votre projet
-  routingUrl: 'http://localhost:5000/graphql', // URL locale pour le développement
-  outputDir: path.resolve(__dirname, './schema-output')
+  graphRef: process.env.APOLLO_GRAPH_REF || 'PROGEASE-3h73pc@current',
+  apiKey: process.env.APOLLO_KEY,
+  subgraphName: process.env.APOLLO_SUBGRAPH_NAME || 'progease-projets',
+  routingUrl: process.env.APOLLO_ROUTING_URL || 'http://localhost:5000/graphql',
+  schemaPath: path.resolve(__dirname, process.env.APOLLO_SCHEMA_PATH || '../src/graphql/schema.graphql'),
+  outputDir: path.resolve(__dirname, process.env.APOLLO_SCHEMA_OUTPUT_DIR || './schema-output')
 };
+
+// Vérification de la présence de la clé Apollo
+if (!CONFIG.apiKey) {
+  log('APOLLO_KEY non définie dans les variables d\'environnement', 'WARNING');
+}
 
 // Créer le répertoire de sortie s'il n'existe pas
 if (!fs.existsSync(CONFIG.outputDir)) {
   fs.mkdirSync(CONFIG.outputDir, { recursive: true });
 }
 
-// Fonctions utilitaires
-function getCurrentDateTime() {
-  return new Date('2025-05-23 15:24:10').toISOString();
-}
-
 function log(message, type = 'INFO') {
+  // noinspection JSDeprecatedSymbols
   const timestamp = getCurrentDateTime().replace('T', ' ').substr(0, 19);
   const prefix = {
     'INFO': '📝',
@@ -389,9 +407,7 @@ async function main() {
     log('Extraction du schéma SDL...');
     let sdl;
 
-    if (typeof typeDefs === 'string') {
-      sdl = typeDefs;
-    } else {
+    if (typeof typeDefs !== 'string') {
       // Si on ne peut pas accéder directement au SDL, on l'extrait du fichier
       log('Utilisation du fichier schema.graphql');
       try {
@@ -400,11 +416,15 @@ async function main() {
           sdl = fs.readFileSync(schemaFilePath, 'utf8');
           log('Fichier schema.graphql chargé avec succès');
         } else {
+          // noinspection ExceptionCaughtLocallyJS
           throw new Error('Fichier schema.graphql introuvable');
         }
       } catch (e) {
+        // noinspection ExceptionCaughtLocallyJS
         throw new Error(`Impossible d'extraire le schéma: ${e.message}`);
       }
+    } else {
+      sdl = typeDefs;
     }
 
     // 2. Sauvegarde du schéma en fichier
@@ -417,11 +437,11 @@ async function main() {
     log('Génération des métadonnées...');
     const metadataPath = path.join(CONFIG.outputDir, 'metadata.json');
     const metadata = {
-      timestamp: getCurrentDateTime(),
-      user: 'WalidBenTouhami',
+      timestamp: getCurrentDateTime(), // Utiliser la fonction mise à jour
+      user: process.env.USER || 'defaultUser',
       version: '2.0.0',
       subgraph: CONFIG.subgraphName,
-      endpoint: CONFIG.endpoint
+      routingUrl: CONFIG.routingUrl
     };
     fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
     log(`Métadonnées sauvegardées dans ${metadataPath}`, 'SUCCESS');
@@ -486,7 +506,7 @@ module.exports = main;
 
 // ======= Contenu de server.js =======
 
-// REDÉMARRAGE À ZÉRO - server.js
+// server.js
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
@@ -496,6 +516,13 @@ const path = require('path');
 const http = require('http');
 const logger = require('./src/utils/logger');
 const { createStandaloneServer } = require('./src/graphql/standalone-server');
+const {
+  ERROR_MESSAGES,
+  setupProcessErrorHandlers,
+  setupHttpErrorHandlers,
+  notFoundHandler,
+  errorHandler
+} = require('./src/middleware/errorHandlers');
 
 // Initialisation des variables principales
 const app = express();
@@ -508,34 +535,25 @@ const projetRoutes = require('./src/routes/projet.routes');
 const livrableRoutes = require('./src/routes/livrable.routes');
 const aiRoutes = require('./src/routes/ai.routes');
 
-// Gestionnaires d'erreurs globaux pour éviter les arrêts inattendus
-process.on('uncaughtException', (error) => {
-    logger.error(`Exception non capturée: ${error.message}`);
-    logger.error(error.stack);
-});
+// Configuration des gestionnaires d'erreurs au niveau du processus
+setupProcessErrorHandlers();
 
-process.on('unhandledRejection', (reason, _) => {
-    logger.error(`Promesse rejetée non gérée: ${reason}`);
-    try {
-        const promiseInfo = {
-            state: 'rejected',
-            reason: String(reason)
-        };
-        logger.error(`Détails de la promesse: ${JSON.stringify(promiseInfo)}`);
-    } catch (e) {
-        logger.error('Impossible de sérialiser les détails de la promesse');
-    }
-});
+// Configuration des gestionnaires d'erreurs HTTP
+setupHttpErrorHandlers(httpServer, PORT);
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: process.env.ALLOWED_ORIGINS?.split(',') || 'http://localhost:4200',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'src', 'public')));
 if (NODE_ENV === 'development') app.use(morgan('dev'));
 app.use((req, res, next) => {
-    req.currentUser = 'WalidBenTouhami';
-    req.timestamp = new Date('2025-05-23 13:37:20').toISOString();
+    req.currentUser = req.headers['x-user'] || 'anonymous';
+    req.timestamp = new Date().toISOString();
     next();
 });
 
@@ -572,7 +590,7 @@ app.get('/health', (req, res) => {
 // Serveur principal
 async function startServer() {
     try {
-        await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/progease');
+        await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/progease');
         logger.info('Connecté à MongoDB avec succès');
 
         // Configuration du serveur GraphQL avant les middlewares d'erreur
@@ -580,23 +598,13 @@ async function startServer() {
         logger.info('Serveur Apollo Standalone configuré');
 
         // Middleware d'erreurs 404 - doit être après les routes ET après Apollo
-        app.use((req, res, _next) => {
-            logger.warn(`Route non trouvée: ${req.originalUrl}`);
-            res.status(404).json({
-                status: 'fail',
-                message: `Route non trouvée: ${req.originalUrl}`,
-                timestamp: req.timestamp || new Date().toISOString()
-            });
+        app.use((req, res, next) => {
+            notFoundHandler(req, res, next);
         });
 
         // Middleware de gestion des erreurs
-        app.use((err, req, res, _next) => {
-            logger.error(`Erreur serveur: ${err.message}`);
-            res.status(err.statusCode || 500).json({
-                status: 'error',
-                message: err.message,
-                timestamp: req.timestamp || new Date().toISOString()
-            });
+        app.use((req, res, next) => {
+            errorHandler(req, res, next);
         });
 
         await new Promise(resolve => {
@@ -609,7 +617,7 @@ async function startServer() {
 =======================================================
 🚀 PROGEASE Server (Apollo v4 Standalone)
 =======================================================
-📅 Date: ${new Date('2025-05-23 13:37:20').toISOString()}
+📅 Date: ${new Date().toISOString()}
 👤 User: WalidBenTouhami
 🌐 Port: ${PORT}
 🔧 Mode: ${NODE_ENV}
@@ -623,29 +631,14 @@ async function startServer() {
             });
         });
     } catch (error) {
-        logger.error(`Erreur de démarrage du serveur: ${error.message}`);
+        logger.error(ERROR_MESSAGES.STARTUP_ERROR(error.message));
         logger.error(error.stack);
         process.exit(1);
     }
 }
 
-// Ajout d'un gestionnaire d'erreurs pour le serveur HTTP
-httpServer.on('error', (error) => {
-    const errorCode = error.code || 'UNKNOWN_ERROR';
-    const timestamp = new Date().toISOString();
-    const errorMessage = error.message || 'Erreur inconnue';
-
-    if (errorCode === 'EADDRINUSE') {
-        logger.error(`Le port ${PORT} est déjà utilisé par une autre application`);
-    } else {
-        logger.error(`Erreur du serveur HTTP: ${errorMessage} (Code: ${errorCode})`);
-    }
-
-    logger.error(`Horodatage de l'erreur: ${timestamp}`);
-});
-
 startServer().catch(err => {
-    logger.error(`Erreur fatale: ${err.message}`);
+    logger.error(ERROR_MESSAGES.FATAL_ERROR(err.message));
     process.exit(1);
 });
 
@@ -1959,11 +1952,12 @@ const { readFileSync } = require('fs');
 const { gql } = require('graphql-tag');
 const path = require('path');
 const logger = require('../utils/logger');
+const { ApolloServerPluginUsageReporting } = require('@apollo/server/plugin/usageReporting');
 
 // Importez-les resolvers depuis le bon chemin
 const resolvers = require('./resolvers');
 
-async function createStandaloneServer(app, httpServer) {
+async function createStandaloneServer(app) {
   try {
     // Utiliser la variable d'environnement ou un chemin par défaut
     const schemaPath = process.env.APOLLO_SCHEMA_PATH || './src/graphql/schema.graphql';
@@ -1991,14 +1985,41 @@ async function createStandaloneServer(app, httpServer) {
         logger.error(`Erreur GraphQL: ${error.message}`);
         return error;
       },
+      plugins: [
+        ApolloServerPluginUsageReporting({
+          sendReportsImmediately: true,
+          // Vous pouvez configurer d'autres options ici si nécessaire
+        })
+      ]
     });
 
     await server.start();
+
+
+
+    // Ajouter avant le middleware GraphQL
+    app.use((req, res, next) => {
+      req.user = req.user || null;
+      next();
+    });
+
     app.use('/graphql', expressMiddleware(server, {
-      context: async ({ req }) => ({
-        user: req.currentUser,
-        timestamp: req.timestamp
-      }),
+      context: async ({ req }) => {
+        try {
+          // Vérifier explicitement que req existe avant d'accéder à ses propriétés
+const userValue = (req && typeof req === 'object' && 'user' in req) ? req.user : null;
+          return {
+            user: userValue,
+            timestamp: Date.now()
+          };
+        } catch (error) {
+          logger.error(`Erreur lors de la création du contexte: ${error.message}`);
+          return {
+            user: null,
+            timestamp: Date.now()
+          };
+        }
+      },
     }));
 
     return server;
@@ -2015,11 +2036,81 @@ module.exports = { createStandaloneServer };
 // src/middleware/errorHandlers.js
 const logger = require('../utils/logger');
 
+// Constantes pour les messages d'erreur
+const ERROR_MESSAGES = {
+  // Messages génériques
+  UNCAUGHT_EXCEPTION: (error) => `Exception non capturée: ${error.message}`,
+  UNHANDLED_REJECTION: (reason) => `Promesse rejetée non gérée: ${reason}`,
+  PROMISE_DETAILS: (info) => `Détails de la promesse: ${info}`,
+  SERIALIZATION_FAILED: 'Impossible de sérialiser les détails de la promesse',
+  ROUTE_NOT_FOUND: (url) => `Route non trouvée: ${url}`,
+  SERVER_ERROR: (msg) => `Erreur serveur: ${msg}`,
+  STARTUP_ERROR: (msg) => `Erreur de démarrage du serveur: ${msg}`,
+  PORT_IN_USE: (port) => `Le port ${port} est déjà utilisé par une autre application`,
+  HTTP_SERVER_ERROR: (msg, code) => `Erreur du serveur HTTP: ${msg} (Code: ${code})`,
+  ERROR_TIMESTAMP: (time) => `Horodatage de l'erreur: ${time}`,
+  FATAL_ERROR: (msg) => `Erreur fatale: ${msg}`,
+
+  // Erreurs MongoDB spécifiques
+  VALIDATION_ERROR: (errors) => `Données invalides. ${errors.join('. ')}`,
+  DUPLICATE_KEY: (field) => `Valeur en doublon pour ${field}. Veuillez utiliser une autre valeur`,
+  CAST_ERROR: (value) => `ID invalide: ${value}`,
+
+  // Erreurs de production
+  PRODUCTION_ERROR: 'Une erreur inattendue est survenue'
+};
+
+/**
+ * Attache les gestionnaires d'erreurs au niveau du processus
+ */
+const setupProcessErrorHandlers = () => {
+  process.on('uncaughtException', (error) => {
+    logger.error(ERROR_MESSAGES.UNCAUGHT_EXCEPTION(error));
+    logger.error(error.stack);
+  });
+
+  process.on('unhandledRejection', (reason, _) => {
+    logger.error(ERROR_MESSAGES.UNHANDLED_REJECTION(reason));
+    try {
+      const promiseInfo = {
+        state: 'rejected',
+        reason: String(reason)
+      };
+      logger.error(ERROR_MESSAGES.PROMISE_DETAILS(JSON.stringify(promiseInfo)));
+    } catch (e) {
+      logger.error(ERROR_MESSAGES.SERIALIZATION_FAILED);
+    }
+  });
+};
+
+/**
+ * Configure les gestionnaires d'erreurs pour le serveur HTTP
+ * @param {http.Server} httpServer - Instance du serveur HTTP
+ * @param {number} port - Numéro du port du serveur
+ */
+const setupHttpErrorHandlers = (httpServer, port) => {
+  httpServer.on('error', (error) => {
+    const errorCode = error.code || 'UNKNOWN_ERROR';
+    const timestamp = new Date().toISOString();
+    const errorMessage = error.message || 'Erreur inconnue';
+
+    if (errorCode === 'EADDRINUSE') {
+      logger.error(ERROR_MESSAGES.PORT_IN_USE(port));
+    } else {
+      logger.error(ERROR_MESSAGES.HTTP_SERVER_ERROR(errorMessage, errorCode));
+    }
+
+    logger.error(ERROR_MESSAGES.ERROR_TIMESTAMP(timestamp));
+  });
+};
+
 /**
  * Middleware pour gérer les routes non trouvées (404)
  */
-const notFoundHandler = (req, res, next) => {
-  logger.warn(`Route non trouvée: ${req.originalUrl}`, {
+const notFoundHandler = (req, res, _next) => {
+  const message = ERROR_MESSAGES.ROUTE_NOT_FOUND(req.originalUrl);
+
+  logger.warn(message, {
     method: req.method,
     ip: req.ip,
     userAgent: req.get('User-Agent')
@@ -2027,26 +2118,24 @@ const notFoundHandler = (req, res, next) => {
 
   res.status(404).json({
     status: 'fail',
-    message: `Route non trouvée: ${req.originalUrl}`
+    message: message,
+    timestamp: req.timestamp || new Date().toISOString()
   });
 };
 
 /**
  * Middleware pour gérer les erreurs globales
  */
-const errorHandler = (err, req, res, next) => {
+const errorHandler = (err, req, res, _next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
 
-  // Utiliser le logger pour enregistrer les erreurs de manière structurée
+  // Log structuré de l'erreur
   logger.error(`${err.statusCode} - ${err.message}`, {
     url: req.originalUrl,
     method: req.method,
     ip: req.ip,
     userId: req.user?.id,
-    body: req.body,
-    params: req.params,
-    query: req.query,
     errorName: err.name,
     errorCode: err.code,
     stack: err.stack
@@ -2055,20 +2144,20 @@ const errorHandler = (err, req, res, next) => {
   // Traitement spécifique des erreurs MongoDB
   if (err.name === 'ValidationError') {
     const errors = Object.values(err.errors).map(el => el.message);
-    err.message = `Données invalides. ${errors.join('. ')}`;
+    err.message = ERROR_MESSAGES.VALIDATION_ERROR(errors);
     err.statusCode = 400;
   }
 
   // Gestion des erreurs de doublons MongoDB
   if (err.code === 11000) {
     const field = Object.keys(err.keyValue)[0];
-    err.message = `Valeur en doublon pour ${field}. Veuillez utiliser une autre valeur`;
+    err.message = ERROR_MESSAGES.DUPLICATE_KEY(field);
     err.statusCode = 400;
   }
 
   // Gestion des erreurs de cast MongoDB
   if (err.name === 'CastError') {
-    err.message = `ID invalide: ${err.value}`;
+    err.message = ERROR_MESSAGES.CAST_ERROR(err.value);
     err.statusCode = 400;
   }
 
@@ -2076,7 +2165,8 @@ const errorHandler = (err, req, res, next) => {
   if (process.env.NODE_ENV === 'production') {
     return res.status(err.statusCode).json({
       status: err.status,
-      message: err.isOperational ? err.message : 'Une erreur inattendue est survenue'
+      message: err.isOperational ? err.message : ERROR_MESSAGES.PRODUCTION_ERROR,
+      timestamp: req.timestamp || new Date().toISOString()
     });
   }
 
@@ -2084,12 +2174,16 @@ const errorHandler = (err, req, res, next) => {
   return res.status(err.statusCode).json({
     status: err.status,
     message: err.message,
+    timestamp: req.timestamp || new Date().toISOString(),
     stack: err.stack,
     error: err
   });
 };
 
 module.exports = {
+  ERROR_MESSAGES,
+  setupProcessErrorHandlers,
+  setupHttpErrorHandlers,
   notFoundHandler,
   errorHandler
 };

@@ -132,9 +132,10 @@ npm run test:api
 ```
 
 Ou manuellement :
-```bash
-newman run tests/postman/PROGEASE.postman_collection.json -e tests/postman/PROGEASE.postman_environment.json --global-var "currentUser=WalidBenTouhami" --global-var "timestamp=2025-05-23 12:23:44" -r cli,htmlextra --reporter-htmlextra-export reports/newman/rapport-$(date +"%Y-%m-%d-%H-%M").html
+```PowerShell
+newman run tests/postman/PROGEASE.postman_collection.json -e tests/postman/PROGEASE.postman_environment.json --global-var "currentUser=WalidBenTouhami" --global-var "timestamp=2025-05-26T14:31:44" -r cli -r htmlextra --reporter-htmlextra-export "reports/newman/rapport-$(Get-Date -Format 'yyyy-MM-dd-HH-mm').html"
 ```
+Le raport de test sera généré dans le dossier `reports/newman`.
 
 ### **Types de tests inclus :**
 - Tests unitaires pour les modules principaux

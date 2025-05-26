@@ -47,8 +47,11 @@ async function main() {
     try {
         // Vérifier si le répertoire existe
         const stat = await fs.stat(directoryPath);
+
+        // Utilisation du early return pattern au lieu de throw dans un bloc try
         if (!stat.isDirectory()) {
-            throw new Error(`Le chemin spécifié (${directoryPath}) n'est pas un répertoire valide.`);
+            console.error(`❌ Erreur: Le chemin spécifié (${directoryPath}) n'est pas un répertoire valide.`);
+            return;
         }
 
         const jsFiles = await getAllJsFiles(directoryPath);
@@ -62,4 +65,8 @@ async function main() {
     }
 }
 
-main();
+// Gestion de la Promise retournée par main()
+main().catch(error => {
+    console.error(`❌ Erreur non gérée: ${error.message}`);
+    process.exit(1);
+});

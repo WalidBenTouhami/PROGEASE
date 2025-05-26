@@ -3,7 +3,7 @@
 const Projet = require('../models/projet.model');
 const Livrable = require('../models/livrable.model');
 
-// Mapping MongoDB -> GraphQL (nomenclature FR)
+// Mapping MongoDB -> GraphQL (intituleenclature FR)
 function mapperProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
@@ -26,9 +26,9 @@ function mapperLivrableMongoVersGraphQL(doc) {
     if (!doc) return null;
     return {
         _id: doc._id.toString(),
-        nom: doc.nom,
+        intitule: doc.intitule,
         description: doc.description,
-        dateLimite: doc.dateLimite,
+        dateEcheance: doc.dateEcheance,
         urlDepot: doc.urlDepot,
         statut: doc.statut,
         projetId: doc.projetId.toString(),
@@ -40,7 +40,7 @@ function mapperLivrableMongoVersGraphQL(doc) {
 exports.ajouterLivrable = async (req, res) => {
     try {
         const { projetId, ...donnees } = req.body;
-        if (!projetId || !donnees.nom || !donnees.description) {
+        if (!projetId || !donnees.intitule || !donnees.description) {
             return res.status(400).json({ erreur: 'Données manquantes pour créer un livrable.' });
         }
         const projet = await Projet.findById(projetId);
