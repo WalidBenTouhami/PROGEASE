@@ -79,3 +79,12 @@
 {"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
 {"level":"error","message":"Erreur GraphQL: Cannot query field \"createProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:12:14"}
 {"level":"error","message":"Erreur GraphQL: Cannot query field \"deleteProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 15:12:15"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"nom\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 21:36:42"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Projet\".","service":"progease-backend","timestamp":"2025-05-26 21:36:42"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"titre\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 21:36:43"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"responsable\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 21:36:43"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"type\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 21:36:43"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"dateEcheance\" on type \"Livrable\".","service":"progease-backend","timestamp":"2025-05-26 21:36:43"}
+{"level":"error","message":"Erreur GraphQL: Field \"livrables\" argument \"projetId\" of type \"ID!\" is required, but it was not provided.","service":"progease-backend","timestamp":"2025-05-26 21:36:43"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"createProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 21:36:43"}
+{"level":"error","message":"Erreur GraphQL: Cannot query field \"deleteProjet\" on type \"Mutation\". Did you mean \"creerProjet\"?","service":"progease-backend","timestamp":"2025-05-26 21:36:43"}

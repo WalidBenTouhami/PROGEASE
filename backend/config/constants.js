@@ -17,13 +17,9 @@ const Enum = Object.freeze({
         TERMINE: "Terminé",
         ARCHIVE: "Archivé",
     },
-    RoleUtilisateur: {
-        ETUDIANT: "Étudiant",
-        TUTEUR: "Tuteur",
-        ADMIN: "Administrateur",
-    },
+
     StatutLivrable: {
-        TERMINE: "Terminé",
+        TERMINE: "Termine",
         EN_ATTENTE: "En attente",
         EN_RETARD: "En retard",
     },
@@ -59,10 +55,6 @@ const MessagesErreur = Object.freeze({
     PROJET: {
         MEMBRE_EQUIPE_INVALIDE: "Un membre de l’équipe est invalide.",
         NON_TROUVE: "Projet introuvable.",
-    },
-    UTILISATEUR: {
-        EMAIL_DUPLIQUE: "Adresse e-mail déjà utilisée.",
-        ROLE_INVALIDE: "Rôle utilisateur invalide.",
     },
     LIVRABLE: {
         NON_TROUVE: "Livrable introuvable.",

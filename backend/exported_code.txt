@@ -20,13 +20,9 @@ const Enum = Object.freeze({
         TERMINE: "Terminé",
         ARCHIVE: "Archivé",
     },
-    RoleUtilisateur: {
-        ETUDIANT: "Étudiant",
-        TUTEUR: "Tuteur",
-        ADMIN: "Administrateur",
-    },
+
     StatutLivrable: {
-        TERMINE: "Terminé",
+        TERMINE: "Termine",
         EN_ATTENTE: "En attente",
         EN_RETARD: "En retard",
     },
@@ -62,10 +58,6 @@ const MessagesErreur = Object.freeze({
     PROJET: {
         MEMBRE_EQUIPE_INVALIDE: "Un membre de l’équipe est invalide.",
         NON_TROUVE: "Projet introuvable.",
-    },
-    UTILISATEUR: {
-        EMAIL_DUPLIQUE: "Adresse e-mail déjà utilisée.",
-        ROLE_INVALIDE: "Rôle utilisateur invalide.",
     },
     LIVRABLE: {
         NON_TROUVE: "Livrable introuvable.",
@@ -175,10 +167,7 @@ const filesToExport = [
     'src/validations/projet.validation.js',
     'test-env.js',
     'test-logs.js',
-    'testGithubService.js',
-    'tests/unit/livrable.model.test.js',
-    'tests/unit/project.model.test.js',
-    'tests/unit/sample.test.js'
+    'testGithubService.js'
 ];
 
 // Chemin du fichier de sortie
@@ -651,135 +640,95 @@ module.exports = app;
 const Projet = require('../models/projet.model');
 const Livrable = require('../models/livrable.model');
 
-// Mapping MongoDB -> GraphQL (nomenclature FR)
-function mapperProjetMongoVersGraphQL(doc) {
+// 🔁 Mapper MongoDB → GraphQL
+function mapperLivrable(doc) {
     if (!doc) return null;
     return {
         _id: doc._id.toString(),
-        titre: doc.titre,
+        intitule: doc.intitule,
         description: doc.description,
-        equipe: doc.equipe.map((id) => id.toString()),
-        tuteur: doc.tuteur?.toString() || null,
-        competences: doc.competences,
-        dateDebut: doc.dateDebut,
-        dateFin: doc.dateFin,
-        livrables: doc.livrables.map((id) => id.toString()),
+        dateEcheance: doc.dateLimite,
         statut: doc.statut,
+        projetId: doc.projetId?.toString(),
         creeLe: doc.creeLe,
         majLe: doc.majLe,
     };
 }
 
-function mapperLivrableMongoVersGraphQL(doc) {
-    if (!doc) return null;
-    return {
-        _id: doc._id.toString(),
-        nom: doc.nom,
-        description: doc.description,
-        dateLimite: doc.dateLimite,
-        urlDepot: doc.urlDepot,
-        statut: doc.statut,
-        projetId: doc.projetId.toString(),
-        creeLe: doc.creeLe,
-        majLe: doc.majLe,
-    };
-}
+module.exports = {
+    // ✅ Mutation : ajouterLivrable
+    ajouterLivrable: async (_, { input }) => {
+        const { projetId, intitule, description, dateEcheance } = input;
 
-exports.ajouterLivrable = async (req, res) => {
-    try {
-        const { projetId, ...donnees } = req.body;
-        if (!projetId || !donnees.nom || !donnees.description) {
-            return res.status(400).json({ erreur: 'Données manquantes pour créer un livrable.' });
+        if (!projetId || !intitule || !description || !dateEcheance) {
+            throw new Error('Tous les champs sont requis.');
         }
+
         const projet = await Projet.findById(projetId);
         if (!projet) {
-            return res.status(404).json({ erreur: 'Projet introuvable.' });
+            throw new Error('Projet introuvable.');
         }
-        const livrable = new Livrable({ ...donnees, projetId });
-        const enregistre = await livrable.save();
-        projet.livrables.push(enregistre._id);
+
+        const livrable = new Livrable({
+            intitule,
+            description,
+            dateLimite: new Date(dateEcheance),
+            projetId,
+        });
+
+        const saved = await livrable.save();
+
+        projet.livrables.push(saved._id);
         await projet.save();
-        res.status(201).json(mapperLivrableMongoVersGraphQL(enregistre));
-    } catch (erreur) {
-        console.error('Erreur lors de l\'ajout du livrable :', erreur);
-        res.status(500).json({ erreur: 'Échec de l\'ajout du livrable.' });
-    }
-};
 
-exports.recupererLivrables = async (req, res) => {
-    try {
-        const { projetId } = req.params;
-        if (!projetId) {
-            return res.status(400).json({ erreur: 'ID du projet manquant.' });
-        }
+        return mapperLivrable(saved);
+    },
+
+    // ✅ Query : recupererLivrablesParProjet(projetId)
+    recupererLivrablesParProjet: async (_, { projetId }) => {
+        if (!projetId) throw new Error('projetId requis.');
         const livrables = await Livrable.find({ projetId });
-        res.status(200).json(livrables.map(mapperLivrableMongoVersGraphQL));
-    } catch (erreur) {
-        console.error('Erreur lors de la récupération des livrables :', erreur);
-        res.status(500).json({ erreur: 'Échec de la récupération des livrables.' });
-    }
-};
+        return livrables.map(mapperLivrable);
+    },
 
-exports.mettreAJourLivrable = async (req, res) => {
-    try {
-        const { livrableId } = req.params;
-        if (!livrableId) {
-            return res.status(400).json({ erreur: 'ID du livrable manquant.' });
-        }
-        const maj = await Livrable.findByIdAndUpdate(livrableId, req.body, { new: true, runValidators: true });
-        if (!maj) {
-            return res.status(404).json({ erreur: 'Livrable introuvable.' });
-        }
-        res.status(200).json(mapperLivrableMongoVersGraphQL(maj));
-    } catch (erreur) {
-        console.error('Erreur lors de la mise à jour du livrable :', erreur);
-        res.status(500).json({ erreur: 'Échec de la mise à jour du livrable.' });
-    }
-};
-
-exports.supprimerLivrable = async (req, res) => {
-    try {
-        const { livrableId } = req.params;
-        if (!livrableId) {
-            return res.status(400).json({ erreur: 'ID du livrable manquant.' });
-        }
-        const supprime = await Livrable.findByIdAndDelete(livrableId);
-        if (!supprime) {
-            return res.status(404).json({ erreur: 'Livrable introuvable.' });
-        }
-        res.status(204).send();
-    } catch (erreur) {
-        console.error('Erreur lors de la suppression du livrable :', erreur);
-        res.status(500).json({ erreur: 'Échec de la suppression du livrable.' });
-    }
-};
-
-exports.recupererTousLivrables = async (req, res) => {
-    try {
+    // ✅ Query : recupererTousLivrables
+    recupererTousLivrables: async () => {
         const livrables = await Livrable.find();
-        res.status(200).json(livrables.map(mapperLivrableMongoVersGraphQL));
-    } catch (erreur) {
-        console.error('Erreur lors de la récupération des livrables :', erreur);
-        res.status(500).json({ erreur: 'Échec de la récupération des livrables.' });
+        return livrables.map(mapperLivrable);
+    },
+
+    // ✅ Query : recupererLivrableParId
+    recupererLivrableParId: async (_, { livrableId }) => {
+        const livrable = await Livrable.findById(livrableId);
+        if (!livrable) throw new Error('Livrable non trouvé.');
+        return mapperLivrable(livrable);
+    },
+
+    // ✅ Mutation : mettreAJourLivrable
+    mettreAJourLivrable: async (_, { livrableId, input }) => {
+        const updated = await Livrable.findByIdAndUpdate(
+            livrableId,
+            {
+                intitule: input.intitule,
+                description: input.description,
+                dateLimite: input.dateEcheance,
+                statut: input.statut,
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!updated) throw new Error('Livrable non trouvé.');
+        return mapperLivrable(updated);
+    },
+
+    // ✅ Mutation : supprimerLivrable
+    supprimerLivrable: async (_, { livrableId }) => {
+        const deleted = await Livrable.findByIdAndDelete(livrableId);
+        if (!deleted) throw new Error('Livrable non trouvé.');
+        return true;
     }
 };
 
-exports.recupererLivrableParId = async (req, res) => {
-    try {
-        const { livrableId } = req.params;
-        if (!livrableId) {
-            return res.status(400).json({ erreur: 'ID du livrable manquant.' });
-        }
-        const livrable = await Livrable.findById(livrableId);
-        if (!livrable) {
-            return res.status(404).json({ erreur: 'Livrable introuvable.' });
-        }
-        res.status(200).json(mapperLivrableMongoVersGraphQL(livrable));
-    } catch (erreur) {
-        console.error('Erreur lors de la récupération du livrable :', erreur);
-        res.status(500).json({ erreur: 'Échec de la récupération du livrable.' });
-    }
-};
 
 // ======= Contenu de src/controllers/projet.controller.js =======
 
@@ -2225,67 +2174,44 @@ module.exports = (req, res, next) => {
 
 // ======= Contenu de src/models/livrable.model.js =======
 
+// models/livrable.model.js
 const mongoose = require('mongoose');
-const { Schema } = mongoose;
+const { Schema, model } = mongoose;
 
 const livrableSchema = new Schema({
-    nom: {
+    intitule: {
         type: String,
-        required: [true, 'Le nom du livrable est requis.'],
+        required: true,
         trim: true,
+        minlength: 3,
+        maxlength: 150
     },
     description: {
         type: String,
-        required: [true, 'La description du livrable est requise.'],
+        required: true,
         trim: true,
+        minlength: 10
     },
     dateLimite: {
         type: Date,
-        required: [true, 'La date limite est requise.'],
-        validate: {
-            validator: function(v) {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                return new Date(v) >= today;
-            },
-            message: 'La date limite doit être aujourd\'hui ou dans le futur.',
-        },
+        required: true
     },
-    urlDepot: {
-        type: String,
-        required: true,
-        validate: {
-            validator: (url) => /^https:\/\/github\.com\/[^/]+\/[^/]+$/.test(url),
-            message: 'URL du dépôt GitHub invalide.',
-        },
+    projetId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Projet',
+        required: true
     },
     statut: {
         type: String,
-        enum: ['En retard', 'En attente', 'Terminé'],
-        default: 'En attente',
-    },
-    projetId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Projet',
-        required: true,
-    },
-    creeLe: {
-        type: Date,
-        default: Date.now,
-    },
-    majLe: {
-        type: Date,
-        default: Date.now,
-    },
+        enum: ['en_attente', 'en_retard', 'termine'],
+        default: 'en_attente'
+    }
+}, {
+    timestamps: true // ajoute automatiquement createdAt et updatedAt
 });
 
-// Middleware pour mettre à jour la date de modification
-livrableSchema.pre('save', function(next) {
-    this.majLe = new Date();
-    next();
-});
+module.exports = model('Livrable', livrableSchema);
 
-module.exports = mongoose.model('Livrable', livrableSchema);
 
 // ======= Contenu de src/models/projet.model.js =======
 
@@ -3327,7 +3253,7 @@ module.exports = { ProjetUtils };
 const yup = require('yup');
 
 const livrableSchema = yup.object().shape({
-    nom: yup.string().required('Le nom du livrable est obligatoire.'),
+    intitule: yup.string().required('Le intitule du livrable est obligatoire.'),
     description: yup.string().required('La description du livrable est obligatoire.'),
     dateLimite: yup.date().required('La date limite est obligatoire.'),
     urlDepot: yup.string()
@@ -3431,218 +3357,3 @@ const { verifierDepotGithubExiste } = require('./src/services/github.service');
     console.error('Une erreur est survenue :', error.message);
   }
 })();
-
-// ======= Contenu de tests/unit/livrable.model.test.js =======
-
-// tests/unit/livrable.model.test.js
-const mongoose = require('mongoose');
-const Livrable = require('../../src/models/livrable.model');
-
-// Mock pour le modèle Livrable si nécessaire
-if (!Livrable) {
-    // Définir un modèle mock si le modèle réel n'est pas disponible
-    jest.mock('../../src/models/livrable.model', () => {
-        const mockSchema = new mongoose.Schema({
-            titre: { type: String, required: true },
-            description: { type: String },
-            projetId: { type: mongoose.Schema.Types.ObjectId, ref: 'Projet', required: true },
-            statut: { type: String, enum: ['À faire', 'En cours', 'Terminé'], default: 'À faire' },
-            dateEcheance: { type: Date },
-            dateRendu: { type: Date },
-            fichiers: [{ nom: String, chemin: String }],
-            notes: { type: Number, min: 0, max: 20 },
-            commentaires: [{
-                auteur: String,
-                texte: String,
-                date: { type: Date, default: Date.now }
-            }],
-            createdBy: { type: String, default: 'WalidBenTouhami' },
-            createdAt: { type: Date, default: Date.now },
-            updatedBy: { type: String },
-            updatedAt: { type: Date }
-        });
-
-        mockSchema.methods.getStatus = function() {
-            const now = new Date();
-            if (!this.dateEcheance) return "Pas d'échéance";
-            if (this.dateRendu) return "Rendu";
-            if (this.dateEcheance < now) return "En retard";
-            return "Dans les délais";
-        };
-
-        return mongoose.model('Livrable', mockSchema);
-    });
-}
-
-describe('Livrable Model', () => {
-    // Information pour les tests
-    const testUser = 'WalidBenTouhami';
-    const testDate = '2025-05-23 12:55:32';
-    const testDateObj = new Date(testDate);
-    let livrableId;
-
-    // Fixing environment expectation
-    beforeAll(() => {
-        // Test passe que NODE_ENV soit 'development' ou 'test'
-        console.log(`Tests exécutés dans l'environnement: ${process.env.NODE_ENV}`);
-    });
-
-    // Test de base pour l'environnement
-    it('should have correct environment setup', () => {
-        expect(['development', 'test']).toContain(process.env.NODE_ENV);
-    });
-
-    // Tests de validation du modèle
-    describe('Validation', () => {
-        it('should validate a valid livrable', () => {
-            const validLivrable = new Livrable({
-                titre: 'Livrable Test',
-                description: 'Description du livrable test',
-                projetId: new mongoose.Types.ObjectId(),
-                dateEcheance: new Date(testDateObj.getTime() + (7 * 24 * 60 * 60 * 1000)), // +7 jours
-                createdBy: testUser
-            });
-
-            const validationError = validLivrable.validateSync();
-            expect(validationError).toBeUndefined();
-        });
-
-        it('should not validate livrable without titre', () => {
-            const invalidLivrable = new Livrable({
-                description: 'Description sans titre',
-                projetId: new mongoose.Types.ObjectId(),
-                createdBy: testUser
-            });
-
-            try {
-                const validationError = invalidLivrable.validateSync();
-                expect(validationError.errors.titre).toBeDefined();
-            } catch (error) {
-                // Parfois le modèle lance une exception au lieu de retourner une erreur
-                expect(error).toBeDefined();
-            }
-        });
-
-        it('should not validate livrable without projetId', () => {
-            const invalidLivrable = new Livrable({
-                titre: 'Livrable sans projet',
-                description: 'Ce livrable n\'a pas de projet associé',
-                createdBy: testUser
-            });
-
-            try {
-                const validationError = invalidLivrable.validateSync();
-                expect(validationError.errors.projetId).toBeDefined();
-            } catch (error) {
-                expect(error).toBeDefined();
-            }
-        });
-    });
-
-    // Tests des propriétés par défaut
-    describe('Default Properties', () => {
-        it('should set default status to "À faire"', () => {
-            const livrable = new Livrable({
-                titre: 'Livrable avec statut par défaut',
-                projetId: new mongoose.Types.ObjectId(),
-                createdBy: testUser
-            });
-
-            expect(livrable.statut).toBe('À faire');
-        });
-
-        it('should set createdBy to current user', () => {
-            const livrable = new Livrable({
-                titre: 'Livrable avec créateur par défaut',
-                projetId: new mongoose.Types.ObjectId()
-            });
-
-            expect(livrable.createdBy).toBe('WalidBenTouhami');
-        });
-    });
-
-    // Tests des méthodes du modèle
-    describe('Instance Methods', () => {
-        it('should return correct status based on dates', () => {
-            // Cas 1: Pas d'échéance
-            const livrableSansEcheance = new Livrable({
-                titre: 'Livrable sans échéance',
-                projetId: new mongoose.Types.ObjectId(),
-                createdBy: testUser
-            });
-
-            // Cas 2: Avec échéance future
-            const livrableAvecEcheanceFuture = new Livrable({
-                titre: 'Livrable avec échéance future',
-                projetId: new mongoose.Types.ObjectId(),
-                dateEcheance: new Date(testDateObj.getTime() + (7 * 24 * 60 * 60 * 1000)), // +7 jours
-                createdBy: testUser
-            });
-
-            // Cas 3: Avec échéance passée
-            const livrableEnRetard = new Livrable({
-                titre: 'Livrable en retard',
-                projetId: new mongoose.Types.ObjectId(),
-                dateEcheance: new Date(testDateObj.getTime() - (7 * 24 * 60 * 60 * 1000)), // -7 jours
-                createdBy: testUser
-            });
-
-            // Cas 4: Rendu (avec dateRendu)
-            const livrableRendu = new Livrable({
-                titre: 'Livrable rendu',
-                projetId: new mongoose.Types.ObjectId(),
-                dateEcheance: new Date(testDateObj.getTime() + (7 * 24 * 60 * 60 * 1000)),
-                dateRendu: new Date(testDateObj),
-                createdBy: testUser
-            });
-
-            // Si getStatus est une méthode du modèle, on la teste
-            if (typeof livrableSansEcheance.getStatus === 'function') {
-                expect(livrableSansEcheance.getStatus()).toBe("Pas d'échéance");
-                expect(livrableAvecEcheanceFuture.getStatus()).toBe("Dans les délais");
-                expect(livrableEnRetard.getStatus()).toBe("En retard");
-                expect(livrableRendu.getStatus()).toBe("Rendu");
-            } else {
-                // Sinon on vérifie juste le statut par défaut
-                expect(livrableSansEcheance.statut).toBe("À faire");
-            }
-        });
-    });
-
-    // Afficher les informations du test
-    afterAll(() => {
-        console.log(`Tests complétés par ${testUser} à ${testDate}`);
-    });
-});
-
-// ======= Contenu de tests/unit/project.model.test.js =======
-
-// tests/unit/sample.test.js
-describe('Sample Test', () => {
-    it('should test that true === true', () => {
-        expect(true).toBe(true);
-    });
-});
-
-// Un exemple de test pour l'API (si vous avez une fonction qui gère la route)
-describe('API Tests', () => {
-    it('should have correct environment setup', () => {
-        expect(['development', 'test']).toContain(process.env.NODE_ENV);
-    });
-});
-
-// ======= Contenu de tests/unit/sample.test.js =======
-
-// tests/unit/sample.test.js
-describe('Sample Test', () => {
-    it('should test that true === true', () => {
-        expect(true).toBe(true);
-    });
-});
-
-// Un exemple de test pour l'API (si vous avez une fonction qui gère la route)
-describe('API Tests', () => {
-    it('should have correct environment setup', () => {
-        expect(['development', 'test']).toContain(process.env.NODE_ENV);
-    });
-});

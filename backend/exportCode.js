@@ -39,10 +39,7 @@ const filesToExport = [
     'src/validations/projet.validation.js',
     'test-env.js',
     'test-logs.js',
-    'testGithubService.js',
-    'tests/unit/livrable.model.test.js',
-    'tests/unit/project.model.test.js',
-    'tests/unit/sample.test.js'
+    'testGithubService.js'
 ];
 
 // Chemin du fichier de sortie

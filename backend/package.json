@@ -52,6 +52,7 @@
     "mongoose": "^8.15.0",
     "morgan": "^1.10.0",
     "reporter": "^0.1.0",
+    "validator": "^13.15.0",
     "winston": "^3.17.0",
     "yup": "^1.6.1"
   },
