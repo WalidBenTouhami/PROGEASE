@@ -1,0 +1,70 @@
+# Configuration GraphQL pour le projet PROGEASE
+# Version: 1.0.0
+# Date: 2025-05-26
+
+# Configuration générale
+schema: ./src/graphql/schema.graphql
+documents: ./src/graphql/operations/**/*.{graphql,gql}
+extensions:
+  endpoints:
+    default:
+      url: http://localhost:4000/graphql
+      headers:
+        Authorization: Bearer ${env:GRAPHQL_TOKEN}
+
+  # Configuration pour Apollo Studio
+  apollo:
+    service:
+      name: progease-api
+      localSchemaFile: ./src/graphql/schema.graphql
+      includes:
+        - src/**/*.{js,ts}
+
+  # Configuration pour les outils de validation
+  validation:
+    # Désactiver les avertissements pour les field-suggestions
+    disableFieldSuggestions: false
+    # Règles personnalisées pour ESLint
+    rules:
+      - "graphql-eslint/no-deprecated": "warn"
+      - "graphql-eslint/no-anonymous-operations": "error"
+      - "graphql-eslint/require-description": ["warn", { "on": ["type", "interface"] }]
+
+  # Configuration pour les tests
+  codegen:
+    generates:
+      ./src/graphql/types.ts:
+        plugins:
+          - typescript
+          - typescript-resolvers
+        config:
+          enumsAsTypes: false
+          constEnums: true
+          skipTypename: false
+          declarationKind: interface
+          scalars:
+            Date: string
+            JSON: '{ [key: string]: any }'
+          enumValues:
+            StatutProjet: ./config/constants#STATUTS_PROJET
+            StatutLivrable: ./config/constants#STATUTS_LIVRABLE
+
+  # Configuration pour les éditeurs
+  editor:
+    formatOnSave: true
+    # Configuration recommandée pour VS Code
+    vscodeExtensions:
+      - apollographql.vscode-apollo
+      - graphql.vscode-graphql
+  
+  # Configuration des fragments pour être réutilisables
+  fragmentRegistry:
+    from:
+      files: ./src/graphql/fragments/**/*.{graphql,gql}
+
+  # Configuration recommandée pour les scripts
+  scripts:
+    generate: "graphql-codegen"
+    validate: "graphql-schema-linter ./src/graphql/schema.graphql"
+    introspect: "npx apollo client:download-schema --endpoint=http://localhost:4000/graphql"
+    typecheck: "tsc --noEmit"

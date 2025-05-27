@@ -12,7 +12,12 @@
     "prepare": "husky install",
     "test:api": "node newman-tests.js",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "validate-enums": "node scripts/validate-enums.js",
+    "prestart": "npm run validate-enums",
+    "prebuild": "npm run validate-enums",
+    "generate-schema": "graphql-codegen --config codegen.js && node scripts/generate-schema.js",
+    "predev": "npm run generate-schema"
   },
   "jest": {
     "testEnvironment": "node",
@@ -41,7 +46,7 @@
     "axios": "^1.9.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^2.2.0",
-    "compression": "^1.7.4",
+    "compression": "^1.8.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
@@ -52,14 +57,23 @@
     "mongoose": "^8.15.0",
     "morgan": "^1.10.0",
     "reporter": "^0.1.0",
+    "uuid": "^11.1.0",
     "validator": "^13.15.0",
     "winston": "^3.17.0",
     "yup": "^1.6.1"
   },
   "devDependencies": {
     "@apollo/rover": "^0.31.2",
+    "@apollo/server-plugin-response-cache": "^4.1.4",
     "@apollo/subgraph": "^2.10.2",
+    "@graphql-codegen/cli": "^5.0.6",
+    "@graphql-codegen/schema-ast": "^4.1.0",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-resolvers": "^4.5.1",
+    "@graphql-markdown/core": "^1.15.0",
+    "@graphql-markdown/docusaurus": "^1.29.0",
     "chalk": "^5.4.1",
+    "dataloader": "^2.2.3",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "graphql": "^16.11.0",
@@ -70,7 +84,7 @@
     "newman-reporter-htmlextra": "^1.23.1",
     "nodemon": "^3.1.9",
     "ora": "^8.2.0",
-    "prettier": "^3.2.5",
+    "prettier": "^3.5.3",
     "supertest": "^6.3.4"
   },
   "lint-staged": {

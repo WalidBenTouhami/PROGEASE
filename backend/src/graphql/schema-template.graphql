@@ -14,43 +14,6 @@ Scalar personnalisé pour manipuler les dates ISO-8601
 scalar Date
 
 # ENUM_DEFINITIONS
-"""
-Énumération des statuts de projet
-"""
-enum StatutProjet {
-    """Projet en phase d'initialisation"""
-    PROPOSE
-    """Projet en cours de réalisation"""
-    EN_COURS
-    """Projet terminé mais pas encore archivé"""
-    TERMINE
-    """Projet archivé"""
-    ARCHIVE
-    """Projet annulé"""
-    ANNULE
-}
-
-"""
-Énumération des statuts de livrable
-"""
-enum StatutLivrable {
-    """Livrable en attente de traitement"""
-    EN_ATTENTE
-    """Livrable en cours de réalisation"""
-    EN_COURS
-    """Livrable terminé en attente de validation"""
-    A_VALIDER
-    """Livrable validé"""
-    VALIDE
-    """Livrable rejeté"""
-    REJETE
-    """Livrable en retard"""
-    EN_RETARD
-    """Livrable terminé et validé"""
-    TERMINE
-    """Livrable planifié"""
-    PLANIFIE
-}
 
 """
 Interface pour les entités avec identifiant

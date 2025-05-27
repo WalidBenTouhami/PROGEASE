@@ -23,7 +23,7 @@ const CONFIG = {
   apiKey: process.env.APOLLO_KEY,
   subgraphName: process.env.APOLLO_SUBGRAPH_NAME || 'progease-projets',
   routingUrl: process.env.APOLLO_ROUTING_URL || 'http://localhost:5000/graphql',
-  schemaPath: path.resolve(__dirname, process.env.APOLLO_SCHEMA_PATH || '../src/graphql/schema.graphql'),
+  schemaPath: path.resolve(__dirname, process.env.APOLLO_SCHEMA_PATH || '../src/graphql/schema-template.graphql'),
   outputDir: path.resolve(__dirname, process.env.APOLLO_SCHEMA_OUTPUT_DIR || './schema-output')
 };
 
@@ -61,15 +61,15 @@ async function main() {
 
     if (typeof typeDefs !== 'string') {
       // Si on ne peut pas accéder directement au SDL, on l'extrait du fichier
-      log('Utilisation du fichier schema.graphql');
+      log('Utilisation du fichier schema-template.graphql');
       try {
-        const schemaFilePath = path.resolve(__dirname, '../src/graphql/schema.graphql');
+        const schemaFilePath = path.resolve(__dirname, '../src/graphql/schema-template.graphql');
         if (fs.existsSync(schemaFilePath)) {
           sdl = fs.readFileSync(schemaFilePath, 'utf8');
-          log('Fichier schema.graphql chargé avec succès');
+          log('Fichier schema-template.graphql chargé avec succès');
         } else {
           // noinspection ExceptionCaughtLocallyJS
-          throw new Error('Fichier schema.graphql introuvable');
+          throw new Error('Fichier schema-template.graphql introuvable');
         }
       } catch (e) {
         // noinspection ExceptionCaughtLocallyJS
@@ -81,7 +81,7 @@ async function main() {
 
     // 2. Sauvegarde du schéma en fichier
     log('Sauvegarde du schéma en fichier...');
-    const schemaPath = path.join(CONFIG.outputDir, 'schema.graphql');
+    const schemaPath = path.join(CONFIG.outputDir, 'schema-template.graphql');
     fs.writeFileSync(schemaPath, sdl);
     log(`Schéma sauvegardé dans ${schemaPath}`, 'SUCCESS');
 
