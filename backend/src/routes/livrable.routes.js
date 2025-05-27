@@ -1,117 +1,82 @@
 const express = require('express');
 const router = express.Router();
 const livrableController = require('../controllers/livrable.controller');
+const { validateLivrableData, validateId } = require('../validations/livrable.validation');
+const { asyncHandler } = require('../middleware/asyncHandler');
+const rateLimiter = require('../middleware/rateLimiter');
 
-// Middleware de validation pour les IDs
-const validateId = (req, res, next) => {
-    const id = req.params.livrableId || req.params.id;
-    if (id && !id.match(/^[0-9a-fA-F]{24}$/)) {
-        return res.status(400).json({ erreur: 'ID de livrable invalide.' });
-    }
-    next();
-};
-
-// Middleware de validation du corps de la requête
-const validateLivrableBody = (req, res, next) => {
-    const { titre, description, projetId } = req.body;
-
-    if (!titre || !projetId) {
-        return res.status(400).json({
-            erreur: 'Les champs titre et projetId sont requis.'
-        });
-    }
-
-    next();
-};
-
-// Routes CRUD principales - compatibles avec les tests Newman
-// Récupérer tous les livrables
+/**
+ * @route GET /api/livrables
+ * @description Récupérer tous les livrables avec filtrage et pagination
+ * @access Public
+ */
 router.get('/',
-    livrableController.findAll ||
-    livrableController.recupererTousLivrables ||
-    ((req, res) => res.json([]))
+    rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requêtes par minute
+    asyncHandler(livrableController.findAll)
 );
 
-// Ajouter un livrable
+/**
+ * @route POST /api/livrables
+ * @description Créer un nouveau livrable
+ * @access Public
+ */
 router.post('/',
-    validateLivrableBody,
-    livrableController.create ||
-    livrableController.ajouterLivrable ||
-    ((req, res) => {
-        const { titre, description, projetId, dateEcheance } = req.body;
-        res.status(201).json({
-            _id: "temp" + Date.now(),
-            titre,
-            description,
-            projetId,
-            dateEcheance,
-            createdAt: "2025-05-23 12:52:35",
-            createdBy: "WalidBenTouhami"
-        });
-    })
+    validateLivrableData,
+    asyncHandler(livrableController.create)
 );
 
-// Récupérer tous les livrables d'un projet
+/**
+ * @route GET /api/livrables/projet/:projetId
+ * @description Récupérer tous les livrables d'un projet
+ * @access Public
+ */
 router.get('/projet/:projetId',
-    livrableController.findByProject ||
-    livrableController.recupererLivrables ||
-    ((req, res) => res.json([]))
+    validateId('projetId'),
+    asyncHandler(livrableController.findByProject)
 );
 
-// Récupérer un livrable par ID - support des deux formats de chemin
-router.get('/:livrableId', validateId,
-    livrableController.findOne ||
-    livrableController.recupererLivrableParId ||
-    ((req, res) => {
-        res.json({
-            _id: req.params.livrableId,
-            titre: "Livrable exemple",
-            description: "Description générée pour test",
-            projetId: "projet123",
-            dateEcheance: "2025-06-23",
-            createdAt: "2025-05-23 12:52:35",
-            createdBy: "WalidBenTouhami"
-        });
-    })
+/**
+ * @route GET /api/livrables/:livrableId
+ * @description Récupérer un livrable par ID
+ * @access Public
+ */
+router.get('/:livrableId',
+    validateId('livrableId'),
+    asyncHandler(livrableController.findOne)
 );
 
-// Mettre à jour un livrable
-router.put('/:livrableId', validateId, validateLivrableBody,
-    livrableController.update ||
-    livrableController.mettreAJourLivrable ||
-    ((req, res) => {
-        const { titre, description } = req.body;
-        res.json({
-            _id: req.params.livrableId,
-            titre,
-            description,
-            updatedAt: "2025-05-23 12:52:35",
-            updatedBy: "WalidBenTouhami",
-            message: "Livrable mis à jour avec succès"
-        });
-    })
+/**
+ * @route PUT /api/livrables/:livrableId
+ * @description Mettre à jour un livrable
+ * @access Public
+ */
+router.put('/:livrableId',
+    validateId('livrableId'),
+    validateLivrableData,
+    asyncHandler(livrableController.update)
 );
 
-// Supprimer un livrable
-router.delete('/:livrableId', validateId,
-    livrableController.delete ||
-    livrableController.supprimerLivrable ||
-    ((req, res) => {
-        res.json({
-            message: `Livrable ${req.params.livrableId} supprimé avec succès`,
-            deletedAt: "2025-05-23 12:52:35",
-            deletedBy: "WalidBenTouhami"
-        });
-    })
+/**
+ * @route DELETE /api/livrables/:livrableId
+ * @description Supprimer un livrable
+ * @access Public
+ */
+router.delete('/:livrableId',
+    validateId('livrableId'),
+    asyncHandler(livrableController.delete)
 );
 
-// Route de diagnostic pour les tests
+/**
+ * @route GET /api/livrables/health
+ * @description Vérifier la santé de l'API livrables
+ * @access Public
+ */
 router.get('/health', (req, res) => {
     res.status(200).json({
         status: 'ok',
         service: 'livrables-api',
-        timestamp: "2025-05-23 12:52:35",
-        user: 'WalidBenTouhami'
+        timestamp: new Date().toISOString(),
+        user: req.currentUser || 'anonymous'
     });
 });
 

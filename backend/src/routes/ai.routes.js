@@ -1,111 +1,261 @@
 // src/routes/ai.routes.js
-// Correction du chemin selon la nouvelle convention
-
 const express = require('express');
 const router = express.Router();
 const aiService = require('../services/ai.service');
+const logger = require('../utils/logger');
+const { HttpStatus } = require('../../config/constants');
 
 // Middleware pour gérer les erreurs asynchrones
 const catchAsync = (fn) => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch(next);
 };
 
-// Middleware de validation plus souple pour les tests
-const validerDonnees = (req, res, next) => {
-    // Validation souple: accepte data ou donnees
-    if (!req.body.donnees && !req.body.data) {
-        return res.status(400).json({
-            error: 'Données manquantes. Veuillez fournir "data" ou "donnees".',
-            status: 'error'
+// Middleware de validation des données
+const validateInput = (req, res, next) => {
+    const data = req.body.data || req.body.donnees;
+
+    if (!data) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            status: 'error',
+            error: 'Données manquantes. Veuillez fournir "data" ou "donnees".'
         });
     }
-    // Normalisation des données pour uniformiser l'accès
-    req.donnees = req.body.donnees || req.body.data;
+
+    // Normaliser les données pour uniformiser l'accès
+    req.donnees = data;
     next();
 };
 
 // Middleware de logging
 const logRequest = (req, res, next) => {
-    console.log(`[${new Date('2025-05-23 13:20:42').toISOString()}] ${req.method} ${req.originalUrl} - User: ${req.body.currentUser || 'WalidBenTouhami'}`);
+    logger.info(`Requête AI: ${req.method} ${req.originalUrl}`, {
+        user: req.currentUser || 'anonymous',
+        dataSize: JSON.stringify(req.body).length
+    });
     next();
 };
 
-// Route principale d'analyse (format attendu par les tests)
-router.post('/analyze', logRequest, catchAsync(async (req, res) => {
+/**
+ * @route   POST /api/ai/analyze
+ * @desc    Analyser un projet avec l'IA
+ * @access  Privé
+ */
+router.post('/analyze', logRequest, validateInput, catchAsync(async (req, res) => {
     try {
-        let analysisResult;
+        const analysisResult = await aiService.analyserProjet(req.donnees);
 
-        if (aiService.analyserProjet) {
-            analysisResult = await aiService.analyserProjet(req.body.data || req.body.donnees || {});
-        } else {
-            analysisResult = {
-                score: 85,
-                risque: 'faible',
-                recommandations: ['Améliorer la documentation', 'Ajouter des tests unitaires'],
-                timestamp: new Date('2025-05-23 13:20:42').toISOString(),
-                generatedBy: 'AI Assistant'
-            };
-        }
-
-        res.status(200).json({
+        res.status(HttpStatus.OK).json({
             analysis: analysisResult,
             resultat: analysisResult,
-            timestamp: new Date('2025-05-23 13:20:42').toISOString(),
-            analyzedBy: req.body.currentUser || 'WalidBenTouhami'
+            timestamp: new Date().toISOString(),
+            analyzedBy: req.currentUser || 'system'
         });
     } catch (error) {
-        console.error(`❌ Erreur d'analyse AI: ${error.message}`);
-        res.status(500).json({
-            error: 'Erreur lors de l\'analyse du projet',
-            status: 'error'
+        logger.error(`❌ Erreur d'analyse AI: ${error.message}`, { stack: error.stack });
+        res.status(HttpStatus.INTERNAL_ERROR).json({
+            status: 'error',
+            error: 'Erreur lors de l\'analyse du projet'
         });
     }
 }));
 
-// Routes secondaires avec format flexible
-router.post('/generer-texte', logRequest, validerDonnees, catchAsync(async (req, res) => {
-    const resultat = aiService.genererTexte ?
-        await aiService.genererTexte(req.donnees) :
-        { texte: 'Texte généré pour les tests' };
+/**
+ * @route   POST /api/ai/generer-texte
+ * @desc    Générer du texte avec l'IA
+ * @access  Privé
+ */
+router.post('/generer-texte', logRequest, validateInput, catchAsync(async (req, res) => {
+    const resultat = await aiService.genererTexte(req.donnees);
 
-    res.status(200).json({
+    res.status(HttpStatus.OK).json({
         resultat,
         result: resultat,
-        timestamp: new Date('2025-05-23 13:20:42').toISOString()
+        timestamp: new Date().toISOString()
     });
 }));
 
-// Version en anglais (alias)
-router.post('/generate-text', logRequest, validerDonnees, catchAsync(async (req, res) => {
-    const resultat = aiService.genererTexte ?
-        await aiService.genererTexte(req.donnees) :
-        { text: 'Text generated for tests' };
+/**
+ * @route   POST /api/ai/generate-text
+ * @desc    Version anglaise pour générer du texte
+ * @access  Privé
+ */
+router.post('/generate-text', logRequest, validateInput, catchAsync(async (req, res) => {
+    const resultat = await aiService.genererTexte(req.donnees);
 
-    res.status(200).json({
+    res.status(HttpStatus.OK).json({
         result: resultat,
-        resultat: resultat,
-        timestamp: new Date('2025-05-23 13:20:42').toISOString()
+        resultat,
+        timestamp: new Date().toISOString()
     });
 }));
 
-// Route de santé pour les tests
+/**
+ * @route   POST /api/ai/track-progress
+ * @desc    Suivre la progression des tâches
+ * @access  Privé
+ */
+router.post('/track-progress', logRequest, validateInput, catchAsync(async (req, res) => {
+    const taches = req.donnees.taches || req.donnees;
+
+    if (!Array.isArray(taches)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            status: 'error',
+            error: 'Format invalide: un tableau de tâches est requis.'
+        });
+    }
+
+    const resultat = await aiService.suiviProgression(taches);
+
+    res.status(HttpStatus.OK).json({
+        resultat,
+        timestamp: new Date().toISOString()
+    });
+}));
+
+/**
+ * @route   POST /api/ai/predict-performance
+ * @desc    Prédire la performance basée sur l'historique
+ * @access  Privé
+ */
+router.post('/predict-performance', logRequest, validateInput, catchAsync(async (req, res) => {
+    const historique = req.donnees.historique || req.donnees;
+
+    if (!Array.isArray(historique)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            status: 'error',
+            error: 'Format invalide: un tableau d\'historique est requis.'
+        });
+    }
+
+    const resultat = await aiService.predirePerformance(historique);
+
+    res.status(HttpStatus.OK).json({
+        resultat,
+        timestamp: new Date().toISOString()
+    });
+}));
+
+/**
+ * @route   POST /api/ai/build-teams
+ * @desc    Former des équipes automatiquement
+ * @access  Privé
+ */
+router.post('/build-teams', logRequest, validateInput, catchAsync(async (req, res) => {
+    const membres = req.donnees.membres || req.donnees;
+
+    if (!Array.isArray(membres)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            status: 'error',
+            error: 'Format invalide: un tableau de membres est requis.'
+        });
+    }
+
+    const resultat = await aiService.creerEquipes(membres);
+
+    res.status(HttpStatus.OK).json({
+        resultat,
+        timestamp: new Date().toISOString()
+    });
+}));
+
+/**
+ * @route   POST /api/ai/match-tutors
+ * @desc    Associer des tuteurs aux équipes
+ * @access  Privé
+ */
+router.post('/match-tutors', logRequest, validateInput, catchAsync(async (req, res) => {
+    const membres = req.donnees.membres || req.donnees;
+
+    if (!Array.isArray(membres)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            status: 'error',
+            error: 'Format invalide: un tableau de membres est requis.'
+        });
+    }
+
+    const resultat = await aiService.associerTuteurs(membres);
+
+    res.status(HttpStatus.OK).json({
+        resultat,
+        timestamp: new Date().toISOString()
+    });
+}));
+
+/**
+ * @route   POST /api/ai/recommend-learning
+ * @desc    Recommander des ressources d'apprentissage
+ * @access  Privé
+ */
+router.post('/recommend-learning', logRequest, validateInput, catchAsync(async (req, res) => {
+    const competences = req.donnees.competences || req.donnees;
+
+    if (!Array.isArray(competences)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            status: 'error',
+            error: 'Format invalide: un tableau de compétences est requis.'
+        });
+    }
+
+    const resultat = await aiService.recommanderApprentissage(competences);
+
+    res.status(HttpStatus.OK).json({
+        resultat,
+        timestamp: new Date().toISOString()
+    });
+}));
+
+/**
+ * @route   POST /api/ai/schedule-tasks
+ * @desc    Générer un planning de tâches
+ * @access  Privé
+ */
+router.post('/schedule-tasks', logRequest, validateInput, catchAsync(async (req, res) => {
+    const taches = req.donnees.taches || req.donnees;
+
+    if (!Array.isArray(taches)) {
+        return res.status(HttpStatus.BAD_REQUEST).json({
+            status: 'error',
+            error: 'Format invalide: un tableau de tâches est requis.'
+        });
+    }
+
+    const resultat = await aiService.genererPlanning(taches);
+
+    res.status(HttpStatus.OK).json({
+        resultat,
+        timestamp: new Date().toISOString()
+    });
+}));
+
+/**
+ * @route   GET /api/ai/health
+ * @desc    Vérifier l'état du service AI
+ * @access  Public
+ */
 router.get('/health', (req, res) => {
-    res.status(200).json({
+    res.status(HttpStatus.OK).json({
         status: 'ok',
         service: 'ai-service',
-        models: ['gpt-4', 'deepseek'],
-        timestamp: new Date('2025-05-23 13:20:42').toISOString(),
-        user: 'WalidBenTouhami'
+        models: ['deepseek'],
+        timestamp: new Date().toISOString(),
+        user: req.currentUser || 'system',
+        version: '2.0.0'
     });
 });
 
-// Middleware de gestion d'erreur global
+// Middleware de gestion d'erreur global pour les routes AI
 router.use((err, req, res, next) => {
-    console.error(`❌ Erreur AI API [${new Date('2025-05-23 13:20:42').toISOString()}]:`, err);
-    res.status(500).json({
-        error: 'Une erreur interne est survenue. Veuillez réessayer plus tard.',
+    logger.error(`❌ Erreur AI API: ${err.message}`, {
+        stack: err.stack,
+        endpoint: req.originalUrl,
+        method: req.method,
+        user: req.currentUser || 'anonymous'
+    });
+
+    res.status(HttpStatus.INTERNAL_ERROR).json({
         status: 'error',
-        timestamp: new Date('2025-05-23 13:20:42').toISOString()
+        error: 'Une erreur est survenue lors du traitement IA.',
+        timestamp: new Date().toISOString()
     });
 });
 

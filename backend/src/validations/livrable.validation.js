@@ -1,13 +1,71 @@
 const yup = require('yup');
+const mongoose = require('mongoose');
+const { MessagesErreur, StatutHttp } = require('../../config/constants');
 
+// Schéma de validation Yup pour les livrables
 const livrableSchema = yup.object().shape({
-    intitule: yup.string().required('Le intitule du livrable est obligatoire.'),
-    description: yup.string().required('La description du livrable est obligatoire.'),
-    dateLimite: yup.date().required('La date limite est obligatoire.'),
-    urlDepot: yup.string()
-        .matches(/^https:\/\/github\.com\/[^/]+\/[^/]+$/, 'Format de dépôt GitHub invalide.')
-        .required('L\'URL du dépôt est obligatoire.'),
-    statut: yup.string().oneOf(['En retard', 'En attente', 'Terminé'])
+    titre: yup.string()
+        .min(3, 'Le titre doit contenir au moins 3 caractères.')
+        .max(150, 'Le titre ne peut pas dépasser 150 caractères.')
+        .required('Le titre est requis.'),
+    intitule: yup.string()
+        .min(3, 'L\'intitulé doit contenir au moins 3 caractères.')
+        .max(150, 'L\'intitulé ne peut pas dépasser 150 caractères.'),
+    description: yup.string()
+        .min(10, 'La description doit contenir au moins 10 caractères.')
+        .required('La description est requise.'),
+    projetId: yup.string()
+        .test('is-mongo-id', 'L\'ID de projet est invalide.',
+            val => val && mongoose.Types.ObjectId.isValid(val))
+        .required('L\'ID du projet est requis.'),
+    dateEcheance: yup.date()
+        .min(new Date(), 'La date d\'échéance doit être future.')
+        .required('La date d\'échéance est requise.'),
+    statut: yup.string()
+        .oneOf(['en_attente', 'en_retard', 'termine'], 'Statut invalide.')
 });
 
-module.exports = { livrableSchema };
+// Middleware de validation des données de livrable
+const validateLivrableData = async (req, res, next) => {
+    try {
+        // Permettre titre OU intitule
+        const body = { ...req.body };
+        if (body.titre && !body.intitule) body.intitule = body.titre;
+        if (body.intitule && !body.titre) body.titre = body.intitule;
+
+        // Adapter dateEcheance au format si besoin
+        if (body.dateEcheance && typeof body.dateEcheance === 'string') {
+            body.dateEcheance = new Date(body.dateEcheance);
+        }
+
+        // Validation
+        await livrableSchema.validate(body, { abortEarly: false });
+        next();
+    } catch (error) {
+        res.status(StatutHttp.MAUVAISE_REQUETE).json({
+            erreur: MessagesErreur.GENERAL.VALIDATION,
+            details: error.errors || error.message
+        });
+    }
+};
+
+// Middleware de validation des IDs
+const validateId = (paramName, source = 'params') => {
+    return (req, res, next) => {
+        const id = source === 'params' ? req.params[paramName] : req.body[paramName];
+
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(StatutHttp.MAUVAISE_REQUETE).json({
+                erreur: MessagesErreur.GENERAL.ID_INVALIDE,
+                details: `L'ID '${paramName}' est invalide ou manquant.`
+            });
+        }
+        next();
+    };
+};
+
+module.exports = {
+    validateLivrableData,
+    validateId,
+    livrableSchema // Export pour tests et réutilisation
+};

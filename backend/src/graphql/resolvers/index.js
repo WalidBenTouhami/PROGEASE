@@ -15,7 +15,6 @@ const logger = require('../../utils/logger');
 // Import des resolvers spécifiques
 const projetResolvers = require('./projet.resolver');
 const livrableResolvers = require('./livrable.resolver');
-const userResolvers = require('./user.resolver');
 const scalarResolvers = require('./scalar.resolver');
 
 /**
@@ -86,7 +85,6 @@ const resolvers = {
     Query: {
         ...projetResolvers.Query,
         ...livrableResolvers.Query,
-        ...userResolvers.Query,
 
         // Requête de santé pour vérifier le bon fonctionnement
         healthCheck: () => ({
@@ -100,7 +98,6 @@ const resolvers = {
     Mutation: {
         ...projetResolvers.Mutation,
         ...livrableResolvers.Mutation,
-        ...userResolvers.Mutation,
 
         // Mutation de test
         ping: (_, { message }) => ({
@@ -113,7 +110,6 @@ const resolvers = {
     // Types complexes
     ...projetResolvers.Types,
     ...livrableResolvers.Types,
-    ...userResolvers.Types,
 
     // Scalars personnalisés
     ...scalarResolvers

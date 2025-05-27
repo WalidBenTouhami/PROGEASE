@@ -1,90 +1,105 @@
 const express = require('express');
 const router = express.Router();
 const projetController = require('../controllers/projet.controller');
-const projetService = require('../services/projet.service');
+const { validateProjetData, validateId } = require('../validations/projet.validation');
+const { asyncHandler } = require('../middleware/asyncHandler');
+const rateLimiter = require('../middleware/rateLimiter');
 
-// Middleware de validation pour les IDs
-const validateProjetId = (req, res, next) => {
-    const { id } = req.params;
-    if (id && !id.match(/^[0-9a-fA-F]{24}$/)) {
-        return res.status(400).json({ erreur: 'ID de projet invalide.' });
-    }
-    next();
-};
+/**
+ * @route POST /api/projets
+ * @description Créer un nouveau projet
+ * @access Public
+ */
+router.post('/',
+    validateProjetData,
+    asyncHandler(projetController.creerProjet)
+);
 
-// Middleware de validation du corps
-const validateProjetBody = (req, res, next) => {
-    const { titre } = req.body;
+/**
+ * @route GET /api/projets
+ * @description Récupérer tous les projets avec filtrage et pagination
+ * @access Public
+ */
+router.get('/',
+    rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requêtes par minute
+    asyncHandler(projetController.recupererProjets)
+);
 
-    if (!titre) {
-        return res.status(400).json({
-            erreur: 'Le champ titre est requis.'
-        });
-    }
+/**
+ * @route GET /api/projets/:id
+ * @description Récupérer un projet par son ID
+ * @access Public
+ */
+router.get('/:id',
+    validateId('id'),
+    asyncHandler(projetController.recupererProjetParId)
+);
 
-    next();
-};
+/**
+ * @route PUT /api/projets/:id
+ * @description Mettre à jour un projet
+ * @access Public
+ */
+router.put('/:id',
+    validateId('id'),
+    validateProjetData,
+    asyncHandler(projetController.mettreAJourProjet)
+);
 
-// Routes CRUD principales - corrigées pour correspondre aux tests Newman
-router.post('/', validateProjetBody, projetController.create || projetController.creerProjet);
-router.get('/', projetController.findAll || projetController.recupererProjets);
-router.get('/:id', validateProjetId, projetController.findOne || projetController.recupererProjetParId);
-router.put('/:id', validateProjetId, validateProjetBody, projetController.update || projetController.mettreAJourProjet);
-router.delete('/:id', validateProjetId, projetController.delete || projetController.supprimerProjet);
+/**
+ * @route DELETE /api/projets/:id
+ * @description Supprimer un projet
+ * @access Public
+ */
+router.delete('/:id',
+    validateId('id'),
+    asyncHandler(projetController.supprimerProjet)
+);
 
-// Routes d'analyse - déléguées au contrôleur
-router.post('/analyse-risques', projetController.analyserRisques || ((req, res) => {
-    try {
-        // Fallback si méthode du contrôleur non disponible
-        res.status(200).json({
-            risques: [
-                { niveau: 'élevé', description: 'Risque test', mitigation: 'Action test' }
-            ],
-            timestamp: new Date(),
-            analysePar: req.body.currentUser || 'WalidBenTouhami'
-        });
-    } catch (error) {
-        console.error('Erreur lors de l\'analyse des risques:', error.message);
-        res.status(500).json({ erreur: 'Échec de l\'analyse des risques.' });
-    }
-}));
+/**
+ * @route POST /api/projets/analyse-risques
+ * @description Analyser les risques d'un projet
+ * @access Public
+ */
+router.post('/analyse-risques',
+    rateLimiter({ windowMs: 300000, max: 10 }),  // max 10 requêtes / 5min (plus lourd)
+    validateId('projetId', 'body'),
+    asyncHandler(projetController.analyserRisques)
+);
 
-router.post('/suivi-taches', projetController.suiviTaches || ((req, res) => {
-    try {
-        // Fallback si méthode du contrôleur non disponible
-        res.status(200).json({
-            progression: '50%',
-            tachesTerminees: 5,
-            tachesTotales: 10,
-            timestamp: new Date(),
-            suiviPar: req.body.currentUser || 'WalidBenTouhami'
-        });
-    } catch (error) {
-        console.error('Erreur lors du suivi des tâches:', error.message);
-        res.status(500).json({ erreur: 'Échec du suivi des tâches.' });
-    }
-}));
+/**
+ * @route POST /api/projets/suivi-taches
+ * @description Obtenir le suivi des tâches d'un projet
+ * @access Public
+ */
+router.post('/suivi-taches',
+    validateId('projetId', 'body'),
+    asyncHandler(projetController.suiviTaches)
+);
 
-// Route pour les livrables associés à un projet (identifiée manquante dans les tests)
-router.get('/:id/livrables', validateProjetId, (req, res) => {
-    try {
-        // Implémentation simplifiée pour les tests
-        res.status(200).json({
-            projetId: req.params.id,
-            livrables: []
-        });
-    } catch (error) {
-        console.error('Erreur lors de la récupération des livrables:', error.message);
-        res.status(500).json({ erreur: 'Échec de la récupération des livrables.' });
-    }
-});
+/**
+ * @route GET /api/projets/:id/livrables
+ * @description Récupérer les livrables d'un projet
+ * @access Public
+ */
+router.get('/:id/livrables',
+    validateId('id'),
+    asyncHandler(async (req, res) => {
+        const livrableController = require('../controllers/livrable.controller');
+        await livrableController.findByProject(req, res);
+    })
+);
 
-// Ajouter debug route pour les tests de santé
+/**
+ * @route GET /api/projets/health
+ * @description Vérifier la santé de l'API projets
+ * @access Public
+ */
 router.get('/health', (req, res) => {
     res.status(200).json({
         status: 'ok',
         time: new Date().toISOString(),
-        user: 'WalidBenTouhami',
+        user: req.currentUser || 'anonymous',
         environment: process.env.NODE_ENV || 'development'
     });
 });

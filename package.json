@@ -7,7 +7,7 @@
     "clean": "rimraf node_modules && cd backend && rimraf node_modules && cd ../frontend && rimraf node_modules"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2",
-    "rimraf": "^6.0.1"
+    "rimraf": "^6.0.1",
+    "concurrently": "^8.2.2"
   }
 }

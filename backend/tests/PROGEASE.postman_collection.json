@@ -1,0 +1,620 @@
+{
+    "info": {
+        "_postman_id": "a6f7e8d9-b0c1-4d2e-85f3-c7a9b8d0e12f",
+        "name": "PROGEASE API Tests",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "Collection de tests pour l'API PROGEASE"
+    },
+    "item": [
+        {
+            "name": "Santé API",
+            "item": [
+                {
+                    "name": "GET /health",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Status field est 'ok'\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.status).to.eql('ok');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/health"
+                    }
+                },
+                {
+                    "name": "GET /api",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Contient les endpoints attendus\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.endpoints).to.include('/api/projets');",
+                                    "    pm.expect(jsonData.endpoints).to.include('/api/livrables');",
+                                    "    pm.expect(jsonData.endpoints).to.include('/graphql');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/api"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Gestion des projets",
+            "item": [
+                {
+                    "name": "Créer un projet",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 201 Created\", function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Projet créé avec ID\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData._id).to.exist;",
+                                    "    pm.expect(jsonData.titre).to.eql(pm.variables.get(\"projetTitre\"));",
+                                    "",
+                                    "    // Stocker l'ID pour les tests suivants",
+                                    "    pm.environment.set(\"projetId\", jsonData._id);",
+                                    "});"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Générer des données de test dynamiques",
+                                    "pm.variables.set(\"projetTitre\", \"Projet Test \" + new Date().toISOString());",
+                                    "pm.variables.set(\"projetDescription\", \"Description générée pour les tests automatisés\");"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"titre\": \"{{projetTitre}}\",\n    \"description\": \"{{projetDescription}}\",\n    \"dateDebut\": \"{{$isoTimestamp}}\",\n    \"dateFin\": \"{{$isoTimestampMs + 2592000000}}\",\n    \"competences\": [\"JavaScript\", \"Node.js\", \"MongoDB\"],\n    \"statut\": \"Brouillon\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/projets"
+                    }
+                },
+                {
+                    "name": "Récupérer tous les projets",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Liste de projets reçue\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.projets).to.be.an('array');",
+                                    "    pm.expect(jsonData.total).to.be.at.least(1);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/projets?page=1&limit=10",
+                            "host": ["{{baseUrl}}"],
+                            "path": ["api", "projets"],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Récupérer un projet par ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Détails du projet corrects\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData._id).to.eql(pm.environment.get(\"projetId\"));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/api/projets/{{projetId}}"
+                    }
+                },
+                {
+                    "name": "Mettre à jour un projet",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Projet mis à jour correctement\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.description).to.eql(pm.variables.get(\"nouvelleDescription\"));",
+                                    "});"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.variables.set(\"nouvelleDescription\", \"Description mise à jour \" + new Date().toISOString());"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"titre\": \"{{projetTitre}} (mis à jour)\",\n    \"description\": \"{{nouvelleDescription}}\",\n    \"statut\": \"En cours\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/projets/{{projetId}}"
+                    }
+                },
+                {
+                    "name": "Analyse des risques",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Contient une analyse des risques\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.projetId).to.eql(pm.environment.get(\"projetId\"));",
+                                    "    pm.expect(jsonData.risques).to.be.an('array');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"projetId\": \"{{projetId}}\",\n    \"currentUser\": \"{{$randomFullName}}\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/projets/analyse-risques"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Gestion des livrables",
+            "item": [
+                {
+                    "name": "Créer un livrable",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 201 Created\", function () {",
+                                    "    pm.response.to.have.status(201);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Livrable créé avec ID\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData._id).to.exist;",
+                                    "    pm.expect(jsonData.intitule || jsonData.titre).to.eql(pm.variables.get(\"livrableTitre\"));",
+                                    "",
+                                    "    // Stocker l'ID pour les tests suivants",
+                                    "    pm.environment.set(\"livrableId\", jsonData._id);",
+                                    "});"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "// Générer des données de test dynamiques",
+                                    "pm.variables.set(\"livrableTitre\", \"Livrable Test \" + new Date().toISOString());",
+                                    "pm.variables.set(\"livrableDescription\", \"Description du livrable de test\");"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"titre\": \"{{livrableTitre}}\",\n    \"description\": \"{{livrableDescription}}\",\n    \"projetId\": \"{{projetId}}\",\n    \"dateEcheance\": \"{{$isoTimestampMs + 1296000000}}\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/livrables"
+                    }
+                },
+                {
+                    "name": "Récupérer les livrables d'un projet",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Liste de livrables reçue\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.livrables).to.be.an('array');",
+                                    "    pm.expect(jsonData.livrables.length).to.be.at.least(1);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/api/livrables/projet/{{projetId}}"
+                    }
+                },
+                {
+                    "name": "Récupérer un livrable par ID",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Détails du livrable corrects\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData._id).to.eql(pm.environment.get(\"livrableId\"));",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/api/livrables/{{livrableId}}"
+                    }
+                },
+                {
+                    "name": "Mettre à jour un livrable",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Livrable mis à jour correctement\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.description).to.eql(pm.variables.get(\"nouvelleLivrableDescription\"));",
+                                    "});"
+                                ]
+                            }
+                        },
+                        {
+                            "listen": "prerequest",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.variables.set(\"nouvelleLivrableDescription\", \"Description du livrable mise à jour \" + new Date().toISOString());"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"titre\": \"{{livrableTitre}} (mis à jour)\",\n    \"description\": \"{{nouvelleLivrableDescription}}\",\n    \"projetId\": \"{{projetId}}\",\n    \"statut\": \"termine\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/livrables/{{livrableId}}"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Tests Négatifs",
+            "item": [
+                {
+                    "name": "Projet - ID invalide",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 400 Bad Request\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Message d'erreur d'ID invalide\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.erreur).to.include('ID');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": "{{baseUrl}}/api/projets/invalid-id"
+                    }
+                },
+                {
+                    "name": "Projet - Création avec données manquantes",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 400 Bad Request\", function () {",
+                                    "    pm.response.to.have.status(400);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Message d'erreur de validation\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.erreur).to.exist;",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"description\": \"Description sans titre\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/projets"
+                    }
+                },
+                {
+                    "name": "Livrable - ID projet inexistant",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 404 Not Found\", function () {",
+                                    "    pm.response.to.have.status(404);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Message d'erreur projet introuvable\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.erreur).to.include('Projet');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"titre\": \"Livrable orphelin\",\n    \"description\": \"Ce livrable a un projet inexistant\",\n    \"projetId\": \"62f7d1db5d5b8f24a97bea1f\",\n    \"dateEcheance\": \"{{$isoTimestamp}}\"\n}"
+                        },
+                        "url": "{{baseUrl}}/api/livrables"
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Nettoyage",
+            "item": [
+                {
+                    "name": "Supprimer le livrable de test",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Livrable supprimé\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.deleted || jsonData.message).to.exist;",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": "{{baseUrl}}/api/livrables/{{livrableId}}"
+                    }
+                },
+                {
+                    "name": "Supprimer le projet de test",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Statut 200 OK\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Projet supprimé\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.message).to.include('supprimé');",
+                                    "",
+                                    "    // Effacer les variables d'environnement",
+                                    "    pm.environment.unset(\"projetId\");",
+                                    "    pm.environment.unset(\"livrableId\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": "{{baseUrl}}/api/projets/{{projetId}}"
+                    }
+                }
+            ]
+        }
+    ],
+    "event": [
+        {
+            "listen": "prerequest",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Script global pré-requête",
+                    "console.log('Test exécuté à', new Date().toISOString());",
+                    "",
+                    "// Ajouter des headers communs",
+                    "pm.request.headers.upsert({",
+                    "    key: 'x-user',",
+                    "    value: pm.variables.get('currentUser') || 'TestUser'",
+                    "});"
+                ]
+            }
+        },
+        {
+            "listen": "test",
+            "script": {
+                "type": "text/javascript",
+                "exec": [
+                    "// Log simple de fin de test",
+                    "console.log('Test terminé pour:', pm.request.url.toString());"
+                ]
+            }
+        }
+    ],
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5000",
+            "type": "string"
+        }
+    ]
+}
