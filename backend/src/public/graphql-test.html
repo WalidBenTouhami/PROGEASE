@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>GraphQL Explorer - PROGEASE v2</title>
+    <title>GraphQL Explorer - PROGEASE</title>
     <style>
         body {
             font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
@@ -69,6 +69,15 @@
             cursor: pointer;
             font-weight: 500;
             align-self: flex-start;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background: #2A3366;
+        }
+
+        button:active {
+            transform: translateY(1px);
         }
 
         pre {
@@ -97,6 +106,18 @@
             transition: width 0.5s ease;
         }
 
+        .error {
+            color: #d32f2f;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .success {
+            color: #2e7d32;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
         footer {
             background: #f1f1f1;
             padding: 15px 20px;
@@ -105,12 +126,29 @@
             font-size: 14px;
             color: #666;
         }
+
+        .query-editor {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .query-editor textarea {
+            width: 100%;
+            min-height: 120px;
+            font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 4px;
+        }
     </style>
 </head>
 
 <body>
 <header>
-    <h1>PROGEASE GraphQL v4</h1>
+    <h1>PROGEASE GraphQL Explorer</h1>
     <div>
         <a href="/graphql" class="sandbox-link" target="_blank">📊 Ouvrir Apollo Sandbox</a>
     </div>
@@ -121,54 +159,106 @@
         <h2>Informations</h2>
         <p>Cette interface vous permet de tester l'API GraphQL de PROGEASE.</p>
         <p>Pour une expérience complète, utilisez Apollo Sandbox en cliquant sur le bouton ci-dessus.</p>
+        <div id="status-message"></div>
         <div class="status-bar"><div id="status" style="width:0%"></div></div>
     </div>
 
     <div class="card test-area">
         <h2>Test Rapide</h2>
-        <button id="queryBtn">Exécuter la requête de test</button>
+        <div class="query-editor">
+            <textarea id="queryInput">query TestQuery {
+  health {
+    status
+    timestamp
+    user
+  }
+  projets {
+    _id
+    titre
+    description
+    statut
+  }
+}</textarea>
+        </div>
+        <button id="queryBtn">Exécuter la requête</button>
         <pre id="output">// Résultat de la requête s'affichera ici...</pre>
+    </div>
+
+    <div class="card">
+        <h2>Documentation</h2>
+        <p>Pour accéder à la documentation complète du schéma GraphQL, utilisez Apollo Sandbox.</p>
+        <p>Exemples de requêtes:</p>
+        <pre>
+# Récupérer les projets
+query {
+  projets {
+    _id
+    titre
+    description
+    statut
+  }
+}
+
+# Récupérer les livrables
+query {
+  livrables {
+    _id
+    titre
+    description
+    statut
+    projetId
+  }
+}</pre>
     </div>
 </main>
 
 <footer>
-    PROGEASE v2 | Utilisateur: WalidBenTouhami | Date: 2025-05-23 13:16:52
+    PROGEASE | Utilisateur: WalidBenTouhami | Date: 2025-05-27 18:56:24
 </footer>
 
 <script>
     document.getElementById('queryBtn').addEventListener('click', function() {
         const output = document.getElementById('output');
         const status = document.getElementById('status');
-        output.textContent = '// Chargement...';
+        const statusMessage = document.getElementById('status-message');
+        const queryInput = document.getElementById('queryInput').value;
+
+        // Réinitialiser l'interface
+        status.style.background = '#4D61FC';
         status.style.width = '30%';
+        statusMessage.className = '';
+        statusMessage.textContent = '';
+        output.textContent = '// Chargement...';
 
         fetch('/graphql', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                query: `
-            query TestQuery {
-              health {
-                status
-                timestamp
-                user
-              }
-              projets {
-                _id
-                titre
-                description
-              }
-            }
-          `
+                query: queryInput
             })
         })
             .then(res => {
                 status.style.width = '70%';
+                if (!res.ok) {
+                    throw new Error(`Erreur réseau: ${res.status} ${res.statusText}`);
+                }
                 return res.json();
             })
             .then(data => {
                 status.style.width = '100%';
+
+                // Vérifier s'il y a des erreurs GraphQL
+                if (data.errors && data.errors.length > 0) {
+                    status.style.background = '#d32f2f';
+                    statusMessage.className = 'error';
+                    statusMessage.textContent = 'Erreur GraphQL: ' + data.errors[0].message;
+                } else {
+                    statusMessage.className = 'success';
+                    statusMessage.textContent = 'Requête exécutée avec succès!';
+                }
+
                 output.textContent = JSON.stringify(data, null, 2);
+
                 setTimeout(() => {
                     status.style.width = '0%';
                 }, 2000);
@@ -176,8 +266,16 @@
             .catch(err => {
                 status.style.width = '100%';
                 status.style.background = '#d32f2f';
+                statusMessage.className = 'error';
+                statusMessage.textContent = err.message;
                 output.textContent = '// Erreur: ' + err.message;
             });
+    });
+
+    // Initialiser avec la date et l'utilisateur actuel
+    document.addEventListener('DOMContentLoaded', function() {
+        const footer = document.querySelector('footer');
+        footer.textContent = 'PROGEASE | Utilisateur: WalidBenTouhami | Date: 2025-05-27 18:56:24';
     });
 </script>
 </body>

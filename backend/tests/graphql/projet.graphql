@@ -1,0 +1,43 @@
+# Tests GraphQL pour Projet
+# Générés automatiquement le 2025-05-27 19:27:50
+# Auteur: WalidBenTouhami
+
+# Requête pour récupérer tous les projets
+query GetAllProjets {
+  projet {
+    _id
+    _id
+    titre
+    description
+    tuteur
+    dateDebut
+    dateFin
+    statut
+    progression
+    creeLe
+    majLe
+  }
+}
+
+# Requête pour récupérer un projet spécifique
+query GetProjetById($id: ID!) {
+  projet(id: $id) {
+    _id
+    _id
+    titre
+    description
+    tuteur
+    dateDebut
+    dateFin
+    statut
+    progression
+    creeLe
+    majLe
+  }
+}
+
+# Variables:
+# {
+#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
+# }
+

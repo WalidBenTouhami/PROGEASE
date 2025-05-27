@@ -1,0 +1,47 @@
+# Tests GraphQL pour Livrable
+# Générés automatiquement le 2025-05-27 19:27:50
+# Auteur: WalidBenTouhami
+
+# Requête pour récupérer tous les livrables
+query GetAllLivrables {
+  livrable {
+    _id
+    _id
+    intitule
+    titre
+    nom
+    description
+    dateEcheance
+    dateLimite
+    urlDepot
+    statut
+    projetId
+    creeLe
+    majLe
+  }
+}
+
+# Requête pour récupérer un livrable spécifique
+query GetLivrableById($id: ID!) {
+  livrable(id: $id) {
+    _id
+    _id
+    intitule
+    titre
+    nom
+    description
+    dateEcheance
+    dateLimite
+    urlDepot
+    statut
+    projetId
+    creeLe
+    majLe
+  }
+}
+
+# Variables:
+# {
+#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
+# }
+
