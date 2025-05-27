@@ -3,6 +3,7 @@
  * Intégration avec Express et configuration des plugins Apollo
  *
  * @module graphql/standalone-server
+ * @modified 2025-05-27 par WalidBenTouhami
  */
 
 'use strict';
@@ -21,6 +22,7 @@ const { ApolloServerPluginInlineTrace } = require('@apollo/server/plugin/inlineT
 const { readFileSync } = require('fs');
 const { gql } = require('graphql-tag');
 const path = require('path');
+const crypto = require('crypto');
 
 // Imports modules personnalisés
 const logger = require('../utils/logger');
@@ -34,8 +36,9 @@ const {
 } = require('../../config/env');
 const { GraphQLRateLimiterPlugin } = require('../plugins/rateLimiter');
 
-// Importation des resolvers
-const resolvers = require('./resolvers');
+// Importation des resolvers et DataLoaders
+const resolvers = require('./resolvers/index');
+const { initLoaders } = require('./resolvers/index');
 
 /**
  * Charge le schéma GraphQL depuis un fichier
@@ -63,7 +66,7 @@ function loadSchemaFromFile(schemaPath) {
 
 /**
  * Configure les plugins Apollo en fonction de l'environnement
- * @param {boolean} isDevEnv - Indique si l'environnement est de développement
+ * @param {http.Server} httpServer - Serveur HTTP Express
  * @returns {Array} Liste des plugins Apollo configurés
  */
 function configureApolloPlugins(httpServer) {
@@ -150,7 +153,7 @@ async function createStandaloneServer(app, httpServer) {
     const server = new ApolloServer({
       schema,
       formatError: formatGraphQLError, // Utiliser notre formateur d'erreur amélioré
-      introspection: isDev(), // Désactiver l'introspection en production
+      introspection: true, // Activer l'introspection même en production pour Apollo Sandbox
       plugins: configureApolloPlugins(httpServer),
       nodeEnv: NODE_ENV,
       cache: 'bounded', // Cache à taille limitée pour éviter les fuites mémoire
@@ -163,7 +166,7 @@ async function createStandaloneServer(app, httpServer) {
     // Ajouter le middleware de contexte
     app.use((req, res, next) => {
       // Initialiser un ID de requête unique pour le traçage
-      req.requestId = req.requestId || require('crypto').randomUUID();
+      req.requestId = req.requestId || crypto.randomUUID();
 
       // Enrichir l'objet req avec les informations utilisateur
       // Note: dans une app réelle, cela viendrait de l'authentification
@@ -181,6 +184,9 @@ async function createStandaloneServer(app, httpServer) {
                 throw new AppError('Requête invalide', 400, 'ERR_INVALID_REQUEST');
               }
 
+              // Initialiser les DataLoaders
+              const loaders = initLoaders();
+
               // Construire le contexte avec les informations utiles
               return {
                 user: req.user,
@@ -188,6 +194,7 @@ async function createStandaloneServer(app, httpServer) {
                 requestId: req.requestId,
                 ip: req.ip,
                 userAgent: req.get('user-agent'),
+                loaders, // Ajouter les DataLoaders au contexte
                 // Ajouter la réponse pour manipuler les en-têtes si nécessaire
                 res
               };
@@ -201,6 +208,7 @@ async function createStandaloneServer(app, httpServer) {
                 timestamp: Date.now(),
                 requestId: req?.requestId || 'unknown',
                 ip: req?.ip || 'unknown',
+                loaders: initLoaders(), // Toujours fournir des loaders même en cas d'erreur
                 res
               };
             }

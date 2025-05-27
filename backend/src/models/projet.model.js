@@ -1,6 +1,9 @@
 /**
- * Modèle Mongoose pour les projets
+ * Modèle Mongoose optimisé pour les projets
  * @module models/projet
+ * @version 2.0.0
+ * @updated 2025-05-27
+ * @author WalidBenTouhami
  */
 
 'use strict';
@@ -36,7 +39,13 @@ const projetSchema = new Schema({
     },
     competences: [{
         type: String,
-        trim: true
+        trim: true,
+        validate: {
+            validator: function(value) {
+                return value.length >= 2 && value.length <= 30;
+            },
+            message: 'Chaque compétence doit contenir entre 2 et 30 caractères'
+        }
     }],
     dateDebut: {
         type: Date,
@@ -80,12 +89,92 @@ const projetSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     }
+}, {
+    timestamps: {
+        createdAt: 'creeLe',
+        updatedAt: 'majLe'
+    },
+    // Activer le versionnement des documents
+    versionKey: 'version'
 });
 
-// Middleware pre-save pour mettre à jour majLe
+// Indexes pour améliorer les performances
+projetSchema.index({ titre: 'text', description: 'text' });
+projetSchema.index({ statut: 1 });
+projetSchema.index({ dateDebut: 1, dateFin: 1 });
+projetSchema.index({ tuteur: 1 });
+projetSchema.index({ creeLe: -1 }); // Pour trier par date de création décroissante
+
+/**
+ * Trouve les projets associés à un tuteur spécifique
+ * @param {ObjectId} tuteurId - ID de l'utilisateur tuteur
+ * @returns {Promise<Array>} Liste des projets triés par date de mise à jour
+ */
+projetSchema.statics.findByTuteur = function(tuteurId) {
+    return this.find({ tuteur: tuteurId }).sort({ majLe: -1 });
+};
+
+/**
+ * Trouve les projets par compétence
+ * @param {string} competence - Compétence recherchée
+ * @returns {Promise<Array>} Liste des projets correspondants
+ */
+projetSchema.statics.findByCompetence = function(competence) {
+    return this.find({ competences: { $in: [competence] } }).sort({ majLe: -1 });
+};
+
+/**
+ * Vérifie si le projet est actuellement actif (entre date début et fin)
+ * @returns {boolean} True si le projet est actif, false sinon
+ */
+projetSchema.methods.isActif = function() {
+    const now = new Date();
+    return now >= this.dateDebut && now <= this.dateFin;
+};
+
+/**
+ * Vérifie si le projet est en retard par rapport à la planification
+ * @returns {boolean} True si le projet est en retard
+ */
+projetSchema.methods.isEnRetard = function() {
+    if (this.statut === STATUTS_PROJET.TERMINE) return false;
+
+    const now = new Date();
+    const totalDuration = this.dateFin - this.dateDebut;
+    const elapsedDuration = now - this.dateDebut;
+    const progressPercentage = (elapsedDuration / totalDuration) * 100;
+
+    // Si plus de 75% du temps est écoulé et statut n'est pas TERMINE ou EN_VALIDATION
+    return progressPercentage > 75 &&
+        ![STATUTS_PROJET.TERMINE, STATUTS_PROJET.EN_VALIDATION].includes(this.statut);
+};
+
+/**
+ * Middleware: Vérification avant suppression d'un projet
+ * Empêche la suppression si des livrables sont associés
+ */
+projetSchema.pre('remove', async function(next) {
+    try {
+        const Livrable = mongoose.model('Livrable');
+        const count = await Livrable.countDocuments({ projetId: this._id });
+        if (count > 0) {
+            return next(new Error(`Ce projet contient ${count} livrable(s) et ne peut pas être supprimé. Supprimez d'abord les livrables.`));
+        }
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
+/**
+ * Middleware: Mise à jour des dates avant chaque opération de sauvegarde
+ * Note: Ce middleware est redondant avec l'option timestamps, mais est conservé
+ * pour garantir la compatibilité avec le code existant.
+ */
 projetSchema.pre('save', function(next) {
     this.majLe = Date.now();
     next();
 });
 
+// Créer et exporter le modèle Projet
 module.exports = mongoose.model('Projet', projetSchema);

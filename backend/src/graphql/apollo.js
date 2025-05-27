@@ -7,19 +7,45 @@
 
 const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
-const { typeDefs, resolvers } = require('./graphql/schema');
-const logger = require('./utils/logger');
+const { ApolloServerPluginLandingPageDisabled } = require('@apollo/server/plugin/disabled');
+const { ApolloServerPluginLandingPageLocalDefault } = require('@apollo/server/plugin/landingPage/default');
+const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
+const http = require('http');
+const { typeDefs } = require('../graphql/schema');
+const logger = require('../utils/logger');
+const resolvers = require('./resolvers/index');
 
 /**
  * Crée et démarre une instance Apollo Server
+ * @param {http.Server} httpServer - Serveur HTTP Express (optionnel)
+ * @param {Object} options - Options supplémentaires pour Apollo Server
  * @returns {Promise<ApolloServer>} Instance Apollo Server démarrée
  */
-async function createApolloServer() {
+async function createApolloServer(httpServer = null, options = {}) {
+    // Configuration des plugins
+    const plugins = [
+        // Plugin de fermeture propre du serveur HTTP
+        ...(httpServer ? [ApolloServerPluginDrainHttpServer({ httpServer })] : []),
+
+        // Page d'accueil GraphQL différente selon l'environnement
+        process.env.NODE_ENV === 'production'
+            ? ApolloServerPluginLandingPageDisabled()
+            : ApolloServerPluginLandingPageLocalDefault({ footer: false })
+    ];
+
+    // Ajout des plugins personnalisés
+    if (options.plugins) {
+        plugins.push(...options.plugins);
+    }
+
     // Création du serveur avec la configuration
     const server = new ApolloServer({
         typeDefs,
         resolvers,
-        introspection: process.env.NODE_ENV !== 'production', // Sécurité: désactivé en production
+        introspection: process.env.NODE_ENV !== 'production',
+        csrfPrevention: process.env.NODE_ENV === 'production',
+        cache: 'bounded',
+        plugins,
         formatError: (formattedError, error) => {
             // Log de l'erreur pour le débogage
             logger.error(`GraphQL Error: ${formattedError.message}`, {
@@ -41,13 +67,13 @@ async function createApolloServer() {
             return {
                 ...formattedError,
                 timestamp: new Date().toISOString(),
-                // Utiliser dynamiquement l'utilisateur du contexte si disponible
-                user: error.originalError?.context?.user?.username || 'SYSTEM'
+                user: error.originalError?.context?.user?.username || 'SYSTEM',
+                stacktrace: error.originalError?.stack || formattedError.extensions?.exception?.stacktrace
             };
-        }
+        },
+        ...options
     });
 
-    // CRITIQUE: démarrer Apollo avant de créer le middleware
     await server.start();
     logger.info('Apollo Server 4 démarré avec succès');
 
@@ -62,11 +88,28 @@ async function createApolloServer() {
  */
 function createApolloMiddleware(server, options = {}) {
     return expressMiddleware(server, {
-        context: async ({ req }) => ({
+        context: async ({ req, res }) => {
             // Extraction du contexte à partir de la requête
-            user: req.user, // Supposant que l'authentification est gérée ailleurs
-            ...options.context
-        })
+            const context = {
+                // Utilisateur authentifié
+                user: req.user,
+
+                // Ajout de l'objet requête pour accéder aux headers
+                req,
+
+                // Ajout de l'objet réponse pour les en-têtes personnalisés
+                res,
+
+                // Ajout d'un timestamp pour calculer la durée d'exécution
+                requestStartTime: Date.now()
+            };
+
+            // Fusionner avec le contexte personnalisé fourni dans les options
+            return {
+                ...context,
+                ...options.context
+            };
+        }
     });
 }
 
