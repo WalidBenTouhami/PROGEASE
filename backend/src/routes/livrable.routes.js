@@ -1,9 +1,24 @@
+// src/routes/livrable.routes.js
 const express = require('express');
 const router = express.Router();
 const livrableController = require('../controllers/livrable.controller');
 const { validateLivrableData, validateId } = require('../validations/livrable.validation');
 const { asyncHandler } = require('../middleware/asyncHandler');
 const rateLimiter = require('../middleware/rateLimiter');
+
+/**
+ * @route GET /api/livrables/health
+ * @description Vérifier la santé de l'API livrables
+ * @access Public
+ */
+router.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'ok',
+        service: 'livrables-api',
+        timestamp: new Date().toISOString(),
+        user: req.currentUser || 'anonymous'
+    });
+});
 
 /**
  * @route GET /api/livrables
@@ -65,19 +80,5 @@ router.delete('/:livrableId',
     validateId('livrableId'),
     asyncHandler(livrableController.delete)
 );
-
-/**
- * @route GET /api/livrables/health
- * @description Vérifier la santé de l'API livrables
- * @access Public
- */
-router.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'ok',
-        service: 'livrables-api',
-        timestamp: new Date().toISOString(),
-        user: req.currentUser || 'anonymous'
-    });
-});
 
 module.exports = router;

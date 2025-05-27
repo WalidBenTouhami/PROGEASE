@@ -13,7 +13,6 @@ const logger = require('../../utils/logger');
 const { AppError, ERROR_CODES } = require('../../middleware/errorHandlers');
 const { validateInput } = require('../../utils/validators');
 const { handleMongooseError } = require('../../utils/errorUtils');
-const authUtils = require('../../utils/authUtils');
 
 /**
  * Transforme un document MongoDB Projet en type GraphQL

@@ -13,742 +13,146 @@ Scalar personnalisé pour manipuler les dates ISO-8601
 """
 scalar Date
 
-# ENUM_DEFINITIONS
 """
-Énumération des statuts de projet
+Type représentant un projet
 """
-enum StatutProjet {
-    """Projet en phase d'initialisation"""
-    PROPOSE
-    """Projet en cours de réalisation"""
-    EN_COURS
-    """Projet terminé mais pas encore archivé"""
-    TERMINE
-    """Projet archivé"""
-    ARCHIVE
-    """Projet annulé"""
-    ANNULE
-}
-
-"""
-Énumération des statuts de livrable
-"""
-enum StatutLivrable {
-    """Livrable en attente de traitement"""
-    EN_ATTENTE
-    """Livrable en cours de réalisation"""
-    EN_COURS
-    """Livrable terminé en attente de validation"""
-    A_VALIDER
-    """Livrable validé"""
-    VALIDE
-    """Livrable rejeté"""
-    REJETE
-    """Livrable en retard"""
-    EN_RETARD
-    """Livrable terminé et validé"""
-    TERMINE
-    """Livrable planifié"""
-    PLANIFIE
-}
-
-"""
-Interface pour les entités avec identifiant
-"""
-interface Node {
-    """
-    Identifiant unique
-    """
+type Projet {
+    """Identifiant unique du projet"""
     _id: ID!
+    """Titre du projet"""
+    titre: String!
+    """Description du projet"""
+    description: String
+    """Liste des membres de l'équipe projet"""
+    equipe: [String]
+    """Tuteur du projet"""
+    tuteur: String
+    """Liste des compétences requises"""
+    competences: [String]
+    """Date de début du projet"""
+    dateDebut: Date
+    """Date de fin prévue du projet"""
+    dateFin: Date
+    """Liste des livrables associés au projet"""
+    livrables: [ID]
+    """Statut actuel du projet"""
+    statut: String
+    """Pourcentage de progression du projet"""
+    progression: Int
+    """Date de création du projet"""
+    creeLe: Date
+    """Date de dernière modification du projet"""
+    majLe: Date
 }
 
 """
-Interface pour les entités traçables
+Type représentant un livrable
 """
-interface Traceable {
-    """
-    Date de création
-    """
-    creeLe: Date!
-
-    """
-    Date de dernière modification
-    """
-    majLe: Date!
-
-    """
-    Utilisateur ayant créé l'entité
-    """
-    createur: ID
-
-    """
-    Utilisateur ayant modifié l'entité
-    """
-    majPar: ID
-}
-
-"""
-Informations de pagination pour les listes
-"""
-type PaginationInfo {
-    """
-    Nombre total d'éléments
-    """
-    total: Int!
-
-    """
-    Nombre total de pages
-    """
-    pages: Int!
-
-    """
-    Page actuelle
-    """
-    page: Int!
-
-    """
-    Nombre d'éléments par page
-    """
-    limit: Int!
-
-    """
-    Indique s'il y a une page suivante
-    """
-    hasNextPage: Boolean!
-
-    """
-    Indique s'il y a une page précédente
-    """
-    hasPreviousPage: Boolean!
-}
-
-"""
-Type de base pour les réponses paginées
-"""
-interface PaginatedResponse {
-    """
-    Informations de pagination
-    """
-    pagination: PaginationInfo!
-}
-
-"""
-Type de livrable pour un projet
-"""
-type Livrable implements Node & Traceable @key(fields: "_id") @shareable {
-    """
-    Identifiant unique
-    """
+type Livrable {
+    """Identifiant unique du livrable"""
     _id: ID!
-
-    """
-    Nom du livrable
-    """
-    nom: String!
-
-    """
-    Description détaillée
-    """
-    description: String!
-
-    """
-    Date limite de livraison
-    """
-    dateLimite: Date!
-
-    """
-    URL du dépôt
-    """
+    """Titre du livrable (principal)"""
+    intitule: String!
+    """Alias pour le titre (compatibilité)"""
+    titre: String
+    """Alias pour le titre (compatibilité)"""
+    nom: String
+    """Description du livrable"""
+    description: String
+    """Date limite de remise"""
+    dateLimite: Date
+    """Alias pour la date limite (compatibilité)"""
+    dateEcheance: Date
+    """URL de dépôt du livrable"""
     urlDepot: String
-
-    """
-    Statut actuel du livrable
-    """
-    statut: StatutLivrable!
-
-    """
-    ID du projet associé
-    """
+    """Statut actuel du livrable"""
+    statut: String
+    """Projet associé au livrable"""
     projetId: ID!
-
-    """
-    Projet associé au livrable
-    """
-    projet: Projet
-
-    """
-    Date de création
-    """
-    creeLe: Date!
-
-    """
-    Date de dernière modification
-    """
-    majLe: Date!
-
-    """
-    Utilisateur ayant créé le livrable
-    """
-    createur: ID
-
-    """
-    Utilisateur ayant modifié le livrable
-    """
-    majPar: ID
+    """Date de création du livrable"""
+    creeLe: Date
+    """Date de dernière modification du livrable"""
+    majLe: Date
 }
 
 """
-Liste paginée de livrables
+Input pour la création d'un projet
 """
-type LivrablesConnection implements PaginatedResponse {
-    """
-    Liste des livrables
-    """
-    items: [Livrable!]!
-
-    """
-    Informations de pagination
-    """
-    pagination: PaginationInfo!
+input ProjetInput {
+    """Titre du projet"""
+    titre: String!
+    """Description du projet"""
+    description: String
+    """Liste des membres de l'équipe projet"""
+    equipe: [String]
+    """Tuteur du projet"""
+    tuteur: String
+    """Liste des compétences requises"""
+    competences: [String]
+    """Date de début du projet"""
+    dateDebut: Date
+    """Date de fin prévue du projet"""
+    dateFin: Date
 }
 
 """
-Données d'entrée pour un livrable
+Input pour la création d'un livrable
 """
 input LivrableInput {
-    """
-    Nom du livrable
-    """
-    nom: String!
-
-    """
-    Description détaillée
-    """
-    description: String!
-
-    """
-    Date limite de livraison
-    """
-    dateLimite: Date!
-
-    """
-    URL du dépôt
-    """
-    urlDepot: String
-
-    """
-    Statut du livrable
-    """
-    statut: StatutLivrable!
-}
-
-"""
-Filtres pour la recherche de livrables
-"""
-input LivrableFilterInput {
-    """
-    Statut du livrable
-    """
-    statut: StatutLivrable
-
-    """
-    Terme de recherche (nom et description)
-    """
-    recherche: String
-
-    """
-    Date limite minimale
-    """
-    dateLimiteMin: Date
-
-    """
-    Date limite maximale
-    """
-    dateLimiteMax: Date
-}
-
-"""
-Type de projet
-"""
-type Projet implements Node & Traceable @key(fields: "_id") {
-    """
-    Identifiant unique
-    """
-    _id: ID!
-
-    """
-    Titre du projet
-    """
-    titre: String!
-
-    """
-    Description détaillée
-    """
-    description: String!
-
-    """
-    Membres de l'équipe
-    """
-    equipe: [ID!]!
-
-    """
-    Tuteur du projet
-    """
-    tuteur: ID
-
-    """
-    Compétences requises
-    """
-    competences: [String!]!
-
-    """
-    Date de début du projet
-    """
-    dateDebut: Date!
-
-    """
-    Date de fin prévue
-    """
-    dateFin: Date!
-
-    """
-    Livrables associés
-    """
-    livrables: [Livrable!]!
-
-    """
-    Statut actuel du projet
-    """
-    statut: StatutProjet!
-
-    """
-    Pourcentage de progression
-    """
-    progression: Int
-
-    """
-    Date de création
-    """
-    creeLe: Date!
-
-    """
-    Date de dernière modification
-    """
-    majLe: Date!
-
-    """
-    Utilisateur ayant créé le projet
-    """
-    createur: ID
-
-    """
-    Utilisateur ayant modifié le projet
-    """
-    majPar: ID
-}
-
-"""
-Liste paginée de projets
-"""
-type ProjetsConnection implements PaginatedResponse {
-    """
-    Liste des projets
-    """
-    items: [Projet!]!
-
-    """
-    Informations de pagination
-    """
-    pagination: PaginationInfo!
-}
-
-"""
-Type d'entrée pour création d'un projet
-"""
-input ProjetCreateInput {
-    """
-    Titre du projet
-    """
-    titre: String!
-
-    """
-    Description détaillée du projet
-    """
-    description: String!
-
-    """
-    Liste des membres de l'équipe
-    """
-    equipe: [ID!]!
-
-    """
-    Tuteur assigné au projet
-    """
-    tuteur: ID
-
-    """
-    Liste des compétences requises
-    """
-    competences: [String!]!
-
-    """
-    Date de début du projet
-    """
-    dateDebut: Date!
-
-    """
-    Date de fin prévue du projet
-    """
-    dateFin: Date!
-
-    """
-    Statut initial du projet
-    """
-    statut: StatutProjet
-}
-
-"""
-Type d'entrée pour mise à jour d'un projet
-"""
-input ProjetUpdateInput {
-    """
-    Titre du projet
-    """
-    titre: String
-
-    """
-    Description détaillée du projet
-    """
+    """Titre du livrable"""
+    intitule: String!
+    """Description du livrable"""
     description: String
-
-    """
-    Liste des membres de l'équipe
-    """
-    equipe: [ID!]
-
-    """
-    Tuteur assigné au projet
-    """
-    tuteur: ID
-
-    """
-    Liste des compétences requises
-    """
-    competences: [String!]
-
-    """
-    Date de début du projet
-    """
-    dateDebut: Date
-
-    """
-    Date de fin prévue du projet
-    """
-    dateFin: Date
-
-    """
-    Statut du projet
-    """
-    statut: StatutProjet
+    """Date limite de remise"""
+    dateEcheance: Date
+    """URL de dépôt du livrable"""
+    urlDepot: String
+    """Statut actuel du livrable"""
+    statut: String
+    """Projet associé au livrable"""
+    projetId: ID!
 }
 
 """
-Filtres pour la recherche de projets
+Résultat de l'analyse IA
 """
-input ProjetFilterInput {
-    """
-    Statut du projet
-    """
-    statut: StatutProjet
-
-    """
-    Terme de recherche (titre et description)
-    """
-    recherche: String
-
-    """
-    Date de début minimale
-    """
-    dateDebutMin: Date
-
-    """
-    Date de fin maximale
-    """
-    dateFinMax: Date
-
-    """
-    Identifiant du tuteur
-    """
-    tuteurId: ID
-
-    """
-    Identifiants des membres de l'équipe
-    """
-    membreEquipe: ID
-
-    """
-    Compétences requises
-    """
-    competence: String
+type AnalyseIA {
+    """Sentiment général"""
+    sentiment: String
+    """Score de sentiment (entre -1 et 1)"""
+    score: Float
+    """Entités détectées"""
+    entites: [String]
+    """Mots-clés identifiés"""
+    motsCles: [String]
+    """Résumé du contenu"""
+    resume: String
 }
 
-"""
-Code d'erreur pour les résultats d'opération
-"""
-enum ErrorCode {
-    VALIDATION_ERROR
-    NOT_FOUND
-    UNAUTHORIZED
-    FORBIDDEN
-    INTERNAL_ERROR
-    DUPLICATE_ENTITY
-    INVALID_INPUT
-    DEPENDENCY_ERROR
-}
-
-"""
-Résultat d'opération standard
-"""
-interface OperationResult {
-    """
-    Indique si l'opération a réussi
-    """
-    success: Boolean!
-
-    """
-    Message associé à l'opération
-    """
-    message: String
-
-    """
-    Code d'erreur en cas d'échec
-    """
-    errorCode: ErrorCode
-}
-
-"""
-Résultat d'opération avec un projet
-"""
-type ProjetResult implements OperationResult {
-    """
-    Indique si l'opération a réussi
-    """
-    success: Boolean!
-
-    """
-    Message associé à l'opération
-    """
-    message: String
-
-    """
-    Code d'erreur en cas d'échec
-    """
-    errorCode: ErrorCode
-
-    """
-    Projet résultant de l'opération
-    """
-    projet: Projet
-}
-
-"""
-Résultat d'opération avec un livrable
-"""
-type LivrableResult implements OperationResult {
-    """
-    Indique si l'opération a réussi
-    """
-    success: Boolean!
-
-    """
-    Message associé à l'opération
-    """
-    message: String
-
-    """
-    Code d'erreur en cas d'échec
-    """
-    errorCode: ErrorCode
-
-    """
-    Livrable résultant de l'opération
-    """
-    livrable: Livrable
-}
-
-"""
-État de santé du serveur
-"""
-type HealthStatus {
-    """
-    État actuel
-    """
-    status: String!
-
-    """
-    Horodatage
-    """
-    timestamp: Date!
-
-    """
-    Utilisateur
-    """
-    user: String!
-
-    """
-    Version de l'API
-    """
-    version: String
-
-    """
-    État de la base de données
-    """
-    databaseStatus: String
-}
-
-"""
-Requêtes disponibles
-"""
 type Query {
-    """
-    Liste des projets avec pagination et filtres
-    """
-    projets(
-        """
-        Page à récupérer (démarre à 1)
-        """
-        page: Int = 1
-        """
-        Nombre d'éléments par page
-        """
-        limit: Int = 10
-        """
-        Filtres à appliquer
-        """
-        filter: ProjetFilterInput
-    ): ProjetsConnection!
-
-    """
-    Récupérer un projet par son ID
-    """
-    projet(
-        """
-        Identifiant du projet
-        """
-        id: ID!
-    ): Projet
-
-    """
-    Liste des livrables avec pagination et filtres
-    """
-    livrables(
-        """
-        Identifiant du projet parent (optionnel)
-        """
-        projetId: ID
-        """
-        Page à récupérer (démarre à 1)
-        """
-        page: Int = 1
-        """
-        Nombre d'éléments par page
-        """
-        limit: Int = 10
-        """
-        Filtres à appliquer
-        """
-        filter: LivrableFilterInput
-    ): LivrablesConnection!
-
-    """
-    Récupérer un livrable par son ID
-    """
-    livrable(
-        """
-        Identifiant du livrable
-        """
-        id: ID!
-    ): Livrable
-
-    """
-    État de santé du serveur
-    """
-    health: HealthStatus!
+    """Récupérer tous les projets"""
+    projets: [Projet]
+    """Récupérer un projet par son ID"""
+    projet(id: ID!): Projet
+    """Récupérer tous les livrables"""
+    livrables: [Livrable]
+    """Récupérer un livrable par son ID"""
+    livrable(id: ID!): Livrable
+    """Récupérer les livrables d'un projet"""
+    livrablesByProjet(projetId: ID!): [Livrable]
 }
 
-"""
-Mutations disponibles
-"""
 type Mutation {
-    """
-    Créer un nouveau projet
-    """
-    creerProjet(
-        """
-        Données du projet à créer
-        """
-        input: ProjetCreateInput!
-    ): ProjetResult!
-
-    """
-    Mettre à jour un projet existant
-    """
-    mettreAJourProjet(
-        """
-        Identifiant du projet à mettre à jour
-        """
-        id: ID!
-        """
-        Données à mettre à jour
-        """
-        input: ProjetUpdateInput!
-    ): ProjetResult!
-
-    """
-    Supprimer un projet et ses livrables associés
-    """
-    supprimerProjet(
-        """
-        Identifiant du projet à supprimer
-        """
-        id: ID!
-    ): ProjetResult!
-
-    """
-    Ajouter un livrable à un projet
-    """
-    ajouterLivrable(
-        """
-        Identifiant du projet parent
-        """
-        projetId: ID!
-        """
-        Données du livrable à ajouter
-        """
-        input: LivrableInput!
-    ): LivrableResult!
-
-    """
-    Mettre à jour un livrable existant
-    """
-    mettreAJourLivrable(
-        """
-        Identifiant du livrable à mettre à jour
-        """
-        livrableId: ID!
-        """
-        Données à mettre à jour
-        """
-        input: LivrableInput!
-    ): LivrableResult!
-
-    """
-    Supprimer un livrable
-    """
-    supprimerLivrable(
-        """
-        Identifiant du livrable à supprimer
-        """
-        livrableId: ID!
-    ): LivrableResult!
+    """Créer un nouveau projet"""
+    creerProjet(input: ProjetInput!): Projet
+    """Mettre à jour un projet existant"""
+    mettreAJourProjet(id: ID!, input: ProjetInput!): Projet
+    """Supprimer un projet"""
+    supprimerProjet(id: ID!): Projet
+    """Créer un nouveau livrable"""
+    creerLivrable(input: LivrableInput!): Livrable
+    """Mettre à jour un livrable existant"""
+    mettreAJourLivrable(id: ID!, input: LivrableInput!): Livrable
+    """Supprimer un livrable"""
+    supprimerLivrable(id: ID!): Livrable
 }

@@ -12,6 +12,7 @@ const connecterBD = require('./config/db');
 const { createStandaloneServer } = require('./src/graphql/standalone-server');
 const { NODE_ENV } = require('./config/constants');
 const { globalRateLimiter } = require('./src/middleware/rateLimiter');
+
 const {
     ERROR_MESSAGES,
     setupProcessErrorHandlers,
@@ -111,8 +112,8 @@ app.get('/health', (req, res) => {
         user: req.currentUser || 'anonymous',
         version: '2.0.0',
         graphqlVersion: '4.0',
-        environment: process.env.NODE_ENV || 'development',
-        uptime: Math.floor(uptime) // Ajouter cette ligne
+        environment: NODE_ENV,
+        uptime: Math.floor(uptime) // Important pour les tests
     });
 });
 
@@ -122,6 +123,17 @@ async function startServer() {
         // Connexion à la base de données
         await connecterBD(process.env.MONGO_URI || 'mongodb://localhost:27017/progease');
         logger.info('Connecté à MongoDB avec succès');
+
+        // Créer les données de test pour Newman
+        try {
+            const { createTestData } = require('./src/utils/testData');
+            if (NODE_ENV === 'development') {
+                await createTestData();
+                logger.info('Données de test créées/vérifiées avec succès');
+            }
+        } catch (error) {
+            logger.warn('Impossible de créer les données de test:', error.message);
+        }
 
         // Configuration du serveur GraphQL avant les middlewares d'erreur
         try {
