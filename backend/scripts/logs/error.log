@@ -1,0 +1,240 @@
+[undefined] ERROR: ❌ Erreur lors de la génération du schéma: ENOENT: no such file or directory, open 'D:\pi\PROGEASE\backend\scripts\"""
+Schéma GraphQL pour PROGEASE
+"""
+
+type Query {
+    """
+    Informations sur l'état du système
+    """
+    health: Health!
+
+    """
+    Liste de tous les projets
+    """
+    projets: [Projet!]!
+
+    """
+    Obtenir un projet par son ID
+    """
+    projet(id: ID!): Projet
+
+    """
+    Liste de tous les livrables
+    """
+    livrables: [Livrable!]!
+
+    """
+    Obtenir un livrable par son ID
+    """
+    livrable(id: ID!): Livrable
+}
+
+type Mutation {
+    """
+    Créer un nouveau projet
+    """
+    createProjet(input: ProjetInput!): Projet!
+
+    """
+    Mettre à jour un projet existant
+    """
+    updateProjet(id: ID!, input: ProjetInput!): Projet!
+
+    """
+    Supprimer un projet
+    """
+    deleteProjet(id: ID!): DeleteResponse!
+
+    """
+    Créer un nouveau livrable
+    """
+    createLivrable(input: LivrableInput!): Livrable!
+
+    """
+    Mettre à jour un livrable existant
+    """
+    updateLivrable(id: ID!, input: LivrableInput!): Livrable!
+
+    """
+    Supprimer un livrable
+    """
+    deleteLivrable(id: ID!): DeleteResponse!
+}
+
+type Health {
+    status: String!
+    timestamp: String!
+    user: String!
+    version: String!
+    uptime: Float!
+}
+
+type Projet {
+    _id: ID!
+    titre: String!
+    description: String
+    statut: String
+    dateDebut: String
+    dateFin: String
+    livrables: [Livrable]
+}
+
+input ProjetInput {
+    titre: String!
+    description: String
+    statut: String
+    dateDebut: String
+    dateFin: String
+}
+
+type Livrable {
+    _id: ID!
+    titre: String!
+    description: String
+    statut: String
+    dateEcheance: String
+    projetId: ID
+    projet: Projet
+}
+
+input LivrableInput {
+    titre: String!
+    description: String
+    statut: String
+    dateEcheance: String
+    projetId: ID
+}
+
+type PaginationInfo {
+    totalItems: Int!
+    totalPages: Int!
+    currentPage: Int!
+    pageSize: Int!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+}
+
+type DeleteResponse {
+    success: Boolean!
+    message: String
+}' {"metadata":{"service":"progease-api","timestamp":"2025-05-28 12:00:04"}}
+[undefined] ERROR: ❌ Erreur lors de la génération du schéma: ENOENT: no such file or directory, open 'D:\pi\PROGEASE\backend\scripts\"""
+Schéma GraphQL pour PROGEASE
+"""
+
+type Query {
+    """
+    Informations sur l'état du système
+    """
+    health: Health!
+
+    """
+    Liste de tous les projets
+    """
+    projets: [Projet!]!
+
+    """
+    Obtenir un projet par son ID
+    """
+    projet(id: ID!): Projet
+
+    """
+    Liste de tous les livrables
+    """
+    livrables: [Livrable!]!
+
+    """
+    Obtenir un livrable par son ID
+    """
+    livrable(id: ID!): Livrable
+}
+
+type Mutation {
+    """
+    Créer un nouveau projet
+    """
+    createProjet(input: ProjetInput!): Projet!
+
+    """
+    Mettre à jour un projet existant
+    """
+    updateProjet(id: ID!, input: ProjetInput!): Projet!
+
+    """
+    Supprimer un projet
+    """
+    deleteProjet(id: ID!): DeleteResponse!
+
+    """
+    Créer un nouveau livrable
+    """
+    createLivrable(input: LivrableInput!): Livrable!
+
+    """
+    Mettre à jour un livrable existant
+    """
+    updateLivrable(id: ID!, input: LivrableInput!): Livrable!
+
+    """
+    Supprimer un livrable
+    """
+    deleteLivrable(id: ID!): DeleteResponse!
+}
+
+type Health {
+    status: String!
+    timestamp: String!
+    user: String!
+    version: String!
+    uptime: Float!
+}
+
+type Projet {
+    _id: ID!
+    titre: String!
+    description: String
+    statut: String
+    dateDebut: String
+    dateFin: String
+    livrables: [Livrable]
+}
+
+input ProjetInput {
+    titre: String!
+    description: String
+    statut: String
+    dateDebut: String
+    dateFin: String
+}
+
+type Livrable {
+    _id: ID!
+    titre: String!
+    description: String
+    statut: String
+    dateEcheance: String
+    projetId: ID
+    projet: Projet
+}
+
+input LivrableInput {
+    titre: String!
+    description: String
+    statut: String
+    dateEcheance: String
+    projetId: ID
+}
+
+type PaginationInfo {
+    totalItems: Int!
+    totalPages: Int!
+    currentPage: Int!
+    pageSize: Int!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+}
+
+type DeleteResponse {
+    success: Boolean!
+    message: String
+}' {"metadata":{"service":"progease-api","timestamp":"2025-05-28 12:01:07"}}

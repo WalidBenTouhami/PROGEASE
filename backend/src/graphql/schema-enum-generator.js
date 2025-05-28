@@ -4,7 +4,7 @@
 'use strict';
 
 const fs = require('fs');
-const path = require('path');
+require('path');
 const {
     STATUTS_PROJET,
     STATUTS_LIVRABLE,
@@ -16,23 +16,52 @@ const {
  */
 function getConstants() {
     try {
-        if (!STATUTS_PROJET || Object.keys(STATUTS_PROJET).length === 0) {
-            throw new Error('STATUTS_PROJET est vide ou non défini');
-        }
+        // Vérifications sans throw d'exceptions
+        const defaultStatutsProjet = {
+            PROPOSE: 'PROPOSE',
+            EN_COURS: 'EN_COURS',
+            TERMINE: 'TERMINE',
+            ARCHIVE: 'ARCHIVE',
+            ANNULE: 'ANNULE'
+        };
 
+        const defaultStatutsLivrable = {
+            EN_ATTENTE: 'EN_ATTENTE',
+            EN_COURS: 'EN_COURS',
+            A_VALIDER: 'A_VALIDER',
+            VALIDE: 'VALIDE',
+            REJETE: 'REJETE',
+            EN_RETARD: 'EN_RETARD',
+            TERMINE: 'TERMINE',
+            PLANIFIE: 'PLANIFIE'
+        };
+
+        // Utiliser des conditions sans throw
+        const statutsProjet = (!STATUTS_PROJET || Object.keys(STATUTS_PROJET).length === 0)
+            ? defaultStatutsProjet
+            : STATUTS_PROJET;
+
+        const statutsLivrable = (!STATUTS_LIVRABLE || Object.keys(STATUTS_LIVRABLE).length === 0)
+            ? defaultStatutsLivrable
+            : STATUTS_LIVRABLE;
+
+        // Ajouter des logs d'avertissement si nécessaire
+        if (!STATUTS_PROJET || Object.keys(STATUTS_PROJET).length === 0) {
+            console.warn('STATUTS_PROJET est vide ou non défini, utilisation des valeurs par défaut');
+        }
         if (!STATUTS_LIVRABLE || Object.keys(STATUTS_LIVRABLE).length === 0) {
-            throw new Error('STATUTS_LIVRABLE est vide ou non défini');
+            console.warn('STATUTS_LIVRABLE est vide ou non défini, utilisation des valeurs par défaut');
         }
 
         return {
-            STATUTS_PROJET,
-            STATUTS_LIVRABLE,
+            STATUTS_PROJET: statutsProjet,
+            STATUTS_LIVRABLE: statutsLivrable,
             DESCRIPTIONS_ENUM: DESCRIPTIONS_ENUM || {}
         };
     } catch (error) {
         console.error(`Erreur lors du chargement des constantes: ${error.message}`);
 
-        // Valeurs par défaut de secours pour éviter les erreurs de type inconnu
+        // Valeurs par défaut de secours
         return {
             STATUTS_PROJET: {
                 PROPOSE: 'PROPOSE',
@@ -135,13 +164,15 @@ function injectEnumsInSchema(schemaPath) {
  */
 function generateSchemaFile(inputPath, outputPath) {
     try {
+        // Vérification sans throw d'exception
         if (!fs.existsSync(inputPath)) {
-            throw new Error(`Le fichier template n'existe pas: ${inputPath}`);
+            console.error(`Erreur: Le fichier template n'existe pas: ${inputPath}`);
+            return null; // Retourner null pour indiquer l'échec
         }
 
         const schema = injectEnumsInSchema(inputPath);
 
-        // Vérifier que StatutProjet et StatutLivrable sont définis dans le schéma
+        // Vérification
         if (!schema.includes('enum StatutProjet') || !schema.includes('enum StatutLivrable')) {
             console.warn('ATTENTION: Les énumérations StatutProjet et/ou StatutLivrable ne semblent pas être présentes dans le schéma généré.');
         }

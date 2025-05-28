@@ -187,10 +187,8 @@ async function analyzeGraphQL() {
 
     // Chercher les fichiers GraphQL dans différents endroits possibles
     const gqlFolders = [
-        path.join(__dirname, '..', 'src', 'graphql'),
-        path.join(__dirname, '..', 'src', 'schema'),
-        path.join(__dirname, '..', 'graphql')
-    ];
+        path.join(__dirname, '..', 'src'),
+        ];
 
     let gqlFiles = [];
     for (const folder of gqlFolders) {

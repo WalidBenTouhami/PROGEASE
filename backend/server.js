@@ -12,7 +12,7 @@ const connecterBD = require('./config/db');
 const { createStandaloneServer } = require('./src/graphql/standalone-server');
 const { NODE_ENV } = require('./config/constants');
 const { globalRateLimiter } = require('./src/middleware/rateLimiter');
-const { schema } = require('./codegen');
+const { schema } = require('./src/graphql/codegen');
 const { graphqlHTTP } = require('express-graphql');
 
 const {

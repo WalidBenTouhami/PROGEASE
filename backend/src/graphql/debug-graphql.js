@@ -1,7 +1,7 @@
 /**
  * PROGEASE - Console de debug GraphQL interactive
- * Date: 2025-05-28 09:48:25
- * Utilisateur: WalidBenTouhami
+ * Date : 2025-05-28 09:48:25
+ * Utilisateur : WalidBenTouhami
  */
 
 const axios = require('axios');

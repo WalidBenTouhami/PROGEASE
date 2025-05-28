@@ -1,86 +1,55 @@
-// src/graphql/standalone-server.js
-const { ApolloServer } = require('@apollo/server');
-const { expressMiddleware } = require('@apollo/server/express4');
-const { gql } = require('graphql-tag');
+'use strict';
+
 const express = require('express');
+const { createApolloServer, createApolloMiddleware } = require('../../apollo');
+const { initLoaders } = require('./index');
 const logger = require('../utils/logger');
 
-// Importations de schéma
-let typeDefs, resolvers;
-try {
-  const schemaImport = require('./schema');
-  typeDefs = schemaImport.typeDefs;
-  resolvers = schemaImport.resolvers;
-} catch (error) {
-  // Fallback vers federation.js si schema.js n'existe pas
-  try {
-    const federationImport = require('./federation');
-    typeDefs = federationImport.typeDefs;
-    resolvers = federationImport.resolvers;
-  } catch (federationError) {
-    logger.error('Impossible de charger le schéma GraphQL:', federationError);
-  }
-}
-
 /**
- * Création d'un serveur Apollo standalone
- * @param {Object} app - Application Express
- * @param {Object} httpServer - Serveur HTTP Express
+ * Configure un serveur Apollo GraphQL autonome et l'intègre à une application Express
+ *
+ * @param {express.Application} app - L'application Express existante
+ * @param {import('http').Server} httpServer - Le serveur HTTP existant
+ * @returns {Promise<void>}
  */
 async function createStandaloneServer(app, httpServer) {
-  try {
-    // Vérifier si les typeDefs et resolvers existent
-    if (!typeDefs || !resolvers) {
-      throw new Error('TypeDefs ou resolvers manquants');
-    }
+    try {
+        logger.info('Configuration du serveur Apollo standalone...');
 
-    // Conversion du typeDefs en objet DocumentNode si c'est une chaîne
-    const processedTypeDefs = typeof typeDefs === 'string' ? gql(typeDefs) : typeDefs;
-
-    // Création du serveur Apollo
-    const server = new ApolloServer({
-      typeDefs: processedTypeDefs,
-      resolvers,
-      introspection: process.env.NODE_ENV !== 'production',
-      formatError: (formattedError) => {
-        // Log les erreurs mais ne pas exposer les détails en production
-        logger.error(`GraphQL Error: ${formattedError.message}`, {
-          path: formattedError.path,
-          extensions: formattedError.extensions
+        // Création et démarrage du serveur Apollo
+        const apolloServer = await createApolloServer(httpServer, {
+            plugins: [
+                // Plugins personnalisés si nécessaires
+            ]
         });
 
-        return process.env.NODE_ENV === 'production'
-            ? { message: 'Erreur interne du serveur GraphQL', code: formattedError.extensions?.code || 'INTERNAL_SERVER_ERROR' }
-            : {
-              ...formattedError,
-              timestamp: new Date().toISOString()
-            };
-      }
-    });
+        // Création du middleware Express pour Apollo Server
+        const apolloMiddleware = createApolloMiddleware(apolloServer, {
+            context: async ({ req }) => {
+                // Contexte personnalisé à partager avec les resolvers
+                return {
+                    // Initialiser les DataLoaders
+                    loaders: initLoaders(),
 
-    // Démarrage du serveur Apollo
-    await server.start();
-    logger.info('Serveur Apollo démarré avec succès');
+                    // Données utilisateur et de requête
+                    currentUser: req.currentUser || 'anonyme',
+                    timestamp: new Date().toISOString()
+                };
+            }
+        });
 
-    // Middleware Express pour Apollo
-    app.use(
-        '/graphql',
-        express.json(),
-        expressMiddleware(server, {
-          context: async ({ req }) => ({
-            user: req.currentUser || 'anonymous',
-            timestamp: req.timestamp || new Date().toISOString()
-          })
-        })
-    );
+        // Enregistrement du middleware Apollo sur le chemin /graphql-apollo
+        app.use('/graphql-apollo', express.json(), apolloMiddleware);
 
-    logger.info('Apollo Server configuré sur /graphql');
+        logger.info('Serveur Apollo standalone configuré avec succès sur /graphql-apollo');
 
-    return server;
-  } catch (error) {
-    logger.error('Erreur lors de la création du serveur Apollo:', error);
-    throw error;
-  }
+        return apolloServer;
+    } catch (error) {
+        logger.error(`Erreur lors de la configuration du serveur Apollo: ${error.message}`);
+        throw error;
+    }
 }
 
-module.exports = { createStandaloneServer };
+module.exports = {
+    createStandaloneServer
+};

@@ -1,8 +1,3 @@
-/**
- * Configuration Apollo Server 4
- *
- * Ce fichier initialise et configure l'instance Apollo Server
- */
 'use strict';
 
 const { ApolloServer } = require('@apollo/server');
@@ -10,14 +5,13 @@ const { expressMiddleware } = require('@apollo/server/express4');
 const { ApolloServerPluginLandingPageDisabled } = require('@apollo/server/plugin/disabled');
 const { ApolloServerPluginLandingPageLocalDefault } = require('@apollo/server/plugin/landingPage/default');
 const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
-const http = require('http');
-const { typeDefs } = require('../graphql/schema');
-const logger = require('../utils/logger');
-const resolvers = require('./resolvers/index');
+const { typeDefs } = require('./src/graphql/schema');
+const logger = require('./src/utils/logger');
+const resolvers = require('./src/graphql');
 
 /**
  * Crée et démarre une instance Apollo Server
- * @param {http.Server} httpServer - Serveur HTTP Express (optionnel)
+ * @param {import('http').Server} httpServer - Serveur HTTP Express (optionnel)
  * @param {Object} options - Options supplémentaires pour Apollo Server
  * @returns {Promise<ApolloServer>} Instance Apollo Server démarrée
  */
@@ -46,6 +40,7 @@ async function createApolloServer(httpServer = null, options = {}) {
         csrfPrevention: process.env.NODE_ENV === 'production',
         cache: 'bounded',
         plugins,
+        // Remplacer formatError par la version non dépréciée
         formatError: (formattedError, error) => {
             // Log de l'erreur pour le débogage
             logger.error(`GraphQL Error: ${formattedError.message}`, {
@@ -67,7 +62,6 @@ async function createApolloServer(httpServer = null, options = {}) {
             return {
                 ...formattedError,
                 timestamp: new Date().toISOString(),
-                user: error.originalError?.context?.user?.username || 'SYSTEM',
                 stacktrace: error.originalError?.stack || formattedError.extensions?.exception?.stacktrace
             };
         },
@@ -84,15 +78,16 @@ async function createApolloServer(httpServer = null, options = {}) {
  * Crée le middleware Express pour Apollo Server
  * @param {ApolloServer} server - Instance Apollo Server démarrée
  * @param {Object} options - Options supplémentaires pour le middleware
- * @returns {Function} Middleware Express
+ * @returns {Function} Middleware Express pour intégrer Apollo Server à Express
  */
 function createApolloMiddleware(server, options = {}) {
     return expressMiddleware(server, {
         context: async ({ req, res }) => {
             // Extraction du contexte à partir de la requête
             const context = {
-                // Utilisateur authentifié
-                user: req.user,
+                // Métadonnées de requête pour le traçage et le débogage
+                ip: req.ip || req.connection?.remoteAddress,
+                userAgent: req.headers['user-agent'],
 
                 // Ajout de l'objet requête pour accéder aux headers
                 req,
@@ -104,15 +99,20 @@ function createApolloMiddleware(server, options = {}) {
                 requestStartTime: Date.now()
             };
 
-            // Fusionner avec le contexte personnalisé fourni dans les options
+            // Fusionner avec le contexte personnalisé
             return {
                 ...context,
-                ...options.context
+                ...(options.context ?
+                    (typeof options.context === 'function' ?
+                        await options.context({ req, res }) :
+                        options.context) :
+                    {})
             };
         }
     });
 }
 
+// Ces fonctions sont utilisées dans "standalone server.js".
 module.exports = {
     createApolloServer,
     createApolloMiddleware

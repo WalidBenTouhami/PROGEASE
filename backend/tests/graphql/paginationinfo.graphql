@@ -1,4 +1,22 @@
 # Tests GraphQL pour PaginationInfo
-# Générés automatiquement le 2025-05-27 19:27:50
+# Générés automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
+# Ce type est généralement utilisé comme partie d'autres types plutôt que directement requêté
+# Exemple d'utilisation dans une requête paginée:
+query GetPaginatedResults {
+  paginatedResults {
+    items {
+      _id
+      # autres champs...
+    }
+    pagination {
+      totalItems
+      totalPages
+      currentPage
+      pageSize
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
