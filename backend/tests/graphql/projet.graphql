@@ -41,3 +41,81 @@ query GetProjetById($id: ID!) {
 #   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
 # }
 
+# Mutation pour créer un projet
+mutation CreateProjet($input: ProjetInput!) {
+  createProjet(input: $input) {
+    _id
+    _id
+    titre
+    description
+    tuteur
+    dateDebut
+    dateFin
+    statut
+    progression
+    creeLe
+    majLe
+  }
+}
+
+# Variables:
+# {
+#   "input": {
+#     "titre": "Exemple de texte",
+#     "description": "Exemple de texte",
+#     "tuteur": "Exemple de texte",
+#     "dateDebut": "Exemple de texte",
+#     "dateFin": "Exemple de texte",
+#     "statut": "Exemple de texte",
+#     "progression": 42,
+#     "creeLe": "Exemple de texte",
+#     "majLe": "Exemple de texte"
+#   }
+# }
+
+# Mutation pour mettre à jour un projet
+mutation UpdateProjet($id: ID!, $input: ProjetInput!) {
+  updateProjet(id: $id, input: $input) {
+    _id
+    _id
+    titre
+    description
+    tuteur
+    dateDebut
+    dateFin
+    statut
+    progression
+    creeLe
+    majLe
+  }
+}
+
+# Variables:
+# {
+#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f",
+#   "input": {
+#     "titre": "Exemple de texte",
+#     "description": "Exemple de texte",
+#     "tuteur": "Exemple de texte",
+#     "dateDebut": "Exemple de texte",
+#     "dateFin": "Exemple de texte",
+#     "statut": "Exemple de texte",
+#     "progression": 42,
+#     "creeLe": "Exemple de texte",
+#     "majLe": "Exemple de texte"
+#   }
+# }
+
+# Mutation pour supprimer un projet
+mutation DeleteProjet($id: ID!) {
+  deleteProjet(id: $id) {
+    success
+    message
+  }
+}
+
+# Variables:
+# {
+#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
+# }
+

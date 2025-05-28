@@ -1,0 +1,33 @@
+# Tests GraphQL pour Health
+# Générés automatiquement le 2025-05-27 19:27:50
+# Auteur: WalidBenTouhami
+
+# Requête pour récupérer tous les healths
+query GetAllHealths {
+  health {
+    _id
+    status
+    timestamp
+    user
+    version
+    uptime
+  }
+}
+
+# Requête pour récupérer un health spécifique
+query GetHealthById($id: ID!) {
+  health(id: $id) {
+    _id
+    status
+    timestamp
+    user
+    version
+    uptime
+  }
+}
+
+# Variables:
+# {
+#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
+# }
+

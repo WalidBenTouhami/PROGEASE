@@ -117,5 +117,17 @@ module.exports = {
     PaginationParDefaut,
     MessagesErreur,
     StatutHttp,
-    NODE_ENV: process.env.NODE_ENV || 'development'
+    NODE_ENV: process.env.NODE_ENV || 'development',
+    STATUTS_PROJET: Object.freeze({
+        BROUILLON: "Brouillon",
+        EN_COURS: "En cours",
+        TERMINE: "Terminé",
+        ARCHIVE: "Archivé",
+    }),
+    STATUTS_LIVRABLE: Object.freeze({
+        TERMINE: "Termine",
+        EN_ATTENTE: "En attente",
+        EN_RETARD: "En retard",
+    })
 };
+

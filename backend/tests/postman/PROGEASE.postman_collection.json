@@ -1,6 +1,6 @@
 {
   "info": {
-    "_postman_id": "8a8e8335-5e5b-4886-b884-be1b998911b2",
+    "_postman_id": "97a70915-d111-42b1-8972-4fdd7efc34e4",
     "name": "PROGEASE API Tests (Auto-générés)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "description": "Collection de tests auto-générés pour l'API PROGEASE - 2025-05-27 19:27:50"
@@ -783,7 +783,7 @@
           ]
         },
         {
-          "name": "11.5 Query page",
+          "name": "11.5 Query health",
           "request": {
             "method": "POST",
             "header": [
@@ -794,7 +794,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"query { page { _id } }\"\n}"
+              "raw": "{\n  \"query\": \"query { health { _id } }\"\n}"
             },
             "url": "{{baseUrl}}/graphql"
           },
@@ -818,7 +818,7 @@
           ]
         },
         {
-          "name": "11.6 Query limit",
+          "name": "11.6 Query projet",
           "request": {
             "method": "POST",
             "header": [
@@ -829,7 +829,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"query { limit { _id } }\"\n}"
+              "raw": "{\n  \"query\": \"query { projet { _id } }\"\n}"
             },
             "url": "{{baseUrl}}/graphql"
           },
@@ -853,7 +853,7 @@
           ]
         },
         {
-          "name": "11.7 Query filter",
+          "name": "11.7 Query livrable",
           "request": {
             "method": "POST",
             "header": [
@@ -864,7 +864,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"query { filter { _id } }\"\n}"
+              "raw": "{\n  \"query\": \"query { livrable { _id } }\"\n}"
             },
             "url": "{{baseUrl}}/graphql"
           },
@@ -923,147 +923,7 @@
           ]
         },
         {
-          "name": "11.9 Query projetId",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { projetId { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.10 Query page",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { page { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.11 Query limit",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { limit { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.12 Query filter",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { filter { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.13 Query livrable",
+          "name": "11.9 Query livrable",
           "request": {
             "method": "POST",
             "header": [
@@ -1098,112 +958,7 @@
           ]
         },
         {
-          "name": "11.14 Query health",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { health { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.15 Query projet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { projet { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.16 Query livrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { livrable { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.17 Query projetId",
+          "name": "11.10 Query projetId",
           "request": {
             "method": "POST",
             "header": [
@@ -1238,112 +993,7 @@
           ]
         },
         {
-          "name": "11.18 Query projet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { projet { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.19 Query livrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { livrable { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.20 Query projetId",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { projetId { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.21 Mutation creerProjet",
+          "name": "11.11 Mutation creerProjet",
           "request": {
             "method": "POST",
             "header": [
@@ -1378,7 +1028,7 @@
           ]
         },
         {
-          "name": "11.22 Mutation mettreAJourProjet",
+          "name": "11.12 Mutation mettreAJourProjet",
           "request": {
             "method": "POST",
             "header": [
@@ -1413,7 +1063,7 @@
           ]
         },
         {
-          "name": "11.23 Mutation supprimerProjet",
+          "name": "11.13 Mutation supprimerProjet",
           "request": {
             "method": "POST",
             "header": [
@@ -1448,7 +1098,7 @@
           ]
         },
         {
-          "name": "11.24 Mutation ajouterLivrable",
+          "name": "11.14 Mutation ajouterLivrable",
           "request": {
             "method": "POST",
             "header": [
@@ -1483,7 +1133,7 @@
           ]
         },
         {
-          "name": "11.25 Mutation mettreAJourLivrable",
+          "name": "11.15 Mutation mettreAJourLivrable",
           "request": {
             "method": "POST",
             "header": [
@@ -1518,7 +1168,7 @@
           ]
         },
         {
-          "name": "11.26 Mutation supprimerLivrable",
+          "name": "11.16 Mutation supprimerLivrable",
           "request": {
             "method": "POST",
             "header": [
@@ -1553,7 +1203,217 @@
           ]
         },
         {
-          "name": "11.27 Mutation creerProjet",
+          "name": "11.17 Mutation createProjet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { createProjet(input: {}) { _id } }\"\n}"
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has valid GraphQL data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11.18 Mutation updateProjet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { updateProjet(input: {}) { _id } }\"\n}"
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has valid GraphQL data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11.19 Mutation deleteProjet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { deleteProjet(input: {}) { _id } }\"\n}"
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has valid GraphQL data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11.20 Mutation createLivrable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { createLivrable(input: {}) { _id } }\"\n}"
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has valid GraphQL data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11.21 Mutation updateLivrable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { updateLivrable(input: {}) { _id } }\"\n}"
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has valid GraphQL data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11.22 Mutation deleteLivrable",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation { deleteLivrable(input: {}) { _id } }\"\n}"
+            },
+            "url": "{{baseUrl}}/graphql"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response has valid GraphQL data\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data).to.exist;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "11.23 Mutation creerProjet",
           "request": {
             "method": "POST",
             "header": [
@@ -1588,7 +1448,7 @@
           ]
         },
         {
-          "name": "11.28 Mutation mettreAJourProjet",
+          "name": "11.24 Mutation mettreAJourProjet",
           "request": {
             "method": "POST",
             "header": [
@@ -1623,7 +1483,7 @@
           ]
         },
         {
-          "name": "11.29 Mutation supprimerProjet",
+          "name": "11.25 Mutation supprimerProjet",
           "request": {
             "method": "POST",
             "header": [
@@ -1658,217 +1518,7 @@
           ]
         },
         {
-          "name": "11.30 Mutation ajouterLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { ajouterLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.31 Mutation mettreAJourLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { mettreAJourLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.32 Mutation supprimerLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { supprimerLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.33 Mutation creerProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { creerProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.34 Mutation mettreAJourProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { mettreAJourProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.35 Mutation supprimerProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { supprimerProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.36 Mutation creerLivrable",
+          "name": "11.26 Mutation creerLivrable",
           "request": {
             "method": "POST",
             "header": [
@@ -1903,7 +1553,7 @@
           ]
         },
         {
-          "name": "11.37 Mutation mettreAJourLivrable",
+          "name": "11.27 Mutation mettreAJourLivrable",
           "request": {
             "method": "POST",
             "header": [
@@ -1938,217 +1588,7 @@
           ]
         },
         {
-          "name": "11.38 Mutation supprimerLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { supprimerLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.39 Mutation creerProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { creerProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.40 Mutation mettreAJourProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { mettreAJourProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.41 Mutation supprimerProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { supprimerProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.42 Mutation creerLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { creerLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.43 Mutation mettreAJourLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { mettreAJourLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.44 Mutation supprimerLivrable",
+          "name": "11.28 Mutation supprimerLivrable",
           "request": {
             "method": "POST",
             "header": [

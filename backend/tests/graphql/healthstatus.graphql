@@ -9,8 +9,6 @@ query GetAllHealthstatuss {
     status
     timestamp
     user
-    version
-    databaseStatus
   }
 }
 

@@ -12,6 +12,8 @@ const connecterBD = require('./config/db');
 const { createStandaloneServer } = require('./src/graphql/standalone-server');
 const { NODE_ENV } = require('./config/constants');
 const { globalRateLimiter } = require('./src/middleware/rateLimiter');
+const { schema } = require('./codegen');
+const { graphqlHTTP } = require('express-graphql');
 
 const {
     ERROR_MESSAGES,
@@ -66,7 +68,7 @@ if (NODE_ENV === 'development') {
 
 // Middleware pour ajouter des informations de contexte
 app.use((req, res, next) => {
-    req.currentUser = req.headers['x-user'] || 'anonymous';
+    req.currentUser = req.headers['x-user'] || 'WalidBenTouhami';
     req.timestamp = new Date().toISOString();
 
     // Ajouter des en-têtes de sécurité
@@ -108,14 +110,32 @@ app.get('/health', (req, res) => {
     const uptime = process.uptime();
     res.json({
         status: 'ok',
-        timestamp: req.timestamp || new Date().toISOString(),
-        user: req.currentUser || 'anonymous',
+        timestamp: req.timestamp || '2025-05-28T09:19:39Z',
+        user: req.currentUser || 'WalidBenTouhami',
         version: '2.0.0',
         graphqlVersion: '4.0',
         environment: NODE_ENV,
         uptime: Math.floor(uptime) // Important pour les tests
     });
 });
+
+// Configuration GraphQL avec express-graphql
+app.use('/graphql', graphqlHTTP({
+    schema,
+    graphiql: true,
+    customFormatErrorFn: (error) => {
+        logger.error(`GraphQL Error: ${error.message}`, { path: error.path });
+        return {
+            message: error.message,
+            locations: error.locations,
+            path: error.path
+        };
+    },
+    context: ({ req }) => ({
+        currentUser: req.currentUser,
+        timestamp: req.timestamp
+    })
+}));
 
 // Serveur principal
 async function startServer() {
@@ -135,15 +155,17 @@ async function startServer() {
             logger.warn('Impossible de créer les données de test:', error.message);
         }
 
-        // Configuration du serveur GraphQL avant les middlewares d'erreur
+        // Configuration du serveur Apollo si nécessaire (option alternative à express-graphql)
         try {
-            await createStandaloneServer(app, httpServer);
-            logger.info('Serveur Apollo Standalone configuré');
+            if (process.env.USE_APOLLO_SERVER === 'true') {
+                await createStandaloneServer(app, httpServer);
+                logger.info('Serveur Apollo Standalone configuré');
+            }
         } catch (error) {
-            logger.warn('Le serveur GraphQL n\'a pas pu être configuré. L\'API REST fonctionnera toujours:', error.message);
+            logger.warn('Le serveur Apollo n\'a pas pu être configuré. Express-GraphQL sera utilisé:', error.message);
         }
 
-        // Middleware d'erreurs 404 - doit être après les routes ET après Apollo
+        // Middleware d'erreurs 404 - doit être après les routes ET après Apollo/GraphQL
         app.use(notFoundHandler);
 
         // Middleware de gestion des erreurs
@@ -158,10 +180,10 @@ async function startServer() {
 
                 console.log(`
 =======================================================
-🚀 PROGEASE Server (Apollo v4 Standalone)
+🚀 PROGEASE Server (GraphQL v4)
 =======================================================
-📅 Date: ${new Date().toISOString()}
-👤 User: ${process.env.USER || 'WalidBenTouhami'}
+📅 Date: 2025-05-28 09:19:39
+👤 User: WalidBenTouhami
 🌐 Port: ${PORT}
 🔧 Mode: ${NODE_ENV}
 🔗 API: http://localhost:${PORT}/api

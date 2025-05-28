@@ -1,0 +1,13 @@
+# Tests GraphQL pour Health
+# Générés automatiquement le 2025-05-28 09:42:02
+# Auteur: WalidBenTouhami
+
+query GetHealth {
+  health {
+    status
+    timestamp
+    user
+    version
+    uptime
+  }
+}
