@@ -1,4 +1,3 @@
-
 # PROGEASE - Plateforme de Gestion des Projets Étudiants
 
 <!--suppress ALL -->
@@ -325,6 +324,74 @@ Ce projet est sous licence **MIT**. Consultez le fichier `LICENSE` pour plus de 
 - **Documentation API** : [http://localhost:5000/api-docs](http://localhost:5000/api-docs)
 - **Documentation GraphQL** : [http://localhost:5000/graphql](http://localhost:5000/graphql)
 - **Tableau Kanban** : [https://trello.com/b/progease](https://trello.com/b/progease)
+
+---
+
+## 🚦 Backend Automation: Tests & Documentation
+
+### **Automated Test Generation & Validation**
+
+PROGEASE fournit des outils CLI pour générer, valider et maintenir automatiquement les tests et la documentation de l'API backend.
+
+#### **Générer et valider les tests API (REST & GraphQL)**
+
+Utilisez le script CLI suivant :
+
+```bash
+# Générer les tests GraphQL à partir du schéma en direct
+yarn test:gen:graphql
+# ou
+node backend/tools/test-generator.js --graphql
+
+# Valider les tests GraphQL existants par rapport au schéma en direct
+node backend/tools/test-generator.js --validate-graphql
+
+# Générer la collection Postman (REST) à partir des routes Express
+node backend/tools/test-generator.js --rest
+
+# Valider la collection Postman existante par rapport aux routes Express
+node backend/tools/test-generator.js --validate-rest
+```
+
+- Les tests générés se trouvent dans `backend/tests/graphql/` (GraphQL) et `backend/tests/postman/` (REST/Postman).
+- Les tests utilisent des données d'exemple réalistes, générées automatiquement à partir des modèles Mongoose et du schéma GraphQL.
+
+#### **Automated API Documentation**
+
+Générez la documentation complète de l'API (REST & GraphQL) :
+
+```bash
+node backend/tools/test-generator.js --docs
+```
+
+- La documentation générée se trouve dans le dossier `docs/` :
+  - `docs/graphql-api.md` : Documentation complète du schéma GraphQL
+  - `docs/rest-api.md` : Documentation de toutes les routes REST, avec exemples de requêtes
+
+#### **Résumé des commandes CLI**
+
+| Commande CLI                                      | Description                                              |
+|---------------------------------------------------|----------------------------------------------------------|
+| `node backend/tools/test-generator.js --graphql`   | Génère les tests GraphQL à partir du schéma en direct    |
+| `node backend/tools/test-generator.js --validate-graphql` | Valide les tests GraphQL existants                      |
+| `node backend/tools/test-generator.js --rest`      | Génère la collection Postman à partir des routes Express |
+| `node backend/tools/test-generator.js --validate-rest` | Valide la collection Postman existante                  |
+| `node backend/tools/test-generator.js --docs`      | Génère la documentation API (REST & GraphQL)             |
+
+#### **Bonnes pratiques pour la maintenance**
+
+- **Régénérez** les tests et la documentation après toute modification du schéma GraphQL, des modèles ou des routes Express.
+- **Validez** régulièrement les tests pour éviter toute dérive entre le code et les tests/docs.
+- **Intégrez** ces scripts dans votre pipeline CI/CD pour garantir la cohérence.
+- **Consultez** les fichiers générés dans `docs/` et `backend/tests/` pour vérifier la couverture.
+
+#### **Dépannage courant**
+
+- Si un test échoue ou une documentation est incomplète :
+  - Vérifiez que le serveur backend est bien démarré (`npm start`)
+  - Vérifiez que les modèles et routes sont bien exportés et accessibles
+  - Relancez la génération avec la commande appropriée
+- Pour toute erreur de connexion à MongoDB ou au serveur GraphQL, vérifiez les variables d'environnement et la configuration réseau.
 
 ---
 

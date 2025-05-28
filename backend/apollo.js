@@ -7,7 +7,7 @@ const { ApolloServerPluginLandingPageLocalDefault } = require('@apollo/server/pl
 const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
 const { typeDefs } = require('./src/graphql/schema');
 const logger = require('./src/utils/logger');
-const resolvers = require('./src/graphql');
+const { resolvers } = require('./src/graphql');
 
 /**
  * Crée et démarre une instance Apollo Server

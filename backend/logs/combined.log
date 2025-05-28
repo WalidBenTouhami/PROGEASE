@@ -1698,3 +1698,128 @@ Unknown directive "@key". {"metadata":{"service":"progease-api","stack":"Error: 
 [undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-28 14:27:24"}}
 [undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-28 14:27:24"}}
 [undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-28 14:27:24"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:37:59"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:37:59"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:37:59"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:00"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:00"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:01"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:01"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:01"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:01"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:01"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:20"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:20"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:20"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:20"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:20"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:21"}}
+[undefined] INFO: Signal SIGINT reçu. Arrêt du serveur... {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:38:59"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:03"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:03"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:03"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:04"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:04"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:05"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:05"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:05"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:05"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:39:05"}}
+[undefined] INFO: Signal SIGINT reçu. Arrêt du serveur... {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:46:07"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:09"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:09"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:09"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:10"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:10"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:11"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:11"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:11"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:11"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-28 21:55:11"}}
+[undefined] INFO: Signal SIGINT reçu. Arrêt du serveur... {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:08"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:12"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:12"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:12"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:13"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:13"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:14"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:14"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:14"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:14"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:23:14"}}
+[undefined] INFO: Signal SIGINT reçu. Arrêt du serveur... {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:39"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:41"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:41"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:41"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:42"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:42"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:43"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:43"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:43"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:43"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:27:43"}}
+[undefined] INFO: Signal SIGINT reçu. Arrêt du serveur... {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:28:01"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:15"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:15"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:15"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:16"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:16"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:17"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:17"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:17"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:17"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:17"}}
+[undefined] ERROR: GraphQL Error: Syntax Error: Unexpected <EOF>. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:37:59"}}
+[undefined] ERROR: GraphQL Error: Syntax Error: Expected Name, found <EOF>. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:45:43"}}
+[undefined] ERROR: GraphQL Error: Syntax Error: Expected Name, found <EOF>. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:45:43"}}
+[undefined] ERROR: GraphQL Error: Syntax Error: Expected Name, found <EOF>. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:45:43"}}
+[undefined] ERROR: GraphQL Error: Syntax Error: Expected Name, found <EOF>. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:45:43"}}
+[undefined] ERROR: GraphQL Error: Syntax Error: Expected Name, found <EOF>. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:45:43"}}
+[undefined] ERROR: GraphQL Error: Syntax Error: Expected Name, found <EOF>. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:45:43"}}
+[undefined] ERROR: GraphQL Error: Syntax Error: Expected Name, found <EOF>. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:45:43"}}
+[undefined] ERROR: GraphQL Error: Syntax Error: Expected Name, found <EOF>. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:45:43"}}
+[undefined] WARN: Ressource non trouvée: /analyze {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:21"}}
+[undefined] WARN: Ressource non trouvée: /generer-texte {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:21"}}
+[undefined] WARN: Ressource non trouvée: /generate-text {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: / {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: / {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: / {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: / {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: /projet/:projetId {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: /:livrableId {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: /:livrableId {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: /:livrableId {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: /:id {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: /:id/livrables {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:22"}}
+[undefined] WARN: Ressource non trouvée: /:id {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] WARN: Ressource non trouvée: /:id {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] WARN: Ressource non trouvée: /analyse-risques {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] WARN: Ressource non trouvée: /suivi-taches {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] ERROR: GraphQL Error: Field "projet" argument "id" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] ERROR: GraphQL Error: Cannot query field "projetId" on type "Query". Did you mean "projet" or "projets"? {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] ERROR: GraphQL Error: Field "livrable" argument "id" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] ERROR: GraphQL Error: Cannot query field "health" on type "Query". {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] ERROR: GraphQL Error: Field "projet" argument "id" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] ERROR: GraphQL Error: Field "livrable" argument "id" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] ERROR: GraphQL Error: Cannot query field "projetId" on type "Query". Did you mean "projet" or "projets"? {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:23"}}
+[undefined] ERROR: GraphQL Error: Field "ProjetInput.titre" of required type "String!" was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "ProjetInput.titre" of required type "String!" was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "mettreAJourProjet" argument "id" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Unknown argument "input" on field "Mutation.supprimerProjet". {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "supprimerProjet" argument "id" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "LivrableInput.intitule" of required type "String!" was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "LivrableInput.projetId" of required type "ID!" was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "ajouterLivrable" argument "projetId" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "mettreAJourLivrable" argument "livrableId" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Unknown argument "input" on field "Mutation.supprimerLivrable". {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "supprimerLivrable" argument "livrableId" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "ProjetInput.titre" of required type "String!" was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "ProjetInput.titre" of required type "String!" was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "mettreAJourProjet" argument "id" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Unknown argument "input" on field "Mutation.supprimerProjet". {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "supprimerProjet" argument "id" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "LivrableInput.intitule" of required type "String!" was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "LivrableInput.projetId" of required type "ID!" was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Field "mettreAJourLivrable" argument "livrableId" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:24"}}
+[undefined] ERROR: GraphQL Error: Unknown argument "input" on field "Mutation.supprimerLivrable". {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:25"}}
+[undefined] ERROR: GraphQL Error: Field "supprimerLivrable" argument "livrableId" of type "ID!" is required, but it was not provided. {"metadata":{"service":"progease-api","timestamp":"2025-05-28 22:46:25"}}

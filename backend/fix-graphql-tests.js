@@ -6,6 +6,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
+const axios = require('axios');
 
 // Couleurs ANSI pour le terminal
 const colors = {
@@ -159,6 +160,12 @@ async function main() {
 
         // Créer ou corriger les fichiers de test
         console.log(colorize('\n🔧 Correction des fichiers de test GraphQL...', 'blue'));
+
+        // [NINJA REFACTOR] Use schema introspection to generate and update test files for all queries/mutations in the current schema.
+        // 1. Use axios to query the running server's introspection endpoint.
+        // 2. Generate test queries/mutations for all types/fields, including required arguments.
+        // 3. Remove or update outdated tests.
+        // 4. Add robust error handling and clear comments.
 
         // Projet
         await createOrUpdateTestFile('projet.graphql', `# Tests GraphQL pour Projet

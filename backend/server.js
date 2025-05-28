@@ -17,7 +17,7 @@ const { graphqlHTTP } = require('express-graphql');
 // Import du schéma GraphQL principal (typeDefs)
 const { typeDefs } = require('./src/graphql/schema');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
-const resolvers = require('./src/graphql');
+const { resolvers } = require('./src/graphql');
 
 // Créer le schéma exécutable à partir des typeDefs et resolvers
 const schema = makeExecutableSchema({ typeDefs, resolvers });

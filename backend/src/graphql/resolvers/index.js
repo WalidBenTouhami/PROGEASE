@@ -19,5 +19,6 @@ module.exports = {
     ...projetResolvers.Mutation,
     ...livrableResolvers.Mutation
   },
-  // Types spécifiques si nécessaire
+  ...(projetResolvers.Types || {}),
+  ...(livrableResolvers.Types || {})
 };

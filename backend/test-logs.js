@@ -30,3 +30,5 @@ logger.info('Test avec données complexes', {
 });
 
 console.log('Tests de logs terminés. Vérifiez le dossier logs/ pour les résultats.');
+
+// [NINJA REFACTOR] Check that logs are written to the correct files/locations. Add comments for maintainers. Improve error handling.

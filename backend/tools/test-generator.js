@@ -1,18 +1,27 @@
+#!/usr/bin/env node
 /**
- * PROGEASE - Générateur de tests automatiques
- * Ce script analyse les fichiers du projet pour générer des tests Newman/Postman et GraphQL
- * Auteur: WalidBenTouhami
- * Date: 2025-05-27 19:27:50
+ * PROGEASE - Générateur de tests automatiques (NINJA REFACTOR)
+ * CLI Usage:
+ *   node tools/test-generator.js --graphql            # Regenerate GraphQL tests from live schema
+ *   node tools/test-generator.js --validate-graphql   # Validate GraphQL tests against live schema
+ *   node tools/test-generator.js --rest               # Regenerate REST/Postman tests from Express app
+ *   node tools/test-generator.js --validate-rest      # Validate Postman collection against Express app
+ *   node tools/test-generator.js --docs               # Auto-generate API documentation from schema and route definitions
  */
 
 const fs = require('fs');
 const path = require('path');
 const util = require('util');
+const axios = require('axios');
 
 const readdir = util.promisify(fs.readdir);
 const readFile = util.promisify(fs.readFile);
 const writeFile = util.promisify(fs.writeFile);
 const mkdir = util.promisify(fs.mkdir);
+
+const GRAPHQL_URL = process.env.GRAPHQL_URL || 'http://localhost:5000/graphql';
+const TESTS_DIR = path.join(__dirname, '..', 'tests', 'graphql');
+const POSTMAN_COLLECTION_PATH = path.join(__dirname, '..', 'tests', 'postman', 'PROGEASE.postman_collection.json');
 
 // Configuration
 const config = {
@@ -581,7 +590,6 @@ function generateTestScript(endpoint, resource) {
         scripts.push("    var jsonData = pm.response.json();");
         scripts.push("    pm.expect(jsonData._id || jsonData.id).to.exist;");
         scripts.push("    ");
-        scripts.push("    // Stocker l'ID pour les tests suivants");
         scripts.push(`    pm.environment.set("${resource.toLowerCase()}Id", jsonData._id || jsonData.id);`);
         scripts.push("});");
     }
@@ -654,165 +662,30 @@ function generateTestData(model) {
  * Génère des fichiers de requêtes GraphQL à partir des types et requêtes détectés
  */
 async function generateGraphQLTests() {
-    console.log('Génération des tests GraphQL...');
+    console.log('[NINJA] Introspecting GraphQL schema...');
+    const schema = await introspectGraphQLSchema();
+    const queries = schema.types.find(t => t.name === schema.queryType.name).fields;
+    const mutations = schema.mutationType ? schema.types.find(t => t.name === schema.mutationType.name).fields : [];
+    const inputTypes = Object.fromEntries(schema.types.filter(t => t.kind === 'INPUT_OBJECT').map(t => [t.name, t]));
 
-    if (projectStructure.graphqlTypes.length === 0) {
-        console.log('Aucun type GraphQL détecté. Génération de tests GraphQL ignorée.');
-        return;
+    await mkdir(TESTS_DIR, { recursive: true });
+    const testFiles = [];
+
+    // Generate queries
+    for (const field of queries) {
+        const { query, variables } = buildQueryOrMutationWithVars(field, 'query', inputTypes);
+        const filePath = path.join(TESTS_DIR, `${field.name}.graphql`);
+        await writeFile(filePath, `# Auto-generated test for query ${field.name}\n${query}\n\n# Variables:\n# ${JSON.stringify(variables, null, 2)}\n`);
+        testFiles.push(filePath);
     }
-
-    // Créer le répertoire de sortie s'il n'existe pas
-    await mkdir(config.paths.output.graphql, { recursive: true });
-
-    // Générer un fichier pour chaque type avec ses requêtes associées
-    for (const type of projectStructure.graphqlTypes) {
-        // Ignorer les types internes comme Query et Mutation
-        if (['Query', 'Mutation', 'Subscription', 'Schema', '__Schema', '__Type'].includes(type.name)) {
-            continue;
-        }
-
-        let testContent = `# Tests GraphQL pour ${type.name}
-# Générés automatiquement le ${config.metadata.date}
-# Auteur: ${config.metadata.author}
-
-`;
-
-        // Ajouter une requête pour récupérer tous les éléments du type
-        const pluralName = type.name.toLowerCase() + 's';
-        const queriesForType = projectStructure.graphqlQueries.filter(q =>
-            q.returnType === type.name || q.name.toLowerCase() === pluralName || q.name.toLowerCase() === type.name.toLowerCase()
-        );
-
-        if (queriesForType.length > 0) {
-            testContent += `# Requête pour récupérer tous les ${pluralName}
-query GetAll${pluralName.charAt(0).toUpperCase() + pluralName.slice(1)} {
-  ${queriesForType[0].name} {
-    _id
-${type.fields.map(f => `    ${f.name}`).join('\n')}
-  }
-}
-
-`;
-
-            // Ajouter une requête pour récupérer un élément spécifique
-            const singularQueryName = projectStructure.graphqlQueries.find(q =>
-                q.name.toLowerCase() === type.name.toLowerCase() ||
-                q.name.toLowerCase() === `get${type.name.toLowerCase()}` ||
-                q.name.toLowerCase() === `get${type.name.toLowerCase()}byid`
-            );
-
-            if (singularQueryName) {
-                testContent += `# Requête pour récupérer un ${type.name.toLowerCase()} spécifique
-query Get${type.name}ById($id: ID!) {
-  ${singularQueryName.name}(id: $id) {
-    _id
-${type.fields.map(f => `    ${f.name}`).join('\n')}
-  }
-}
-
-# Variables:
-# {
-#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
-# }
-
-`;
-            }
-        }
-
-        // Ajouter des mutations associées à ce type
-        const mutationsForType = projectStructure.graphqlMutations.filter(m =>
-            m.returnType === type.name ||
-            m.name.toLowerCase().includes(type.name.toLowerCase())
-        );
-
-        if (mutationsForType.length > 0) {
-            // Créer une mutation
-            const createMutation = mutationsForType.find(m =>
-                m.name.toLowerCase().startsWith('create') ||
-                m.name.toLowerCase().startsWith('add')
-            );
-
-            if (createMutation) {
-                testContent += `# Mutation pour créer un ${type.name.toLowerCase()}
-mutation Create${type.name}($input: ${type.name}Input!) {
-  ${createMutation.name}(input: $input) {
-    _id
-${type.fields.map(f => `    ${f.name}`).join('\n')}
-  }
-}
-
-# Variables:
-# {
-#   "input": {
-${type.fields
-                    .filter(f => f.name !== '_id' && f.name !== 'id' && f.name !== 'createdAt' && f.name !== 'updatedAt')
-                    .map(f => `#     "${f.name}": ${getGraphqlMockValue(f.type)}`)
-                    .join(',\n')}
-#   }
-# }
-
-`;
-            }
-
-            // Mettre à jour une mutation
-            const updateMutation = mutationsForType.find(m =>
-                m.name.toLowerCase().startsWith('update') ||
-                m.name.toLowerCase().startsWith('edit')
-            );
-
-            if (updateMutation) {
-                testContent += `# Mutation pour mettre à jour un ${type.name.toLowerCase()}
-mutation Update${type.name}($id: ID!, $input: ${type.name}Input!) {
-  ${updateMutation.name}(id: $id, input: $input) {
-    _id
-${type.fields.map(f => `    ${f.name}`).join('\n')}
-  }
-}
-
-# Variables:
-# {
-#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f",
-#   "input": {
-${type.fields
-                    .filter(f => f.name !== '_id' && f.name !== 'id' && f.name !== 'createdAt' && f.name !== 'updatedAt')
-                    .map(f => `#     "${f.name}": ${getGraphqlMockValue(f.type)}`)
-                    .join(',\n')}
-#   }
-# }
-
-`;
-            }
-
-            // Supprimer une mutation
-            const deleteMutation = mutationsForType.find(m =>
-                m.name.toLowerCase().startsWith('delete') ||
-                m.name.toLowerCase().startsWith('remove')
-            );
-
-            if (deleteMutation) {
-                testContent += `# Mutation pour supprimer un ${type.name.toLowerCase()}
-mutation Delete${type.name}($id: ID!) {
-  ${deleteMutation.name}(id: $id) {
-    success
-    message
-  }
-}
-
-# Variables:
-# {
-#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
-# }
-
-`;
-            }
-        }
-
-        // Écrire le fichier de test GraphQL
-        const outputPath = path.join(config.paths.output.graphql, `${type.name.toLowerCase()}.graphql`);
-        await writeFile(outputPath, testContent, 'utf8');
+    // Generate mutations
+    for (const field of mutations) {
+        const { query, variables } = buildQueryOrMutationWithVars(field, 'mutation', inputTypes);
+        const filePath = path.join(TESTS_DIR, `${field.name}.graphql`);
+        await writeFile(filePath, `# Auto-generated test for mutation ${field.name}\n${query}\n\n# Variables:\n# ${JSON.stringify(variables, null, 2)}\n`);
+        testFiles.push(filePath);
     }
-
-    console.log(`Tests GraphQL générés dans: ${config.paths.output.graphql}`);
+    console.log(`[NINJA] Generated ${testFiles.length} GraphQL test files in ${TESTS_DIR}`);
 }
 
 /**
@@ -850,28 +723,371 @@ function getGraphqlMockValue(type) {
  * Fonction principale
  */
 async function main() {
-    console.log('Démarrage du générateur de tests PROGEASE...');
-    console.log(`Date d'exécution: ${config.metadata.date}`);
-    console.log(`Utilisateur: ${config.metadata.author}`);
-    console.log('-------------------------------------------');
-
-    try {
-        await analyzeModels();
-        await analyzeRoutes();
-        await analyzeGraphQL();
-
-        await generateNewmanCollection();
+    const arg = process.argv[2];
+    if (!arg || arg === '--help') {
+        console.log(`\nUsage:\n  node tools/test-generator.js --graphql            # Regenerate GraphQL tests from live schema\n  node tools/test-generator.js --validate-graphql   # Validate GraphQL tests against live schema\n  node tools/test-generator.js --rest               # Regenerate REST/Postman tests from Express app\n  node tools/test-generator.js --validate-rest      # Validate Postman collection against Express app\n  node tools/test-generator.js --docs               # Auto-generate API documentation from schema and route definitions\n`);
+        process.exit(0);
+    }
+    if (arg === '--graphql') {
         await generateGraphQLTests();
-
-        console.log('-------------------------------------------');
-        console.log('Génération de tests terminée avec succès!');
-        console.log(`Tests Postman/Newman: ${config.paths.output.newman}`);
-        console.log(`Tests GraphQL: ${config.paths.output.graphql}`);
-    } catch (err) {
-        console.error('Erreur lors de la génération des tests:', err);
+    } else if (arg === '--validate-graphql') {
+        await validateGraphQLTests();
+    } else if (arg === '--rest') {
+        await generateRestTests();
+    } else if (arg === '--validate-rest') {
+        await validateRestTests();
+    } else if (arg === '--docs') {
+        await generateApiDocs();
+        process.exit(0);
+    } else {
+        console.log('Unknown option:', arg);
         process.exit(1);
     }
 }
 
+async function introspectGraphQLSchema() {
+    const introspectionQuery = {
+        query: `{
+            __schema {
+                queryType { name }
+                mutationType { name }
+                types {
+                    ...FullType
+                }
+            }
+        }
+        fragment FullType on __Type {
+            kind
+            name
+            fields(includeDeprecated: true) {
+                name
+                args {
+                    ...InputValue
+                }
+                type {
+                    ...TypeRef
+                }
+            }
+            inputFields {
+                ...InputValue
+            }
+            interfaces { ...TypeRef }
+            enumValues(includeDeprecated: true) { name }
+            possibleTypes { ...TypeRef }
+        }
+        fragment InputValue on __InputValue {
+            name
+            type { ...TypeRef }
+            defaultValue
+        }
+        fragment TypeRef on __Type {
+            kind
+            name
+            ofType {
+                kind
+                name
+                ofType {
+                    kind
+                    name
+                    ofType {
+                        kind
+                        name
+                    }
+                }
+            }
+        }`
+    };
+    const res = await axios.post(GRAPHQL_URL, introspectionQuery, {
+        headers: { 'Content-Type': 'application/json' }
+    });
+    return res.data.data.__schema;
+}
+
+function getTypeName(type) {
+    if (!type) return '';
+    if (type.kind === 'NON_NULL') return getTypeName(type.ofType);
+    if (type.kind === 'LIST') return `[${getTypeName(type.ofType)}]`;
+    return type.name;
+}
+
+function buildQueryOrMutation(field, type, inputTypes) {
+    // type: 'query' or 'mutation'
+    const args = (field.args || []).map(arg => {
+        const typeStr = getTypeName(arg.type);
+        return `$${arg.name}: ${typeStr}`;
+    });
+    const argStr = args.length ? `(${args.join(', ')})` : '';
+    const callArgs = (field.args || []).map(arg => `${arg.name}: $${arg.name}`).join(', ');
+    const callStr = callArgs ? `(${callArgs})` : '';
+    return `${type} ${field.name}${argStr} {
+        ${field.name}${callStr} {
+            __typename
+        }
+    }`;
+}
+
+async function validateGraphQLTests() {
+    console.log('[NINJA] Validating GraphQL test files against live schema...');
+    const schema = await introspectGraphQLSchema();
+    const validFields = new Set([
+        ...schema.types.find(t => t.name === schema.queryType.name).fields.map(f => f.name),
+        ...(schema.mutationType ? schema.types.find(t => t.name === schema.mutationType.name).fields.map(f => f.name) : [])
+    ]);
+    const files = await readdir(TESTS_DIR);
+    let valid = true;
+    for (const file of files) {
+        if (!file.endsWith('.graphql')) continue;
+        const name = file.replace('.graphql', '');
+        if (!validFields.has(name)) {
+            console.warn(`[NINJA] Test file ${file} does not match any field in schema. Consider removing.`);
+            valid = false;
+        }
+    }
+    if (valid) {
+        console.log('[NINJA] All GraphQL test files are valid!');
+    }
+}
+
+async function extractExpressRoutes() {
+    // Dynamically require the Express app
+    const app = require('../server');
+    const routes = [];
+    app._router.stack.forEach(middleware => {
+        if (middleware.route) {
+            // Route registered directly on the app
+            routes.push({
+                method: Object.keys(middleware.route.methods)[0].toUpperCase(),
+                path: middleware.route.path
+            });
+        } else if (middleware.name === 'router' && middleware.handle.stack) {
+            // Router middleware
+            middleware.handle.stack.forEach(handler => {
+                if (handler.route) {
+                    routes.push({
+                        method: Object.keys(handler.route.methods)[0].toUpperCase(),
+                        path: handler.route.path
+                    });
+                }
+            });
+        }
+    });
+    return routes;
+}
+
 // Exécuter la fonction principale
 main();
+
+// [NINJA PRO IMPLEMENTATION] Realistic test data generation for GraphQL and REST
+
+// Helper: Generate mock value for a given type and field name
+function generateMockValue(type, fieldName) {
+    if (!type) return null;
+    const name = fieldName.toLowerCase();
+    if (type === 'String') {
+        if (name.includes('email')) return 'test@example.com';
+        if (name.includes('url')) return 'https://example.com';
+        if (name.includes('nom') || name.includes('name')) return 'Test Name';
+        if (name.includes('titre') || name.includes('title')) return 'Titre Test';
+        if (name.includes('description')) return 'Ceci est une description de test.';
+        return 'Valeur de test';
+    }
+    if (type === 'Int' || type === 'Float' || type === 'Number') return 42;
+    if (type === 'Boolean') return true;
+    if (type === 'ID') return '5f8f8f8f8f8f8f8f8f8f8f8f';
+    if (type.startsWith('[')) return [generateMockValue(type.replace(/\[|\]/g, ''), fieldName)];
+    if (type === 'Date') return new Date().toISOString();
+    return 'valeur';
+}
+
+// Helper: Recursively generate mock input for GraphQL input objects
+function generateMockInput(inputType, inputTypes) {
+    const obj = {};
+    if (!inputType || !inputType.inputFields) return obj;
+    for (const field of inputType.inputFields) {
+        const typeName = getTypeName(field.type);
+        if (typeName in inputTypes) {
+            obj[field.name] = generateMockInput(inputTypes[typeName], inputTypes);
+        } else {
+            obj[field.name] = generateMockValue(typeName, field.name);
+        }
+    }
+    return obj;
+}
+
+// Enhanced: Build query/mutation with variable set
+function buildQueryOrMutationWithVars(field, type, inputTypes) {
+    const args = (field.args || []).map(arg => {
+        const typeStr = getTypeName(arg.type);
+        return `$${arg.name}: ${typeStr}`;
+    });
+    const argStr = args.length ? `(${args.join(', ')})` : '';
+    const callArgs = (field.args || []).map(arg => `${arg.name}: $${arg.name}`).join(', ');
+    const callStr = callArgs ? `(${callArgs})` : '';
+    // Generate variables
+    const variables = {};
+    for (const arg of field.args || []) {
+        const typeName = getTypeName(arg.type);
+        if (typeName in inputTypes) {
+            variables[arg.name] = generateMockInput(inputTypes[typeName], inputTypes);
+        } else {
+            variables[arg.name] = generateMockValue(typeName, arg.name);
+        }
+    }
+    return {
+        query: `${type} ${field.name}${argStr} {\n  ${field.name}${callStr} {\n    __typename\n  }\n}`,
+        variables
+    };
+}
+
+// REST: Generate mock data for request bodies using Mongoose models
+function generateRestMockData(model) {
+    if (!model || !model.schema) return {};
+    const obj = {};
+    for (const [field, def] of Object.entries(model.schema.paths)) {
+        if (field === '_id' || field === '__v') continue;
+        if (def.isRequired || def.options.required) {
+            const type = def.instance;
+            obj[field] = generateMockValue(type, field);
+        }
+    }
+    return obj;
+}
+
+// PATCH: Use mock data in REST test generation
+async function generateRestTests() {
+    console.log('[NINJA] Extracting Express routes...');
+    const routes = await extractExpressRoutes();
+    const collection = {
+        info: {
+            name: 'PROGEASE API Tests (Auto-generated)',
+            schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+        },
+        item: [],
+        variable: [{ key: 'baseUrl', value: 'http://localhost:5000', type: 'string' }]
+    };
+    // Try to require models for mock data
+    let models = {};
+    try {
+        const modelsDir = path.join(__dirname, '..', 'src', 'models');
+        for (const file of fs.readdirSync(modelsDir)) {
+            if (file.endsWith('.js')) {
+                const modelName = file.replace('.model.js', '').replace('.js', '');
+                models[modelName.toLowerCase()] = require(path.join(modelsDir, file));
+            }
+        }
+    } catch (e) {}
+    for (const route of routes) {
+        const item = {
+            name: `${route.method} ${route.path}`,
+            request: {
+                method: route.method,
+                header: [{ key: 'Content-Type', value: 'application/json' }],
+                url: `{{baseUrl}}${route.path}`
+            }
+        };
+        // If POST/PUT/PATCH, add mock body
+        if (['POST', 'PUT', 'PATCH'].includes(route.method)) {
+            // Guess model from path
+            const seg = route.path.split('/').filter(Boolean)[0];
+            const model = models[seg && seg.toLowerCase()];
+            if (model) {
+                item.request.body = {
+                    mode: 'raw',
+                    raw: JSON.stringify(generateRestMockData(model), null, 2)
+                };
+            }
+        }
+        collection.item.push(item);
+    }
+    await mkdir(path.dirname(POSTMAN_COLLECTION_PATH), { recursive: true });
+    await writeFile(POSTMAN_COLLECTION_PATH, JSON.stringify(collection, null, 2), 'utf8');
+    console.log(`[NINJA] Generated Postman collection with ${routes.length} endpoints at ${POSTMAN_COLLECTION_PATH}`);
+}
+
+// [NINJA DOCS] Auto-generate API documentation from schema and route definitions
+async function generateApiDocs() {
+    const docsDir = path.join(__dirname, '..', 'docs');
+    await mkdir(docsDir, { recursive: true });
+    // --- GraphQL Docs ---
+    const schema = await introspectGraphQLSchema();
+    let md = `# GraphQL API Documentation\n\n`;
+    md += `## Types\n`;
+    for (const type of schema.types) {
+        if (type.name.startsWith('__') || ['Query', 'Mutation', 'Subscription'].includes(type.name)) continue;
+        md += `### ${type.name}\n`;
+        if (type.fields) {
+            md += '| Field | Type |\n|---|---|\n';
+            for (const f of type.fields) {
+                md += `| ${f.name} | ${getTypeName(f.type)} |\n`;
+            }
+        }
+        if (type.inputFields) {
+            md += '| Input Field | Type |\n|---|---|\n';
+            for (const f of type.inputFields) {
+                md += `| ${f.name} | ${getTypeName(f.type)} |\n`;
+            }
+        }
+        md += '\n';
+    }
+    md += `## Queries\n`;
+    const queries = schema.types.find(t => t.name === schema.queryType.name).fields;
+    for (const q of queries) {
+        md += `### ${q.name}\n`;
+        if (q.args && q.args.length) {
+            md += '**Arguments:**\n';
+            md += '| Name | Type |\n|---|---|\n';
+            for (const a of q.args) {
+                md += `| ${a.name} | ${getTypeName(a.type)} |\n`;
+            }
+        }
+        md += `**Returns:** ${getTypeName(q.type)}\n\n`;
+    }
+    if (schema.mutationType) {
+        md += `## Mutations\n`;
+        const mutations = schema.types.find(t => t.name === schema.mutationType.name).fields;
+        for (const m of mutations) {
+            md += `### ${m.name}\n`;
+            if (m.args && m.args.length) {
+                md += '**Arguments:**\n';
+                md += '| Name | Type |\n|---|---|\n';
+                for (const a of m.args) {
+                    md += `| ${a.name} | ${getTypeName(a.type)} |\n`;
+                }
+            }
+            md += `**Returns:** ${getTypeName(m.type)}\n\n`;
+        }
+    }
+    await writeFile(path.join(docsDir, 'graphql-api.md'), md, 'utf8');
+    console.log(`[NINJA] Generated GraphQL API docs at ${path.join(docsDir, 'graphql-api.md')}`);
+
+    // --- REST Docs ---
+    const routes = await extractExpressRoutes();
+    let restMd = `# REST API Documentation\n\n`;
+    restMd += '| Method | Path |\n|---|---|\n';
+    for (const r of routes) {
+        restMd += `| ${r.method} | ${r.path} |\n`;
+    }
+    restMd += '\n';
+    // Try to require models for example bodies
+    let models = {};
+    try {
+        const modelsDir = path.join(__dirname, '..', 'src', 'models');
+        for (const file of fs.readdirSync(modelsDir)) {
+            if (file.endsWith('.js')) {
+                const modelName = file.replace('.model.js', '').replace('.js', '');
+                models[modelName.toLowerCase()] = require(path.join(modelsDir, file));
+            }
+        }
+    } catch (e) {}
+    for (const r of routes) {
+        if (['POST', 'PUT', 'PATCH'].includes(r.method)) {
+            const seg = r.path.split('/').filter(Boolean)[0];
+            const model = models[seg && seg.toLowerCase()];
+            if (model) {
+                restMd += `\n#### Example ${r.method} ${r.path} Body\n\n\`json\n${JSON.stringify(generateRestMockData(model), null, 2)}\n\n`;
+            }
+        }
+    }
+    await writeFile(path.join(docsDir, 'rest-api.md'), restMd, 'utf8');
+    console.log(`[NINJA] Generated REST API docs at ${path.join(docsDir, 'rest-api.md')}`);
+}

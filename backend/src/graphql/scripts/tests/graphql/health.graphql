@@ -11,3 +11,30 @@ query GetHealth {
     uptime
   }
 }
+
+const resolvers = require('./resolvers');
+
+exports.resolvers = resolvers;
+exports.initLoaders = initLoaders;
+
+type Mutation {
+  ...
+  generateContent(prompt: String!, contentType: String!, options: GenerateContentOptions): GenerateContentResult
+}
+
+type GenerateContentResult {
+  content: String
+  metadata: GenerateContentMetadata
+}
+
+type GenerateContentMetadata {
+  generationTime: String
+  modelUsed: String
+  tokens: Int
+}
+
+input GenerateContentOptions {
+  model: String
+  temperature: Float
+  maxTokens: Int
+}
