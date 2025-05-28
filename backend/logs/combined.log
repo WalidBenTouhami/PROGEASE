@@ -1884,3 +1884,23 @@ Use mongoose.model(name, schema) {"metadata":{"service":"progease-api","stack":"
 [undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:50"}}
 [undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:50"}}
 [undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:50"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:25"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:25"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:25"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:31"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:31"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:33"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:33"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:33"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:33"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:31:33"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:49"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:49"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:49"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:55"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:55"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:57"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:57"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:57"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:57"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:41:57"}}
