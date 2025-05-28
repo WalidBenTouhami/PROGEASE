@@ -1,8 +1,8 @@
 /**
  * PROGEASE - Exécution des tests GraphQL
  * Ce script exécute les tests GraphQL générés
- * Date: 2025-05-27 19:46:03
- * Utilisateur: WalidBenTouhami
+ * Date : 2025-05-27 19:46:03
+ * Utilisateur : WalidBenTouhami
  */
 
 const fs = require('fs').promises;
@@ -200,15 +200,15 @@ async function checkServerAvailability() {
     } catch (err) {
         console.error(colorize(`❌ Impossible de se connecter au serveur GraphQL: ${config.baseUrl}`, 'red'));
 
-        // Vérifier si le serveur est en cours d'exécution mais avec des erreurs GraphQL
+        // Vérifier si le serveur est en cours d'exécution, mais avec des erreurs GraphQL
         if (err.response && err.response.status === 400) {
-            // Le serveur est actif mais il y a une erreur dans la requête
+            // Le serveur est actif, mais il y a une erreur dans la requête.
             if (err.response.data && err.response.data.errors) {
                 console.log(colorize('   Le serveur répond mais avec des erreurs dans la syntaxe GraphQL.', 'yellow'));
                 console.log(colorize('   Cela peut indiquer que le schéma est différent de celui attendu.', 'yellow'));
                 console.log(colorize('\n   Vérification alternative...', 'blue'));
 
-                // Tentative alternative - juste vérifier que le endpoint répond
+                // Tentative alternative-juste vérifier que le endpoint répond.
                 try {
                     await axios.get(config.baseUrl.split('/graphql')[0], { timeout: 5000 });
                     console.log(colorize('   ✅ Le serveur de base répond, on continue les tests', 'green'));
