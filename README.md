@@ -1,5 +1,15 @@
 # PROGEASE - Plateforme de Gestion des Projets Étudiants
 
+[![CI](https://github.com/username/progease/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/username/progease/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/username/progease/branch/main/graph/badge.svg)](https://codecov.io/gh/username/progease)
+[![Node.js Version](https://img.shields.io/badge/node-v16%2B-green.svg)](https://nodejs.org/)
+[![npm version](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/username/progease.svg)](https://github.com/username/progease/commits/main)
+[![Issues](https://img.shields.io/github/issues/username/progease.svg)](https://github.com/username/progease/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/username/progease.svg)](https://github.com/username/progease/pulls)
+[![Contributors](https://img.shields.io/github/contributors/username/progease.svg)](https://github.com/username/progease/graphs/contributors)
+
 <!--suppress ALL -->
 <p align="center">
   <img src="./assets/PROGEASE.png" alt="PROGEASE logo" width="400"/>

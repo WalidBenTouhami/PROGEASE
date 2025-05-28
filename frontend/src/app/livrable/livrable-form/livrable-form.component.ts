@@ -1,9 +1,9 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Deliverable, DeliverableStatuses } from '../../core/models/livrable.model';
+import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
 @Component({
-  selector: 'app-deliverable-form',
+  selector: 'app-livrable-form',
   standalone: true,
   imports: [
     ReactiveFormsModule
@@ -12,25 +12,25 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/
   styleUrl: './livrable-form.component.css'
 })
 export class LivrableFormComponent implements OnInit {
-  @Input() livrable?: Deliverable;
-  @Output() formSubmit = new EventEmitter<Deliverable>();
+  @Input() livrable?: Livrable;
+  @Output() formSubmit = new EventEmitter<Livrable>();
 
   livrableForm!: FormGroup;
   statutsLivrable = [
-    DeliverableStatuses.EN_ATTENTE,
-    DeliverableStatuses.EN_RETARD,
-    DeliverableStatuses.TERMINE
+    StatutLivrable.EN_ATTENTE,
+    StatutLivrable.EN_RETARD,
+    StatutLivrable.TERMINE
   ];
 
   constructor(private fb: FormBuilder) {}
 
   ngOnInit() {
     this.livrableForm = this.fb.group({
-      nom: [this.livrable?.nom || '', Validators.required],
+      intitule: [this.livrable?.intitule || '', Validators.required],
       description: [this.livrable?.description || '', Validators.required],
       dateLimite: [this.livrable?.dateLimite ? this.livrable.dateLimite.toString().substring(0, 10) : '', Validators.required],
-      urlDepot: [this.livrable?.urlDepot || '', [Validators.required]],
-      statut: [this.livrable?.statut || DeliverableStatuses.EN_ATTENTE, Validators.required]
+      // urlDepot: [this.livrable?.urlDepot || '', [Validators.required]],
+      statut: [this.livrable?.statut || StatutLivrable.EN_ATTENTE, Validators.required]
     });
   }
 

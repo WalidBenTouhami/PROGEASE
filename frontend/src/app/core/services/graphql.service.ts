@@ -20,12 +20,11 @@ export class GraphqlService {
             dateDebut
             dateFin
             statut
-            livrables {
+            livrablesComplets {
               _id
-              nom
+              intitule
               description
               dateLimite
-              urlDepot
               statut
               projetId
             }

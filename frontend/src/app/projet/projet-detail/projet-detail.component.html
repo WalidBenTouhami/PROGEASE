@@ -15,9 +15,9 @@
     <section aria-labelledby="livrables-titre">
       <h3 id="livrables-titre">Livrables associés</h3>
       <ul>
-        <li *ngFor="let livrable of projet.livrables">
-          <strong>{{ livrable.nom }}</strong>
-          <span class="status" [class]="livrable.statut.toLowerCase()">{{ livrable.statut }}</span>
+        <li *ngFor="let livrable of projet.livrablesComplets">
+          <strong>{{ livrable.intitule }}</strong>
+          <span class="status" [class]="livrable.statut">{{ livrable.statut }}</span>
           <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant le <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
         </li>
       </ul>

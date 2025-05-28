@@ -2,9 +2,9 @@
   <h2 id="formulaire-livrable-titre">Ajouter ou modifier un livrable</h2>
 
   <div class="form-group">
-    <label for="nom">Titre du livrable</label>
-    <input id="nom" formControlName="nom" type="text" required aria-required="true">
-    <div *ngIf="livrableForm.get('nom')?.invalid && livrableForm.get('nom')?.touched" class="error">
+    <label for="intitule">Titre du livrable</label>
+    <input id="intitule" formControlName="intitule" type="text" required aria-required="true">
+    <div *ngIf="livrableForm.get('intitule')?.invalid && livrableForm.get('intitule')?.touched" class="error">
       Le titre est requis.
     </div>
   </div>
@@ -22,10 +22,10 @@
     <input id="dateLimite" formControlName="dateLimite" type="date" required aria-required="true">
   </div>
 
-  <div class="form-group">
+  <!-- <div class="form-group">
     <label for="urlDepot">URL de dépôt</label>
     <input id="urlDepot" formControlName="urlDepot" type="url" required aria-required="true">
-  </div>
+  </div> -->
 
   <div class="form-group">
     <label for="statut">Statut</label>

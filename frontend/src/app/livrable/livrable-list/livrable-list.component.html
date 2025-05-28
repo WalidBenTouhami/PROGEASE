@@ -6,16 +6,16 @@
 
   <ul class="deliverable-list" *ngIf="!chargement && livrables.length">
     <li *ngFor="let livrable of livrables">
-      <span class="livrable-nom">{{ livrable.nom }}</span>
+      <span class="livrable-intitule">{{ livrable.intitule }}</span>
       <span class="status" [ngClass]="{
-        'termine': livrable.statut === 'Terminé',
-        'attente': livrable.statut === 'En attente',
-        'retard': livrable.statut === 'En retard'
+        'termine': livrable.statut === 'termine',
+        'attente': livrable.statut === 'en_attente',
+        'retard': livrable.statut === 'en_retard'
       }">{{ livrable.statut }}</span>
       <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant le <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
-      <span *ngIf="livrable.urlDepot">
+      <!-- <span *ngIf="livrable.urlDepot">
         &nbsp;| <a [href]="livrable.urlDepot" target="_blank" rel="noopener">Dépôt</a>
-      </span>
+      </span> -->
     </li>
   </ul>
 

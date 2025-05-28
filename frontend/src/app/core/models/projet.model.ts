@@ -1,5 +1,6 @@
-import { Deliverable } from './livrable.model';
+import { Livrable } from './livrable.model';
 
+// Synced with backend/src/models/projet.model.js
 export interface Projet {
     _id?: string;
     titre: string;
@@ -11,20 +12,24 @@ export interface Projet {
     dateFin: Date;
     livrables: string[];
     statut: StatutProjet;
+    progression?: number;
+    duree?: number; // Virtual
+    estEnRetard?: boolean; // Virtual
+    livrablesComplets?: Livrable[]; // Virtual, if used in UI
     creeLe?: Date;
     majLe?: Date;
 }
 
 export enum StatutProjet {
-    BROUILLON = 'Brouillon',
-    EN_COURS = 'En cours',
-    TERMINE = 'Terminé',
-    ARCHIVE = 'Archivé'
+    BROUILLON = 'brouillon',
+    EN_COURS = 'en_cours',
+    TERMINE = 'termine',
+    ARCHIVE = 'archive'
 }
 
 export const ProjectStatuses = {
-  BROUILLON: 'Brouillon',
-  EN_COURS: 'En cours',
-  TERMINE: 'Terminé',
-  ARCHIVE: 'Archivé'
+  BROUILLON: 'brouillon',
+  EN_COURS: 'en_cours',
+  TERMINE: 'termine',
+  ARCHIVE: 'archive'
 } as const;
