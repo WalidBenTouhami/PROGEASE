@@ -13,10 +13,14 @@ const rateLimiter = require('../middleware/rateLimiter');
  */
 router.get('/health', (req, res) => {
     res.status(200).json({
-        status: 'ok',
-        service: 'livrables-api',
-        timestamp: new Date().toISOString(),
-        user: req.currentUser || 'anonymous'
+        success: true,
+        message: 'Health check OK',
+        data: {
+            status: 'ok',
+            service: 'livrables-api',
+            timestamp: new Date().toISOString(),
+            user: req.currentUser || 'anonymous'
+        }
     });
 });
 

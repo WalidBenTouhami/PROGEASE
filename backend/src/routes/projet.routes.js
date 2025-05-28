@@ -98,10 +98,14 @@ router.get('/:id/livrables',
  */
 router.get('/health', (req, res) => {
     res.status(200).json({
-        status: 'ok',
-        time: new Date().toISOString(),
-        user: req.currentUser || 'anonymous',
-        environment: process.env.NODE_ENV || 'development'
+        success: true,
+        message: 'Health check OK',
+        data: {
+            status: 'ok',
+            service: 'projets-api',
+            timestamp: new Date().toISOString(),
+            user: req.currentUser || 'anonymous'
+        }
     });
 });
 

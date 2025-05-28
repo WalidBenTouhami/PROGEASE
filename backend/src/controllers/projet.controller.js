@@ -46,6 +46,7 @@ exports.getAllProjets = async (req, res) => {
 
     res.status(200).json({
       success: true,
+      message: 'Liste des projets récupérée avec succès',
       data: {
         items: projets,
         pagination: {
@@ -78,7 +79,8 @@ exports.getProjetById = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de projet invalide'
+        message: 'ID de projet invalide',
+        error: 'ID de projet invalide'
       });
     }
 
@@ -87,12 +89,14 @@ exports.getProjetById = async (req, res) => {
     if (!projet) {
       return res.status(404).json({
         success: false,
-        message: `Projet avec l'ID ${id} non trouvé`
+        message: `Projet avec l'ID ${id} non trouvé`,
+        error: `Projet avec l'ID ${id} non trouvé`
       });
     }
 
     res.status(200).json({
       success: true,
+      message: 'Projet récupéré avec succès',
       data: projet
     });
   } catch (error) {
@@ -125,7 +129,8 @@ exports.createProjet = async (req, res) => {
     if (!titre) {
       return res.status(400).json({
         success: false,
-        message: 'Le titre du projet est obligatoire'
+        message: 'Le titre du projet est obligatoire',
+        error: 'Le titre du projet est obligatoire'
       });
     }
 
@@ -145,8 +150,12 @@ exports.createProjet = async (req, res) => {
     });
 
     await nouveauProjet.save();
-
-    res.status(201).json(nouveauProjet);
+    logger.monitoring('Projet créé', { projetId: nouveauProjet._id, user: req.user?.id });
+    res.status(201).json({
+      success: true,
+      message: 'Projet créé avec succès',
+      data: nouveauProjet
+    });
   } catch (error) {
     logger.error('Erreur lors de la création du projet:', error);
     res.status(500).json({
@@ -177,7 +186,8 @@ exports.updateProjet = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de projet invalide'
+        message: 'ID de projet invalide',
+        error: 'ID de projet invalide'
       });
     }
 
@@ -186,7 +196,8 @@ exports.updateProjet = async (req, res) => {
     if (!projet) {
       return res.status(404).json({
         success: false,
-        message: `Projet avec l'ID ${id} non trouvé`
+        message: `Projet avec l'ID ${id} non trouvé`,
+        error: `Projet avec l'ID ${id} non trouvé`
       });
     }
 
@@ -207,7 +218,12 @@ exports.updateProjet = async (req, res) => {
       { new: true }
     );
 
-    res.status(200).json(projetMisAJour);
+    logger.monitoring('Projet mis à jour', { projetId: id, user: req.user?.id });
+    res.status(200).json({
+      success: true,
+      message: 'Projet mis à jour avec succès',
+      data: projetMisAJour
+    });
   } catch (error) {
     logger.error(`Erreur lors de la mise à jour du projet ${req.params.id}:`, error);
     res.status(500).json({
@@ -228,7 +244,8 @@ exports.deleteProjet = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de projet invalide'
+        message: 'ID de projet invalide',
+        error: 'ID de projet invalide'
       });
     }
 
@@ -237,7 +254,8 @@ exports.deleteProjet = async (req, res) => {
     if (!projet) {
       return res.status(404).json({
         success: false,
-        message: `Projet avec l'ID ${id} non trouvé`
+        message: `Projet avec l'ID ${id} non trouvé`,
+        error: `Projet avec l'ID ${id} non trouvé`
       });
     }
 
@@ -247,10 +265,15 @@ exports.deleteProjet = async (req, res) => {
     // Supprimer le projet
     await Projet.findByIdAndDelete(id);
 
+    logger.monitoring('Projet supprimé', { projetId: id, user: req.user?.id });
     res.status(200).json({
-      _id: id,
-      titre: "Projet supprimé",
-      statut: "SUPPRIME"
+      success: true,
+      message: 'Projet supprimé avec succès',
+      data: {
+        _id: id,
+        titre: 'Projet supprimé',
+        statut: 'SUPPRIME'
+      }
     });
   } catch (error) {
     logger.error(`Erreur lors de la suppression du projet ${req.params.id}:`, error);

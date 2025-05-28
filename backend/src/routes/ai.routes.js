@@ -2,99 +2,112 @@
 const express = require('express');
 const router = express.Router();
 const logger = require('../utils/logger');
+const aiService = require('../services/ai.service');
 
-// Endpoint d'analyse pour les tests
-router.post('/analyze', (req, res) => {
+// Endpoint d'analyse IA
+router.post('/analyze', async (req, res) => {
     try {
         const { text, document } = req.body;
-
-        // Validation minimale
         if (!text && !document) {
             return res.status(400).json({
-                erreur: "Aucun contenu à analyser"
+                success: false,
+                message: "Aucun contenu à analyser",
+                error: "Aucun contenu à analyser"
             });
         }
-
-        // Si le texte est trop court (pour le test API handles short text)
-        if (text && text.length < 10) {
-            return res.status(400).json({
-                erreur: "Le texte est trop court pour une analyse précise",
-                minLength: 10,
-                receivedLength: text.length
-            });
-        }
-
-        // Réponse pour les tests
+        // On passe tout le body pour permettre l'analyse flexible
+        const analyse = await aiService.analyserProjet({ text, document });
+        logger.monitoring('Analyse IA effectuée', { user: req.currentUser });
         res.status(200).json({
-            analysis: {
-                sentiment: "positif",
-                topics: ["test", "api", "progease"],
-                keywords: ["projet", "test", "api"],
-                summary: "Analyse complétée avec succès."
-            },
-            input: text ? text.substring(0, 100) + "..." : "document analysé",
-            timestamp: new Date().toISOString()
+            success: true,
+            message: 'Analyse IA effectuée avec succès',
+            data: analyse
         });
     } catch (error) {
         logger.error("Erreur lors de l'analyse AI:", error);
         res.status(500).json({
-            erreur: "Erreur interne lors de l'analyse",
-            details: error.message
+            success: false,
+            message: "Erreur interne lors de l'analyse",
+            error: error.message
         });
     }
 });
 
-// Route pour générer du texte (minimal pour les tests)
-router.post('/generer-texte', (req, res) => {
+// Route pour générer du texte (français)
+router.post('/generer-texte', async (req, res) => {
     try {
         const { prompt } = req.body;
-
         if (!prompt) {
             return res.status(400).json({
-                erreur: "Le prompt est requis"
+                success: false,
+                message: "Le prompt est requis",
+                error: "Le prompt est requis"
             });
         }
-
+        const texte = await aiService.genererTexte(prompt);
+        logger.monitoring('Génération de texte IA (FR)', { user: req.currentUser });
         res.status(200).json({
-            text: `Texte généré basé sur: "${prompt.substring(0, 30)}..."`,
-            prompt: prompt.substring(0, 100),
-            timestamp: new Date().toISOString()
+            success: true,
+            message: 'Texte généré avec succès',
+            data: {
+                text: texte,
+                prompt: prompt.substring(0, 100),
+                timestamp: new Date().toISOString()
+            }
         });
     } catch (error) {
         logger.error("Erreur lors de la génération de texte:", error);
-        res.status(500).json({ erreur: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la génération de texte',
+            error: error.message
+        });
     }
 });
 
 // Alias en anglais
-router.post('/generate-text', (req, res) => {
+router.post('/generate-text', async (req, res) => {
     try {
         const { prompt } = req.body;
-
         if (!prompt) {
             return res.status(400).json({
+                success: false,
+                message: "Prompt is required",
                 error: "Prompt is required"
             });
         }
-
+        const texte = await aiService.genererTexte(prompt);
+        logger.monitoring('Génération de texte IA (EN)', { user: req.currentUser });
         res.status(200).json({
-            text: `Generated text based on: "${prompt.substring(0, 30)}..."`,
-            prompt: prompt.substring(0, 100),
-            timestamp: new Date().toISOString()
+            success: true,
+            message: 'Text generated successfully',
+            data: {
+                text: texte,
+                prompt: prompt.substring(0, 100),
+                timestamp: new Date().toISOString()
+            }
         });
     } catch (error) {
         logger.error("Error generating text:", error);
-        res.status(500).json({ error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Error generating text',
+            error: error.message
+        });
     }
 });
 
 // Route health
 router.get('/health', (req, res) => {
     res.status(200).json({
-        status: 'ok',
-        service: 'ai-api',
-        timestamp: new Date().toISOString(),
-        model: 'deepseek-test'
+        success: true,
+        message: 'Health check OK',
+        data: {
+            status: 'ok',
+            service: 'ai-api',
+            timestamp: new Date().toISOString(),
+            model: 'deepseek-test'
+        }
     });
 });
 

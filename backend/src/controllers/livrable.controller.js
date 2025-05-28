@@ -54,7 +54,11 @@ exports.getAllLivrables = async (req, res) => {
 
     const total = await Livrable.countDocuments(filter);
 
-    res.status(200).json(livrables);
+    res.status(200).json({
+      success: true,
+      message: 'Liste des livrables récupérée avec succès',
+      data: livrables
+    });
   } catch (error) {
     logger.error('Erreur lors de la récupération des livrables:', error);
     res.status(500).json({
@@ -75,7 +79,8 @@ exports.getLivrableById = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de livrable invalide'
+        message: 'ID de livrable invalide',
+        error: 'ID de livrable invalide'
       });
     }
 
@@ -84,11 +89,16 @@ exports.getLivrableById = async (req, res) => {
     if (!livrable) {
       return res.status(404).json({
         success: false,
-        message: `Livrable avec l'ID ${id} non trouvé`
+        message: `Livrable avec l'ID ${id} non trouvé`,
+        error: `Livrable avec l'ID ${id} non trouvé`
       });
     }
 
-    res.status(200).json(livrable);
+    res.status(200).json({
+      success: true,
+      message: 'Livrable récupéré avec succès',
+      data: livrable
+    });
   } catch (error) {
     logger.error(`Erreur lors de la récupération du livrable ${req.params.id}:`, error);
     res.status(500).json({
@@ -144,7 +154,8 @@ exports.createLivrable = async (req, res) => {
     if (!intitule || !projetId) {
       return res.status(400).json({
         success: false,
-        message: 'L\'intitulé et l\'ID du projet sont obligatoires'
+        message: 'L\'intitulé et l\'ID du projet sont obligatoires',
+        error: 'L\'intitulé et l\'ID du projet sont obligatoires'
       });
     }
 
@@ -166,8 +177,12 @@ exports.createLivrable = async (req, res) => {
 
     // Mettre à jour la date du projet
     await Projet.findByIdAndUpdate(projetId, { majLe: new Date() });
-
-    res.status(201).json(nouveauLivrable);
+    logger.monitoring('Livrable créé', { livrableId: nouveauLivrable._id, projetId, user: req.user?.id });
+    res.status(201).json({
+      success: true,
+      message: 'Livrable créé avec succès',
+      data: nouveauLivrable
+    });
   } catch (error) {
     logger.error('Erreur lors de la création du livrable:', error);
     res.status(500).json({
@@ -196,7 +211,8 @@ exports.updateLivrable = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de livrable invalide'
+        message: 'ID de livrable invalide',
+        error: 'ID de livrable invalide'
       });
     }
 
@@ -205,7 +221,8 @@ exports.updateLivrable = async (req, res) => {
     if (!livrable) {
       return res.status(404).json({
         success: false,
-        message: `Livrable avec l'ID ${id} non trouvé`
+        message: `Livrable avec l'ID ${id} non trouvé`,
+        error: `Livrable avec l'ID ${id} non trouvé`
       });
     }
 
@@ -225,7 +242,12 @@ exports.updateLivrable = async (req, res) => {
 
     const livableMisAJour = await Livrable.findByIdAndUpdate(id, updateData, { new: true });
 
-    res.status(200).json(livableMisAJour);
+    logger.monitoring('Livrable mis à jour', { livrableId: id, user: req.user?.id });
+    res.status(200).json({
+      success: true,
+      message: 'Livrable mis à jour avec succès',
+      data: livableMisAJour
+    });
   } catch (error) {
     logger.error(`Erreur lors de la mise à jour du livrable ${req.params.id}:`, error);
     res.status(500).json({
@@ -246,7 +268,8 @@ exports.deleteLivrable = async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({
         success: false,
-        message: 'ID de livrable invalide'
+        message: 'ID de livrable invalide',
+        error: 'ID de livrable invalide'
       });
     }
 
@@ -255,18 +278,24 @@ exports.deleteLivrable = async (req, res) => {
     if (!livrable) {
       return res.status(404).json({
         success: false,
-        message: `Livrable avec l'ID ${id} non trouvé`
+        message: `Livrable avec l'ID ${id} non trouvé`,
+        error: `Livrable avec l'ID ${id} non trouvé`
       });
     }
 
     await Livrable.findByIdAndDelete(id);
 
+    logger.monitoring('Livrable supprimé', { livrableId: id, user: req.user?.id });
     res.status(200).json({
-      _id: id,
-      intitule: "Livrable supprimé",
-      titre: "Livrable supprimé",
-      nom: "Livrable supprimé",
-      statut: "SUPPRIME"
+      success: true,
+      message: 'Livrable supprimé avec succès',
+      data: {
+        _id: id,
+        intitule: 'Livrable supprimé',
+        titre: 'Livrable supprimé',
+        nom: 'Livrable supprimé',
+        statut: 'SUPPRIME'
+      }
     });
   } catch (error) {
     logger.error(`Erreur lors de la suppression du livrable ${req.params.id}:`, error);
