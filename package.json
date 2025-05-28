@@ -7,7 +7,12 @@
     "clean": "rimraf node_modules && cd backend && rimraf node_modules && cd ../frontend && rimraf node_modules"
   },
   "devDependencies": {
-    "rimraf": "^6.0.1",
-    "concurrently": "^8.2.2"
+    "@graphql-codegen/cli": "^5.0.6",
+    "@graphql-codegen/introspection": "^4.0.3",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-apollo-angular": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.6.1",
+    "concurrently": "^8.2.2",
+    "rimraf": "^6.0.1"
   }
 }

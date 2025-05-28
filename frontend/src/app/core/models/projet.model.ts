@@ -1,4 +1,5 @@
 import { Livrable } from './livrable.model';
+import { GetProjetsQuery, GetProjetsGQL } from '../core/generated/graphql';
 
 // Synced with backend/src/models/projet.model.js
 export interface Projet {

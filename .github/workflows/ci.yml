@@ -88,4 +88,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: test-reports
-          path: backend/reports/ 
+          path: backend/reports/
+
+      - name: Install additional dependencies
+        run: |
+          cd frontend
+          npm install --save-dev @graphql-codegen/introspection 

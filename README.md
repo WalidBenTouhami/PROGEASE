@@ -1,14 +1,14 @@
 # PROGEASE - Plateforme de Gestion des Projets Étudiants
 
-[![CI](https://github.com/username/progease/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/username/progease/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/username/progease/branch/main/graph/badge.svg)](https://codecov.io/gh/username/progease)
+[![CI](https://github.com/WalidBenTouhami/PROGEASE/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/WalidBenTouhami/PROGEASE/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/WalidBenTouhami/PROGEASE/branch/main/graph/badge.svg)](https://codecov.io/gh/WalidBenTouhami/PROGEASE)
 [![Node.js Version](https://img.shields.io/badge/node-v16%2B-green.svg)](https://nodejs.org/)
 [![npm version](https://img.shields.io/npm/v/npm.svg)](https://www.npmjs.com/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/username/progease.svg)](https://github.com/username/progease/commits/main)
-[![Issues](https://img.shields.io/github/issues/username/progease.svg)](https://github.com/username/progease/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/username/progease.svg)](https://github.com/username/progease/pulls)
-[![Contributors](https://img.shields.io/github/contributors/username/progease.svg)](https://github.com/username/progease/graphs/contributors)
+[![Last Commit](https://img.shields.io/github/last-commit/WalidBenTouhami/PROGEASE.svg)](https://github.com/WalidBenTouhami/PROGEASE/commits/main)
+[![Issues](https://img.shields.io/github/issues/WalidBenTouhami/PROGEASE.svg)](https://github.com/WalidBenTouhami/PROGEASE/issues)
+[![Pull Requests](https://img.shields.io/github/issues-pr/WalidBenTouhami/PROGEASE.svg)](https://github.com/WalidBenTouhami/PROGEASE/pulls)
+[![Contributors](https://img.shields.io/github/contributors/WalidBenTouhami/PROGEASE.svg)](https://github.com/WalidBenTouhami/PROGEASE/graphs/contributors)
 
 <!--suppress ALL -->
 <p align="center">
@@ -95,7 +95,7 @@
 
 1. **Cloner le dépôt :**
    ```bash
-   git clone https://github.com/username/progease.git
+   git clone https://github.com/WalidBenTouhami/PROGEASE.git
    cd progease
    ```
 
