@@ -93,4 +93,5 @@ jobs:
       - name: Install additional dependencies
         run: |
           cd frontend
-          npm install --save-dev @graphql-codegen/introspection 
+          npm install --save-dev @graphql-codegen/introspection
+          npm install @angular/material @angular/cdk 

@@ -1,0 +1,18 @@
+<div class="frontoffice-layout">
+  <header class="fo-header">
+    <img src="assets/PROGEASE.png" alt="PROGEASE Logo" class="fo-logo" />
+    <span class="fo-title">PROGEASE</span>
+    <nav class="fo-nav">
+      <a routerLink="/front-office/dashboard" routerLinkActive="active">Dashboard</a>
+      <a routerLink="/front-office/projets" routerLinkActive="active">Projets</a>
+      <a routerLink="/front-office/livrables" routerLinkActive="active">Livrables</a>
+      <a routerLink="/front-office/profile" routerLinkActive="active">Profil</a>
+    </nav>
+  </header>
+  <main class="fo-main">
+    <router-outlet></router-outlet>
+  </main>
+  <footer class="fo-footer">
+    &copy; {{ new Date().getFullYear() }} PROGEASE - Front-Office
+  </footer>
+</div> 

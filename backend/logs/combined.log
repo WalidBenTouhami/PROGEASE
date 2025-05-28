@@ -1849,3 +1849,38 @@ Use mongoose.model(name, schema) {"metadata":{"service":"progease-api","stack":"
 [undefined] WARN: Erreur client HTTP: read ECONNRESET {"metadata":{"service":"progease-api","errno":-4077,"code":"ECONNRESET","syscall":"read","stack":"Error: read ECONNRESET\n    at TCP.onStreamRead (node:internal/stream_base_commons:218:20)","timestamp":"2025-05-28 23:37:51"}}
 [undefined] WARN: Erreur client HTTP: read ECONNRESET {"metadata":{"service":"progease-api","errno":-4077,"code":"ECONNRESET","syscall":"read","stack":"Error: read ECONNRESET\n    at TCP.onStreamRead (node:internal/stream_base_commons:218:20)","timestamp":"2025-05-28 23:38:27"}}
 [undefined] WARN: Erreur client HTTP: read ECONNRESET {"metadata":{"service":"progease-api","errno":-4077,"code":"ECONNRESET","syscall":"read","stack":"Error: read ECONNRESET\n    at TCP.onStreamRead (node:internal/stream_base_commons:218:20)","timestamp":"2025-05-28 23:38:48"}}
+[undefined] INFO: Signal SIGINT reçu. Arrêt du serveur... {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:07:52"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:36"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:36"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:36"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:37"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:37"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:37"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:37"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:37"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:37"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:08:37"}}
+[undefined] WARN: Erreur client HTTP: read ECONNRESET {"metadata":{"service":"progease-api","errno":-4077,"code":"ECONNRESET","syscall":"read","stack":"Error: read ECONNRESET\n    at TCP.onStreamRead (node:internal/stream_base_commons:218:20)","timestamp":"2025-05-29 00:11:50"}}
+[undefined] INFO: Signal SIGINT reçu. Arrêt du serveur... {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:41"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:44"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:44"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:44"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:47"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:47"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:48"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:48"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:48"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:48"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:15:48"}}
+[undefined] WARN: Erreur client HTTP: read ECONNRESET {"metadata":{"service":"progease-api","errno":-4077,"code":"ECONNRESET","syscall":"read","stack":"Error: read ECONNRESET\n    at TCP.onStreamRead (node:internal/stream_base_commons:218:20)","timestamp":"2025-05-29 00:16:31"}}
+[undefined] INFO: Signal SIGINT reçu. Arrêt du serveur... {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:19:12"}}
+[undefined] INFO: ✅ Clé API Deepseek chargée {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:44"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:44"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configurés {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:44"}}
+[undefined] INFO: ✅ Connecté à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:48"}}
+[undefined] INFO: Connecté à MongoDB avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:48"}}
+[undefined] INFO: Données de test déjà présentes {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:50"}}
+[undefined] INFO: Données de test créées/vérifiées avec succès {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:50"}}
+[undefined] INFO: Serveur Express démarré sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:50"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:50"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-29 00:27:50"}}

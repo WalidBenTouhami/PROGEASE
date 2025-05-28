@@ -1,0 +1,27 @@
+<div class="backoffice-layout">
+  <header class="bo-header">
+    <img src="assets/PROGEASE.png" alt="PROGEASE Logo" class="bo-logo" />
+    <span class="bo-title">PROGEASE Back-Office</span>
+    <nav class="bo-user-menu">
+      <a href="#">Profil</a> |
+      <a href="#">Déconnexion</a>
+    </nav>
+  </header>
+  <aside class="bo-sidebar">
+    <nav>
+      <ul>
+        <li><a routerLink="/back-office/dashboard" routerLinkActive="active">Dashboard</a></li>
+        <li><a routerLink="/back-office/projet-management" routerLinkActive="active">Gestion Projets</a></li>
+        <li><a routerLink="/back-office/livrable-management" routerLinkActive="active">Gestion Livrables</a></li>
+        <li><a routerLink="/back-office/users" routerLinkActive="active">Utilisateurs</a></li>
+        <li><a routerLink="/back-office/settings" routerLinkActive="active">Paramètres</a></li>
+      </ul>
+    </nav>
+  </aside>
+  <main class="bo-main">
+    <router-outlet></router-outlet>
+  </main>
+  <footer class="bo-footer">
+    &copy; {{ new Date().getFullYear() }} PROGEASE - Back-Office
+  </footer>
+</div> 
