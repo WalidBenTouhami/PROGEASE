@@ -155,5 +155,5 @@ const resolvers = {
 };
 
 // Exports
-module.exports = resolvers;
-module.exports.initLoaders = initLoaders;
+exports.resolvers = resolvers;
+exports.initLoaders = initLoaders;

@@ -46,22 +46,28 @@ async function createApolloServer(httpServer = null, options = {}) {
             logger.error(`GraphQL Error: ${formattedError.message}`, {
                 path: formattedError.path,
                 code: formattedError.extensions?.code,
+                errorType: formattedError.extensions?.errorType,
                 originalError: error.originalError
             });
 
-            // En production, on peut masquer certains détails sensibles
-            if (process.env.NODE_ENV === 'production') {
-                // Retourner une erreur simplifiée au client
-                return {
-                    message: formattedError.message,
-                    code: formattedError.extensions?.code || 'INTERNAL_SERVER_ERROR'
-                };
+            const baseError = {
+                message: formattedError.message,
+                code: formattedError.extensions?.code || 'INTERNAL_SERVER_ERROR',
+                path: formattedError.path,
+                timestamp: new Date().toISOString(),
+            };
+            if (formattedError.extensions?.errorType) {
+                baseError.errorType = formattedError.extensions.errorType;
             }
 
-            // En développement, ajouter des détails pour le débogage
+            if (process.env.NODE_ENV === 'production') {
+                // Masquer stacktrace et détails sensibles
+                return baseError;
+            }
+
+            // En développement, ajouter la stacktrace
             return {
-                ...formattedError,
-                timestamp: new Date().toISOString(),
+                ...baseError,
                 stacktrace: error.originalError?.stack || formattedError.extensions?.exception?.stacktrace
             };
         },

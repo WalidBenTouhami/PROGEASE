@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { STATUTS_PROJET, STATUTS_LIVRABLE } = require('../config/constants');
+const { STATUTS_PROJET, STATUTS_LIVRABLE } = require('../../../config/constants');
 
 console.log('Vérification des énumérations...');
 

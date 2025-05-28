@@ -12,8 +12,15 @@ const connecterBD = require('./config/db');
 const { createStandaloneServer } = require('./src/graphql/standalone-server');
 const { NODE_ENV } = require('./config/constants');
 const { globalRateLimiter } = require('./src/middleware/rateLimiter');
-const { schema } = require('./src/graphql/codegen');
 const { graphqlHTTP } = require('express-graphql');
+
+// Import du schéma GraphQL principal (typeDefs)
+const { typeDefs } = require('./src/graphql/schema');
+const { makeExecutableSchema } = require('@graphql-tools/schema');
+const resolvers = require('./src/graphql');
+
+// Créer le schéma exécutable à partir des typeDefs et resolvers
+const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const {
     ERROR_MESSAGES,
@@ -119,23 +126,50 @@ app.get('/health', (req, res) => {
     });
 });
 
-// Configuration GraphQL avec express-graphql
-app.use('/graphql', graphqlHTTP({
-    schema,
-    graphiql: true,
-    customFormatErrorFn: (error) => {
-        logger.error(`GraphQL Error: ${error.message}`, { path: error.path });
-        return {
-            message: error.message,
-            locations: error.locations,
-            path: error.path
-        };
-    },
-    context: ({ req }) => ({
-        currentUser: req.currentUser,
-        timestamp: req.timestamp
-    })
-}));
+// Configuration GraphQL
+if (process.env.USE_APOLLO_SERVER === 'true') {
+    // Apollo Server (moderne, recommandé)
+    createStandaloneServer(app, httpServer, schema)
+        .then(() => logger.info('Serveur Apollo Standalone configuré'))
+        .catch(error => {
+            logger.error('Erreur Apollo Server, fallback sur express-graphql:', error.message);
+            // Fallback express graphql si Apollo échoue
+            app.use('/graphql', graphqlHTTP({
+                schema,
+                graphiql: true,
+                customFormatErrorFn: (error) => {
+                    logger.error(`GraphQL Error: ${error.message}`, { path: error.path });
+                    return {
+                        message: error.message,
+                        locations: error.locations,
+                        path: error.path
+                    };
+                },
+                context: ({ req }) => ({
+                    currentUser: req.currentUser,
+                    timestamp: req.timestamp
+                })
+            }));
+        });
+} else {
+    // express-graphql (legacy, fallback)
+    app.use('/graphql', graphqlHTTP({
+        schema,
+        graphiql: true,
+        customFormatErrorFn: (error) => {
+            logger.error(`GraphQL Error: ${error.message}`, { path: error.path });
+            return {
+                message: error.message,
+                locations: error.locations,
+                path: error.path
+            };
+        },
+        context: ({ req }) => ({
+            currentUser: req.currentUser,
+            timestamp: req.timestamp
+        })
+    }));
+}
 
 // Serveur principal
 async function startServer() {
@@ -153,16 +187,6 @@ async function startServer() {
             }
         } catch (error) {
             logger.warn('Impossible de créer les données de test:', error.message);
-        }
-
-        // Configuration du serveur Apollo si nécessaire (option alternative à express-graphql)
-        try {
-            if (process.env.USE_APOLLO_SERVER === 'true') {
-                await createStandaloneServer(app, httpServer);
-                logger.info('Serveur Apollo Standalone configuré');
-            }
-        } catch (error) {
-            logger.warn('Le serveur Apollo n\'a pas pu être configuré. Express-GraphQL sera utilisé:', error.message);
         }
 
         // Middleware d'erreurs 404 - doit être après les routes ET après Apollo/GraphQL

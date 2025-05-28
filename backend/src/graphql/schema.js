@@ -35,6 +35,7 @@ const typeDefs = gql`
     projetId: ID!
     creeLe: String
     majLe: String
+    projet: Projet
   }
 
   input LivrableInput {
@@ -101,6 +102,14 @@ const typeDefs = gql`
     livrables: [Livrable]
     livrable(id: ID!): Livrable
     livrablesByProjet(projetId: ID!): [Livrable]
+    healthCheck: HealthCheckResult
+  }
+
+  type HealthCheckResult {
+    status: String
+    timestamp: String
+    version: String
+    message: String
   }
 
   type Mutation {
@@ -109,8 +118,16 @@ const typeDefs = gql`
     supprimerProjet(id: ID!): Projet
     
     creerLivrable(input: LivrableInput!): Livrable
-    mettreAJourLivrable(id: ID!, input: LivrableUpdateInput!): Livrable
-    supprimerLivrable(id: ID!): Livrable
+    ajouterLivrable(projetId: ID!, input: LivrableInput!): Livrable
+    mettreAJourLivrable(livrableId: ID!, input: LivrableUpdateInput!): Livrable
+    supprimerLivrable(livrableId: ID!): Livrable
+    ping(message: String): PingResult
+  }
+
+  type PingResult {
+    success: Boolean
+    message: String
+    timestamp: String
   }
 `;
 
@@ -222,9 +239,18 @@ const resolvers = {
         majLe: new Date().toISOString()
       };
     },
-    mettreAJourLivrable: async (_, { id, input }) => {
+    ajouterLivrable: async (_, { projetId, input }) => {
       return {
-        _id: id,
+        _id: "new" + Date.now(),
+        ...input,
+        projetId: projetId,
+        creeLe: new Date().toISOString(),
+        majLe: new Date().toISOString()
+      };
+    },
+    mettreAJourLivrable: async (_, { livrableId, input }) => {
+      return {
+        _id: livrableId,
         intitule: input.intitule || "Livrable Test Modifié",
         titre: input.titre || "Livrable Test Modifié",
         nom: input.nom || "Livrable Test Modifié",
@@ -232,14 +258,21 @@ const resolvers = {
         majLe: new Date().toISOString()
       };
     },
-    supprimerLivrable: async (_, { id }) => {
+    supprimerLivrable: async (_, { livrableId }) => {
       return {
-        _id: id,
+        _id: livrableId,
         intitule: "Livrable supprimé",
         titre: "Livrable supprimé",
         nom: "Livrable supprimé",
         statut: "SUPPRIME",
         projetId: "project123"
+      };
+    },
+    ping: async (_, { message }) => {
+      return {
+        success: true,
+        message: message || "Ping successful",
+        timestamp: new Date().toISOString()
       };
     }
   },

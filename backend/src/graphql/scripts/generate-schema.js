@@ -8,7 +8,7 @@ const {
     generateAllEnums,
     injectEnumsInSchema,
     generateSchemaFile
-} = require('../src/graphql/schema-enum-generator');
+} = require('../schema-enum-generator');
 
 // Chemins des fichiers
 const templatePath = path.resolve(__dirname, '../my-apollo-graph/graphql/schema-template.graphql');

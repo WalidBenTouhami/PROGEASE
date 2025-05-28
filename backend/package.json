@@ -10,7 +10,7 @@
     "test:newman": "node newman-tests.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "publish-schema": "node scripts/publish-schema.js"
+    "publish-schema": "node src/graphql/scripts/publish-schema.js"
   },
   "keywords": [
     "api",

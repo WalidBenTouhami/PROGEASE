@@ -8,7 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const { exec } = require('child_process');
-const { typeDefs } = require('../src/graphql/schema');
+const { typeDefs } = require('../schema');
 // Importer et configurer dotenv en tout premier
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
