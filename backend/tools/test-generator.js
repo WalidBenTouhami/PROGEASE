@@ -50,7 +50,7 @@ const config = {
 };
 
 // Structure pour stocker les informations extraites
-const projectStructure = {
+const projetStructure = {
     models: [],
     endpoints: [],
     graphqlTypes: [],
@@ -129,7 +129,7 @@ async function analyzeModels() {
                 }
             }
 
-            projectStructure.models.push({
+            projetStructure.models.push({
                 name: modelName,
                 fields: fields,
                 file: path.relative(path.join(__dirname, '..'), file)
@@ -139,7 +139,7 @@ async function analyzeModels() {
         }
     }
 
-    console.log(`${projectStructure.models.length} modèles analysés.`);
+    console.log(`${projetStructure.models.length} modèles analysés.`);
 }
 
 /**
@@ -172,7 +172,7 @@ async function analyzeRoutes() {
                 const controllerMatch = lineContext.match(controllerRegex);
                 const controller = controllerMatch ? controllerMatch[1] : 'unknown';
 
-                projectStructure.endpoints.push({
+                projetStructure.endpoints.push({
                     method: method,
                     path: endpoint,
                     controller: controller,
@@ -185,7 +185,7 @@ async function analyzeRoutes() {
         }
     }
 
-    console.log(`${projectStructure.endpoints.length} endpoints détectés.`);
+    console.log(`${projetStructure.endpoints.length} endpoints détectés.`);
 }
 
 /**
@@ -227,7 +227,7 @@ async function analyzeGraphQL() {
                     });
                 }
 
-                projectStructure.graphqlTypes.push({
+                projetStructure.graphqlTypes.push({
                     name: typeName,
                     fields: fields,
                     file: path.relative(path.join(__dirname, '..'), file)
@@ -244,7 +244,7 @@ async function analyzeGraphQL() {
                 let queryFieldMatch;
 
                 while ((queryFieldMatch = queryFieldRegex.exec(queriesContent)) !== null) {
-                    projectStructure.graphqlQueries.push({
+                    projetStructure.graphqlQueries.push({
                         name: queryFieldMatch[1],
                         returnType: queryFieldMatch[2],
                         file: path.relative(path.join(__dirname, '..'), file)
@@ -262,7 +262,7 @@ async function analyzeGraphQL() {
                 let mutationFieldMatch;
 
                 while ((mutationFieldMatch = mutationFieldRegex.exec(mutationsContent)) !== null) {
-                    projectStructure.graphqlMutations.push({
+                    projetStructure.graphqlMutations.push({
                         name: mutationFieldMatch[1],
                         returnType: mutationFieldMatch[2],
                         file: path.relative(path.join(__dirname, '..'), file)
@@ -274,9 +274,9 @@ async function analyzeGraphQL() {
         }
     }
 
-    console.log(`${projectStructure.graphqlTypes.length} types GraphQL détectés.`);
-    console.log(`${projectStructure.graphqlQueries.length} requêtes GraphQL détectées.`);
-    console.log(`${projectStructure.graphqlMutations.length} mutations GraphQL détectées.`);
+    console.log(`${projetStructure.graphqlTypes.length} types GraphQL détectés.`);
+    console.log(`${projetStructure.graphqlQueries.length} requêtes GraphQL détectées.`);
+    console.log(`${projetStructure.graphqlMutations.length} mutations GraphQL détectées.`);
 }
 
 /**
@@ -332,7 +332,7 @@ async function generateNewmanCollection() {
     // Regrouper les endpoints par ressource (basé sur le premier segment de l'URL)
     const endpointGroups = {};
 
-    projectStructure.endpoints.forEach(endpoint => {
+    projetStructure.endpoints.forEach(endpoint => {
         // Ignorer les routes de santé et API principale déjà incluses
         if (endpoint.path === '/health' || endpoint.path === '/api') {
             return;
@@ -359,7 +359,7 @@ async function generateNewmanCollection() {
         };
 
         // Trouver le modèle associé à cette ressource
-        const associatedModel = projectStructure.models.find(m =>
+        const associatedModel = projetStructure.models.find(m =>
             m.name.toLowerCase() === resource.toLowerCase() ||
             m.name.toLowerCase() === resource.toLowerCase().slice(0, -1) // singulier
         );
@@ -420,7 +420,7 @@ async function generateNewmanCollection() {
     }
 
     // Ajouter une section pour les tests GraphQL si présents
-    if (projectStructure.graphqlQueries.length > 0 || projectStructure.graphqlMutations.length > 0) {
+    if (projetStructure.graphqlQueries.length > 0 || projetStructure.graphqlMutations.length > 0) {
         const graphqlGroup = {
             name: `${groupCounter}. Tests GraphQL`,
             item: []
@@ -428,7 +428,7 @@ async function generateNewmanCollection() {
 
         // Ajouter des requêtes pour chaque query GraphQL
         let gqlCounter = 1;
-        projectStructure.graphqlQueries.forEach(query => {
+        projetStructure.graphqlQueries.forEach(query => {
             const testItem = {
                 name: `${groupCounter}.${gqlCounter} Query ${query.name}`,
                 request: {
@@ -472,7 +472,7 @@ async function generateNewmanCollection() {
         });
 
         // Ajouter des requêtes pour chaque mutation GraphQL
-        projectStructure.graphqlMutations.forEach(mutation => {
+        projetStructure.graphqlMutations.forEach(mutation => {
             const testItem = {
                 name: `${groupCounter}.${gqlCounter} Mutation ${mutation.name}`,
                 request: {

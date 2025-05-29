@@ -304,12 +304,12 @@ type PaginationInfo {
                 console.log(colorize('❌ Le schéma ne contient pas de type Query!', 'red'));
             }
 
-            if (!schemaContent.includes('type Projet') && !schemaContent.includes('type Project')) {
-                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Projet/Project!', 'yellow'));
+            if (!schemaContent.includes('type Projet') && !schemaContent.includes('type Projet')) {
+                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Projet/Projet!', 'yellow'));
             }
 
-            if (!schemaContent.includes('type Livrable') && !schemaContent.includes('type Deliverable')) {
-                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Livrable/Deliverable!', 'yellow'));
+            if (!schemaContent.includes('type Livrable') && !schemaContent.includes('type Livrable')) {
+                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Livrable/Livrable!', 'yellow'));
             }
         }
 

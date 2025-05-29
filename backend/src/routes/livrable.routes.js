@@ -51,7 +51,7 @@ router.post('/',
  */
 router.get('/projet/:projetId',
     validateId('projetId'),
-    asyncHandler(livrableController.findByProject)
+    asyncHandler(livrableController.findByProjet)
 );
 
 /**

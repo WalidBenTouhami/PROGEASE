@@ -12,7 +12,7 @@ import { FormsModule } from '@angular/forms';
 export class DashboardComponent implements OnInit {
   users = [{ nom: 'Jean', role: 'Administrateur' }];
   roles = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projectTemplates = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
+  projetTemplates = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
   tutorPerformance: { nom?: string; score?: number }[] = [];
   aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };

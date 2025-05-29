@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-deliverable-management',
+  selector: 'app-livrable-management',
   templateUrl: './livrable-management.component.html',
   styleUrls: ['./livrable-management.component.css']
 })

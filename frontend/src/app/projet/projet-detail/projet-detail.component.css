@@ -1,4 +1,4 @@
-.project-detail {
+.projet-detail {
   max-width: 900px;
   margin: 2rem auto;
   background: #fff;
@@ -6,7 +6,7 @@
   box-shadow: 0 4px 18px #0001;
   padding: 2rem;
 }
-.project-detail h2 {
+.projet-detail h2 {
   margin-top: 0;
 }
 .status {

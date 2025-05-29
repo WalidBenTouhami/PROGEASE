@@ -87,7 +87,7 @@ router.get('/:id/livrables',
     validateId('id'),
     asyncHandler(async (req, res) => {
         const livrableController = require('../controllers/livrable.controller');
-        await livrableController.findByProject(req, res);
+        await livrableController.findByProjet(req, res);
     })
 );
 

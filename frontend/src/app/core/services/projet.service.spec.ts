@@ -1,31 +1,37 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ProjetService } from './projet.service';
 import { environment } from '../../../environments/environment';
-import { Project } from '../models/projet.model';
+import { Projet, StatutProjet } from '../models/projet.model';
 
-describe('ProjectService', () => {
+describe('ProjetService', () => {
   let service: ProjetService;
   let httpMock: HttpTestingController;
 
-  const API = `${environment.apiUrl}/projects`;
+  const apiUrl = `${environment.apiUrl}/projets`;
 
-  const mockProject: Project = {
+  const mockprojet: Projet = {
     _id: '1',
     titre: 'Projet 1',
     description: 'Description',
     equipe: [],
     tuteur: '123',
     competences: ['Angular', 'Express'],
-    dateDebut: '2023-01-01',
-    dateFin: '2023-06-30',
-    statut: 'Brouillon'
+    dateDebut: new Date('2023-01-01'),
+    dateFin: new Date('2023-06-30'),
+    statut: StatutProjet.BROUILLON,
+    livrables: []
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ProjetService]
+      providers: [
+        ProjetService,
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     });
 
     service = TestBed.inject(ProjetService);
@@ -36,75 +42,69 @@ describe('ProjectService', () => {
     httpMock.verify();
   });
 
-  it('doit récupérer tous les projets', (done) => {
-    service.recupererProjets().subscribe(projects => {
-      expect(projects.length).toBe(1);
-      expect(projects[0].titre).toBe('Projet 1');
-      done();
+  it('doit récupérer tous les projets', () => {
+    service.recupererProjets().subscribe(projets => {
+      expect(projets.length).toBe(1);
+      expect(projets[0].titre).toBe('Projet 1');
     });
 
-    const req = httpMock.expectOne(API);
+    const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('GET');
-    req.flush([mockProject]);
+    req.flush([mockprojet]);
   });
 
-  it('doit récupérer un projet par ID', (done) => {
-    service.recupererProjet('1').subscribe(project => {
-      expect(project._id).toBe('1');
-      expect(project.titre).toBe('Projet 1');
-      done();
+  it('doit récupérer un projet par ID', () => {
+    service.recupererProjet('1').subscribe(projet => {
+      expect(projet._id).toBe('1');
+      expect(projet.titre).toBe('Projet 1');
     });
 
-    const req = httpMock.expectOne(`${API}/1`);
+    const req = httpMock.expectOne(`${apiUrl}/1`);
     expect(req.request.method).toBe('GET');
-    req.flush(mockProject);
+    req.flush(mockprojet);
   });
 
-  it('doit créer un projet', (done) => {
-    service.creerProjet(mockProject).subscribe(project => {
-      expect(project.titre).toBe('Projet 1');
-      done();
+  it('doit créer un projet', () => {
+    service.creerProjet(mockprojet).subscribe(projet => {
+      expect(projet.titre).toBe('Projet 1');
     });
 
-    const req = httpMock.expectOne(API);
+    const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('POST');
-    req.flush(mockProject);
+    req.flush(mockprojet);
   });
 
-  it('doit mettre à jour un projet', (done) => {
-    const updated = { ...mockProject, titre: 'Projet Modifié' };
-    service.mettreAJourProjet('1', updated).subscribe(project => {
-      expect(project.titre).toBe('Projet Modifié');
-      done();
+  it('doit mettre à jour un projet', () => {
+    const updated = { ...mockprojet, titre: 'Projet Modifié' };
+    service.mettreAJourProjet('1', updated).subscribe(projet => {
+      expect(projet.titre).toBe('Projet Modifié');
     });
 
-    const req = httpMock.expectOne(`${API}/1`);
+    const req = httpMock.expectOne(`${apiUrl}/1`);
     expect(req.request.method).toBe('PUT');
     req.flush(updated);
   });
 
-  it('doit supprimer un projet', (done) => {
+  it('doit supprimer un projet', () => {
     service.supprimerProjet('1').subscribe(response => {
       expect(response).toBeTruthy();
-      done();
     });
 
-    const req = httpMock.expectOne(`${API}/1`);
+    const req = httpMock.expectOne(`${apiUrl}/1`);
     expect(req.request.method).toBe('DELETE');
     req.flush({ success: true });
   });
 
-  it('doit gérer une erreur serveur (500)', (done) => {
+  it('doit gérer une erreur serveur (500)', () => {
     service.recupererProjets().subscribe({
       next: () => fail('appel devait échouer'),
       error: (err) => {
         expect(err.status).toBe(500);
-        expect(err.message).toContain('Erreur serveur');
-        done();
+        expect(err.statusText).toBe('Erreur interne');
       }
     });
 
-    const req = httpMock.expectOne(API);
-    req.flush({}, { status: 500, statusText: 'Erreur interne' });
+    const req = httpMock.expectOne(apiUrl);
+    req.flush('Erreur serveur', { status: 500, statusText: 'Erreur interne' });
   });
 });

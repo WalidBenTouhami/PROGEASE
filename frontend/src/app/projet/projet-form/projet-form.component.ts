@@ -1,24 +1,24 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Project, ProjectStatuses } from '../../core/models/projet.model';
+import { Projet, StatutProjet } from '../../core/models/projet.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-project-form',
+  selector: 'app-projet-form',
   standalone: true,
   imports: [],
   templateUrl: './projet-form.component.html',
   styleUrls: ['./projet-form.component.css']
 })
 export class ProjetFormComponent implements OnInit {
-  @Input() projet?: Project;
-  @Output() formSubmit = new EventEmitter<Project>();
+  @Input() projet?: Projet;
+  @Output() formSubmit = new EventEmitter<Projet>();
 
   projetForm!: FormGroup;
   statutsProjet = [
-    ProjectStatuses.BROUILLON,
-    ProjectStatuses.EN_COURS,
-    ProjectStatuses.TERMINE,
-    ProjectStatuses.ARCHIVE
+    StatutProjet.BROUILLON,
+    StatutProjet.EN_COURS,
+    StatutProjet.TERMINE,
+    StatutProjet.ARCHIVE
   ];
 
   constructor(private fb: FormBuilder) {}
@@ -32,7 +32,7 @@ export class ProjetFormComponent implements OnInit {
       competences: [this.projet?.competences ? this.projet.competences.join(',') : '', Validators.required],
       dateDebut: [this.projet?.dateDebut ? this.toDateInputValue(this.projet.dateDebut) : '', Validators.required],
       dateFin: [this.projet?.dateFin ? this.toDateInputValue(this.projet.dateFin) : '', Validators.required],
-      statut: [this.projet?.statut || ProjectStatuses.BROUILLON, Validators.required]
+      statut: [this.projet?.statut || StatutProjet.BROUILLON, Validators.required]
     });
   }
 
@@ -45,7 +45,7 @@ export class ProjetFormComponent implements OnInit {
   onSubmit() {
     if (this.projetForm.valid) {
       const formValue = this.projetForm.value;
-      const projet: Project = {
+      const projet: Projet = {
         ...formValue,
         equipe: formValue.equipe.split(',').map((id: string) => id.trim()).filter((id: string) => id),
         competences: formValue.competences.split(',').map((c: string) => c.trim()).filter((c: string) => c),

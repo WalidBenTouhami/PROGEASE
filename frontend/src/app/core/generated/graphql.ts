@@ -114,7 +114,7 @@ export type Mutation = {
   generateContent?: Maybe<GenerateContentResult>;
   mettreAJourLivrable?: Maybe<Livrable>;
   mettreAJourProjet?: Maybe<Projet>;
-  optimizeProjectDescription?: Maybe<OptimizeProjectDescriptionResult>;
+  optimizeProjetDescription?: Maybe<OptimizeProjetDescriptionResult>;
   ping?: Maybe<PingResult>;
   supprimerLivrable?: Maybe<Livrable>;
   supprimerProjet?: Maybe<Projet>;
@@ -156,8 +156,8 @@ export type MutationMettreAJourProjetArgs = {
 };
 
 
-export type MutationOptimizeProjectDescriptionArgs = {
-  options?: InputMaybe<OptimizeProjectDescriptionOptions>;
+export type MutationOptimizeProjetDescriptionArgs = {
+  options?: InputMaybe<OptimizeProjetDescriptionOptions>;
   projetId: Scalars['ID']['input'];
 };
 
@@ -176,12 +176,12 @@ export type MutationSupprimerProjetArgs = {
   id: Scalars['ID']['input'];
 };
 
-export type OptimizeProjectDescriptionOptions = {
+export type OptimizeProjetDescriptionOptions = {
   language?: InputMaybe<Scalars['String']['input']>;
   style?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type OptimizeProjectDescriptionResult = {
+export type OptimizeProjetDescriptionResult = {
   improvements?: Maybe<Array<Scalars['String']['output']>>;
   optimizedDescription?: Maybe<Scalars['String']['output']>;
   originalDescription?: Maybe<Scalars['String']['output']>;
@@ -294,7 +294,7 @@ export const GetProjetsDocument = gql`
   })
   export class GetProjetsGQL extends Apollo.Query<GetProjetsQuery, GetProjetsQueryVariables> {
     document = GetProjetsDocument;
-    
+
     constructor(apollo: Apollo.Apollo) {
       super(apollo);
     }

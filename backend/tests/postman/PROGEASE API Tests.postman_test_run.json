@@ -114,7 +114,7 @@
 		{
 			"id": "9326bda6-ec01-4b33-b25d-3d4a4ece1357",
 			"name": "2.3 Obtenir un projet par ID",
-			"url": "http://localhost:3000/api/projets/{{projectId}}",
+			"url": "http://localhost:3000/api/projets/{{projetId}}",
 			"time": 3,
 			"responseCode": {
 				"code": 500,
@@ -122,14 +122,14 @@
 			},
 			"tests": {
 				"Status code is 200": false,
-				"Project data is correct": true
+				"Projet data is correct": true
 			},
 			"testPassFailCounts": {
 				"Status code is 200": {
 					"pass": 0,
 					"fail": 1
 				},
-				"Project data is correct": {
+				"Projet data is correct": {
 					"pass": 1,
 					"fail": 0
 				}
@@ -140,14 +140,14 @@
 			"allTests": [
 				{
 					"Status code is 200": false,
-					"Project data is correct": true
+					"Projet data is correct": true
 				}
 			]
 		},
 		{
 			"id": "841f09dc-08ba-445f-9e87-44fc90f21b0d",
 			"name": "2.4 Mettre à jour un projet",
-			"url": "http://localhost:3000/api/projets/{{projectId}}",
+			"url": "http://localhost:3000/api/projets/{{projetId}}",
 			"time": 4,
 			"responseCode": {
 				"code": 500,
@@ -155,14 +155,14 @@
 			},
 			"tests": {
 				"Status code is 200": false,
-				"Project is updated correctly": false
+				"Projet is updated correctly": false
 			},
 			"testPassFailCounts": {
 				"Status code is 200": {
 					"pass": 0,
 					"fail": 1
 				},
-				"Project is updated correctly": {
+				"Projet is updated correctly": {
 					"pass": 0,
 					"fail": 1
 				}
@@ -173,14 +173,14 @@
 			"allTests": [
 				{
 					"Status code is 200": false,
-					"Project is updated correctly": false
+					"Projet is updated correctly": false
 				}
 			]
 		},
 		{
 			"id": "cb2a7e9f-9e37-46c1-aa8e-28be7032e301",
 			"name": "2.5 Supprimer un projet",
-			"url": "http://localhost:3000/api/projets/{{projectId}}",
+			"url": "http://localhost:3000/api/projets/{{projetId}}",
 			"time": 3,
 			"responseCode": {
 				"code": 500,
@@ -188,14 +188,14 @@
 			},
 			"tests": {
 				"Status code is 200": false,
-				"Project is deleted": false
+				"Projet is deleted": false
 			},
 			"testPassFailCounts": {
 				"Status code is 200": {
 					"pass": 0,
 					"fail": 1
 				},
-				"Project is deleted": {
+				"Projet is deleted": {
 					"pass": 0,
 					"fail": 1
 				}
@@ -206,7 +206,7 @@
 			"allTests": [
 				{
 					"Status code is 200": false,
-					"Project is deleted": false
+					"Projet is deleted": false
 				}
 			]
 		},

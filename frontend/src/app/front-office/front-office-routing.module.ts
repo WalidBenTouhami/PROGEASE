@@ -6,8 +6,8 @@ import { LivrableListComponent } from './livrable-list/livrable-list.component';
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
-  { path: 'projects', component: ProjetListComponent },
-  { path: 'deliverables', component: LivrableListComponent },
+  { path: 'projets', component: ProjetListComponent },
+  { path: 'livrables', component: LivrableListComponent },
 ];
 
 @NgModule({

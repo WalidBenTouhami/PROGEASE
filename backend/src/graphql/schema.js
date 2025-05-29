@@ -144,13 +144,13 @@ const typeDefs = gql`
     maxTokens: Int
   }
 
-  type OptimizeProjectDescriptionResult {
+  type OptimizeProjetDescriptionResult {
     originalDescription: String
     optimizedDescription: String
     improvements: [String!]
   }
 
-  input OptimizeProjectDescriptionOptions {
+  input OptimizeProjetDescriptionOptions {
     style: String
     language: String
   }
@@ -166,7 +166,7 @@ const typeDefs = gql`
     supprimerLivrable(livrableId: ID!): Livrable
     ping(message: String): PingResult
     generateContent(prompt: String!, contentType: String!, options: GenerateContentOptions): GenerateContentResult
-    optimizeProjectDescription(projetId: ID!, options: OptimizeProjectDescriptionOptions): OptimizeProjectDescriptionResult
+    optimizeProjetDescription(projetId: ID!, options: OptimizeProjetDescriptionOptions): OptimizeProjetDescriptionResult
   }
 
   type PingResult {

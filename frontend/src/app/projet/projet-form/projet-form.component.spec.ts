@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ProjetFormComponent } from './projet-form.component';
 
-describe('ProjectFormComponent', () => {
+describe('ProjetFormComponent', () => {
   let component: ProjetFormComponent;
   let fixture: ComponentFixture<ProjetFormComponent>;
 

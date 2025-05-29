@@ -1144,12 +1144,12 @@ type PaginationInfo {
                 console.log(colorize('❌ Le schéma ne contient pas de type Query!', 'red'));
             }
 
-            if (!schemaContent.includes('type Projet') && !schemaContent.includes('type Project')) {
-                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Projet/Project!', 'yellow'));
+            if (!schemaContent.includes('type Projet') && !schemaContent.includes('type Projet')) {
+                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Projet/Projet!', 'yellow'));
             }
 
-            if (!schemaContent.includes('type Livrable') && !schemaContent.includes('type Deliverable')) {
-                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Livrable/Deliverable!', 'yellow'));
+            if (!schemaContent.includes('type Livrable') && !schemaContent.includes('type Livrable')) {
+                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Livrable/Livrable!', 'yellow'));
             }
         }
 
@@ -3488,7 +3488,7 @@ const resolvers = {
             try {
                 // Pour les tests, retourne un tableau avec un projet d'exemple
                 return [{
-                    _id: "project123",
+                    _id: "projet123",
                     titre: "Projet GraphQL Test",
                     description: "Description pour les tests",
                     equipe: ["user1", "user2"],
@@ -3564,7 +3564,7 @@ const resolvers = {
                     dateLimite: "2025-06-15",
                     urlDepot: "https://github.com/username/repo/livrable/" + id,
                     statut: "EN_ATTENTE",
-                    projetId: "project123",
+                    projetId: "projet123",
                     creeLe: currentDate,
                     majLe: currentDate
                 };
@@ -3712,7 +3712,7 @@ const resolvers = {
                 return {
                     _id: livrableId,
                     ...input,
-                    projetId: "project123",
+                    projetId: "projet123",
                     creeLe: "2025-05-23 10:00:00",
                     majLe: currentDate
                 };
@@ -3732,7 +3732,7 @@ const resolvers = {
                     dateLimite: "2025-06-15",
                     urlDepot: "",
                     statut: "TERMINE",
-                    projetId: "project123",
+                    projetId: "projet123",
                     creeLe: "2025-05-23 10:00:00",
                     majLe: currentDate
                 };
@@ -5240,7 +5240,7 @@ const resolvers = {
   Query: {
     projets: async () => {
       return [{
-        _id: "project123",
+        _id: "projet123",
         titre: "Projet Test",
         description: "Description du projet",
         equipe: ["user1"],
@@ -5277,7 +5277,7 @@ const resolvers = {
         dateLimite: "2025-07-15",
         urlDepot: "https://github.com/repo/livrable",
         statut: "EN_COURS",
-        projetId: "project123"
+        projetId: "projet123"
       }];
     },
     livrable: async (_, { id }) => {
@@ -5291,7 +5291,7 @@ const resolvers = {
         dateLimite: "2025-07-15",
         urlDepot: "https://github.com/repo/livrable",
         statut: "EN_COURS",
-        projetId: "project123"
+        projetId: "projet123"
       };
     },
     livrablesByProjet: async (_, { projetId }) => {
@@ -5349,7 +5349,7 @@ const resolvers = {
         intitule: input.intitule || "Livrable Test Modifié",
         titre: input.titre || "Livrable Test Modifié",
         nom: input.nom || "Livrable Test Modifié",
-        projetId: "project123",
+        projetId: "projet123",
         majLe: new Date().toISOString()
       };
     },
@@ -5360,7 +5360,7 @@ const resolvers = {
         titre: "Livrable supprimé",
         nom: "Livrable supprimé",
         statut: "SUPPRIME",
-        projetId: "project123"
+        projetId: "projet123"
       };
     }
   },
@@ -6576,7 +6576,7 @@ router.post('/',
  */
 router.get('/projet/:projetId',
     validateId('projetId'),
-    asyncHandler(livrableController.findByProject)
+    asyncHandler(livrableController.findByProjet)
 );
 
 /**
@@ -6703,7 +6703,7 @@ router.get('/:id/livrables',
     validateId('id'),
     asyncHandler(async (req, res) => {
         const livrableController = require('../controllers/livrable.controller');
-        await livrableController.findByProject(req, res);
+        await livrableController.findByProjet(req, res);
     })
 );
 
@@ -8605,21 +8605,21 @@ const Livrable = require('../models/livrable.model');
 const logger = require('./logger');
 
 // Créer l'ID de test qui sera utilisé par Newman
-const TEST_PROJECT_ID = new mongoose.Types.ObjectId('6064f5ca7623a9b8e7c1a123');
+const TEST_PROJET_ID = new mongoose.Types.ObjectId('6064f5ca7623a9b8e7c1a123');
 const TEST_LIVRABLE_ID = new mongoose.Types.ObjectId('6064f5ca7623a9b8e7c1a124');
 
 async function createTestData() {
     try {
         // Vérifier si les données de test existent déjà
-        const existingProject = await Projet.findById(TEST_PROJECT_ID);
-        if (existingProject) {
+        const existingProjet = await Projet.findById(TEST_PROJET_ID);
+        if (existingProjet) {
             logger.info("Données de test déjà présentes");
-            return { TEST_PROJECT_ID, TEST_LIVRABLE_ID };
+            return { TEST_PROJET_ID, TEST_LIVRABLE_ID };
         }
 
         // Créer un projet de test
         const projet = new Projet({
-            _id: TEST_PROJECT_ID,
+            _id: TEST_PROJET_ID,
             titre: "Projet Test Newman",
             description: "Projet créé pour les tests automatisés",
             competences: ["Test", "Newman", "API"],
@@ -8636,7 +8636,7 @@ async function createTestData() {
             intitule: "Livrable Test Newman",
             description: "Livrable créé pour les tests automatisés",
             dateLimite: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
-            projetId: TEST_PROJECT_ID,
+            projetId: TEST_PROJET_ID,
             statut: "en_attente"
         });
 
@@ -8647,7 +8647,7 @@ async function createTestData() {
         await projet.save();
 
         logger.info("Données de test créées avec succès");
-        return { TEST_PROJECT_ID, TEST_LIVRABLE_ID };
+        return { TEST_PROJET_ID, TEST_LIVRABLE_ID };
     } catch (error) {
         logger.error("Erreur lors de la création des données de test:", error);
         throw error;
@@ -8655,7 +8655,7 @@ async function createTestData() {
 }
 
 module.exports = {
-    TEST_PROJECT_ID,
+    TEST_PROJET_ID,
     TEST_LIVRABLE_ID,
     createTestData
 };
@@ -9171,7 +9171,7 @@ const config = {
 };
 
 // Structure pour stocker les informations extraites
-const projectStructure = {
+const projetStructure = {
     models: [],
     endpoints: [],
     graphqlTypes: [],
@@ -9250,7 +9250,7 @@ async function analyzeModels() {
                 }
             }
 
-            projectStructure.models.push({
+            projetStructure.models.push({
                 name: modelName,
                 fields: fields,
                 file: path.relative(path.join(__dirname, '..'), file)
@@ -9260,7 +9260,7 @@ async function analyzeModels() {
         }
     }
 
-    console.log(`${projectStructure.models.length} modèles analysés.`);
+    console.log(`${projetStructure.models.length} modèles analysés.`);
 }
 
 /**
@@ -9293,7 +9293,7 @@ async function analyzeRoutes() {
                 const controllerMatch = lineContext.match(controllerRegex);
                 const controller = controllerMatch ? controllerMatch[1] : 'unknown';
 
-                projectStructure.endpoints.push({
+                projetStructure.endpoints.push({
                     method: method,
                     path: endpoint,
                     controller: controller,
@@ -9306,7 +9306,7 @@ async function analyzeRoutes() {
         }
     }
 
-    console.log(`${projectStructure.endpoints.length} endpoints détectés.`);
+    console.log(`${projetStructure.endpoints.length} endpoints détectés.`);
 }
 
 /**
@@ -9348,7 +9348,7 @@ async function analyzeGraphQL() {
                     });
                 }
 
-                projectStructure.graphqlTypes.push({
+                projetStructure.graphqlTypes.push({
                     name: typeName,
                     fields: fields,
                     file: path.relative(path.join(__dirname, '..'), file)
@@ -9365,7 +9365,7 @@ async function analyzeGraphQL() {
                 let queryFieldMatch;
 
                 while ((queryFieldMatch = queryFieldRegex.exec(queriesContent)) !== null) {
-                    projectStructure.graphqlQueries.push({
+                    projetStructure.graphqlQueries.push({
                         name: queryFieldMatch[1],
                         returnType: queryFieldMatch[2],
                         file: path.relative(path.join(__dirname, '..'), file)
@@ -9383,7 +9383,7 @@ async function analyzeGraphQL() {
                 let mutationFieldMatch;
 
                 while ((mutationFieldMatch = mutationFieldRegex.exec(mutationsContent)) !== null) {
-                    projectStructure.graphqlMutations.push({
+                    projetStructure.graphqlMutations.push({
                         name: mutationFieldMatch[1],
                         returnType: mutationFieldMatch[2],
                         file: path.relative(path.join(__dirname, '..'), file)
@@ -9395,9 +9395,9 @@ async function analyzeGraphQL() {
         }
     }
 
-    console.log(`${projectStructure.graphqlTypes.length} types GraphQL détectés.`);
-    console.log(`${projectStructure.graphqlQueries.length} requêtes GraphQL détectées.`);
-    console.log(`${projectStructure.graphqlMutations.length} mutations GraphQL détectées.`);
+    console.log(`${projetStructure.graphqlTypes.length} types GraphQL détectés.`);
+    console.log(`${projetStructure.graphqlQueries.length} requêtes GraphQL détectées.`);
+    console.log(`${projetStructure.graphqlMutations.length} mutations GraphQL détectées.`);
 }
 
 /**
@@ -9453,7 +9453,7 @@ async function generateNewmanCollection() {
     // Regrouper les endpoints par ressource (basé sur le premier segment de l'URL)
     const endpointGroups = {};
 
-    projectStructure.endpoints.forEach(endpoint => {
+    projetStructure.endpoints.forEach(endpoint => {
         // Ignorer les routes de santé et API principale déjà incluses
         if (endpoint.path === '/health' || endpoint.path === '/api') {
             return;
@@ -9480,7 +9480,7 @@ async function generateNewmanCollection() {
         };
 
         // Trouver le modèle associé à cette ressource
-        const associatedModel = projectStructure.models.find(m =>
+        const associatedModel = projetStructure.models.find(m =>
             m.name.toLowerCase() === resource.toLowerCase() ||
             m.name.toLowerCase() === resource.toLowerCase().slice(0, -1) // singulier
         );
@@ -9541,7 +9541,7 @@ async function generateNewmanCollection() {
     }
 
     // Ajouter une section pour les tests GraphQL si présents
-    if (projectStructure.graphqlQueries.length > 0 || projectStructure.graphqlMutations.length > 0) {
+    if (projetStructure.graphqlQueries.length > 0 || projetStructure.graphqlMutations.length > 0) {
         const graphqlGroup = {
             name: `${groupCounter}. Tests GraphQL`,
             item: []
@@ -9549,7 +9549,7 @@ async function generateNewmanCollection() {
 
         // Ajouter des requêtes pour chaque query GraphQL
         let gqlCounter = 1;
-        projectStructure.graphqlQueries.forEach(query => {
+        projetStructure.graphqlQueries.forEach(query => {
             const testItem = {
                 name: `${groupCounter}.${gqlCounter} Query ${query.name}`,
                 request: {
@@ -9593,7 +9593,7 @@ async function generateNewmanCollection() {
         });
 
         // Ajouter des requêtes pour chaque mutation GraphQL
-        projectStructure.graphqlMutations.forEach(mutation => {
+        projetStructure.graphqlMutations.forEach(mutation => {
             const testItem = {
                 name: `${groupCounter}.${gqlCounter} Mutation ${mutation.name}`,
                 request: {
@@ -9786,7 +9786,7 @@ function generateTestData(model) {
 async function generateGraphQLTests() {
     console.log('Génération des tests GraphQL...');
 
-    if (projectStructure.graphqlTypes.length === 0) {
+    if (projetStructure.graphqlTypes.length === 0) {
         console.log('Aucun type GraphQL détecté. Génération de tests GraphQL ignorée.');
         return;
     }
@@ -9795,7 +9795,7 @@ async function generateGraphQLTests() {
     await mkdir(config.paths.output.graphql, { recursive: true });
 
     // Générer un fichier pour chaque type avec ses requêtes associées
-    for (const type of projectStructure.graphqlTypes) {
+    for (const type of projetStructure.graphqlTypes) {
         // Ignorer les types internes comme Query et Mutation
         if (['Query', 'Mutation', 'Subscription', 'Schema', '__Schema', '__Type'].includes(type.name)) {
             continue;
@@ -9809,7 +9809,7 @@ async function generateGraphQLTests() {
 
         // Ajouter une requête pour récupérer tous les éléments du type
         const pluralName = type.name.toLowerCase() + 's';
-        const queriesForType = projectStructure.graphqlQueries.filter(q =>
+        const queriesForType = projetStructure.graphqlQueries.filter(q =>
             q.returnType === type.name || q.name.toLowerCase() === pluralName || q.name.toLowerCase() === type.name.toLowerCase()
         );
 
@@ -9825,7 +9825,7 @@ ${type.fields.map(f => `    ${f.name}`).join('\n')}
 `;
 
             // Ajouter une requête pour récupérer un élément spécifique
-            const singularQueryName = projectStructure.graphqlQueries.find(q =>
+            const singularQueryName = projetStructure.graphqlQueries.find(q =>
                 q.name.toLowerCase() === type.name.toLowerCase() ||
                 q.name.toLowerCase() === `get${type.name.toLowerCase()}` ||
                 q.name.toLowerCase() === `get${type.name.toLowerCase()}byid`
@@ -9850,7 +9850,7 @@ ${type.fields.map(f => `    ${f.name}`).join('\n')}
         }
 
         // Ajouter des mutations associées à ce type
-        const mutationsForType = projectStructure.graphqlMutations.filter(m =>
+        const mutationsForType = projetStructure.graphqlMutations.filter(m =>
             m.returnType === type.name ||
             m.name.toLowerCase().includes(type.name.toLowerCase())
         );

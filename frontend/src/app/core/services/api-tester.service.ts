@@ -19,7 +19,7 @@ export class ApiTesterService {
   ) {}
 
   testRestConnection(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/projects`).pipe(
+    return this.http.get(`${this.apiUrl}/projets`).pipe(
       catchError((error) => this.handleError(error))
     );
   }

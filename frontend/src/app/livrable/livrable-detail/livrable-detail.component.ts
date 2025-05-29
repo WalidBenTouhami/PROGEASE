@@ -1,16 +1,16 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Deliverable } from '../../core/models/livrable.model';
+import { Livrable } from '../../core/models/livrable.model';
 
 @Component({
-  selector: 'app-deliverable-detail',
+  selector: 'app-livrable-detail',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './livrable-detail.component.html',
   styleUrls: ['./livrable-detail.component.css']
 })
 export class LivrableDetailComponent implements OnInit {
-  @Input() livrable?: Deliverable;
+  @Input() livrable?: Livrable;
 
   ngOnInit(): void {}
 

@@ -17,7 +17,7 @@
     "graphql",
     "express",
     "mongoose",
-    "project-management"
+    "projet-management"
   ],
   "author": "WalidBenTouhami",
   "license": "ISC",

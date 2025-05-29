@@ -32,7 +32,7 @@
           tokens: 150
         };
       },
-      optimizeProjectDescription: async (projetId, options) => {
+      optimizeProjetDescription: async (projetId, options) => {
         return {
           originalDescription: `Description originale du projet ${projetId}`,
           optimizedDescription: `Description optimisée (${options?.style || 'standard'})`,
@@ -97,11 +97,11 @@
 
         // @GraphQLResolver - supprime l'avertissement "Unused property"
         // noinspection JSUnusedGlobalSymbols
-        optimizeProjectDescription: async (_, { projetId, options = {} }, { currentUser }) => {
+        optimizeProjetDescription: async (_, { projetId, options = {} }, { currentUser }) => {
           logger.debug(`Optimisation de description pour le projet ${projetId} par ${currentUser}`);
 
           try {
-            return await aiService.optimizeProjectDescription(projetId, options);
+            return await aiService.optimizeProjetDescription(projetId, options);
           } catch (error) {
             logger.error(`Erreur lors de l'optimisation de la description: ${error.message}`);
             throw new Error('Impossible d\'optimiser la description du projet');

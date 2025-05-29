@@ -6,7 +6,7 @@
     "user": "Walid",
     "password": "securePassword"
   },
-  "projects": [
+  "projets": [
     {
       "id": "1",
       "title": "Gestion des Tâches",

@@ -1,11 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Deliverable, StatutLivrable } from '../../core/models/livrable.model';
+import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
 import { LivrableService } from '../../core/services/livrable.service';
 
 @Component({
-  selector: 'app-deliverable-list',
+  selector: 'app-livrable-list',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './livrable-list.component.html',
@@ -13,16 +13,16 @@ import { LivrableService } from '../../core/services/livrable.service';
 })
 export class LivrableListComponent implements OnInit {
   @Input() projetId!: string;
-  livrables: Deliverable[] = [];
+  livrables: Livrable[] = [];
   chargement = false;
   erreur = '';
 
-  constructor(private deliverableService: LivrableService) {}
+  constructor(private livrableService: LivrableService) {}
 
   ngOnInit() {
     if (this.projetId) {
       this.chargement = true;
-      this.deliverableService.recupererLivrablesParProjet(this.projetId).subscribe({
+      this.livrableService.recupererLivrablesParProjet(this.projetId).subscribe({
         next: (livrables) => {
           this.livrables = livrables;
           this.chargement = false;

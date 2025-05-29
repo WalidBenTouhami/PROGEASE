@@ -1,12 +1,12 @@
 # PROGEASE Frontend
 
-This project is the Angular frontend for the PROGEASE platform.
+This projet is the Angular frontend for the PROGEASE platform.
 
 ---
 
 ## 🚀 Features
 - **Professional Back-Office and Front-Office templates** with responsive layouts, logo, and navigation
-- **Dashboard, project, and livrable management pages** (see `/back-office` and `/front-office`)
+- **Dashboard, projet, and livrable management pages** (see `/back-office` and `/front-office`)
 - **Branding**: Uses the official PROGEASE logo and color scheme (dark, teal, gold)
 - **Type-safe GraphQL integration** with codegen
 - **Modern Angular best practices**
@@ -61,7 +61,7 @@ ng test
 | Command            | Description                                 |
 |--------------------|---------------------------------------------|
 | `ng serve`         | Start dev server                            |
-| `ng build`         | Build the project                           |
+| `ng build`         | Build the projet                           |
 | `ng test`          | Run unit tests                              |
 | `npm run codegen`  | Generate GraphQL types/services             |
 

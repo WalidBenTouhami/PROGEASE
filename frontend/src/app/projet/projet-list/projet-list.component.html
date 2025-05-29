@@ -4,7 +4,7 @@
   <div *ngIf="chargement" class="info">Chargement des projets...</div>
   <div *ngIf="erreur" class="error">{{ erreur }}</div>
 
-  <ul class="project-list" *ngIf="!chargement && projets.length">
+  <ul class="projet-list" *ngIf="!chargement && projets.length">
     <li *ngFor="let projet of projets">
       <a (click)="voirDetails(projet._id)" tabindex="0">{{ projet.titre }}</a>
       <span class="status" [ngClass]="{

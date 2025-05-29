@@ -1166,7 +1166,7 @@
             "deprecationReason": null
           },
           {
-            "name": "optimizeProjectDescription",
+            "name": "optimizeProjetDescription",
             "description": null,
             "args": [
               {
@@ -1174,7 +1174,7 @@
                 "description": null,
                 "type": {
                   "kind": "INPUT_OBJECT",
-                  "name": "OptimizeProjectDescriptionOptions",
+                  "name": "OptimizeProjetDescriptionOptions",
                   "ofType": null
                 },
                 "defaultValue": null,
@@ -1200,7 +1200,7 @@
             ],
             "type": {
               "kind": "OBJECT",
-              "name": "OptimizeProjectDescriptionResult",
+              "name": "OptimizeProjetDescriptionResult",
               "ofType": null
             },
             "isDeprecated": false,
@@ -1297,7 +1297,7 @@
       },
       {
         "kind": "INPUT_OBJECT",
-        "name": "OptimizeProjectDescriptionOptions",
+        "name": "OptimizeProjetDescriptionOptions",
         "description": null,
         "isOneOf": false,
         "fields": null,
@@ -1333,7 +1333,7 @@
       },
       {
         "kind": "OBJECT",
-        "name": "OptimizeProjectDescriptionResult",
+        "name": "OptimizeProjetDescriptionResult",
         "description": null,
         "isOneOf": null,
         "fields": [

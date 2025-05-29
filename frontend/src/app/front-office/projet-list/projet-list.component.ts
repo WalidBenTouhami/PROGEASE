@@ -2,24 +2,24 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProjetService } from '../../core/services/projet.service';
-import { Project } from '../../core/models/projet.model';
+import { Projet } from '../../core/models/projet.model';
 import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-project-list',
+  selector: 'app-projet-list',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './projet-list.component.html',
   styleUrls: ['./projet-list.component.css']
 })
 export class ProjetListComponent implements OnInit, OnDestroy {
-  projets: Project[] = [];
+  projets: Projet[] = [];
   chargement = false;
   erreur = '';
   private subscription?: Subscription;
 
   constructor(
-    private projectService: ProjetService,
+    private projetService: ProjetService,
     private router: Router
   ) {}
 
@@ -29,7 +29,7 @@ export class ProjetListComponent implements OnInit, OnDestroy {
 
   chargerProjets() {
     this.chargement = true;
-    this.subscription = this.projectService.recupererProjets().subscribe({
+    this.subscription = this.projetService.recupererProjets().subscribe({
       next: (projets) => {
         this.projets = projets;
         this.chargement = false;
@@ -43,7 +43,7 @@ export class ProjetListComponent implements OnInit, OnDestroy {
   }
 
   voirDetails(id: string) {
-    this.router.navigate(['/project', id]);
+    this.router.navigate(['/projet', id]);
   }
 
   ngOnDestroy() {

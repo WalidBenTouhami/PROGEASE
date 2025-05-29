@@ -4,7 +4,7 @@
   <div *ngIf="chargement" class="info">Chargement des livrables...</div>
   <div *ngIf="erreur" class="error">{{ erreur }}</div>
 
-  <ul class="deliverable-list" *ngIf="!chargement && livrables.length">
+  <ul class="livrable-list" *ngIf="!chargement && livrables.length">
     <li *ngFor="let livrable of livrables">
       <span class="livrable-intitule">{{ livrable.intitule }}</span>
       <span class="status" [ngClass]="{

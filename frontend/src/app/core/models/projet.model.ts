@@ -1,4 +1,4 @@
-import { Livrable } from '../../core/models/livrable.model';
+import { Livrable } from './livrable.model';
 
 // Synced with backend/src/models/projet.model.js
 export interface Projet {
@@ -27,9 +27,4 @@ export enum StatutProjet {
     ARCHIVE = 'archive'
 }
 
-export const ProjectStatuses = {
-  BROUILLON: 'brouillon',
-  EN_COURS: 'en_cours',
-  TERMINE: 'termine',
-  ARCHIVE: 'archive'
-} as const;
+

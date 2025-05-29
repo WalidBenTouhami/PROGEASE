@@ -6,8 +6,8 @@ import { LivrableManagementComponent } from './livrable-management/livrable-mana
 
 const routes: Routes = [
   { path: '', component: DashboardComponent },
-  { path: 'projects', component: ProjetManagementComponent },
-  { path: 'deliverables', component: LivrableManagementComponent },
+  { path: 'projets', component: ProjetManagementComponent },
+  { path: 'livrables', component: LivrableManagementComponent },
 ];
 
 @NgModule({

@@ -5,18 +5,18 @@ const path = require('path');
 const filesToExport = [
   'src/app/app.component.html',
   'src/app/back-office/dashboard/dashboard.component.html',
-  'src/app/back-office/deliverable-management/livrable-management.component.html',
-  'src/app/back-office/project-management/projet-management.component.html',
+  'src/app/back-office/livrable-management/livrable-management.component.html',
+  'src/app/back-office/projet-management/projet-management.component.html',
   'src/app/core/api-test/api-test.component.html',
-  'src/app/deliverable/deliverable-detail/livrable-detail.component.html',
-  'src/app/deliverable/deliverable-form/livrable-form.component.html',
-  'src/app/deliverable/deliverable-list/livrable-list.component.html',
+  'src/app/livrable/livrable-detail/livrable-detail.component.html',
+  'src/app/livrable/livrable-form/livrable-form.component.html',
+  'src/app/livrable/livrable-list/livrable-list.component.html',
   'src/app/front-office/dashboard/dashboard.component.html',
-  'src/app/front-office/deliverable-list/livrable-list.component.html',
-  'src/app/front-office/project-list/projet-list.component.html',
-  'src/app/project/project-detail/projet-detail.component.html',
-  'src/app/project/project-form/projet-form.component.html',
-  'src/app/project/project-list/projet-list.component.html',
+  'src/app/front-office/livrable-list/livrable-list.component.html',
+  'src/app/front-office/projet-list/projet-list.component.html',
+  'src/app/projet/projet-detail/projet-detail.component.html',
+  'src/app/projet/projet-form/projet-form.component.html',
+  'src/app/projet/projet-list/projet-list.component.html',
   'src/index.html'
 ];
 

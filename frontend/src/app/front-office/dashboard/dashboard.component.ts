@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
-interface Project {
+interface Projet {
   id: string;
   nom: string;
   progression?: number;
@@ -14,7 +14,7 @@ interface Notification {
   date: Date | string;
 }
 
-interface Deliverable {
+interface Livrable {
   nom: string;
   statut: string;
   dateLimite: Date | string;
@@ -37,12 +37,12 @@ interface Template {
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  projects: Project[] = [];
+  projets: Projet[] = [];
   notifications: Notification[] = [];
-  deliverables: Deliverable[] = [];
+  livrables: Livrable[] = [];
   users: User[] = [{ nom: 'Jean', role: 'Administrateur' }];
   roles: string[] = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projectTemplates: Template[] = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
+  projetTemplates: Template[] = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
   tutorPerformance: { nom?: string; score?: number }[] = [];
   aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
@@ -51,7 +51,7 @@ export class DashboardComponent implements OnInit {
   projetsEnCours: number = 0;
   livrablesSoumis: number = 0;
   retoursRecus: number = 0;
-  projetsRecents: Project[] = [];
+  projetsRecents: Projet[] = [];
 
   ngOnInit() {
     // Initialize dashboard data
