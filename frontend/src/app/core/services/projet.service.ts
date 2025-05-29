@@ -1,59 +1,54 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, throwError } from 'rxjs';
-import { Projet } from '../models/projet.model';
+import { Observable, map, tap, catchError, throwError } from 'rxjs';
+import { Projet, StatutProjet } from '../models/projet.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProjetService {
-  private baseUrl = `${environment.apiUrl}/projets`;
+  private apiUrl = `${environment.apiUrl}/projets`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  recupererProjets(): Observable<Projet[]> {
-    return this.http.get<Projet[]>(this.baseUrl).pipe(
-      catchError(error => {
-        console.error('Erreur lors de la recuperation des projets:', error);
-        return throwError(() => error);
-      })
+  getAllProjets(): Observable<Projet[]> {
+    return this.http.get<Projet[]>(this.apiUrl).pipe(
+      map(projets => projets.map(projet => ({
+        ...projet,
+        dateDebut: new Date(projet.dateDebut),
+        dateFin: new Date(projet.dateFin),
+        creeLe: projet.creeLe ? new Date(projet.creeLe) : undefined,
+        majLe: projet.majLe ? new Date(projet.majLe) : undefined
+      })))
     );
   }
 
-  recupererProjet(id: string): Observable<Projet> {
-    return this.http.get<Projet>(`${this.baseUrl}/${id}`).pipe(
-      catchError(error => {
-        console.error(`Erreur lors de la recuperation du projet ${id}:`, error);
-        return throwError(() => error);
-      })
+  getProjetById(id: string): Observable<Projet> {
+    return this.http.get<Projet>(`${this.apiUrl}/${id}`).pipe(
+      map(projet => ({
+        ...projet,
+        dateDebut: new Date(projet.dateDebut),
+        dateFin: new Date(projet.dateFin),
+        creeLe: projet.creeLe ? new Date(projet.creeLe) : undefined,
+        majLe: projet.majLe ? new Date(projet.majLe) : undefined
+      }))
     );
   }
 
-  creerProjet(projet: Projet): Observable<Projet> {
-    return this.http.post<Projet>(this.baseUrl, projet).pipe(
-      catchError(error => {
-        console.error('Erreur lors de la creation du projet:', error);
-        return throwError(() => error);
-      })
-    );
+  createProjet(projet: Projet): Observable<Projet> {
+    return this.http.post<Projet>(this.apiUrl, projet);
   }
 
-  mettreAJourProjet(id: string, projet: Projet): Observable<Projet> {
-    return this.http.put<Projet>(`${this.baseUrl}/${id}`, projet).pipe(
-      catchError(error => {
-        console.error(`Erreur lors de la mise à jour du projet ${id}:`, error);
-        return throwError(() => error);
-      })
-    );
+  updateProjet(id: string, projet: Projet): Observable<Projet> {
+    return this.http.put<Projet>(`${this.apiUrl}/${id}`, projet);
   }
 
-  supprimerProjet(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`).pipe(
-      catchError(error => {
-        console.error(`Erreur lors de la suppression du projet ${id}:`, error);
-        return throwError(() => error);
-      })
-    );
+  deleteProjet(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getStatutOptions(): string[] {
+    return Object.values(StatutProjet);
   }
 }

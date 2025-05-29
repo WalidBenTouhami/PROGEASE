@@ -1,29 +1,63 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { Livrable, StatutLivrable } from '../models/livrable.model';
 import { environment } from '../../../environments/environment';
-import { Livrable } from '../models/livrable.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LivrableService {
-  private baseUrl = `${environment.apiUrl}/livrables`;
+  private apiUrl = `${environment.apiUrl}/livrables`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  recupererLivrablesParProjet(projetId: string) {
-    return this.http.get<Livrable[]>(`${this.baseUrl}/${projetId}`);
+  getAllLivrables(): Observable<Livrable[]> {
+    return this.http.get<Livrable[]>(this.apiUrl).pipe(
+      map(livrables => livrables.map(livrable => ({
+        ...livrable,
+        dateLimite: new Date(livrable.dateLimite),
+        creeLe: livrable.creeLe ? new Date(livrable.creeLe) : undefined,
+        majLe: livrable.majLe ? new Date(livrable.majLe) : undefined
+      })))
+    );
   }
 
-  ajouterLivrable(data: Livrable) {
-    return this.http.post<Livrable>(this.baseUrl, data);
+  getLivrablesForProject(projetId: string): Observable<Livrable[]> {
+    return this.http.get<Livrable[]>(`${this.apiUrl}/projet/${projetId}`).pipe(
+      map(livrables => livrables.map(livrable => ({
+        ...livrable,
+        dateLimite: new Date(livrable.dateLimite),
+        creeLe: livrable.creeLe ? new Date(livrable.creeLe) : undefined,
+        majLe: livrable.majLe ? new Date(livrable.majLe) : undefined
+      })))
+    );
   }
 
-  mettreAJourLivrable(livrableId: string, data: Livrable) {
-    return this.http.put<Livrable>(`${this.baseUrl}/${livrableId}`, data);
+  getLivrableById(id: string): Observable<Livrable> {
+    return this.http.get<Livrable>(`${this.apiUrl}/${id}`).pipe(
+      map(livrable => ({
+        ...livrable,
+        dateLimite: new Date(livrable.dateLimite),
+        creeLe: livrable.creeLe ? new Date(livrable.creeLe) : undefined,
+        majLe: livrable.majLe ? new Date(livrable.majLe) : undefined
+      }))
+    );
   }
 
-  supprimerLivrable(livrableId: string) {
-    return this.http.delete(`${this.baseUrl}/${livrableId}`);
+  createLivrable(livrable: Livrable): Observable<Livrable> {
+    return this.http.post<Livrable>(this.apiUrl, livrable);
+  }
+
+  updateLivrable(id: string, livrable: Livrable): Observable<Livrable> {
+    return this.http.put<Livrable>(`${this.apiUrl}/${id}`, livrable);
+  }
+
+  deleteLivrable(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getStatutOptions(): string[] {
+    return Object.values(StatutLivrable);
   }
 }

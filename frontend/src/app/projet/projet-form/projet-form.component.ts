@@ -1,60 +1,126 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ProjetService } from '../../core/services/projet.service';
 import { Projet, StatutProjet } from '../../core/models/projet.model';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-projet-form',
-  standalone: true,
-  imports: [],
   templateUrl: './projet-form.component.html',
-  styleUrls: ['./projet-form.component.css']
+  standalone: true,
+  styleUrls: ['./projet-form.component.css'],
 })
 export class ProjetFormComponent implements OnInit {
-  @Input() projet?: Projet;
-  @Output() formSubmit = new EventEmitter<Projet>();
+  projetForm: FormGroup;
+  isEditing = false;
+  projetId: string | null = null;
+  statutOptions = Object.values(StatutProjet);
+  availableUsers: any[] = [];
 
-  projetForm!: FormGroup;
-  statutsProjet = [
-    StatutProjet.BROUILLON,
-    StatutProjet.EN_COURS,
-    StatutProjet.TERMINE,
-    StatutProjet.ARCHIVE,
-    StatutProjet.EN_RETARD,
-    StatutProjet.A_VENIR
-  ];
+  constructor(
+    private fb: FormBuilder,
+    private projetService: ProjetService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
+    this.projetForm = this.createForm();
+  }
 
-  constructor(private fb: FormBuilder) {}
+  ngOnInit(): void {
+    this.loadUsers();
 
-  ngOnInit() {
-    this.projetForm = this.fb.group({
-      titre: [this.projet?.titre || '', Validators.required],
-      description: [this.projet?.description || '', Validators.required],
-      equipe: [this.projet?.equipe ? this.projet.equipe.join(',') : '', Validators.required],
-      tuteur: [this.projet?.tuteur || '', Validators.required],
-      competences: [this.projet?.competences ? this.projet.competences.join(',') : '', Validators.required],
-      dateDebut: [this.projet?.dateDebut ? this.toDateInputValue(this.projet.dateDebut) : '', Validators.required],
-      dateFin: [this.projet?.dateFin ? this.toDateInputValue(this.projet.dateFin) : '', Validators.required],
-      statut: [this.projet?.statut || StatutProjet.BROUILLON, Validators.required]
+    this.projetId = this.route.snapshot.paramMap.get('id');
+    if (this.projetId) {
+      this.isEditing = true;
+      this.projetService.getProjetById(this.projetId).subscribe(projet => {
+        this.updateFormWithProjet(projet);
+      });
+    }
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
+      titre: ['', Validators.required],
+      description: ['', Validators.required],
+      equipe: [[]],
+      tuteur: [''],
+      competences: this.fb.array([]),
+      dateDebut: ['', Validators.required],
+      dateFin: ['', Validators.required],
+      statut: [StatutProjet.BROUILLON, Validators.required]
     });
   }
 
-  toDateInputValue(date: string | Date): string {
-    if (!date) return '';
-    const d = new Date(date);
-    return d.toISOString().substring(0, 10);
+  private updateFormWithProjet(projet: Projet): void {
+    // Reset competences FormArray
+    while (this.competences.length) {
+      this.competences.removeAt(0);
+    }
+
+    // Add each competence to FormArray
+    if (projet.competences && projet.competences.length) {
+      projet.competences.forEach(comp => {
+        this.competences.push(this.fb.control(comp));
+      });
+    }
+
+    // Update form values
+    this.projetForm.patchValue({
+      titre: projet.titre,
+      description: projet.description,
+      equipe: projet.equipe,
+      tuteur: projet.tuteur,
+      dateDebut: this.formatDateForInput(projet.dateDebut),
+      dateFin: this.formatDateForInput(projet.dateFin),
+      statut: projet.statut
+    });
   }
 
-  onSubmit() {
-    if (this.projetForm.valid) {
-      const formValue = this.projetForm.value;
-      const projet: Projet = {
-        ...formValue,
-        equipe: formValue.equipe.split(',').map((id: string) => id.trim()).filter((id: string) => id),
-        competences: formValue.competences.split(',').map((c: string) => c.trim()).filter((c: string) => c),
-        dateDebut: formValue.dateDebut,
-        dateFin: formValue.dateFin
-      };
-      this.formSubmit.emit(projet);
+  private formatDateForInput(date: Date): string {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0];
+  }
+
+  get competences(): FormArray {
+    return this.projetForm.get('competences') as FormArray;
+  }
+
+  addCompetence(): void {
+    this.competences.push(this.fb.control(''));
+  }
+
+  removeCompetence(index: number): void {
+    this.competences.removeAt(index);
+  }
+
+  onSubmit(): void {
+    if (this.projetForm.invalid) return;
+
+    const formValue = this.projetForm.value;
+    const projet: Projet = {
+      titre: formValue.titre,
+      description: formValue.description,
+      equipe: formValue.equipe,
+      tuteur: formValue.tuteur,
+      competences: formValue.competences.filter((c: string) => c.trim() !== ''),
+      dateDebut: new Date(formValue.dateDebut),
+      dateFin: new Date(formValue.dateFin),
+      livrables: [], // Will be filled by livrable form
+      statut: formValue.statut
+    };
+
+    let action$: Observable<Projet>;
+
+    if (this.isEditing && this.projetId) {
+      action$ = this.projetService.updateProjet(this.projetId, projet);
+    } else {
+      action$ = this.projetService.createProjet(projet);
     }
+
+    action$.subscribe({
+      next: () => this.router.navigate(['/projets']),
+      error: (error) => console.error('Error saving project:', error)
+    });
   }
 }
