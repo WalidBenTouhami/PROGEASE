@@ -1,0 +1,83 @@
+/* PROGEASE Front-Office Template Styles */
+.frontoffice-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #101624;
+  color: #e0e6ef;
+}
+.fo-header {
+  display: flex;
+  align-items: center;
+  background: #18223a;
+  padding: 0 2rem;
+  height: 64px;
+  box-shadow: 0 2px 8px #0002;
+}
+.fo-logo {
+  height: 44px;
+  margin-right: 1rem;
+}
+.fo-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2ed8c3;
+  letter-spacing: 2px;
+  flex: 1;
+}
+.fo-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+.fo-nav a {
+  color: #e0e6ef;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.fo-nav a.active, .fo-nav a:hover {
+  color: #ffd700;
+  font-weight: bold;
+}
+.fo-main {
+  flex: 1;
+  padding: 2rem;
+  background: #151b2b;
+  min-height: 400px;
+}
+.fo-footer {
+  background: #18223a;
+  color: #ffd700;
+  text-align: center;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+}
+@media (max-width: 900px) {
+  .fo-header {
+    padding: 0 1rem;
+    height: 56px;
+  }
+  .fo-title {
+    font-size: 1.1rem;
+  }
+  .fo-main {
+    padding: 1rem;
+  }
+}
+@media (max-width: 600px) {
+  .fo-header {
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    padding: 0.5rem 0.5rem;
+  }
+  .fo-nav {
+    gap: 0.7rem;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+  }
+  .fo-main {
+    padding: 0.5rem;
+  }
+} 

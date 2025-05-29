@@ -1,0 +1,112 @@
+[2025-05-23 12:18:01] [ERROR]: Erreur de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [WARN]: Avertissement de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: Information de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [DEBUG]: Debug de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: Demarrage du serveur PROGEASE...
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: Connecte à MongoDB avec succes
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: Serveur Express demarre sur le port 5000 en mode development
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: GraphQL disponible sur http://localhost:5000/graphql
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:01] [INFO]: API REST disponible sur http://localhost:5000/api
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: Demarrage du serveur PROGEASE...
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: Connecte à MongoDB avec succes
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: Serveur Express demarre sur le port 5000 en mode development
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: GraphQL disponible sur http://localhost:5000/graphql
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:18:48] [INFO]: API REST disponible sur http://localhost:5000/api
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: Demarrage du serveur PROGEASE...
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: Connecte à MongoDB avec succes
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: Serveur Express demarre sur le port 5000 en mode development
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: GraphQL disponible sur http://localhost:5000/graphql
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:19:18] [INFO]: API REST disponible sur http://localhost:5000/api
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [ERROR]: Erreur de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [WARN]: Avertissement de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: Information de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [DEBUG]: Debug de test
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: Demarrage du serveur PROGEASE...
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: Connecte à MongoDB avec succes
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: Serveur Express demarre sur le port 5000 en mode development
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: GraphQL disponible sur http://localhost:5000/graphql
+{
+  "service": "progease-backend"
+}
+[2025-05-23 12:20:01] [INFO]: API REST disponible sur http://localhost:5000/api
+{
+  "service": "progease-backend"
+}

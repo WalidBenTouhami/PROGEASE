@@ -1,0 +1,5 @@
+{"level":"info","message":"Schema GraphQL genere avec succes: D:\\pi\\PROGEASE\\backend\\src\\graphql\\schema.graphql","service":"progease-backend","timestamp":"2025-05-27 00:24:58"}
+[undefined] INFO: 🚀 Generation du schema GraphQL... {"metadata":{"service":"progease-api","timestamp":"2025-05-28 12:00:04"}}
+[undefined] INFO: 📄 Lecture du template: D:\pi\PROGEASE\backend\src\graphql\schema-template.graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-28 12:00:04"}}
+[undefined] INFO: 🔄 Generation des enumerations... {"metadata":{"service":"progease-api","timestamp":"2025-05-28 12:00:04"}}
+[undefined] INFO: 🚀 Generation du schema GraphQL... {"metadata":{"service":"progease-api","timestamp":"2025-05-28 12:01:07"}}

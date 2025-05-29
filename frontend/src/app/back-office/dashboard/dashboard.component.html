@@ -1,0 +1,26 @@
+<section class="dashboard-container" aria-labelledby="tableau-bord-admin-titre">
+  <h2 id="tableau-bord-admin-titre" class="title">Tableau de bord administration</h2>
+  <div class="stats-grid" role="list" aria-label="Statistiques de gestion">
+    <div class="stat-card" role="listitem">
+      <h3>Projets à valider</h3>
+      <span class="stat-value">{{ projetsAValider }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Livrables à corriger</h3>
+      <span class="stat-value">{{ livrablesACorriger }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>etudiants inscrits</h3>
+      <span class="stat-value">{{ nbEtudiants }}</span>
+    </div>
+  </div>
+  <section aria-labelledby="dernieres-actions-titre">
+    <h3 id="dernieres-actions-titre">Dernieres actions</h3>
+    <ul>
+      <li *ngFor="let action of dernieresActions">
+        {{ action.description }}
+        <time [attr.datetime]="action.date">{{ action.date | date:'shortDate' }}</time>
+      </li>
+    </ul>
+  </section>
+</section>

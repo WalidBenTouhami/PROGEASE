@@ -1,0 +1,26 @@
+<section class="dashboard-container" aria-labelledby="tableau-bord-titre">
+  <h2 id="tableau-bord-titre" class="title">Tableau de bord etudiant</h2>
+  <div class="stats-grid" role="list" aria-label="Statistiques principales">
+    <div class="stat-card" role="listitem">
+      <h3>Projets en cours</h3>
+      <span class="stat-value">{{ projetsEnCours }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Livrables soumis</h3>
+      <span class="stat-value">{{ livrablesSoumis }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Retours reçus</h3>
+      <span class="stat-value">{{ retoursRecus }}</span>
+    </div>
+  </div>
+  <section aria-labelledby="projets-recents-titre">
+    <h3 id="projets-recents-titre">Projets recents</h3>
+    <ul>
+      <li *ngFor="let projet of projetsRecents">
+        <a [routerLink]="['/projets', projet.id]">{{ projet.nom }}</a>
+        <span class="sr-only">, projet recent</span>
+      </li>
+    </ul>
+  </section>
+</section>

@@ -1,54 +1,72 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const path = require('path');
 
 /**
- * Fonction récursive pour récupérer tous les fichiers `.js` d'un répertoire donné.
- * @param {string} dirPath - Chemin du répertoire à parcourir.
- * @param {Array<string>} arrayOfFiles - Tableau pour stocker les fichiers trouvés.
- * @returns {Array<string>} - Liste des chemins des fichiers `.js`.
+ * Fonction recursive pour recuperer tous les fichiers `.js` d'un repertoire donne.
+ * Exclut certains repertoires et fichiers indesirables.
+ * @param {string} dirPath - Chemin du repertoire à parcourir.
+ * @param {string[]} jsFiles - Tableau pour stocker les fichiers trouves.
+ * @returns {Promise<string[]>} - Promesse contenant un tableau des chemins relatifs des fichiers `.js`.
  */
-function getAllJsFiles(dirPath, arrayOfFiles = []) {
+async function getAllJsFiles(dirPath, jsFiles = []) {
     try {
-        const files = fs.readdirSync(dirPath);
+        const files = await fs.readdir(dirPath, { withFileTypes: true });
 
-        files.forEach(file => {
-            const fullPath = path.join(dirPath, file);
+        for (const file of files) {
+            const fullPath = path.join(dirPath, file.name);
 
-            // Ignorer uniquement le répertoire node_modules
-            if (file === 'node_modules') {
-                return; // Passer au fichier suivant
+            // Exclure les repertoires ou fichiers indesirables
+            if (
+                file.name === 'node_modules' || // Ignorer `node_modules`
+                file.name.startsWith('.') || // Ignorer les fichiers/dossiers caches comme `.angular`
+                fullPath.includes('.angular/cache') // Ignorer tout dans `.angular/cache`
+            ) {
+                continue;
             }
 
-            // Vérifier si c'est un répertoire ou un fichier
-            if (fs.statSync(fullPath).isDirectory()) {
-                getAllJsFiles(fullPath, arrayOfFiles); // Appel récursif pour parcourir les sous-dossiers
-            } else if (file.endsWith('.js')) {
-                arrayOfFiles.push(fullPath); // Ajouter les fichiers `.js` trouvés
+            if (file.isDirectory()) {
+                await getAllJsFiles(fullPath, jsFiles);
+            } else if (file.name.endsWith('.js')) {
+                jsFiles.push(path.relative('.', fullPath).replace(/\\/g, '/'));
             }
-        });
+        }
     } catch (error) {
-        console.error(`❌ Erreur lors de la lecture du répertoire ${dirPath}:`, error.message);
+        console.error(`❌ Erreur lors de la lecture du repertoire ${dirPath}: ${error.message}`);
     }
 
-    return arrayOfFiles;
+    return jsFiles;
 }
 
-// Utilisation principale
-const directoryPath = path.resolve('.'); // Chemin du répertoire à parcourir
-if (fs.existsSync(directoryPath) && fs.statSync(directoryPath).isDirectory()) {
-    const jsFiles = getAllJsFiles(directoryPath);
+/**
+ * Fonction principale pour recuperer les fichiers `.js` et ecrire la liste dans un fichier.
+ */
+async function main() {
+    const directoryPath = path.resolve('.'); // Repertoire actuel
+    const outputFilePath = path.resolve('filesList.txt'); // Fichier de sortie
 
-    // Formater la liste en tableau avec chaque fichier sur une nouvelle ligne
-    const formattedList = `[\n${jsFiles.map(file => `  '${file}'`).join(',\n')}\n]`;
-
-    // Écrire dans le fichier filesList.txt
-    const outputFilePath = path.resolve('filesList.txt'); // Assurer un chemin absolu pour le fichier de sortie
     try {
-        fs.writeFileSync(outputFilePath, formattedList, 'utf8');
-        console.log(`✅ Liste des fichiers .js écrite dans ${outputFilePath}`);
-    } catch (writeError) {
-        console.error(`❌ Erreur lors de l'écriture dans ${outputFilePath}:`, writeError.message);
+        // Verifier si le repertoire existe
+        const stat = await fs.stat(directoryPath);
+
+        // Utilisation du early return pattern au lieu de throw dans un bloc try
+        if (!stat.isDirectory()) {
+            console.error(`❌ Erreur: Le chemin specifie (${directoryPath}) n'est pas un repertoire valide.`);
+            return;
+        }
+
+        const jsFiles = await getAllJsFiles(directoryPath);
+
+        const formattedList = `[\n${jsFiles.map(file => `    '${file}'`).join(',\n')}\n];`;
+        await fs.writeFile(outputFilePath, formattedList, 'utf8');
+
+        console.log(`✅ Liste des fichiers .js ecrite dans ${outputFilePath}`);
+    } catch (error) {
+        console.error(`❌ Erreur: ${error.message}`);
     }
-} else {
-    console.error(`❌ Le chemin spécifié (${directoryPath}) n'est pas un répertoire valide.`);
 }
+
+// Gestion de la Promise retournee par main()
+main().catch(error => {
+    console.error(`❌ Erreur non geree: ${error.message}`);
+    process.exit(1);
+});

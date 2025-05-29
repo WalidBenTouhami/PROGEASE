@@ -6,11 +6,11 @@
     "user": "Walid",
     "password": "securePassword"
   },
-  "projects": [
+  "projets": [
     {
       "id": "1",
       "title": "Gestion des Tâches",
-      "description": "Application pour gérer les tâches d'une équipe.",
+      "description": "Application pour gerer les tâches d'une equipe.",
       "status": "draft"
     }
   ],

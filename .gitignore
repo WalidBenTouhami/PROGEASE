@@ -1,3 +1,4 @@
+
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # Compiled output
@@ -40,3 +41,27 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+=======
+# Default ignored files
+node_modules/
+shelf/
+
+# IntelliJ IDEA files
+.idea/
+.idea/workspace.xml
+
+# Editor-based HTTP Client requests
+httpRequests/
+
+# Datasource local storage ignored files
+dataSources/
+dataSources.local.xml
+
+# Environment variables
+.env
+
+# Task management files
+todo
+
+# Ignorer tous les repertoires node_modules
+

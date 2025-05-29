@@ -1,0 +1,409 @@
+
+// ======= Contenu de src/app/app.component.html =======
+
+<a href="#contenu-principal" class="skip-link">Aller au contenu principal</a>
+<div class="app-container">
+  <header class="app-header">
+    <div class="logo-container">
+      <img src="assets/PROGEASE.png" alt="Logo PROGEASE" height="45" loading="lazy" />
+      <h1>PROGEASE</h1>
+    </div>
+    <nav class="main-nav" aria-label="Menu principal">
+      <ul>
+        <li>
+          <a routerLink="/front-office" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" aria-current="page">Accueil</a>
+        </li>
+        <li>
+          <a routerLink="/projets" routerLinkActive="active">Projets</a>
+        </li>
+        <li>
+          <a routerLink="/livrables" routerLinkActive="active">Livrables</a>
+        </li>
+        <li>
+          <a routerLink="/back-office" routerLinkActive="active">Administration</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <main id="contenu-principal" class="app-content" tabindex="-1">
+    <router-outlet></router-outlet>
+  </main>
+  <footer class="app-footer">
+    <p>&copy; 2025 PROGEASE – Plateforme de gestion de projets academiques</p>
+  </footer>
+</div>
+
+
+// ======= Contenu de src/app/back-office/dashboard/dashboard.component.html =======
+
+<section class="dashboard-container" aria-labelledby="tableau-bord-admin-titre">
+  <h2 id="tableau-bord-admin-titre" class="title">Tableau de bord administration</h2>
+  <div class="stats-grid" role="list" aria-label="Statistiques de gestion">
+    <div class="stat-card" role="listitem">
+      <h3>Projets à valider</h3>
+      <span class="stat-value">{{ projetsAValider }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Livrables à corriger</h3>
+      <span class="stat-value">{{ livrablesACorriger }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>etudiants inscrits</h3>
+      <span class="stat-value">{{ nbEtudiants }}</span>
+    </div>
+  </div>
+  <section aria-labelledby="dernieres-actions-titre">
+    <h3 id="dernieres-actions-titre">Dernieres actions</h3>
+    <ul>
+      <li *ngFor="let action of dernieresActions">
+        {{ action.description }}
+        <time [attr.datetime]="action.date">{{ action.date | date:'shortDate' }}</time>
+      </li>
+    </ul>
+  </section>
+</section>
+
+
+// ======= Contenu de src/app/back-office/livrable-management/livrable-management.component.html =======
+
+<h2>Gestion des livrables</h2>
+<p>Section pour la gestion et le suivi des livrables.</p>
+
+
+// ======= Contenu de src/app/back-office/projet-management/projet-management.component.html =======
+
+<h2>Gestion des projets</h2>
+<p>Section pour la gestion et le suivi des projets.</p>
+
+
+// ======= Contenu de src/app/core/api-test/api-test.component.html =======
+
+<section class="api-test-section" aria-labelledby="api-test-title">
+  <h2 id="api-test-title">Testeur d'API</h2>
+  <form (ngSubmit)="onSubmit()" #apiForm="ngForm" aria-label="Formulaire de test API">
+    <div class="form-group">
+      <label for="endpoint">Endpoint</label>
+      <input id="endpoint" name="endpoint" type="text" [(ngModel)]="endpoint" required aria-required="true" #endpointInput="ngModel">
+    </div>
+    <div class="form-group">
+      <label for="method">Methode</label>
+      <select id="method" name="method" [(ngModel)]="method" required aria-required="true">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="DELETE">DELETE</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="body">Corps (JSON)</label>
+      <textarea id="body" name="body" [(ngModel)]="body" rows="4" placeholder='{"key": "value"}' aria-label="Corps de la requete"></textarea>
+    </div>
+    <button type="submit" [disabled]="apiForm.invalid">Envoyer</button>
+  </form>
+  <section *ngIf="response" aria-labelledby="response-title">
+    <h3 id="response-title">Reponse</h3>
+    <pre>{{ response | json }}</pre>
+  </section>
+</section>
+
+
+// ======= Contenu de src/app/livrable/livrable-detail/livrable-detail.component.html =======
+
+<ng-container *ngIf="livrable; else loading">
+  <article class="livrable-detail" aria-labelledby="livrable-titre">
+    <h2 id="livrable-titre">{{ livrable.nom }}
+      <span [class]="statutClass(livrable.statut)">{{ livrable.statut }}</span>
+    </h2>
+    <p><strong>Description&nbsp;:</strong> {{ livrable.description }}</p>
+    <p><strong>Date limite&nbsp;:</strong> <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'longDate' }}</time></p>
+    <p *ngIf="livrable.urlDepot"><strong>URL de depôt&nbsp;:</strong> <a [href]="livrable.urlDepot" rel="noopener" target="_blank">{{ livrable.urlDepot }}</a></p>
+    <p *ngIf="livrable.projetId"><strong>Projet associe</strong>&nbsp;: {{ livrable.projetId }}</p>
+  </article>
+</ng-container>
+<ng-template #loading>
+  <p>Chargement du livrable...</p>
+</ng-template>
+
+
+// ======= Contenu de src/app/livrable/livrable-form/livrable-form.component.html =======
+
+<form [formGroup]="livrableForm" (ngSubmit)="onSubmit()" aria-labelledby="formulaire-livrable-titre" class="form-container">
+  <h2 id="formulaire-livrable-titre">Ajouter ou modifier un livrable</h2>
+
+  <div class="form-group">
+    <label for="nom">Titre du livrable</label>
+    <input id="nom" formControlName="nom" type="text" required aria-required="true">
+    <div *ngIf="livrableForm.get('nom')?.invalid && livrableForm.get('nom')?.touched" class="error">
+      Le titre est requis.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description</label>
+    <textarea id="description" formControlName="description" rows="4" required aria-required="true"></textarea>
+    <div *ngIf="livrableForm.get('description')?.invalid && livrableForm.get('description')?.touched" class="error">
+      La description est requise.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="dateLimite">Date limite</label>
+    <input id="dateLimite" formControlName="dateLimite" type="date" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="urlDepot">URL de depôt</label>
+    <input id="urlDepot" formControlName="urlDepot" type="url" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="statut">Statut</label>
+    <select id="statut" formControlName="statut" required aria-required="true">
+      <option *ngFor="let statut of statutsLivrable" [value]="statut">{{ statut }}</option>
+    </select>
+  </div>
+
+  <button type="submit" [disabled]="livrableForm.invalid">Enregistrer</button>
+</form>
+
+
+// ======= Contenu de src/app/livrable/livrable-list/livrable-list.component.html =======
+
+<section aria-labelledby="liste-livrables-titre">
+  <h2 id="liste-livrables-titre">Liste des livrables</h2>
+
+  <div *ngIf="chargement" class="info">Chargement des livrables...</div>
+  <div *ngIf="erreur" class="error">{{ erreur }}</div>
+
+  <ul class="livrable-list" *ngIf="!chargement && livrables.length">
+    <li *ngFor="let livrable of livrables">
+      <span class="livrable-nom">{{ livrable.nom }}</span>
+      <span class="status" [ngClass]="{
+        'termine': livrable.statut === 'Termine',
+        'attente': livrable.statut === 'En attente',
+        'retard': livrable.statut === 'En retard'
+      }">{{ livrable.statut }}</span>
+      <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant le <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
+      <span *ngIf="livrable.urlDepot">
+        &nbsp;| <a [href]="livrable.urlDepot" target="_blank" rel="noopener">Depôt</a>
+      </span>
+    </li>
+  </ul>
+
+  <div *ngIf="!chargement && !livrables.length && !erreur" class="info">
+    Aucun livrable à afficher.
+  </div>
+</section>
+
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.html =======
+
+<section class="dashboard-container" aria-labelledby="tableau-bord-titre">
+  <h2 id="tableau-bord-titre" class="title">Tableau de bord etudiant</h2>
+  <div class="stats-grid" role="list" aria-label="Statistiques principales">
+    <div class="stat-card" role="listitem">
+      <h3>Projets en cours</h3>
+      <span class="stat-value">{{ projetsEnCours }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Livrables soumis</h3>
+      <span class="stat-value">{{ livrablesSoumis }}</span>
+    </div>
+    <div class="stat-card" role="listitem">
+      <h3>Retours reçus</h3>
+      <span class="stat-value">{{ retoursRecus }}</span>
+    </div>
+  </div>
+  <section aria-labelledby="projets-recents-titre">
+    <h3 id="projets-recents-titre">Projets recents</h3>
+    <ul>
+      <li *ngFor="let projet of projetsRecents">
+        <a [routerLink]="['/projets', projet.id]">{{ projet.nom }}</a>
+        <span class="sr-only">, projet recent</span>
+      </li>
+    </ul>
+  </section>
+</section>
+
+
+// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.html =======
+
+<section aria-labelledby="liste-livrables-titre">
+  <h2 id="liste-livrables-titre">Liste des livrables</h2>
+  <ul class="livrable-list">
+    <li *ngFor="let livrable of livrables">
+      <a [routerLink]="['/livrables', livrable.id]">{{ livrable.titre }}</a>
+      <span *ngIf="livrable.statut === 'soumis'" class="status soumis">Soumis</span>
+      <span *ngIf="livrable.statut === 'attente'" class="status attente">En attente</span>
+    </li>
+  </ul>
+</section>
+
+
+// ======= Contenu de src/app/front-office/projet-list/projet-list.component.html =======
+
+<h2>Liste des projets</h2>
+
+<div *ngIf="chargement">Chargement...</div>
+<div *ngIf="erreur" class="erreur">{{ erreur }}</div>
+
+<table *ngIf="projets.length">
+  <thead>
+  <tr>
+    <th>Titre</th>
+    <th>Description</th>
+    <th>Statut</th>
+    <th>Date de debut</th>
+    <th>Date de fin</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let projet of projets">
+    <td>{{ projet.titre }}</td>
+    <td>{{ projet.description }}</td>
+    <td>{{ projet.statut }}</td>
+    <td>{{ projet.dateDebut | date:'dd/MM/yyyy' }}</td>
+    <td>{{ projet.dateFin | date:'dd/MM/yyyy' }}</td>
+    <td>
+      <button type="button" (click)="voirDetails(projet._id)">Voir</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<div *ngIf="!projets.length && !chargement">Aucun projet trouve.</div>
+
+
+// ======= Contenu de src/app/projet/projet-detail/projet-detail.component.html =======
+
+<ng-container *ngIf="projet; else loading">
+  <article class="projet-detail" aria-labelledby="projet-titre">
+    <h2 id="projet-titre">{{ projet.titre }}
+      <span [class]="statutClass(projet.statut)">{{ projet.statut }}</span>
+    </h2>
+    <p><strong>Description&nbsp;:</strong> {{ projet.description }}</p>
+    <p><strong>Date de debut&nbsp;:</strong> <time [attr.datetime]="projet.dateDebut">{{ projet.dateDebut | date:'longDate' }}</time></p>
+    <p><strong>Date de fin&nbsp;:</strong> <time [attr.datetime]="projet.dateFin">{{ projet.dateFin | date:'longDate' }}</time></p>
+    <section aria-labelledby="membres-titre">
+      <h3 id="membres-titre">Membres du projet</h3>
+      <ul>
+        <li *ngFor="let membre of projet.equipe">{{ membre }}</li>
+      </ul>
+    </section>
+    <section aria-labelledby="livrables-titre">
+      <h3 id="livrables-titre">Livrables associes</h3>
+      <ul>
+        <li *ngFor="let livrable of projet.livrables">
+          <strong>{{ livrable.nom }}</strong>
+          <span class="status" [class]="livrable.statut.toLowerCase()">{{ livrable.statut }}</span>
+          <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant le <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
+        </li>
+      </ul>
+    </section>
+  </article>
+</ng-container>
+<ng-template #loading>
+  <p>Chargement du projet...</p>
+</ng-template>
+
+
+// ======= Contenu de src/app/projet/projet-form/projet-form.component.html =======
+
+<form [formGroup]="projetForm" (ngSubmit)="onSubmit()" aria-labelledby="formulaire-projet-titre" class="form-container">
+  <h2 id="formulaire-projet-titre">Creer ou modifier un projet</h2>
+
+  <div class="form-group">
+    <label for="titre">Titre du projet</label>
+    <input id="titre" formControlName="titre" type="text" required aria-required="true">
+    <div *ngIf="projetForm.get('titre')?.invalid && projetForm.get('titre')?.touched" class="error">
+      Le titre est requis.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="description">Description</label>
+    <textarea id="description" formControlName="description" rows="4" required aria-required="true"></textarea>
+    <div *ngIf="projetForm.get('description')?.invalid && projetForm.get('description')?.touched" class="error">
+      La description est requise.
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="equipe">Membres de l'equipe (separes par une virgule)</label>
+    <input id="equipe" formControlName="equipe" type="text" required aria-required="true" placeholder="Ex: Alice,Bob,Charlie">
+  </div>
+
+  <div class="form-group">
+    <label for="tuteur">Tuteur</label>
+    <input id="tuteur" formControlName="tuteur" type="text" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="competences">Competences requises (separees par une virgule)</label>
+    <input id="competences" formControlName="competences" type="text" required aria-required="true" placeholder="Ex: Angular,Node.js,Agilite">
+  </div>
+
+  <div class="form-group">
+    <label for="dateDebut">Date de debut</label>
+    <input id="dateDebut" formControlName="dateDebut" type="date" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="dateFin">Date de fin</label>
+    <input id="dateFin" formControlName="dateFin" type="date" required aria-required="true">
+  </div>
+
+  <div class="form-group">
+    <label for="statut">Statut</label>
+    <select id="statut" formControlName="statut" required aria-required="true">
+      <option *ngFor="let statut of statutsProjet" [value]="statut">{{ statut }}</option>
+    </select>
+  </div>
+
+  <button type="submit" [disabled]="projetForm.invalid">Enregistrer</button>
+</form>
+
+
+// ======= Contenu de src/app/projet/projet-list/projet-list.component.html =======
+
+<section aria-labelledby="liste-projets-titre">
+  <h2 id="liste-projets-titre">Liste des projets</h2>
+
+  <div *ngIf="chargement" class="info">Chargement des projets...</div>
+  <div *ngIf="erreur" class="error">{{ erreur }}</div>
+
+  <ul class="projet-list" *ngIf="!chargement && projets.length">
+    <li *ngFor="let projet of projets">
+      <a (click)="voirDetails(projet._id)" tabindex="0">{{ projet.titre }}</a>
+      <span class="status" [ngClass]="{
+        'encours': projet.statut === 'En cours',
+        'termine': projet.statut === 'Termine',
+        'brouillon': projet.statut === 'Brouillon',
+        'archive': projet.statut === 'Archive'
+      }">{{ projet.statut }}</span>
+    </li>
+  </ul>
+
+  <div *ngIf="!chargement && !projets.length && !erreur" class="info">
+    Aucun projet à afficher.
+  </div>
+</section>
+
+
+// ======= Contenu de src/index.html =======
+
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>PROGEASE</title>
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="theme-color" content="#146D78">
+</head>
+<body>
+<app-root role="main"></app-root>
+</body>
+</html>
+

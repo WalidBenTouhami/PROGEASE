@@ -1,0 +1,14 @@
+# Tests GraphQL pour HealthStatus
+# Generes automatiquement le 2025-05-27 19:27:50
+# Auteur: WalidBenTouhami
+
+# Requete pour recuperer tous les healthstatuss
+query GetAllHealthstatuss {
+  health {
+    _id
+    status
+    timestamp
+    user
+  }
+}
+

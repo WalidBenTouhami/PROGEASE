@@ -1,0 +1,22 @@
+<section aria-labelledby="liste-projets-titre">
+  <h2 id="liste-projets-titre">Liste des projets</h2>
+
+  <div *ngIf="chargement" class="info">Chargement des projets...</div>
+  <div *ngIf="erreur" class="error">{{ erreur }}</div>
+
+  <ul class="projet-list" *ngIf="!chargement && projets.length">
+    <li *ngFor="let projet of projets">
+      <a (click)="voirDetails(projet._id)" tabindex="0">{{ projet.titre }}</a>
+      <span class="status" [ngClass]="{
+        'encours': projet.statut === 'en_cours',
+        'termine': projet.statut === 'termine',
+        'brouillon': projet.statut === 'brouillon',
+        'archive': projet.statut === 'archive'
+      }">{{ projet.statut }}</span>
+    </li>
+  </ul>
+
+  <div *ngIf="!chargement && !projets.length && !erreur" class="info">
+    Aucun projet à afficher.
+  </div>
+</section>

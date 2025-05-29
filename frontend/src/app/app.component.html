@@ -1,0 +1,31 @@
+<a href="#contenu-principal" class="skip-link">Aller au contenu principal</a>
+<div class="app-container">
+  <header class="app-header">
+    <div class="logo-container">
+      <img src="assets/PROGEASE.png" alt="Logo PROGEASE" height="45" loading="lazy" />
+      <h1>PROGEASE</h1>
+    </div>
+    <nav class="main-nav" aria-label="Menu principal">
+      <ul>
+        <li>
+          <a routerLink="/front-office" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" aria-current="page">Accueil</a>
+        </li>
+        <li>
+          <a routerLink="/projets" routerLinkActive="active">Projets</a>
+        </li>
+        <li>
+          <a routerLink="/livrables" routerLinkActive="active">Livrables</a>
+        </li>
+        <li>
+          <a routerLink="/back-office" routerLinkActive="active">Administration</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <main id="contenu-principal" class="app-content" tabindex="-1">
+    <router-outlet></router-outlet>
+  </main>
+  <footer class="app-footer">
+    <p>&copy; 2025 PROGEASE – Plateforme de gestion de projets academiques</p>
+  </footer>
+</div>

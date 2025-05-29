@@ -1,96 +1,128 @@
-// ../backend/config/constants.js
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-require('dotenv').config({ path: 'D:\\ESPRIT2\\9. Projet intégré\\PROGEASE\\backend\\.env' });
+// Tableau des variables necessaires et fonction pour verifier/logger sans crash
+const VARIABLES_ENV_OBLIGATOIRES = {
+    CRITIQUES: ["MONGO_URI", "JWT_SECRET"],
+    RECOMMANDEES: ["PORT", "DEEPSEEK_API_KEY"]
+};
 
-// ✅ Validation des variables d'environnement critiques
-const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "OPENAI_API_KEY"];
-REQUIRED_ENV_VARS.forEach((envVar) => {
-    if (!process.env[envVar]) {
-        throw new Error(`La variable d'environnement ${envVar} est manquante.`);
+// Verification sans crash immediat pour les variables recommandees
+const variablesManquantes = {
+    critiques: [],
+    recommandees: []
+};
+
+VARIABLES_ENV_OBLIGATOIRES.CRITIQUES.forEach((varEnv) => {
+    if (!process.env[varEnv]) {
+        variablesManquantes.critiques.push(varEnv);
     }
 });
 
-// ✅ Énumérations globales
-const Enums = Object.freeze({
-    ProjectStatus: {
-        DRAFT: "brouillon",
-        IN_PROGRESS: "en_cours",
-        COMPLETED: "termine",
-        ARCHIVED: "archive",
+VARIABLES_ENV_OBLIGATOIRES.RECOMMANDEES.forEach((varEnv) => {
+    if (!process.env[varEnv]) {
+        variablesManquantes.recommandees.push(varEnv);
+    }
+});
+
+// Ne crash que si des variables critiques manquent
+if (variablesManquantes.critiques.length) {
+    throw new Error(`Variables d'environnement critiques manquantes: ${variablesManquantes.critiques.join(', ')}`);
+}
+
+if (variablesManquantes.recommandees.length) {
+    console.warn(`⚠️ Variables d'environnement recommandees manquantes: ${variablesManquantes.recommandees.join(', ')}`);
+}
+
+// Enum utilises dans le systeme
+const Enum = Object.freeze({
+    StatutProjet: {
+        BROUILLON: "Brouillon",
+        EN_COURS: "En_cours",
+        TERMINE: "Termine",
+        ARCHIVE: "Archive",
+        EN_RETARD: "En_retard",
+        A_VENIR: "A_venir",
     },
-    UserRole: {
-        STUDENT: "etudiant",
-        TUTOR: "tuteur",
-        ADMIN: "admin",
-    },
-    DeliverableStatus: {
-        COMPLETED: "Terminé",
-        PENDING: "En attente",
-        OVERDUE: "En retard",
+    StatutLivrable: {
+        EN_ATTENTE: 'En_attente',
+        EN_COURS: 'En_cours',
+        EN_RETARD: 'En_retard',
+        TERMINE: 'Termine',
+        VALIDE: 'Valide',
+        REJETE: 'Rejete'
     },
 });
 
-// ✅ Configuration de sécurité
-const SecurityConfig = Object.freeze({
+// Securite avec valeurs de production plus strictes
+const ConfigSecurite = Object.freeze({
     JWT: {
-        EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
-        COOKIE_NAME: process.env.JWT_COOKIE_NAME || "__progease_token",
+        // 1 jour en dev, 2h en production
+        EXPIRE_DANS: process.env.NODE_ENV === 'production'
+            ? process.env.JWT_EXPIRES_IN || "2h"
+            : process.env.JWT_EXPIRES_IN || "1d",
+        NOM_COOKIE: process.env.JWT_COOKIE_NAME || "__progease_token",
     },
-    PASSWORD: {
-        MIN_LENGTH: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10,
-        SALT_ROUNDS: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
-        MAX_ATTEMPTS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5,
-        LOCKOUT_MINUTES: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30,
+    MOT_DE_PASSE: {
+        LONGUEUR_MIN: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10,
+        NB_SALT: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
+        NB_MAX_ESSAIS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5,
+        MINUTES_VERROUILLAGE: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30,
     },
+    RATE_LIMIT: {
+        WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000, // 15 minutes
+        MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX, 10) || 100, // 100 requetes
+    }
 });
 
-// ✅ Paramètres de pagination par défaut
-const PaginationDefaults = Object.freeze({
+const PaginationParDefaut = Object.freeze({
     PAGE: 1,
-    LIMIT: 20,
-    MAX_LIMIT: 100,
+    LIMITE: 20,
+    LIMITE_MAX: 100,
 });
 
-// ✅ Messages d'erreur globaux & modulaires
-const ErrorMessages = Object.freeze({
+const MessagesErreur = Object.freeze({
     GENERAL: {
-        NOT_FOUND: "Ressource non trouvée.",
-        SERVER_ERROR: "Erreur serveur interne.",
-        UNAUTHORIZED: "Accès non autorisé.",
-        FORBIDDEN: "Action interdite.",
-        INVALID_ID: "ID invalide.",
+        NON_TROUVE: "Ressource non trouvee.",
+        ERREUR_SERVEUR: "Erreur serveur interne.",
+        NON_AUTORISE: "Acces non autorise.",
+        INTERDIT: "Action interdite.",
+        ID_INVALIDE: "ID invalide.",
+        VALIDATION: "Erreur de validation des donnees."
     },
-    PROJECT: {
-        INVALID_TEAM_MEMBER: "Un membre de l’équipe est invalide.",
-        NOT_FOUND: "Projet introuvable.",
+    PROJET: {
+        MEMBRE_EQUIPE_INVALIDE: "Un membre de l'equipe est invalide.",
+        NON_TROUVE: "Projet introuvable.",
     },
-    USER: {
-        DUPLICATE_EMAIL: "Email déjà utilisé.",
-        INVALID_ROLE: "Rôle utilisateur invalide.",
-    },
+    LIVRABLE: {
+        NON_TROUVE: "Livrable introuvable.",
+        INVALIDE: "Livrable invalide.",
+    }
 });
 
-// ✅ Codes de statut HTTP
-const HttpStatus = Object.freeze({
+const StatutHttp = Object.freeze({
     OK: 200,
-    CREATED: 201,
-    NO_CONTENT: 204,
-    BAD_REQUEST: 400,
-    UNAUTHORIZED: 401,
-    FORBIDDEN: 403,
-    NOT_FOUND: 404,
-    CONFLICT: 409,
-    INTERNAL_ERROR: 500,
+    CREE: 201,
+    SANS_CONTENU: 204,
+    MAUVAISE_REQUETE: 400,
+    NON_AUTORISE: 401,
+    INTERDIT: 403,
+    NON_TROUVE: 404,
+    CONFLIT: 409,
+    ERREUR_INTERNE: 500,
 });
 
 module.exports = {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT || 3000,
     JWT_SECRET: process.env.JWT_SECRET,
-    OPENAI_API_KEY: process.env.OPENAI_API_KEY,
-    Enums,
-    SecurityConfig,
-    PaginationDefaults,
-    ErrorMessages,
-    HttpStatus,
+    DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
+    Enum,
+    ConfigSecurite,
+    PaginationParDefaut,
+    MessagesErreur,
+    StatutHttp,
+    NODE_ENV: process.env.NODE_ENV || 'development',
+
 };
+

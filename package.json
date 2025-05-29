@@ -1,4 +1,5 @@
 {
+
   "name": "user-management-updated",
   "version": "1.0.0",
   "main": "app.js",
@@ -20,5 +21,22 @@
     "mongoose": "^8.15.1",
     "nodemailer": "^7.0.3",
     "pdfkit": "^0.17.1"
+=======
+  "name": "progease",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm start\"",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "clean": "rimraf node_modules && cd backend && rimraf node_modules && cd ../frontend && rimraf node_modules"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.6",
+    "@graphql-codegen/introspection": "^4.0.3",
+    "@graphql-codegen/typescript": "^4.1.6",
+    "@graphql-codegen/typescript-apollo-angular": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.6.1",
+    "concurrently": "^8.2.2",
+    "rimraf": "^6.0.1"
+
   }
 }

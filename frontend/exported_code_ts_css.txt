@@ -1,0 +1,2475 @@
+
+// ======= Contenu de server.ts =======
+
+import { APP_BASE_HREF } from '@angular/common';
+import { CommonEngine } from '@angular/ssr';
+import express from 'express';
+import { fileURLToPath } from 'node:url';
+import { dirname, join, resolve } from 'node:path';
+import bootstrap from './src/main.server';
+
+// The Express app is exported so that it can be used by serverless Functions.
+export function app(): express.Express {
+  const server = express();
+  const serverDistFolder = dirname(fileURLToPath(import.meta.url));
+  const browserDistFolder = resolve(serverDistFolder, '../browser');
+  const indexHtml = join(serverDistFolder, 'index.server.html');
+
+  const commonEngine = new CommonEngine();
+
+  server.set('view engine', 'html');
+  server.set('views', browserDistFolder);
+
+  // Serve static files from /browser
+  server.get('*.*', express.static(browserDistFolder, {
+    maxAge: '1y'
+  }));
+
+  // All regular routes use the Angular engine
+  server.get('*', (req, res, next) => {
+    const { protocol, originalUrl, baseUrl, headers } = req;
+
+    commonEngine
+      .render({
+        bootstrap,
+        documentFilePath: indexHtml,
+        url: `${protocol}://${headers.host}${originalUrl}`,
+        publicPath: browserDistFolder,
+        providers: [{ provide: APP_BASE_HREF, useValue: baseUrl }],
+      })
+      .then((html) => res.send(html))
+      .catch((err) => next(err));
+  });
+
+  return server;
+}
+
+function run(): void {
+  const port = process.env['PORT'] || 4000;
+
+  // Start up the Node server
+  const server = app();
+  server.listen(port, () => {
+    console.log(`Node Express server listening on http://localhost:${port}`);
+  });
+}
+
+run();
+
+
+// ======= Contenu de src/app/app-routing.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+
+export const routes: Routes = [
+  { path: 'back-office', loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule) },
+  { path: 'front-office', loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule) },
+  { path: 'livrable', loadChildren: () => import('./livrable/livrable.module').then(m => m.LivrableModule) },
+  { path: 'projet', loadChildren: () => import('./projet/projet.module').then(m => m.ProjetModule) },
+  { path: '', redirectTo: 'front-office', pathMatch: 'full' },
+  { path: '**', redirectTo: 'front-office' }
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule {}
+
+
+// ======= Contenu de src/app/app.component.css =======
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+.app-header {
+  background: var(--primary-color);
+  color: #fff;
+  padding: 1rem 0;
+  box-shadow: 0 2px 8px #0001;
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-left: 2rem;
+}
+.logo-container h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+.main-nav ul {
+  display: flex;
+  gap: 2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0 2rem;
+}
+.main-nav a {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 500;
+  position: relative;
+}
+.main-nav a.active,
+.main-nav a:focus {
+  text-decoration: underline;
+  color: var(--accent-color);
+}
+.app-content {
+  flex: 1;
+  padding: 2rem 0;
+  background: var(--background-light);
+}
+.app-footer {
+  background: var(--primary-dark);
+  color: #fff;
+  text-align: center;
+  padding: 1rem;
+}
+
+
+// ======= Contenu de src/app/app.component.spec.ts =======
+
+import { TestBed } from '@angular/core/testing';
+import { AppComponent } from './app.component';
+
+describe('AppComponent', () => {
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [AppComponent],
+    }).compileComponents();
+  });
+
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  it('should have the titre "Application de gestion de projets"', () => {
+    const fixture = TestBed.createComponent(AppComponent);
+    const app = fixture.componentInstance;
+    expect(app.titre).toEqual('Application de gestion de projets');
+  });
+});
+
+
+// ======= Contenu de src/app/app.component.ts =======
+
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterModule, RouterOutlet, CommonModule],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  titre = 'Application de gestion de projets';
+}
+
+
+// ======= Contenu de src/app/app.config.server.ts =======
+
+import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
+import { provideServerRendering } from '@angular/platform-server';
+import { appConfig } from './app.config';
+
+const serverConfig: ApplicationConfig = {
+  providers: [
+    provideServerRendering()
+  ]
+};
+
+export const config = mergeApplicationConfig(appConfig, serverConfig);
+
+
+// ======= Contenu de src/app/app.config.ts =======
+
+import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { routes } from './app.routes';
+import { provideClientHydration } from '@angular/platform-browser';
+import { apolloProviders } from './core/apollo.config';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideClientHydration(),
+    provideHttpClient(
+      withInterceptors([authInterceptor])
+    ),
+    ...apolloProviders
+  ]
+};
+
+
+// ======= Contenu de src/app/app.module.ts =======
+
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app.component';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
+import { routes } from './app-routing.module';
+import { apolloProviders } from './core/apollo.config';
+
+    bootstrapApplication(AppComponent, {
+      providers: [
+        provideHttpClient(),
+        provideRouter(routes),
+        ...apolloProviders,
+      ],
+    }).catch(err => console.error(err));
+
+
+// ======= Contenu de src/app/app.routes.ts =======
+
+import { Routes } from '@angular/router';
+import { ApiTestComponent } from './core/api-test/api-test.component';
+
+export const routes: Routes = [
+  { path: 'back-office', loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule) },
+  { path: 'front-office', loadChildren: () => import('./front-office/front-office.module').then(m => m.FrontOfficeModule) },
+  { path: 'livrable', loadChildren: () => import('./livrable/livrable.module').then(m => m.LivrableModule) },
+  { path: 'projet', loadChildren: () => import('./projet/projet.module').then(m => m.ProjetModule) },
+  { path: '', redirectTo: 'front-office', pathMatch: 'full' },
+  { path: '**', redirectTo: 'front-office' },
+  // Route de test
+  { path: 'test-api', component: ApiTestComponent },
+];
+
+
+// ======= Contenu de src/app/back-office/back-office-routing.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjetManagementComponent } from './projet-management/projet-management.component';
+import { LivrableManagementComponent } from './livrable-management/livrable-management.component';
+
+const routes: Routes = [
+  { path: '', component: DashboardComponent },
+  { path: 'projets', component: ProjetManagementComponent },
+  { path: 'livrables', component: LivrableManagementComponent },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class BackOfficeRoutingModule {}
+
+
+// ======= Contenu de src/app/back-office/back-office.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BackOfficeRoutingModule } from './back-office-routing.module';
+import { ProjetManagementComponent } from './projet-management/projet-management.component';
+import { LivrableManagementComponent } from './livrable-management/livrable-management.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+
+@NgModule({
+  declarations: [
+    ProjetManagementComponent,
+    LivrableManagementComponent
+  ],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    BackOfficeRoutingModule,
+    DashboardComponent // standalone component
+  ]
+})
+export class BackOfficeModule {}
+
+
+// ======= Contenu de src/app/back-office/dashboard/dashboard.component.css =======
+
+.dashboard-container {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 18px #0001;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 0.4rem;
+  transition: background 0.2s;
+}
+button:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+button:hover { background: #174bb3; }
+
+.user-actions {
+  margin: 1rem 0;
+  display: flex;
+  gap: 1rem;
+}
+
+
+// ======= Contenu de src/app/back-office/dashboard/dashboard.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DashboardComponent } from './dashboard.component';
+
+describe('DashboardComponent', () => {
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DashboardComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(DashboardComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/back-office/dashboard/dashboard.component.ts =======
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent {
+  users = [{ nom: 'Jean', role: 'Administrateur' }];
+  roles = ['Administrateur', 'Tuteur', 'etudiant'];
+  projetTemplates = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
+  stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
+  tutorPerformance: { nom?: string; score?: number }[] = [];
+  aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
+
+  openUserForm() {}
+  updateRole(user: any) {}
+  editUser(user: any) {}
+  deleteUser(user: any) {}
+  exportUsers() {}
+  importUsers() {}
+  createTemplate() {}
+  editTemplate(template: any) {}
+  updateAICfg() {}
+}
+
+
+// ======= Contenu de src/app/back-office/livrable-management/livrable-management.component.css =======
+
+.section-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+p {
+  color: #555;
+}
+
+
+// ======= Contenu de src/app/back-office/livrable-management/livrable-management.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { LivrableManagementComponent } from './livrable-management.component';
+
+describe('LivrableManagementComponent', () => {
+  let component: LivrableManagementComponent;
+  let fixture: ComponentFixture<LivrableManagementComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [LivrableManagementComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(LivrableManagementComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/back-office/livrable-management/livrable-management.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-livrable-management',
+  templateUrl: './livrable-management.component.html',
+  styleUrls: ['./livrable-management.component.css']
+})
+export class LivrableManagementComponent {}
+
+
+// ======= Contenu de src/app/back-office/projet-management/projet-management.component.css =======
+
+.section-header {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+
+p {
+  color: #555;
+}
+
+
+// ======= Contenu de src/app/back-office/projet-management/projet-management.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjetManagementComponent } from './projet-management.component';
+
+describe('ProjetManagementComponent', () => {
+  let component: ProjetManagementComponent;
+  let fixture: ComponentFixture<ProjetManagementComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjetManagementComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(ProjetManagementComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/back-office/projet-management/projet-management.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-projet-management',
+  templateUrl: './projet-management.component.html',
+  styleUrls: ['./projet-management.component.css']
+})
+export class ProjetManagementComponent {}
+
+
+// ======= Contenu de src/app/core/api-test/api-test.component.ts =======
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ApiTesterService } from '../services/api-tester.service';
+
+@Component({
+  selector: 'app-api-test',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="test-container">
+      <h2>Test de connexion API</h2>
+
+      <div class="test-card">
+        <h3>Test REST API</h3>
+        <button (click)="testRest()" [disabled]="testingRest">Tester</button>
+        <div *ngIf="restResult" class="result success">
+          <pre>{{ restResult | json }}</pre>
+        </div>
+        <div *ngIf="restError" class="result error">
+          <p>Erreur: {{ restError }}</p>
+        </div>
+      </div>
+
+      <div class="test-card">
+        <h3>Test GraphQL</h3>
+        <button (click)="testGraphQL()" [disabled]="testingGraphQL">Tester</button>
+        <div *ngIf="graphqlResult" class="result success">
+          <pre>{{ graphqlResult | json }}</pre>
+        </div>
+        <div *ngIf="graphqlError" class="result error">
+          <p>Erreur: {{ graphqlError }}</p>
+        </div>
+      </div>
+
+      <div class="test-card">
+        <h3>Test Service IA</h3>
+        <button (click)="testAI()" [disabled]="testingAI">Tester</button>
+        <div *ngIf="aiResult" class="result success">
+          <pre>{{ aiResult | json }}</pre>
+        </div>
+        <div *ngIf="aiError" class="result error">
+          <p>Erreur: {{ aiError }}</p>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .test-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+    .test-card {
+      background: var(--background-medium);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h3 {
+      margin-top: 0;
+      color: var(--primary-color);
+    }
+    button {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: var(--primary-light);
+    }
+    button:disabled {
+      background: var(--text-secondary);
+      cursor: not-allowed;
+    }
+    .result {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 4px;
+      max-height: 300px;
+      overflow: auto;
+    }
+    .success {
+      background: #e3f2fd;
+      border: 1px solid #2196F3;
+    }
+    .error {
+      background: #ffebee;
+      border: 1px solid #f44336;
+    }
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+  `]
+})
+export class ApiTestComponent {
+  // REST API
+  restResult: any = null;
+  restError: string | null = null;
+  testingRest = false;
+
+  // GraphQL
+  graphqlResult: any = null;
+  graphqlError: string | null = null;
+  testingGraphQL = false;
+
+  // AI Service
+  aiResult: any = null;
+  aiError: string | null = null;
+  testingAI = false;
+
+  constructor(private apiTester: ApiTesterService) {}
+
+  testRest() {
+    this.testingRest = true;
+    this.restResult = null;
+    this.restError = null;
+
+    this.apiTester.testRestConnection().subscribe({
+      next: (result) => {
+        this.restResult = result;
+        this.testingRest = false;
+      },
+      error: (error) => {
+        this.restError = error.message || "Erreur de connexion";
+        this.testingRest = false;
+      }
+    });
+  }
+
+  testGraphQL() {
+    this.testingGraphQL = true;
+    this.graphqlResult = null;
+    this.graphqlError = null;
+
+    this.apiTester.testGraphQLConnection().subscribe({
+      next: (result) => {
+        this.graphqlResult = result.data;
+        this.testingGraphQL = false;
+      },
+      error: (error) => {
+        this.graphqlError = error.message || "Erreur de connexion";
+        this.testingGraphQL = false;
+      }
+    });
+  }
+
+  testAI() {
+    this.testingAI = true;
+    this.aiResult = null;
+    this.aiError = null;
+
+    const prompt = "Resumer les avantages d'une gestion de projet academique";
+
+    this.apiTester.testAIService(prompt).subscribe({
+      next: (result) => {
+        this.aiResult = result;
+        this.testingAI = false;
+      },
+      error: (error) => {
+        this.aiError = error.message || "Erreur de connexion";
+        this.testingAI = false;
+      }
+    });
+  }
+}
+
+
+// ======= Contenu de src/app/core/apollo.config.ts =======
+
+import { APOLLO_OPTIONS } from 'apollo-angular';
+import { ApolloClient, InMemoryCache } from '@apollo/client/core';
+import { HttpLink } from 'apollo-angular/http';
+import { environment } from '../../environments/environment';
+
+export function createApollo(httpLink: HttpLink) {
+  return {
+    cache: new InMemoryCache(),
+    link: httpLink.create({ uri: environment.graphqlUrl }),
+    defaultOptions: {
+      watchQuery: {
+        fetchPolicy: 'no-cache',
+        errorPolicy: 'ignore',
+      },
+      query: {
+        fetchPolicy: 'no-cache',
+        errorPolicy: 'all',
+      },
+      mutate: {
+        errorPolicy: 'all',
+      },
+    },
+  };
+}
+
+export const apolloProviders = [
+  {
+    provide: APOLLO_OPTIONS,
+    useFactory: createApollo,
+    deps: [HttpLink],
+  },
+];
+
+
+// ======= Contenu de src/app/core/interceptors/auth.interceptor.ts =======
+
+import { HttpInterceptorFn } from '@angular/common/http';
+
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authToken = localStorage.getItem('auth_token');
+
+  const authReq = authToken
+    ? req.clone({
+      headers: req.headers.set('Authorization', `Bearer ${authToken}`)
+    })
+    : req;
+
+  return next(authReq);
+};
+
+
+// ======= Contenu de src/app/core/models/livrable.model.ts =======
+
+export type StatutLivrable =  'En attente' | 'En_cours' | 'En retard' | 'Termine' | 'Valide' | 'Rejete' |;
+
+export interface Livrable {
+  _id?: string;
+  nom: string;
+  description: string;
+  dateLimite: Date | string;
+  urlDepot: string;
+  statut: StatutLivrable;
+  projetId?: string;
+  creeLe?: Date | string;
+  majLe?: Date | string;
+}
+
+export const StatutLivrable = {
+  StatutLivrable.EN_ATTENTE,
+  StatutLivrable.EN_COURS,
+  StatutLivrable.EN_RETARD,
+  StatutLivrable.TERMINE,
+  StatutLivrable.VALIDE,
+  StatutLivrable.REJETE
+} as const;
+
+
+// ======= Contenu de src/app/core/models/projet.model.ts =======
+
+import { Livrable } from './livrable.model';
+
+export type StatutProjet = 'Brouillon' | 'En_cours' | 'Termine' | 'Archive' | 'En_retard' | 'A_venir' |;
+
+export interface Projet {
+  _id: string;
+  titre: string;
+  description: string;
+  equipe: string[];
+  tuteur: string;
+  competences: string[];
+  dateDebut: Date | string;
+  dateFin: Date | string;
+  livrables?: Livrable[];
+  statut: StatutProjet;
+  progression?: number;
+  creeLe?: Date | string;
+  majLe?: Date | string;
+}
+
+export const Statutprojet = {
+  BROUILLON: 'Brouillon',
+  EN_COURS: 'En_cours',
+  TERMINE: 'Termine',
+  ARCHIVE: 'Archive'
+  EN_RETARD: 'En_retard',
+  A_VENIR: 'A_venir'
+} as const;
+
+
+// ======= Contenu de src/app/core/services/api-tester.service.ts =======
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { Apollo, gql } from 'apollo-angular';
+import { AlertService } from './atert.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ApiTesterService {
+  private apiUrl = environment.apiUrl;
+
+  constructor(
+    private http: HttpClient,
+    private apollo: Apollo,
+    private alertService: AlertService
+  ) {}
+
+  testRestConnection(): Observable<any> {
+    return this.http.get(`${this.apiUrl}/projets`).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  testGraphQLConnection(): Observable<any> {
+    return this.apollo.query({
+      query: gql`
+        query {
+          projets {
+            _id
+            titre
+            description
+          }
+        }
+      `
+    }).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  testAIService(prompt: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/ai/generer-texte`, { prompt }).pipe(
+      catchError((error) => this.handleError(error))
+    );
+  }
+
+  private handleError(error: any): Observable<never> {
+    const errorMessage = 'Erreur lors de la requete API : ' + (error.message || error.statusText);
+    this.alertService.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
+}
+
+
+// ======= Contenu de src/app/core/services/atert.service.ts =======
+
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AlertService {
+  private alertSubject = new BehaviorSubject<string | null>(null);
+  private alertTypeSubject = new BehaviorSubject<'success' | 'error' | 'info' | null>(null);
+
+  get alert$(): Observable<string | null> {
+    return this.alertSubject.asObservable();
+  }
+
+  get alertType$(): Observable<'success' | 'error' | 'info' | null> {
+    return this.alertTypeSubject.asObservable();
+  }
+
+  success(message: string): void {
+    this.alertTypeSubject.next('success');
+    this.alertSubject.next(message);
+  }
+
+  error(message: string): void {
+    this.alertTypeSubject.next('error');
+    this.alertSubject.next(message);
+  }
+
+  info(message: string): void {
+    this.alertTypeSubject.next('info');
+    this.alertSubject.next(message);
+  }
+
+  clear(): void {
+    this.alertTypeSubject.next(null);
+    this.alertSubject.next(null);
+  }
+}
+
+
+// ======= Contenu de src/app/core/services/livrable.service.spec.ts =======
+
+import { TestBed } from '@angular/core/testing';
+
+import { LivrableService } from './livrable.service';
+
+describe('LivrableService', () => {
+  let service: LivrableService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(LivrableService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/core/services/livrable.service.ts =======
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Livrable } from '../models/livrable.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LivrableService {
+  private baseUrl = `${environment.apiUrl}/livrables`;
+
+  constructor(private http: HttpClient) {}
+
+  recupererLivrablesParProjet(projetId: string) {
+    return this.http.get<Livrable[]>(`${this.baseUrl}/${projetId}`);
+  }
+
+  ajouterLivrable(data: Livrable) {
+    return this.http.post<Livrable>(this.baseUrl, data);
+  }
+
+  mettreAJourLivrable(livrableId: string, data: Livrable) {
+    return this.http.put<Livrable>(`${this.baseUrl}/${livrableId}`, data);
+  }
+
+  supprimerLivrable(livrableId: string) {
+    return this.http.delete(`${this.baseUrl}/${livrableId}`);
+  }
+}
+
+
+// ======= Contenu de src/app/core/services/graphql.service.ts =======
+
+import { Injectable } from '@angular/core';
+import { Apollo, gql } from 'apollo-angular';
+import { Observable } from 'rxjs';
+
+@Injectable({ providedIn: 'root' })
+export class GraphqlService {
+  constructor(private apollo: Apollo) {}
+
+  recupererProjets(): Observable<any> {
+    return this.apollo.query({
+      query: gql`
+        query {
+          projets {
+            _id
+            titre
+            description
+            equipe
+            tuteur
+            competences
+            dateDebut
+            dateFin
+            statut
+            livrables {
+              _id
+              nom
+              description
+              dateLimite
+              urlDepot
+              statut
+              projetId
+            }
+          }
+        }
+      `
+    });
+  }
+
+  creerProjet(data: any): Observable<any> {
+    return this.apollo.mutate({
+      mutation: gql`
+        mutation(
+          $titre: String!
+          $description: String!
+          $equipe: [ID!]!
+          $tuteur: ID
+          $competences: [String!]!
+          $dateDebut: String!
+          $dateFin: String!
+          $statut: String
+        ) {
+          creerProjet(
+            titre: $titre
+            description: $description
+            equipe: $equipe
+            tuteur: $tuteur
+            competences: $competences
+            dateDebut: $dateDebut
+            dateFin: $dateFin
+            statut: $statut
+          ) {
+            _id
+            titre
+            description
+            statut
+          }
+        }
+      `,
+      variables: {
+        titre: data.titre,
+        description: data.description,
+        equipe: data.equipe,
+        tuteur: data.tuteur,
+        competences: data.competences,
+        dateDebut: data.dateDebut,
+        dateFin: data.dateFin,
+        statut: data.statut
+      }
+    });
+  }
+}
+
+
+// ======= Contenu de src/app/core/services/projet.service.spec.ts =======
+
+import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { ProjetService } from './projet.service';
+import { environment } from '../../../environments/environment';
+import { Projet } from '../models/projet.model';
+
+describe('ProjetService', () => {
+  let service: ProjetService;
+  let httpMock: HttpTestingController;
+
+  const API = `${environment.apiUrl}/projets`;
+
+  const mockProjet: Projet = {
+    _id: '1',
+    titre: 'Projet 1',
+    description: 'Description',
+    equipe: [],
+    tuteur: '123',
+    competences: ['Angular', 'Express'],
+    dateDebut: '2023-01-01',
+    dateFin: '2023-06-30',
+    statut: 'Brouillon'
+  };
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      imports: [HttpClientTestingModule],
+      providers: [ProjetService]
+    });
+
+    service = TestBed.inject(ProjetService);
+    httpMock = TestBed.inject(HttpTestingController);
+  });
+
+  afterEach(() => {
+    httpMock.verify();
+  });
+
+  it('doit recuperer tous les projets', (done) => {
+    service.recupererProjets().subscribe(projets => {
+      expect(projets.length).toBe(1);
+      expect(projets[0].titre).toBe('Projet 1');
+      done();
+    });
+
+    const req = httpMock.expectOne(API);
+    expect(req.request.method).toBe('GET');
+    req.flush([mockProjet]);
+  });
+
+  it('doit recuperer un projet par ID', (done) => {
+    service.recupererProjet('1').subscribe(projet => {
+      expect(projet._id).toBe('1');
+      expect(projet.titre).toBe('Projet 1');
+      done();
+    });
+
+    const req = httpMock.expectOne(`${API}/1`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockProjet);
+  });
+
+  it('doit creer un projet', (done) => {
+    service.creerProjet(mockProjet).subscribe(projet => {
+      expect(projet.titre).toBe('Projet 1');
+      done();
+    });
+
+    const req = httpMock.expectOne(API);
+    expect(req.request.method).toBe('POST');
+    req.flush(mockProjet);
+  });
+
+  it('doit mettre à jour un projet', (done) => {
+    const updated = { ...mockProjet, titre: 'Projet Modifie' };
+    service.mettreAJourProjet('1', updated).subscribe(projet => {
+      expect(projet.titre).toBe('Projet Modifie');
+      done();
+    });
+
+    const req = httpMock.expectOne(`${API}/1`);
+    expect(req.request.method).toBe('PUT');
+    req.flush(updated);
+  });
+
+  it('doit supprimer un projet', (done) => {
+    service.supprimerProjet('1').subscribe(response => {
+      expect(response).toBeTruthy();
+      done();
+    });
+
+    const req = httpMock.expectOne(`${API}/1`);
+    expect(req.request.method).toBe('DELETE');
+    req.flush({ success: true });
+  });
+
+  it('doit gerer une erreur serveur (500)', (done) => {
+    service.recupererProjets().subscribe({
+      next: () => fail('appel devait echouer'),
+      error: (err) => {
+        expect(err.status).toBe(500);
+        expect(err.message).toContain('Erreur serveur');
+        done();
+      }
+    });
+
+    const req = httpMock.expectOne(API);
+    req.flush({}, { status: 500, statusText: 'Erreur interne' });
+  });
+});
+
+
+// ======= Contenu de src/app/core/services/projet.service.ts =======
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, catchError, retry, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Projet } from '../models/projet.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProjetService {
+  private baseUrl = `${environment.apiUrl}/projets`;
+
+  constructor(private http: HttpClient) {}
+
+  recupererProjets(): Observable<Projet[]> {
+    return this.http.get<Projet[]>(this.baseUrl).pipe(
+      retry(1),
+      catchError(this.handleError)
+    );
+  }
+
+  recupererProjet(id: string): Observable<Projet> {
+    return this.http.get<Projet>(`${this.baseUrl}/${id}`).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  creerProjet(data: Projet): Observable<Projet> {
+    return this.http.post<Projet>(this.baseUrl, data).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  mettreAJourProjet(id: string, data: Projet): Observable<Projet> {
+    return this.http.put<Projet>(`${this.baseUrl}/${id}`, data).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  supprimerProjet(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`).pipe(
+      retry(1),
+      catchError(this.handleError)
+    );
+  }
+
+  private handleError(error: any): Observable<never> {
+    let message = 'Une erreur est survenue';
+
+    if (error.error instanceof ErrorEvent) {
+      message = `Erreur client : ${error.error.message}`;
+    } else {
+      message = `Erreur serveur - code : ${error.status}, message : ${error.message}`;
+    }
+
+    console.error(`[ProjetService] ${message}`);
+    return throwError(() => new Error(message));
+  }
+}
+
+
+// ======= Contenu de src/app/livrable/livrable-detail/livrable-detail.component.css =======
+
+.livrable-detail {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 18px #0001;
+  padding: 2rem;
+}
+.status {
+  display: inline-block;
+  font-size: 0.95em;
+  margin-left: 0.5em;
+  padding: 0.2em 0.6em;
+  border-radius: 1em;
+}
+.status.termine { background: #c8e6c9; color: #256029; }
+.status.attente { background: #ffe082; color: #996c00; }
+.status.retard { background: #ffebee; color: #b71c1c; }
+
+
+// ======= Contenu de src/app/livrable/livrable-detail/livrable-detail.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { LivrableDetailComponent } from './livrable-detail.component';
+
+describe('LivrableDetailComponent', () => {
+  let component: LivrableDetailComponent;
+  let fixture: ComponentFixture<LivrableDetailComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [LivrableDetailComponent]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(LivrableDetailComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('devrait etre cree', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/livrable/livrable-detail/livrable-detail.component.ts =======
+
+import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Livrable } from '../../core/models/livrable.model';
+
+@Component({
+  selector: 'app-livrable-detail',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './livrable-detail.component.html',
+  styleUrls: ['./livrable-detail.component.css']
+})
+export class LivrableDetailComponent implements OnInit {
+  @Input() livrable?: Livrable;
+
+  ngOnInit(): void {}
+
+  statutClass(statut: string): string {
+    switch (statut) {
+      case 'Termine': return 'status termine';
+      case 'En attente': return 'status attente';
+      case 'En retard': return 'status retard';
+      default: return 'status';
+    }
+  }
+}
+
+
+// ======= Contenu de src/app/livrable/livrable-form/livrable-form.component.css =======
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  background: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  margin: 2rem auto;
+  box-shadow: 0 2px 10px #0001;
+}
+
+label {
+  font-weight: 500;
+}
+
+input, textarea, select {
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+button[type="submit"] {
+  align-self: flex-end;
+  background: #146D78;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 4px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button[type="submit"]:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+button[type="submit"]:hover {
+  background: #0B4D57;
+}
+
+
+// ======= Contenu de src/app/livrable/livrable-form/livrable-form.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { LivrableFormComponent } from './livrable-form.component';
+
+describe('LivrableFormComponent', () => {
+  let component: LivrableFormComponent;
+  let fixture: ComponentFixture<LivrableFormComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [LivrableFormComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(LivrableFormComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/livrable/livrable-form/livrable-form.component.ts =======
+
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+
+@Component({
+  selector: 'app-livrable-form',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule
+  ],
+  templateUrl: './livrable-form.component.html',
+  styleUrl: './livrable-form.component.css'
+})
+export class LivrableFormComponent implements OnInit {
+  @Input() livrable?: Livrable;
+  @Output() formSubmit = new EventEmitter<Livrable>();
+
+  livrableForm!: FormGroup;
+  statutsLivrable = [
+    StatutLivrable.EN_ATTENTE,
+    StatutLivrable.EN_COURS,
+    StatutLivrable.EN_RETARD,
+    StatutLivrable.TERMINE,
+    StatutLivrable.VALIDE,
+    StatutLivrable.REJETE
+  ];
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit() {
+    this.livrableForm = this.fb.group({
+      nom: [this.livrable?.nom || '', Validators.required],
+      description: [this.livrable?.description || '', Validators.required],
+      dateLimite: [this.livrable?.dateLimite ? this.livrable.dateLimite.toString().substring(0, 10) : '', Validators.required],
+      urlDepot: [this.livrable?.urlDepot || '', [Validators.required]],
+      statut: [this.livrable?.statut || StatutLivrable.EN_ATTENTE, Validators.required]
+    });
+  }
+
+  onSubmit() {
+    if (this.livrableForm.valid) {
+      this.formSubmit.emit(this.livrableForm.value);
+    }
+  }
+}
+
+
+// ======= Contenu de src/app/livrable/livrable-list/livrable-list.component.css =======
+
+h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+
+a:hover {
+  color: #174bb3;
+}
+
+.erreur {
+  color: #F44336;
+  margin-bottom: 1rem;
+}
+
+
+// ======= Contenu de src/app/livrable/livrable-list/livrable-list.component.spec.ts =======
+
+//src/app/livrable/livrable-list/livrable-list.component.spec.ts
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { LivrableListComponent } from './livrable-list.component';
+
+describe('LivrableListComponent', () => {
+  let component: LivrableListComponent;
+  let fixture: ComponentFixture<LivrableListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [LivrableListComponent]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(LivrableListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/livrable/livrable-list/livrable-list.component.ts =======
+
+import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Livrable } from '../../core/models/livrable.model';
+import { LivrableService } from '../../core/services/livrable.service';
+
+@Component({
+  selector: 'app-livrable-list',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './livrable-list.component.html',
+  styleUrls: ['./livrable-list.component.css']
+})
+export class LivrableListComponent implements OnInit {
+  @Input() projetId!: string;
+  livrables: Livrable[] = [];
+  chargement = false;
+  erreur = '';
+
+  constructor(private livrableService: LivrableService) {}
+
+  ngOnInit() {
+    if (this.projetId) {
+      this.chargement = true;
+      this.livrableService.recupererLivrablesParProjet(this.projetId).subscribe({
+        next: (livrables: Livrable[]) => {
+          this.livrables = livrables;
+          this.chargement = false;
+        },
+        error: () => {
+          this.erreur = "Erreur lors du chargement des livrables.";
+          this.chargement = false;
+        }
+      });
+    }
+  }
+}
+
+
+// ======= Contenu de src/app/livrable/livrable-routing.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { LivrableListComponent } from './livrable-list/livrable-list.component';
+
+const routes: Routes = [
+  { path: '', component: LivrableListComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class LivrableRoutingModule {}
+
+
+// ======= Contenu de src/app/livrable/livrable.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LivrableRoutingModule } from './livrable-routing.module';
+
+@NgModule({
+  declarations: [],
+  imports: [
+    CommonModule,
+    LivrableRoutingModule
+  ]
+})
+export class LivrableModule {}
+
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.css =======
+
+h2 {
+  margin-bottom: 1.5rem;
+}
+section {
+  margin-bottom: 2rem;
+}
+ul {
+  padding-left: 1.2rem;
+}
+li {
+  margin: 0.5rem 0;
+}
+
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DashboardComponent } from './dashboard.component';
+
+describe('DashboardComponent', () => {
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DashboardComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(DashboardComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.ts =======
+
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+interface Projet {
+  _id: string;
+  titre: string;
+  progression?: number;
+}
+
+interface Notification {
+  message: string;
+  date: Date | string;
+}
+
+interface Livrable {
+  nom: string;
+  statut: string;
+  dateLimite: Date | string;
+}
+
+interface User {
+  nom: string;
+  role: string;
+}
+
+interface Template {
+  nom: string;
+}
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent {
+  projets: Projet[] = [];
+  notifications: Notification[] = [];
+  livrables: Livrable[] = [];
+  users: User[] = [{ nom: 'Jean', role: 'Administrateur' }];
+  roles: string[] = ['Administrateur', 'Tuteur', 'etudiant'];
+  projetTemplates: Template[] = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
+  stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
+  tutorPerformance: { nom?: string; score?: number }[] = [];
+  aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
+
+  // Ouvre le formulaire pour ajouter un utilisateur
+  openUserForm(): void {}
+
+  // Met à jour le rôle d'un utilisateur
+  updateRole(user: User): void {}
+
+  // Modifie les informations d'un utilisateur
+  editUser(user: User): void {}
+
+  // Supprime un utilisateur
+  deleteUser(user: User): void {}
+
+  // Exporte la liste des utilisateurs
+  exportUsers(): void {}
+
+  // Importe une liste d'utilisateurs
+  importUsers(): void {}
+
+  // Cree un nouveau modele de projet
+  createTemplate(): void {}
+
+  // Modifie un modele de projet existant
+  editTemplate(template: Template): void {}
+
+  // Met à jour la configuration de l'IA
+  updateAICfg(): void {}
+}
+
+
+// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.css =======
+
+h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+
+a:hover {
+  color: #174bb3;
+}
+
+.erreur {
+  color: #F44336;
+  margin-bottom: 1rem;
+}
+
+
+// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { LivrableListComponent } from './livrable-list.component';
+
+describe('LivrableListComponent', () => {
+  let component: LivrableListComponent;
+  let fixture: ComponentFixture<LivrableListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [LivrableListComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(LivrableListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.ts =======
+
+import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Livrable } from '../../core/models/livrable.model';
+import { LivrableService } from '../../core/services/livrable.service';
+
+@Component({
+  selector: 'app-livrable-list',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './livrable-list.component.html',
+  styleUrl: './livrable-list.component.css'
+})
+export class LivrableListComponent implements OnInit {
+  @Input() projetId!: string;
+  livrables: Livrable[] = [];
+  chargement = false;
+  erreur = '';
+  constructor(private livrableService: LivrableService) {}
+  ngOnInit() {
+    if (this.projetId) {
+      this.chargement = true;
+      this.livrableService.recupererLivrablesParProjet(this.projetId).subscribe({
+        next: (livrables) => {
+          this.livrables = livrables;
+          this.chargement = false;
+        },
+        error: () => {
+          this.erreur = "Erreur lors du chargement des livrables.";
+          this.chargement = false;
+        }
+      });
+    }
+  }
+}
+
+
+// ======= Contenu de src/app/front-office/front-office-routing.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjetListComponent } from './projet-list/projet-list.component';
+import { LivrableListComponent } from './livrable-list/livrable-list.component';
+
+const routes: Routes = [
+  { path: '', component: DashboardComponent },
+  { path: 'projets', component: ProjetListComponent },
+  { path: 'livrables', component: LivrableListComponent },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class FrontOfficeRoutingModule {}
+
+
+// ======= Contenu de src/app/front-office/front-office.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FrontOfficeRoutingModule } from './front-office-routing.module';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjetListComponent } from './projet-list/projet-list.component';
+import { LivrableListComponent } from './livrable-list/livrable-list.component';
+
+@NgModule({
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FrontOfficeRoutingModule,
+    DashboardComponent, // standalone components
+    ProjetListComponent,
+    LivrableListComponent
+  ]
+})
+export class FrontOfficeModule {}
+
+
+// ======= Contenu de src/app/front-office/projet-list/projet-list.component.css =======
+
+h2 {
+  margin-bottom: 1.5rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: .5rem 1rem;
+  border-radius: .4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+button:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+button:hover { background: #174bb3; }
+.erreur {
+  color: #F44336;
+  margin-bottom: 1rem;
+}
+
+
+// ======= Contenu de src/app/front-office/projet-list/projet-list.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjetListComponent } from './projet-list.component';
+
+describe('ProjetListComponent', () => {
+  let component: ProjetListComponent;
+  let fixture: ComponentFixture<ProjetListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjetListComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(ProjetListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/front-office/projet-list/projet-list.component.ts =======
+
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { ProjetService } from '../../core/services/projet.service';
+import { Projet } from '../../core/models/projet.model';
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-projet-list',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './projet-list.component.html',
+  styleUrls: ['./projet-list.component.css']
+})
+export class ProjetListComponent implements OnInit, OnDestroy {
+  projets: Projet[] = [];
+  chargement = false;
+  erreur = '';
+  private subscription?: Subscription;
+
+  constructor(
+    private projetService: ProjetService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.chargerProjets();
+  }
+
+  chargerProjets() {
+    this.chargement = true;
+    this.subscription = this.projetService.recupererProjets().subscribe({
+      next: (projets) => {
+        this.projets = projets;
+        this.chargement = false;
+      },
+      error: (err) => {
+        this.erreur = "Erreur lors du chargement des projets.";
+        this.chargement = false;
+        console.error('Erreur:', err);
+      }
+    });
+  }
+
+  voirDetails(id: string) {
+    this.router.navigate(['/projet', id]);
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+}
+
+
+// ======= Contenu de src/app/projet/projet-detail/projet-detail.component.css =======
+
+.projet-detail {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 18px #0001;
+  padding: 2rem;
+}
+.projet-detail h2 {
+  margin-top: 0;
+}
+.status {
+  display: inline-block;
+  font-size: 0.95em;
+  margin-left: 0.5em;
+  padding: 0.2em 0.6em;
+  border-radius: 1em;
+}
+.status.termine { background: #c8e6c9; color: #256029; }
+.status.encours { background: #ffe082; color: #996c00; }
+.status.brouillon { background: #e0e0e0; color: #666; }
+.status.archive { background: #d1c4e9; color: #4527a0; }
+ul {
+  padding-left: 1.5em;
+}
+
+
+// ======= Contenu de src/app/projet/projet-detail/projet-detail.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjetDetailComponent } from './projet-detail.component';
+
+describe('ProjetDetailComponent', () => {
+  let component: ProjetDetailComponent;
+  let fixture: ComponentFixture<ProjetDetailComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjetDetailComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(ProjetDetailComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/projet/projet-detail/projet-detail.component.ts =======
+
+import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Projet } from '../../core/models/projet.model';
+import { Livrable } from '../../core/models/livrable.model';
+
+@Component({
+  selector: 'app-projet-detail',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './projet-detail.component.html',
+  styleUrls: ['./projet-detail.component.css']
+})
+export class ProjetDetailComponent implements OnInit {
+  @Input() projet?: Projet;
+
+  ngOnInit(): void {}
+
+  statutClass(statut: string): string {
+    switch (statut) {
+      case 'Brouillon': return 'status brouillon';
+      case 'En cours': return 'status encours';
+      case 'Termine': return 'status termine';
+      case 'Archive': return 'status archive';
+      default: return 'status';
+    }
+  }
+}
+
+
+// ======= Contenu de src/app/projet/projet-form/projet-form.component.css =======
+
+.form-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 18px #0001;
+  padding: 2rem;
+}
+.form-group label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.4em;
+}
+input, textarea, select {
+  width: 100%;
+  margin-bottom: 0.6em;
+}
+button[type="submit"] {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  padding: 0.6em 1.4em;
+  border-radius: 0.4em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button[type="submit"]:hover,
+button[type="submit"]:focus {
+  background: var(--primary-dark);
+}
+.error {
+  color: var(--error-color, #b00020);
+  font-size: .95em;
+  margin-top: -0.4em;
+  margin-bottom: 0.6em;
+}
+
+
+// ======= Contenu de src/app/projet/projet-form/projet-form.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjetFormComponent } from './projet-form.component';
+
+describe('ProjetFormComponent', () => {
+  let component: ProjetFormComponent;
+  let fixture: ComponentFixture<ProjetFormComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjetFormComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(ProjetFormComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/projet/projet-form/projet-form.component.ts =======
+
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Projet, Statutprojet } from '../../core/models/projet.model';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-projet-form',
+  standalone: true,
+  imports: [],
+  templateUrl: './projet-form.component.html',
+  styleUrls: ['./projet-form.component.css']
+})
+export class ProjetFormComponent implements OnInit {
+  @Input() projet?: Projet;
+  @Output() formSubmit = new EventEmitter<Projet>();
+
+  projetForm!: FormGroup;
+  statutsProjet = [
+    Statutprojet.BROUILLON,
+    Statutprojet.EN_COURS,
+    Statutprojet.TERMINE,
+    Statutprojet.ARCHIVE,
+    Statutprojet.EN_RETARD,
+    Statutprojet.A_venir
+  ];
+
+  constructor(private fb: FormBuilder) {}
+
+  ngOnInit() {
+    this.projetForm = this.fb.group({
+      titre: [this.projet?.titre || '', Validators.required],
+      description: [this.projet?.description || '', Validators.required],
+      equipe: [this.projet?.equipe ? this.projet.equipe.join(',') : '', Validators.required],
+      tuteur: [this.projet?.tuteur || '', Validators.required],
+      competences: [this.projet?.competences ? this.projet.competences.join(',') : '', Validators.required],
+      dateDebut: [this.projet?.dateDebut ? this.toDateInputValue(this.projet.dateDebut) : '', Validators.required],
+      dateFin: [this.projet?.dateFin ? this.toDateInputValue(this.projet.dateFin) : '', Validators.required],
+      statut: [this.projet?.statut || Statutprojet.BROUILLON, Validators.required]
+    });
+  }
+
+  toDateInputValue(date: string | Date): string {
+    if (!date) return '';
+    const d = new Date(date);
+    return d.toISOString().substring(0, 10);
+  }
+
+  onSubmit() {
+    if (this.projetForm.valid) {
+      const formValue = this.projetForm.value;
+      const projet: Projet = {
+        ...formValue,
+        equipe: formValue.equipe.split(',').map((id: string) => id.trim()).filter((id: string) => id),
+        competences: formValue.competences.split(',').map((c: string) => c.trim()).filter((c: string) => c),
+        dateDebut: formValue.dateDebut,
+        dateFin: formValue.dateFin
+      };
+      this.formSubmit.emit(projet);
+    }
+  }
+}
+
+
+// ======= Contenu de src/app/projet/projet-list/projet-list.component.css =======
+
+.projet-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.projet-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  border-radius: .6em;
+  padding: 1em 1.5em;
+  margin-bottom: 1em;
+  box-shadow: 0 2px 8px #0001;
+}
+.status {
+  margin-left: 1em;
+}
+
+
+// ======= Contenu de src/app/projet/projet-list/projet-list.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { ProjetListComponent } from './projet-list.component';
+
+describe('ProjetListComponent', () => {
+  let component: ProjetListComponent;
+  let fixture: ComponentFixture<ProjetListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjetListComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(ProjetListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/projet/projet-list/projet-list.component.ts =======
+
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { ProjetService } from '../../core/services/projet.service';
+import { Projet } from '../../core/models/projet.model';
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-projet-list',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './projet-list.component.html',
+  styleUrls: ['./projet-list.component.css']
+})
+export class ProjetListComponent implements OnInit, OnDestroy {
+  projets: (Projet & { _id: string })[] = [];
+  chargement = false;
+  erreur = '';
+  private subscription?: Subscription;
+
+  constructor(
+    private projetService: ProjetService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.chargerProjets();
+  }
+
+  chargerProjets() {
+    this.chargement = true;
+    this.subscription = this.projetService.recupererProjets().subscribe({
+      next: (projets) => {
+        this.projets = projets.filter(p => !!p._id) as (Projet & { _id: string })[];
+        this.chargement = false;
+      },
+      error: (err) => {
+        this.erreur = "Erreur lors du chargement des projets.";
+        this.chargement = false;
+        console.error('Erreur:', err);
+      }
+    });
+  }
+
+  voirDetails(id: string) {
+    this.router.navigate(['/projet', id]);
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
+  }
+}
+
+
+// ======= Contenu de src/app/projet/projet-routing.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { ProjetListComponent } from './projet-list/projet-list.component';
+
+const routes: Routes = [
+  { path: '', component: ProjetListComponent }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class ProjetRoutingModule {}
+
+
+// ======= Contenu de src/app/projet/projet.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ProjetRoutingModule } from './projet-routing.module';
+import { ProjetListComponent } from './projet-list/projet-list.component';
+
+@NgModule({
+  imports: [
+    CommonModule,
+    ProjetRoutingModule,
+    ProjetListComponent
+  ]
+})
+export class ProjetModule {}
+
+
+// ======= Contenu de src/environments/environment.prod.ts =======
+
+export const environment = {
+  production: true,
+  apiUrl: 'https://your-production-url.com/api',
+  graphqlUrl: 'https://your-production-url.com/graphql',
+  appVersion: '1.0.0',
+  appName: 'PROGEASE'
+};
+
+
+// ======= Contenu de src/environments/environment.ts =======
+
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api',
+  graphqlUrl: 'http://localhost:3000/graphql',
+  appVersion: '1.0.0',
+  appName: 'PROGEASE'
+};
+
+
+// ======= Contenu de src/main.server.ts =======
+
+import { bootstrapApplication } from '@angular/platform-browser';
+import { AppComponent } from './app/app.component';
+import { config } from './app/app.config.server';
+import '../src/polyfills';
+
+const bootstrap = () => bootstrapApplication(AppComponent, config);
+
+export default bootstrap;
+
+
+// ======= Contenu de src/main.ts =======
+
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { AppComponent } from './app/app.component';
+import './polyfills';
+
+// Initialisation de l'application
+bootstrapApplication(AppComponent, appConfig).catch(err => console.error(err));
+
+
+// ======= Contenu de src/polyfills.ts =======
+
+/***************************************************************************************************
+ * Zone JS is required by Angular itself.
+ */
+import 'zone.js';  // Included with Angular CLI.
+
+
+// ======= Contenu de src/styles.css =======
+
+:root {
+  --primary-color: #146D78;
+  --primary-light: #1D8A99;
+  --primary-dark: #0B4D57;
+  --accent-color: #17B5B5;
+  --background-light: #f7fbfc;
+  --background-medium: #e4f0f2;
+  --error-color: #b00020;
+}
+
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--background-light);
+  color: #222;
+  margin: 0;
+}
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:focus, a:hover {
+  color: var(--accent-color);
+  text-decoration: underline;
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
+}
+.skip-link {
+  position: absolute;
+  left: -999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  background: #fff;
+  color: var(--primary-color);
+  padding: 0.5em;
+  border-radius: 0 0 0.5em 0.5em;
+  z-index: 100;
+}
+.skip-link:focus {
+  left: 0;
+  top: 0;
+  width: auto;
+  height: auto;
+  font-size: 1rem;
+  outline: 2px solid var(--primary-color);
+}
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: 1rem;
+  border-radius: .3em;
+  border: 1px solid #ccc;
+  padding: .5em;
+  margin-bottom: .5em;
+  box-sizing: border-box;
+}
+button {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+button:focus, button:hover {
+  background: var(--primary-dark);
+}
+.form-group {
+  margin-bottom: 1em;
+}
+.error {
+  color: var(--error-color);
+  font-size: .95em;
+}
+.status {
+  display: inline-block;
+  font-size: 0.85em;
+  margin-left: 0.5em;
+  padding: 0.2em 0.6em;
+  border-radius: 1em;
+}
+.status.termine { background: #c8e6c9; color: #256029; }
+.status.encours { background: #ffe082; color: #996c00; }
+.status.soumis { background: #bbdefb; color: #0d47a1; }
+.status.attente { background: #fff3e0; color: #bf360c; }
+
+@media (max-width: 600px) {
+  .dashboard-container, .form-container {
+    padding: 1rem;
+  }
+  .stats-grid {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}
+
