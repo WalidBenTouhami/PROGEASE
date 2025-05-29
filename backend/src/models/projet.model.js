@@ -199,8 +199,10 @@ projetSchema.statics.rechercheAvancee = async function(criteres = {}) {
     if (statut) query.statut = statut;
     if (competences && competences.length) query.competences = { $all: competences };
 
-    if (dateDebut) query.dateDebut = { $gte: new Date(dateDebut) };
-    if (dateFin) query.dateFin = { $lte: new Date(dateFin) };
+    if (dateDebut || dateFin) {
+        if (dateDebut) query.dateDebut = { $gte: new Date(dateDebut) };
+        if (dateFin) query.dateFin = { $lte: new Date(dateFin) };
+    }
 
     const options = {
         page: parseInt(page),

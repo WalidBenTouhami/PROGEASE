@@ -6103,6 +6103,18 @@ livrableSchema.pre('save', function(next) {
             this.statut = 'en_retard';
         }
     }
+    if (this.statut !== Enum.StatutProjet.ARCHIVE) {
+        const maintenant = new Date();
+        if (this.progression >= 100 && this.statut !== Enum.StatutProjet.TERMINE) {
+            this.statut = Enum.StatutProjet.TERMINE;
+        } else if (maintenant > this.dateFin && this.statut !== Enum.StatutProjet.TERMINE) {
+            this.statut = Enum.StatutProjet.EN_RETARD;
+        } else if (maintenant >= this.dateDebut && maintenant <= this.dateFin) {
+            if (this.statut === Enum.StatutProjet.BROUILLON || this.statut === Enum.StatutProjet.A_VENIR) {
+                this.statut = Enum.StatutProjet.EN_COURS;
+            }
+        }
+    }
     next();
 });
 
@@ -6256,9 +6268,12 @@ projetSchema.index({ dateDebut: 1, dateFin: 1 });
 projetSchema.pre('save', function(next) {
     this.majLe = new Date();
 
-    // Auto-calcul de progression si livrables presents
+// Auto-calcul de progression si livrables presents
+projetSchema.pre('save', async function(next) {
+    this.majLe = new Date();
+
     if (this.isModified('livrables') && this.livrables.length > 0) {
-        this.calculerProgression();
+        await this.calculerProgression();
     }
 
     next();

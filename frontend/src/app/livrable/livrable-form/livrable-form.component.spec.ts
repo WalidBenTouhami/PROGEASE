@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing';
 import { LivrableFormComponent } from './livrable-form.component';
 
 describe('LivrableFormComponent', () => {
@@ -8,7 +8,10 @@ describe('LivrableFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LivrableFormComponent]
+      imports: [
+        RouterTestingModule,
+        LivrableFormComponent
+      ]
     })
       .compileComponents();
 

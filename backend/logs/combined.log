@@ -1925,3 +1925,14 @@ Use mongoose.model(name, schema) {"metadata":{"service":"progease-api","stack":"
 [undefined] INFO: Serveur Express demarre sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-29 17:50:34"}}
 [undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-29 17:50:34"}}
 [undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-29 17:50:34"}}
+[undefined] INFO: ✅ Cle API Deepseek chargee {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:39"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configures {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:39"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configures {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:39"}}
+[undefined] INFO: ✅ Connecte à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:51"}}
+[undefined] INFO: Connecte à MongoDB avec succes {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:51"}}
+[undefined] INFO: Donnees de test dejà presentes {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:53"}}
+[undefined] INFO: Donnees de test creees/verifiees avec succes {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:53"}}
+[undefined] INFO: Serveur Express demarre sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:53"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:53"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-29 22:33:53"}}
+[undefined] WARN: Erreur client HTTP: Request timeout {"metadata":{"service":"progease-api","code":"ERR_HTTP_REQUEST_TIMEOUT","stack":"Error [ERR_HTTP_REQUEST_TIMEOUT]: Request timeout\n    at onRequestTimeout (node:_http_server:829:30)\n    at Server.checkConnections (node:_http_server:642:7)\n    at listOnTimeout (node:internal/timers:581:17)\n    at process.processTimers (node:internal/timers:519:7)","timestamp":"2025-05-29 22:36:23"}}

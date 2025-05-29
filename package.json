@@ -1,18 +1,25 @@
 {
-
-  "name": "user-management-updated",
+  "name": "progease",
   "version": "1.0.0",
   "main": "app.js",
-  "directories": {
-    "test": "tests"
-  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm start\"",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "clean": "rimraf node_modules && cd backend && rimraf node_modules && cd ../frontend && rimraf node_modules"
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@angular/animations": "^18.2.0",
+    "@angular/common": "^18.2.0",
+    "@angular/compiler": "^18.2.0",
+    "@angular/core": "^18.2.0",
+    "@angular/forms": "^18.2.0",
+    "@angular/platform-browser": "^18.2.0",
+    "@angular/platform-browser-dynamic": "^18.2.0",
+    "@angular/router": "^18.2.0",
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
@@ -21,15 +28,12 @@
     "mongoose": "^8.15.1",
     "nodemailer": "^7.0.3",
     "pdfkit": "^0.17.1"
-=======
-  "name": "progease",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "concurrently \"cd backend && npm start\" \"cd frontend && npm start\"",
-    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
-    "clean": "rimraf node_modules && cd backend && rimraf node_modules && cd ../frontend && rimraf node_modules"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^18.2.0",
+    "@angular/build": "^18.2.0",
+    "@angular/cli": "^18.2.0",
+    "@angular/compiler-cli": "^18.2.0",
     "@graphql-codegen/cli": "^5.0.6",
     "@graphql-codegen/introspection": "^4.0.3",
     "@graphql-codegen/typescript": "^4.1.6",
@@ -37,6 +41,5 @@
     "@graphql-codegen/typescript-operations": "^4.6.1",
     "concurrently": "^8.2.2",
     "rimraf": "^6.0.1"
-
   }
 }
