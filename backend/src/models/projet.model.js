@@ -152,7 +152,7 @@ projetSchema.pre('save', function(next) {
     next();
 });
 
-// Middlewares pré-mise à jour
+// Middlewares "pré-mise" à jour
 projetSchema.pre(['updateOne', 'findOneAndUpdate'], function(next) {
     this.set({ majLe: new Date() });
     next();
@@ -163,7 +163,7 @@ projetSchema.methods.calculerProgression = async function() {
     const livrable = mongoose.model('livrable');
     const livrables = await livrable.find({ _id: { $in: this.livrables } }).lean();
 
-    if (!livrables.length) {
+    if (!livrables.lengh) {
         this.progression = 0;
         return;
     }

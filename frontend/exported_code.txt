@@ -286,7 +286,7 @@ import { FormsModule } from '@angular/forms';
 export class DashboardComponent {
   users = [{ nom: 'Jean', role: 'Administrateur' }];
   roles = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projetTemplates = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
+  projetTemplates = [{ intitule: 'Modèle 1' }, { titre: 'Modèle 2' }];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
   tutorPerformance: { nom?: string; score?: number }[] = [];
   aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
@@ -625,7 +625,7 @@ export interface Livrable {
   majLe?: Date | string;
 }
 
-export const Statutdelivrable = {
+export const Statutlivrable = {
   TERMINE: 'Terminé',
   EN_ATTENTE: 'En attente',
   EN_RETARD: 'En retard'
@@ -1155,7 +1155,7 @@ describe('LivrableFormComponent', () => {
 // ======= Contenu de src/app/livrable/livrable-form/livrable-form.component.ts =======
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Livrable, Statutdelivrable } from '../../core/models/livrable.model';
+import { Livrable, Statutlivrable } from '../../core/models/livrable.model';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
@@ -1171,9 +1171,9 @@ export class LivrableFormComponent implements OnInit {
 
   livrableForm!: FormGroup;
   statutsLivrable = [
-    Statutdelivrable.EN_ATTENTE,
-    Statutdelivrable.EN_RETARD,
-    Statutdelivrable.TERMINE
+    Statutlivrable.EN_ATTENTE,
+    Statutlivrable.EN_RETARD,
+    Statutlivrable.TERMINE
   ];
 
   constructor(private fb: FormBuilder) {}
@@ -1184,7 +1184,7 @@ export class LivrableFormComponent implements OnInit {
       description: [this.livrable?.description || '', Validators.required],
       dateLimite: [this.livrable?.dateLimite ? this.livrable.dateLimite.toString().substring(0, 10) : '', Validators.required],
       urlDepot: [this.livrable?.urlDepot || '', [Validators.required]],
-      statut: [this.livrable?.statut || Statutdelivrable.EN_ATTENTE, Validators.required]
+      statut: [this.livrable?.statut || Statutlivrable.EN_ATTENTE, Validators.required]
     });
   }
 

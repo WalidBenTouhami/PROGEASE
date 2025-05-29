@@ -9,8 +9,8 @@
 
 ---
 
-## 🚀 Project Overview
-**PROGEASE** is a modern, full-stack platform for managing student projects in an academic environment. It streamlines project and deliverable tracking, team collaboration, evaluation, and reporting, with advanced features like AI-powered analysis and automated documentation/testing.
+## 🚀 Projet Overview
+**PROGEASE** is a modern, full-stack platform for managing student projets in an academic environment. It streamlines projet and livrable tracking, team collaboration, evaluation, and reporting, with advanced features like AI-powered analysis and automated documentation/testing.
 
 ---
 
@@ -112,10 +112,10 @@ This section presents a detailed audit of the PROGEASE codebase, covering archit
 ---
 
 ## 🌟 Key Features
-- Project and deliverable (livrable) management (CRUD, search, filter)
+- Projet and livrable (livrable) management (CRUD, search, filter)
 - Role-based access (admin, tutor, student)
 - Dashboards for both back-office and front-office
-- AI-powered project analysis (optional)
+- AI-powered projet analysis (optional)
 - Automated API documentation and test generation (REST & GraphQL)
 - Type-safe GraphQL integration with codegen
 - Modern, branded UI with logo and color scheme

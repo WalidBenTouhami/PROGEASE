@@ -154,21 +154,18 @@ exports.createLivrable = async (req, res) => {
     if (!intitule || !projetId) {
       return res.status(400).json({
         success: false,
-        message: 'L\'intitulé et l\'ID du projet sont obligatoires',
-        error: 'L\'intitulé et l\'ID du projet sont obligatoires'
+        message: 'Le titre et l\'ID du projet sont obligatoires',
+        error: 'Le titre et l\'ID du projet sont obligatoires'
       });
     }
 
     const nouveauLivrable = new Livrable({
-      intitule,
-      titre: intitule,
-      nom: intitule,
-      description,
-      dateEcheance: dateEcheance || null,
-      dateLimite: dateLimite || dateEcheance || null,
-      urlDepot,
+      intitule: intitule,
+      description: description,
+      dateLimite: dateLimite || null,
+      urlDepot: urlDepot,
       statut: statut || 'EN_ATTENTE',
-      projetId,
+      projetId: projetId,
       creeLe: new Date(),
       majLe: new Date()
     });

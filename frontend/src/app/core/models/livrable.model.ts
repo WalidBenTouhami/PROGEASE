@@ -4,8 +4,8 @@ export interface Livrable {
     intitule: string;
     description: string;
     dateLimite: Date;
-    statut: StatutLivrable;
     projetId: string;
+    statut: StatutLivrable;
     creeLe?: Date;
     majLe?: Date;
     // urlDepot?: string; // Uncomment if backend adds this field

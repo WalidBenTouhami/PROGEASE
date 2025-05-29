@@ -2,15 +2,15 @@
                                         Backend Tasks
 -------------------------------------------------------------------------------------------
 
-### **Module Project Management**
-[ ] 1. **Créer 02 métiers du module Project Management**
+### **Module Projet Management**
+[ ] 1. **Créer 02 métiers du module Projet Management**
    - [x] Analyse des risques (Risk Analysis)
      - Définir la logique métier.
-     - Exposer l’API `/api/projects/risk-analysis`.
+     - Exposer l’API `/api/projets/risk-analysis`.
      - Tester l’intégration avec la base de données et les services.
    - [x] Suivi des tâches et rapports d'avancement (Task Tracking)
      - Implémenter la logique métier.
-     - Exposer l’API `/api/projects/task-tracking`.
+     - Exposer l’API `/api/projets/task-tracking`.
      - Ajouter des tests Postman pour vérifier les fonctionnalités.
 
 [ ] 2. **Statistiques (thème + catégorie)**
@@ -84,36 +84,36 @@
 
 ---
 
-### **Module Project Management**
+### **Module Projet Management**
 [ ] 4. **Créer un module pour la gestion de projet**
    - Créez un module Angular pour la gestion des projets et configurez le routage :
      ```bash
-     ng g m project
-     ng g m project/project-routing --flat --module=project
+     ng g m projet
+     ng g m projet/projet-routing --flat --module=projet
      ```
 
 [ ] 5. **Ajouter des composants pour les fonctionnalités clés**
    - **Liste des projets :**
      ```bash
-     ng g c project/project-list
+     ng g c projet/projet-list
      ```
    - **Détails d’un projet :**
      ```bash
-     ng g c project/project-detail
+     ng g c projet/projet-detail
      ```
    - **Formulaire pour ajouter ou modifier un projet :**
      ```bash
-     ng g c project/project-form
+     ng g c projet/projet-form
      ```
 
-[ ] 6. **Configurer le routage pour le module Project**
+[ ] 6. **Configurer le routage pour le module Projet**
    - Ajoutez les routes dans le fichier `projet-routing.module.ts` :
      ```typescript
      import { NgModule } from '@angular/core';
      import { RouterModule, Routes } from '@angular/router';
-     import { ProjetListComponent } from './project-list/project-list.component';
-     import { ProjetDetailComponent } from './project-detail/project-detail.component';
-     import { ProjetFormComponent } from './project-form/project-form.component';
+     import { ProjetListComponent } from './projet-list/projet-list.component';
+     import { ProjetDetailComponent } from './projet-detail/projet-detail.component';
+     import { ProjetFormComponent } from './projet-form/projet-form.component';
 
      const routes: Routes = [
        { path: '', component: ProjetListComponent },
@@ -130,36 +130,36 @@
 
 ---
 
-### **Module Deliverable**
+### **Module Livrable**
 [ ] 7. **Créer un module pour la gestion des livrables**
    - Créez un module Angular pour gérer les livrables et configurez le routage :
      ```bash
-     ng g m deliverable
-     ng g m deliverable/deliverable-routing --flat --module=deliverable
+     ng g m livrable
+     ng g m livrable/livrable-routing --flat --module=livrable
      ```
 
 [ ] 8. **Ajouter des composants pour les fonctionnalités clés**
    - **Liste des livrables :**
      ```bash
-     ng g c deliverable/deliverable-list
+     ng g c livrable/livrable-list
      ```
    - **Détails d’un livrable :**
      ```bash
-     ng g c deliverable/deliverable-detail
+     ng g c livrable/livrable-detail
      ```
    - **Formulaire pour ajouter ou modifier un livrable :**
      ```bash
-     ng g c deliverable/deliverable-form
+     ng g c livrable/livrable-form
      ```
 
-[ ] 9. **Configurer le routage pour le module Deliverable**
+[ ] 9. **Configurer le routage pour le module Livrable**
    - Ajoutez les routes dans le fichier `livrable-routing.module.ts` :
      ```typescript
      import { NgModule } from '@angular/core';
      import { RouterModule, Routes } from '@angular/router';
-     import { LivrableListComponent } from './deliverable-list/deliverable-list.component';
-     import { LivrableDetailComponent } from './deliverable-detail/deliverable-detail.component';
-     import { LivrableFormComponent } from './deliverable-form/deliverable-form.component';
+     import { LivrableListComponent } from './livrable-list/livrable-list.component';
+     import { LivrableDetailComponent } from './livrable-detail/livrable-detail.component';
+     import { LivrableFormComponent } from './livrable-form/livrable-form.component';
 
      const routes: Routes = [
        { path: '', component: LivrableListComponent },
@@ -177,14 +177,14 @@
 ---
 
 ### **Services pour les appels API**
-[ ] 10. **Créer des services Angular pour Project et Deliverable**
-   - Service pour `project` :
+[ ] 10. **Créer des services Angular pour Projet et Livrable**
+   - Service pour `projet` :
      ```bash
-     ng g s core/services/project
+     ng g s core/services/projet
      ```
-   - Service pour `deliverable` :
+   - Service pour `livrable` :
      ```bash
-     ng g s core/services/deliverable
+     ng g s core/services/livrable
      ```
 
 [ ] 11. **Intégrer les services dans les composants**
@@ -209,11 +209,11 @@
                                         Priorités Générales
 -------------------------------------------------------------------------------------------
 ### **Priorités Backend**
-- Terminer les métiers liés au **module Project Management**.
+- Terminer les métiers liés au **module Projet Management**.
 - Ajouter des tests unitaires et d’intégration pour les APIs critiques.
 
 ### **Priorités Frontend**
-- Configurer le projet Angular et commencer par les composants clés du **module Project Management**.
+- Configurer le projet Angular et commencer par les composants clés du **module Projet Management**.
 - Tester les interactions avec l’API backend.
 
 -------------------------------------------------------------------------------------------

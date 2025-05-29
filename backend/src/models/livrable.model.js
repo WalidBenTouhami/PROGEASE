@@ -31,16 +31,17 @@ const livrableSchema = new Schema({
         required: [true, 'L\'ID du projet est requis.'],
         index: true // Indexation pour améliorer les performances
     },
-    statut: {
-        type: String,
-        enum: {
-            values: ['en_attente', 'en_retard', 'termine'],
-            message: 'Le statut doit être: en_attente, en_retard ou termine.'
-        },
-        default: 'en_attente',
-        index: true // Indexation pour améliorer les performances
-    }
-}, {
+        statut: {
+            type: String,
+            enum: {
+                values: ['en_attente', 'en_retard', 'termine'],
+                message: 'Le statut doit être: en_attente, en_retard ou termine.'
+            },
+            default: 'en_attente',
+            index: true // Indexation pour améliorer les performances
+        }
+    },
+     {
     timestamps: {
         createdAt: 'creeLe',
         updatedAt: 'majLe'
