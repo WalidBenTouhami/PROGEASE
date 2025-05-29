@@ -8,7 +8,7 @@ const rateLimiter = require('../middleware/rateLimiter');
 
 /**
  * @route GET /api/livrables/health
- * @description Vérifier la santé de l'API livrables
+ * @description Verifier la sante de l'API livrables
  * @access Public
  */
 router.get('/health', (req, res) => {
@@ -26,17 +26,17 @@ router.get('/health', (req, res) => {
 
 /**
  * @route GET /api/livrables
- * @description Récupérer tous les livrables avec filtrage et pagination
+ * @description Recuperer tous les livrables avec filtrage et pagination
  * @access Public
  */
 router.get('/',
-    rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requêtes par minute
+    rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requetes par minute
     asyncHandler(livrableController.findAll)
 );
 
 /**
  * @route POST /api/livrables
- * @description Créer un nouveau livrable
+ * @description Creer un nouveau livrable
  * @access Public
  */
 router.post('/',
@@ -46,7 +46,7 @@ router.post('/',
 
 /**
  * @route GET /api/livrables/projet/:projetId
- * @description Récupérer tous les livrables d'un projet
+ * @description Recuperer tous les livrables d'un projet
  * @access Public
  */
 router.get('/projet/:projetId',
@@ -56,7 +56,7 @@ router.get('/projet/:projetId',
 
 /**
  * @route GET /api/livrables/:livrableId
- * @description Récupérer un livrable par ID
+ * @description Recuperer un livrable par ID
  * @access Public
  */
 router.get('/:livrableId',

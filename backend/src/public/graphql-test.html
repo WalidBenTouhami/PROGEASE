@@ -223,7 +223,7 @@ query {
         const statusMessage = document.getElementById('status-message');
         const queryInput = document.getElementById('queryInput').value;
 
-        // Réinitialiser l'interface
+        // Reinitialiser l'interface
         status.style.background = '#4D61FC';
         status.style.width = '30%';
         statusMessage.className = '';
@@ -247,14 +247,14 @@ query {
             .then(data => {
                 status.style.width = '100%';
 
-                // Vérifier s'il y a des erreurs GraphQL
+                // Verifier s'il y a des erreurs GraphQL
                 if (data.errors && data.errors.length > 0) {
                     status.style.background = '#d32f2f';
                     statusMessage.className = 'error';
                     statusMessage.textContent = 'Erreur GraphQL: ' + data.errors[0].message;
                 } else {
                     statusMessage.className = 'success';
-                    statusMessage.textContent = 'Requête exécutée avec succès!';
+                    statusMessage.textContent = 'Requete executee avec succes!';
                 }
 
                 output.textContent = JSON.stringify(data, null, 2);

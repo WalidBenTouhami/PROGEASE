@@ -19,7 +19,7 @@ const colors = {
     bold: '\x1b[1m'
 };
 
-// Fonction d'aide pour les textes colorés
+// Fonction d'aide pour les textes colores
 function colorize(text, color) {
     return `${colors[color]}${text}${colors.reset}`;
 }
@@ -27,7 +27,7 @@ function colorize(text, color) {
 // Configuration
 const testsDir = path.join(__dirname, 'tests', 'graphql');
 
-// Bannière d'information
+// Banniere d'information
 function showBanner() {
     console.log('╔══════════════════════════════════════════════════════════════╗');
     console.log('║             PROGEASE - Correction Tests GraphQL              ║');
@@ -37,7 +37,7 @@ function showBanner() {
     console.log('╚══════════════════════════════════════════════════════════════╝');
 }
 
-// Modèles de requêtes GraphQL correctes pour chaque type
+// Modeles de requetes GraphQL correctes pour chaque type
 const correctQueries = {
     projet: {
         all: `query GetAllProjets {
@@ -116,8 +116,8 @@ const correctQueries = {
 }`
     },
     paginationinfo: {
-        example: `# Ce type est généralement utilisé comme partie d'autres types plutôt que directement requêté
-# Exemple d'utilisation dans une requête paginée:
+        example: `# Ce type est generalement utilise comme partie d'autres types plutôt que directement requete
+# Exemple d'utilisation dans une requete paginee:
 query GetPaginatedResults {
   paginatedResults {
     items {
@@ -142,23 +142,23 @@ async function main() {
     showBanner();
 
     try {
-        // Vérifier l'existence du dossier de tests
+        // Verifier l'existence du dossier de tests
         try {
             await fs.access(testsDir);
         } catch (err) {
             console.error(colorize(`Le dossier des tests GraphQL n'existe pas: ${testsDir}`, 'red'));
-            console.log(colorize('Création du dossier...', 'yellow'));
+            console.log(colorize('Creation du dossier...', 'yellow'));
 
             try {
                 await fs.mkdir(testsDir, { recursive: true });
-                console.log(colorize('Dossier créé avec succès.', 'green'));
+                console.log(colorize('Dossier cree avec succes.', 'green'));
             } catch (mkdirErr) {
-                console.error(colorize('Échec de la création du dossier.', 'red'));
+                console.error(colorize('echec de la creation du dossier.', 'red'));
                 return;
             }
         }
 
-        // Créer ou corriger les fichiers de test
+        // Creer ou corriger les fichiers de test
         console.log(colorize('\n🔧 Correction des fichiers de test GraphQL...', 'blue'));
 
         // [NINJA REFACTOR] Use schema introspection to generate and update test files for all queries/mutations in the current schema.
@@ -169,7 +169,7 @@ async function main() {
 
         // Projet
         await createOrUpdateTestFile('projet.graphql', `# Tests GraphQL pour Projet
-# Générés automatiquement le 2025-05-28 09:42:02
+# Generes automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
 ${correctQueries.projet.all}
@@ -179,7 +179,7 @@ ${correctQueries.projet.byId}
 
         // Livrable
         await createOrUpdateTestFile('livrable.graphql', `# Tests GraphQL pour Livrable
-# Générés automatiquement le 2025-05-28 09:42:02
+# Generes automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
 ${correctQueries.livrable.all}
@@ -189,7 +189,7 @@ ${correctQueries.livrable.byId}
 
         // Health
         await createOrUpdateTestFile('health.graphql', `# Tests GraphQL pour Health
-# Générés automatiquement le 2025-05-28 09:42:02
+# Generes automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
 ${correctQueries.health.all}
@@ -197,32 +197,32 @@ ${correctQueries.health.all}
 
         // PaginationInfo
         await createOrUpdateTestFile('paginationinfo.graphql', `# Tests GraphQL pour PaginationInfo
-# Générés automatiquement le 2025-05-28 09:42:02
+# Generes automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
 ${correctQueries.paginationinfo.example}
 `);
 
-        console.log(colorize('\n✅ Correction des fichiers de test terminée!', 'green'));
-        console.log(colorize('\n🧪 Vous pouvez maintenant exécuter: node graphql-tests.js', 'cyan'));
+        console.log(colorize('\n✅ Correction des fichiers de test terminee!', 'green'));
+        console.log(colorize('\n🧪 Vous pouvez maintenant executer: node graphql-tests.js', 'cyan'));
 
     } catch (err) {
         console.error(colorize('Erreur lors de la correction des tests:', 'red'), err);
     }
 }
 
-// Créer ou mettre à jour un fichier de test
+// Creer ou mettre à jour un fichier de test
 async function createOrUpdateTestFile(filename, content) {
     const filePath = path.join(testsDir, filename);
     try {
         await fs.writeFile(filePath, content);
-        console.log(colorize(`  ✓ ${filename} créé/mis à jour avec succès`, 'green'));
+        console.log(colorize(`  ✓ ${filename} cree/mis à jour avec succes`, 'green'));
     } catch (err) {
-        console.error(colorize(`  ✗ Échec de la mise à jour de ${filename}: ${err.message}`, 'red'));
+        console.error(colorize(`  ✗ echec de la mise à jour de ${filename}: ${err.message}`, 'red'));
     }
 }
 
-// Exécuter le script
+// Executer le script
 main().catch(err => {
-    console.error(colorize('Erreur non gérée:', 'red'), err);
+    console.error(colorize('Erreur non geree:', 'red'), err);
 });

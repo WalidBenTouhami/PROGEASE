@@ -1,5 +1,5 @@
 /**
- * Script de génération du schéma GraphQL avancé
+ * Script de generation du schema GraphQL avance
  */
 const path = require('path');
 const fs = require('fs');
@@ -16,38 +16,38 @@ const outputPath = path.resolve(__dirname, '../my-apollo-graph/graphql/schema.gr
 const enumsOnlyPath = path.resolve(__dirname, '../my-apollo-graph/graphql/enums.graphql');
 
 try {
-    // 1. Générer uniquement les énumérations dans un fichier séparé
+    // 1. Generer uniquement les enumerations dans un fichier separe
     const allEnums = generateAllEnums();
     fs.writeFileSync(enumsOnlyPath, allEnums, 'utf8');
-    console.log(`Fichier d'énumérations généré: ${enumsOnlyPath}`);
+    console.log(`Fichier d'enumerations genere: ${enumsOnlyPath}`);
 
-    // 2. Générer une définition d'énumération personnalisée
+    // 2. Generer une definition d'enumeration personnalisee
     const customEnum = generateEnumDefinition('PrioriteLivrable', {
         BASSE: 'BASSE',
         NORMALE: 'NORMALE',
         HAUTE: 'HAUTE',
         URGENTE: 'URGENTE'
     }, {
-        BASSE: 'Priorité basse - non urgent',
-        HAUTE: 'Priorité haute - à traiter rapidement'
+        BASSE: 'Priorite basse - non urgent',
+        HAUTE: 'Priorite haute - à traiter rapidement'
     });
-    console.log('Énumération personnalisée générée:');
+    console.log('enumeration personnalisee generee:');
     console.log(customEnum);
 
-    // 3. Injecter les énumérations dans le schéma sans écrire de fichier
+    // 3. Injecter les enumerations dans le schema sans ecrire de fichier
     if (fs.existsSync(templatePath)) {
-        // Option 1 : Utiliser la variable pour afficher un aperçu du schéma
+        // Option 1 : Utiliser la variable pour afficher un aperçu du schema
         const schemaWithEnums = injectEnumsInSchema(templatePath);
-        console.log('Schéma avec énumérations injectées généré en mémoire');
-        console.log('Aperçu des 200 premiers caractères:');
+        console.log('Schema avec enumerations injectees genere en memoire');
+        console.log('Aperçu des 200 premiers caracteres:');
         console.log(schemaWithEnums.substring(0, 200) + '...');
 
 
     }
 
-    // 4. Générer le fichier de schéma complet (comme actuellement)
+    // 4. Generer le fichier de schema complet (comme actuellement)
     generateSchemaFile(templatePath, outputPath);
-    console.log(`Schéma GraphQL complet généré: ${outputPath}`);
+    console.log(`Schema GraphQL complet genere: ${outputPath}`);
 
 } catch (error) {
     console.error(`Erreur: ${error.message}`);

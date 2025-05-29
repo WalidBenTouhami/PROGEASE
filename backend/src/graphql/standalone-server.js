@@ -6,7 +6,7 @@ const { initLoaders } = require('./index');
 const logger = require('../utils/logger');
 
 /**
- * Configure un serveur Apollo GraphQL autonome et l'intègre à une application Express
+ * Configure un serveur Apollo GraphQL autonome et l'integre à une application Express
  *
  * @param {express.Application} app - L'application Express existante
  * @param {import('http').Server} httpServer - Le serveur HTTP existant
@@ -16,22 +16,22 @@ async function createStandaloneServer(app, httpServer) {
     try {
         logger.info('Configuration du serveur Apollo standalone...');
 
-        // Création et démarrage du serveur Apollo
+        // Creation et demarrage du serveur Apollo
         const apolloServer = await createApolloServer(httpServer, {
             plugins: [
-                // Plugins personnalisés si nécessaires
+                // Plugins personnalises si necessaires
             ]
         });
 
-        // Création du middleware Express pour Apollo Server
+        // Creation du middleware Express pour Apollo Server
         const apolloMiddleware = createApolloMiddleware(apolloServer, {
             context: async ({ req }) => {
-                // Contexte personnalisé à partager avec les resolvers
+                // Contexte personnalise à partager avec les resolvers
                 return {
                     // Initialiser les DataLoaders
                     loaders: initLoaders(),
 
-                    // Données utilisateur et de requête
+                    // Donnees utilisateur et de requete
                     currentUser: req.currentUser || 'anonyme',
                     timestamp: new Date().toISOString()
                 };
@@ -41,7 +41,7 @@ async function createStandaloneServer(app, httpServer) {
         // Enregistrement du middleware Apollo sur le chemin /graphql-apollo
         app.use('/graphql-apollo', express.json(), apolloMiddleware);
 
-        logger.info('Serveur Apollo standalone configuré avec succès sur /graphql-apollo');
+        logger.info('Serveur Apollo standalone configure avec succes sur /graphql-apollo');
 
         return apolloServer;
     } catch (error) {

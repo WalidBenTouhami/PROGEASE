@@ -394,8 +394,8 @@ import { FormsModule } from '@angular/forms';
 })
 export class DashboardComponent {
   users = [{ nom: 'Jean', role: 'Administrateur' }];
-  roles = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projetTemplates = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
+  roles = ['Administrateur', 'Tuteur', 'etudiant'];
+  projetTemplates = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
   tutorPerformance: { nom?: string; score?: number }[] = [];
   aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
@@ -675,7 +675,7 @@ export class ApiTestComponent {
     this.aiResult = null;
     this.aiError = null;
 
-    const prompt = "Résumer les avantages d'une gestion de projet académique";
+    const prompt = "Resumer les avantages d'une gestion de projet academique";
 
     this.apiTester.testAIService(prompt).subscribe({
       next: (result) => {
@@ -746,7 +746,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 // ======= Contenu de src/app/core/models/livrable.model.ts =======
 
-export type StatutLivrable = 'En retard' | 'En attente' | 'Terminé';
+export type StatutLivrable =  'En attente' | 'En_cours' | 'En retard' | 'Termine' | 'Valide' | 'Rejete' |;
 
 export interface Livrable {
   _id?: string;
@@ -760,10 +760,13 @@ export interface Livrable {
   majLe?: Date | string;
 }
 
-export const Statutlivrable = {
-  TERMINE: 'Terminé',
-  EN_ATTENTE: 'En attente',
-  EN_RETARD: 'En retard'
+export const StatutLivrable = {
+  StatutLivrable.EN_ATTENTE,
+  StatutLivrable.EN_COURS,
+  StatutLivrable.EN_RETARD,
+  StatutLivrable.TERMINE,
+  StatutLivrable.VALIDE,
+  StatutLivrable.REJETE
 } as const;
 
 
@@ -771,7 +774,7 @@ export const Statutlivrable = {
 
 import { Livrable } from './livrable.model';
 
-export type StatutProjet = 'Brouillon' | 'En cours' | 'Terminé' | 'Archivé';
+export type StatutProjet = 'Brouillon' | 'En_cours' | 'Termine' | 'Archive' | 'En_retard' | 'A_venir' |;
 
 export interface Projet {
   _id: string;
@@ -791,9 +794,11 @@ export interface Projet {
 
 export const Statutprojet = {
   BROUILLON: 'Brouillon',
-  EN_COURS: 'En cours',
-  TERMINE: 'Terminé',
-  ARCHIVE: 'Archivé'
+  EN_COURS: 'En_cours',
+  TERMINE: 'Termine',
+  ARCHIVE: 'Archive'
+  EN_RETARD: 'En_retard',
+  A_VENIR: 'A_venir'
 } as const;
 
 
@@ -848,7 +853,7 @@ export class ApiTesterService {
   }
 
   private handleError(error: any): Observable<never> {
-    const errorMessage = 'Erreur lors de la requête API : ' + (error.message || error.statusText);
+    const errorMessage = 'Erreur lors de la requete API : ' + (error.message || error.statusText);
     this.alertService.error(errorMessage);
     return throwError(() => new Error(errorMessage));
   }
@@ -1074,7 +1079,7 @@ describe('ProjetService', () => {
     httpMock.verify();
   });
 
-  it('doit récupérer tous les projets', (done) => {
+  it('doit recuperer tous les projets', (done) => {
     service.recupererProjets().subscribe(projets => {
       expect(projets.length).toBe(1);
       expect(projets[0].titre).toBe('Projet 1');
@@ -1086,7 +1091,7 @@ describe('ProjetService', () => {
     req.flush([mockProjet]);
   });
 
-  it('doit récupérer un projet par ID', (done) => {
+  it('doit recuperer un projet par ID', (done) => {
     service.recupererProjet('1').subscribe(projet => {
       expect(projet._id).toBe('1');
       expect(projet.titre).toBe('Projet 1');
@@ -1098,7 +1103,7 @@ describe('ProjetService', () => {
     req.flush(mockProjet);
   });
 
-  it('doit créer un projet', (done) => {
+  it('doit creer un projet', (done) => {
     service.creerProjet(mockProjet).subscribe(projet => {
       expect(projet.titre).toBe('Projet 1');
       done();
@@ -1110,9 +1115,9 @@ describe('ProjetService', () => {
   });
 
   it('doit mettre à jour un projet', (done) => {
-    const updated = { ...mockProjet, titre: 'Projet Modifié' };
+    const updated = { ...mockProjet, titre: 'Projet Modifie' };
     service.mettreAJourProjet('1', updated).subscribe(projet => {
-      expect(projet.titre).toBe('Projet Modifié');
+      expect(projet.titre).toBe('Projet Modifie');
       done();
     });
 
@@ -1132,9 +1137,9 @@ describe('ProjetService', () => {
     req.flush({ success: true });
   });
 
-  it('doit gérer une erreur serveur (500)', (done) => {
+  it('doit gerer une erreur serveur (500)', (done) => {
     service.recupererProjets().subscribe({
-      next: () => fail('appel devait échouer'),
+      next: () => fail('appel devait echouer'),
       error: (err) => {
         expect(err.status).toBe(500);
         expect(err.message).toContain('Erreur serveur');
@@ -1252,7 +1257,7 @@ describe('LivrableDetailComponent', () => {
     fixture.detectChanges();
   });
 
-  it('devrait être créé', () => {
+  it('devrait etre cree', () => {
     expect(component).toBeTruthy();
   });
 });
@@ -1278,7 +1283,7 @@ export class LivrableDetailComponent implements OnInit {
 
   statutClass(statut: string): string {
     switch (statut) {
-      case 'Terminé': return 'status termine';
+      case 'Termine': return 'status termine';
       case 'En attente': return 'status attente';
       case 'En retard': return 'status retard';
       default: return 'status';
@@ -1361,7 +1366,7 @@ describe('LivrableFormComponent', () => {
 // ======= Contenu de src/app/livrable/livrable-form/livrable-form.component.ts =======
 
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Livrable, Statutlivrable } from '../../core/models/livrable.model';
+import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 
 @Component({
@@ -1379,9 +1384,12 @@ export class LivrableFormComponent implements OnInit {
 
   livrableForm!: FormGroup;
   statutsLivrable = [
-    Statutlivrable.EN_ATTENTE,
-    Statutlivrable.EN_RETARD,
-    Statutlivrable.TERMINE
+    StatutLivrable.EN_ATTENTE,
+    StatutLivrable.EN_COURS,
+    StatutLivrable.EN_RETARD,
+    StatutLivrable.TERMINE,
+    StatutLivrable.VALIDE,
+    StatutLivrable.REJETE
   ];
 
   constructor(private fb: FormBuilder) {}
@@ -1392,7 +1400,7 @@ export class LivrableFormComponent implements OnInit {
       description: [this.livrable?.description || '', Validators.required],
       dateLimite: [this.livrable?.dateLimite ? this.livrable.dateLimite.toString().substring(0, 10) : '', Validators.required],
       urlDepot: [this.livrable?.urlDepot || '', [Validators.required]],
-      statut: [this.livrable?.statut || Statutlivrable.EN_ATTENTE, Validators.required]
+      statut: [this.livrable?.statut || StatutLivrable.EN_ATTENTE, Validators.required]
     });
   }
 
@@ -1638,8 +1646,8 @@ export class DashboardComponent {
   notifications: Notification[] = [];
   livrables: Livrable[] = [];
   users: User[] = [{ nom: 'Jean', role: 'Administrateur' }];
-  roles: string[] = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projetTemplates: Template[] = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
+  roles: string[] = ['Administrateur', 'Tuteur', 'etudiant'];
+  projetTemplates: Template[] = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
   tutorPerformance: { nom?: string; score?: number }[] = [];
   aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
@@ -1662,10 +1670,10 @@ export class DashboardComponent {
   // Importe une liste d'utilisateurs
   importUsers(): void {}
 
-  // Crée un nouveau modèle de projet
+  // Cree un nouveau modele de projet
   createTemplate(): void {}
 
-  // Modifie un modèle de projet existant
+  // Modifie un modele de projet existant
   editTemplate(template: Template): void {}
 
   // Met à jour la configuration de l'IA
@@ -2033,8 +2041,8 @@ export class ProjetDetailComponent implements OnInit {
     switch (statut) {
       case 'Brouillon': return 'status brouillon';
       case 'En cours': return 'status encours';
-      case 'Terminé': return 'status termine';
-      case 'Archivé': return 'status archive';
+      case 'Termine': return 'status termine';
+      case 'Archive': return 'status archive';
       default: return 'status';
     }
   }
@@ -2131,7 +2139,9 @@ export class ProjetFormComponent implements OnInit {
     Statutprojet.BROUILLON,
     Statutprojet.EN_COURS,
     Statutprojet.TERMINE,
-    Statutprojet.ARCHIVE
+    Statutprojet.ARCHIVE,
+    Statutprojet.EN_RETARD,
+    Statutprojet.A_venir
   ];
 
   constructor(private fb: FormBuilder) {}

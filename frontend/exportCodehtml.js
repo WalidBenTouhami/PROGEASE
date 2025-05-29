@@ -30,7 +30,7 @@ async function exportCode() {
   try {
     let outputContent = '';
 
-    console.log('🚀 Début de l\'export des fichiers...\n');
+    console.log('🚀 Debut de l\'export des fichiers...\n');
 
     for (const file of filesToExport) {
       const filePath = path.resolve(file);
@@ -46,7 +46,7 @@ async function exportCode() {
     }
 
     fs.writeFileSync(outputFile, outputContent, 'utf-8');
-    console.log(`\n✅ Code exporté avec succès dans : ${outputFile}`);
+    console.log(`\n✅ Code exporte avec succes dans : ${outputFile}`);
   } catch (error) {
     console.error('❌ Erreur lors de l\'exportation :', error.message);
   }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * PROGEASE - Générateur de tests automatiques (NINJA REFACTOR)
+ * PROGEASE - Generateur de tests automatiques (NINJA REFACTOR)
  * CLI Usage:
  *   node tools/test-generator.js --graphql            # Regenerate GraphQL tests from live schema
  *   node tools/test-generator.js --validate-graphql   # Validate GraphQL tests against live schema
@@ -25,7 +25,7 @@ const POSTMAN_COLLECTION_PATH = path.join(__dirname, '..', 'tests', 'postman', '
 
 // Configuration
 const config = {
-    // Chemin vers les différents dossiers du projet
+    // Chemin vers les differents dossiers du projet
     paths: {
         models: path.join(__dirname, '..', 'src', 'models'),
         controllers: path.join(__dirname, '..', 'src', 'controllers'),
@@ -33,13 +33,13 @@ const config = {
         services: path.join(__dirname, '..', 'src', 'services'),
         validations: path.join(__dirname, '..', 'src', 'validations'),
         middleware: path.join(__dirname, '..', 'src', 'middleware'),
-        // Chemins de sortie pour les tests générés
+        // Chemins de sortie pour les tests generes
         output: {
             newman: path.join(__dirname, '..', 'tests', 'postman'),
             graphql: path.join(__dirname, '..', 'tests', 'graphql')
         }
     },
-    // Métadonnées
+    // Metadonnees
     metadata: {
         author: 'WalidBenTouhami',
         date: '2025-05-27 19:27:50',
@@ -59,7 +59,7 @@ const projetStructure = {
 };
 
 /**
- * Parcourt les fichiers d'un répertoire de manière récursive
+ * Parcourt les fichiers d'un repertoire de maniere recursive
  */
 async function scanDirectory(directory, filePattern) {
     try {
@@ -79,7 +79,7 @@ async function scanDirectory(directory, filePattern) {
         return files;
     } catch (err) {
         if (err.code === 'ENOENT') {
-            console.log(`Le répertoire ${directory} n'existe pas.`);
+            console.log(`Le repertoire ${directory} n'existe pas.`);
             return [];
         }
         throw err;
@@ -87,10 +87,10 @@ async function scanDirectory(directory, filePattern) {
 }
 
 /**
- * Analyse les fichiers de modèles pour extraire les structures de données
+ * Analyse les fichiers de modeles pour extraire les structures de donnees
  */
 async function analyzeModels() {
-    console.log('Analyse des modèles...');
+    console.log('Analyse des modeles...');
     const modelFiles = await scanDirectory(config.paths.models, /\.(js|ts)$/);
 
     for (const file of modelFiles) {
@@ -98,7 +98,7 @@ async function analyzeModels() {
             const content = await readFile(file, 'utf8');
             const modelName = path.basename(file, path.extname(file));
 
-            // Extraction des propriétés du modèle
+            // Extraction des proprietes du modele
             const fields = [];
             const schemaRegex = /new\s+Schema\s*\(\s*{([^}]*)}/s;
             const schemaMatch = content.match(schemaRegex);
@@ -139,11 +139,11 @@ async function analyzeModels() {
         }
     }
 
-    console.log(`${projetStructure.models.length} modèles analysés.`);
+    console.log(`${projetStructure.models.length} modeles analyses.`);
 }
 
 /**
- * Analyse les fichiers de routes pour détecter les endpoints API
+ * Analyse les fichiers de routes pour detecter les endpoints API
  */
 async function analyzeRoutes() {
     console.log('Analyse des routes...');
@@ -162,7 +162,7 @@ async function analyzeRoutes() {
                 const method = routeMatch[1].toUpperCase();
                 const endpoint = routeMatch[2];
 
-                // Extraction du contrôleur associé
+                // Extraction du contrôleur associe
                 const lineContext = content.substring(
                     Math.max(0, routeMatch.index - 100),
                     Math.min(content.length, routeMatch.index + 200)
@@ -185,16 +185,16 @@ async function analyzeRoutes() {
         }
     }
 
-    console.log(`${projetStructure.endpoints.length} endpoints détectés.`);
+    console.log(`${projetStructure.endpoints.length} endpoints detectes.`);
 }
 
 /**
- * Analyse les fichiers GraphQL pour extraire les types, requêtes et mutations
+ * Analyse les fichiers GraphQL pour extraire les types, requetes et mutations
  */
 async function analyzeGraphQL() {
-    console.log('Analyse des définitions GraphQL...');
+    console.log('Analyse des definitions GraphQL...');
 
-    // Chercher les fichiers GraphQL dans différents endroits possibles
+    // Chercher les fichiers GraphQL dans differents endroits possibles
     const gqlFolders = [
         path.join(__dirname, '..', 'src'),
         ];
@@ -234,7 +234,7 @@ async function analyzeGraphQL() {
                 });
             }
 
-            // Extraction des requêtes
+            // Extraction des requetes
             const queryRegex = /type\s+Query\s*{([^}]*)}/;
             const queryMatch = content.match(queryRegex);
 
@@ -274,18 +274,18 @@ async function analyzeGraphQL() {
         }
     }
 
-    console.log(`${projetStructure.graphqlTypes.length} types GraphQL détectés.`);
-    console.log(`${projetStructure.graphqlQueries.length} requêtes GraphQL détectées.`);
-    console.log(`${projetStructure.graphqlMutations.length} mutations GraphQL détectées.`);
+    console.log(`${projetStructure.graphqlTypes.length} types GraphQL detectes.`);
+    console.log(`${projetStructure.graphqlQueries.length} requetes GraphQL detectees.`);
+    console.log(`${projetStructure.graphqlMutations.length} mutations GraphQL detectees.`);
 }
 
 /**
- * Génère une collection Postman/Newman à partir des données analysées
+ * Genere une collection Postman/Newman à partir des donnees analysees
  */
 async function generateNewmanCollection() {
-    console.log('Génération de la collection Newman/Postman...');
+    console.log('Generation de la collection Newman/Postman...');
 
-    // Créer la structure de la collection
+    // Creer la structure de la collection
     const timestamp = Date.now();
     const collection = {
         info: {
@@ -293,16 +293,16 @@ async function generateNewmanCollection() {
                 const r = (timestamp + Math.random() * 16) % 16 | 0;
                 return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
             }),
-            name: "PROGEASE API Tests (Auto-générés)",
+            name: "PROGEASE API Tests (Auto-generes)",
             schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-            description: `Collection de tests auto-générés pour l'API PROGEASE - ${config.metadata.date}`
+            description: `Collection de tests auto-generes pour l'API PROGEASE - ${config.metadata.date}`
         },
         item: [
             {
-                name: "1. Tests de Santé",
+                name: "1. Tests de Sante",
                 item: [
                     {
-                        name: "Vérifier l'état du serveur",
+                        name: "Verifier l'etat du serveur",
                         request: {
                             method: "GET",
                             header: [],
@@ -310,7 +310,7 @@ async function generateNewmanCollection() {
                         }
                     },
                     {
-                        name: "Vérifier l'API principale",
+                        name: "Verifier l'API principale",
                         request: {
                             method: "GET",
                             header: [],
@@ -329,16 +329,16 @@ async function generateNewmanCollection() {
         ]
     };
 
-    // Regrouper les endpoints par ressource (basé sur le premier segment de l'URL)
+    // Regrouper les endpoints par ressource (base sur le premier segment de l'URL)
     const endpointGroups = {};
 
     projetStructure.endpoints.forEach(endpoint => {
-        // Ignorer les routes de santé et API principale déjà incluses
+        // Ignorer les routes de sante et API principale dejà incluses
         if (endpoint.path === '/health' || endpoint.path === '/api') {
             return;
         }
 
-        // Déterminer le groupe (ressource) basé sur le chemin
+        // Determiner le groupe (ressource) base sur le chemin
         const segments = endpoint.path.split('/').filter(s => s);
         const resourceName = segments.length > 0 ? segments[0] : 'autres';
 
@@ -350,7 +350,7 @@ async function generateNewmanCollection() {
     });
 
     // Ajouter les groupes d'endpoints à la collection
-    let groupCounter = 2; // commencer à 2 car nous avons déjà les tests de santé
+    let groupCounter = 2; // commencer à 2 car nous avons dejà les tests de sante
 
     for (const [resource, endpoints] of Object.entries(endpointGroups)) {
         const itemGroup = {
@@ -358,13 +358,13 @@ async function generateNewmanCollection() {
             item: []
         };
 
-        // Trouver le modèle associé à cette ressource
+        // Trouver le modele associe à cette ressource
         const associatedModel = projetStructure.models.find(m =>
             m.name.toLowerCase() === resource.toLowerCase() ||
             m.name.toLowerCase() === resource.toLowerCase().slice(0, -1) // singulier
         );
 
-        // Générer des exemples de données pour les tests
+        // Generer des exemples de donnees pour les tests
         const testData = associatedModel ? generateTestData(associatedModel) : {};
 
         // Trier les endpoints pour avoir un ordre logique: GET all, POST, GET one, PUT, DELETE
@@ -392,7 +392,7 @@ async function generateNewmanCollection() {
                 }
             };
 
-            // Ajouter un corps de requête pour POST, PUT, PATCH
+            // Ajouter un corps de requete pour POST, PUT, PATCH
             if (['POST', 'PUT', 'PATCH'].includes(endpoint.method) && Object.keys(testData).length > 0) {
                 testItem.request.body = {
                     mode: "raw",
@@ -400,7 +400,7 @@ async function generateNewmanCollection() {
                 };
             }
 
-            // Scripts de test pour vérifier les réponses
+            // Scripts de test pour verifier les reponses
             testItem.event = [
                 {
                     listen: "test",
@@ -419,14 +419,14 @@ async function generateNewmanCollection() {
         groupCounter++;
     }
 
-    // Ajouter une section pour les tests GraphQL si présents
+    // Ajouter une section pour les tests GraphQL si presents
     if (projetStructure.graphqlQueries.length > 0 || projetStructure.graphqlMutations.length > 0) {
         const graphqlGroup = {
             name: `${groupCounter}. Tests GraphQL`,
             item: []
         };
 
-        // Ajouter des requêtes pour chaque query GraphQL
+        // Ajouter des requetes pour chaque query GraphQL
         let gqlCounter = 1;
         projetStructure.graphqlQueries.forEach(query => {
             const testItem = {
@@ -471,7 +471,7 @@ async function generateNewmanCollection() {
             gqlCounter++;
         });
 
-        // Ajouter des requêtes pour chaque mutation GraphQL
+        // Ajouter des requetes pour chaque mutation GraphQL
         projetStructure.graphqlMutations.forEach(mutation => {
             const testItem = {
                 name: `${groupCounter}.${gqlCounter} Mutation ${mutation.name}`,
@@ -518,16 +518,16 @@ async function generateNewmanCollection() {
         collection.item.push(graphqlGroup);
     }
 
-    // Créer le répertoire de sortie s'il n'existe pas
+    // Creer le repertoire de sortie s'il n'existe pas
     await mkdir(config.paths.output.newman, { recursive: true });
 
-    // Écrire le fichier de collection
+    // ecrire le fichier de collection
     const outputPath = path.join(config.paths.output.newman, 'PROGEASE.postman_collection.json');
     await writeFile(outputPath, JSON.stringify(collection, null, 2), 'utf8');
 
-    console.log(`Collection Newman/Postman générée dans: ${outputPath}`);
+    console.log(`Collection Newman/Postman generee dans: ${outputPath}`);
 
-    // Générer également un fichier d'environnement
+    // Generer egalement un fichier d'environnement
     const environment = {
         id: `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.replace(/[xy]/g, (c) => {
             const r = (timestamp + Math.random() * 16) % 16 | 0;
@@ -552,11 +552,11 @@ async function generateNewmanCollection() {
     const envOutputPath = path.join(config.paths.output.newman, 'PROGEASE.postman_environment.json');
     await writeFile(envOutputPath, JSON.stringify(environment, null, 2), 'utf8');
 
-    console.log(`Environnement Newman/Postman généré dans: ${envOutputPath}`);
+    console.log(`Environnement Newman/Postman genere dans: ${envOutputPath}`);
 }
 
 /**
- * Génère des scripts de test pour un endpoint spécifique
+ * Genere des scripts de test pour un endpoint specifique
  */
 function generateTestScript(endpoint, resource) {
     const scripts = [
@@ -571,7 +571,7 @@ function generateTestScript(endpoint, resource) {
         scripts.push("    var jsonData = pm.response.json();");
 
         if (endpoint.path.match(/\/\w+\/:\w+/) || endpoint.path.includes('/:id')) {
-            // GET détail
+            // GET detail
             scripts.push("    pm.expect(jsonData).to.be.an('object');");
             scripts.push(`    pm.expect(jsonData._id || jsonData.id).to.exist;`);
         } else {
@@ -614,7 +614,7 @@ function generateTestScript(endpoint, resource) {
 }
 
 /**
- * Génère des données de test fictives basées sur un modèle
+ * Genere des donnees de test fictives basees sur un modele
  */
 function generateTestData(model) {
     const testData = {};
@@ -622,7 +622,7 @@ function generateTestData(model) {
     if (!model || !model.fields) return testData;
 
     model.fields.forEach(field => {
-        // Ne pas inclure les champs automatiquement générés
+        // Ne pas inclure les champs automatiquement generes
         if (field.name === '_id' || field.name === 'id' || field.name === 'createdAt' || field.name === 'updatedAt') {
             return;
         }
@@ -659,7 +659,7 @@ function generateTestData(model) {
 }
 
 /**
- * Génère des fichiers de requêtes GraphQL à partir des types et requêtes détectés
+ * Genere des fichiers de requetes GraphQL à partir des types et requetes detectes
  */
 async function generateGraphQLTests() {
     console.log('[NINJA] Introspecting GraphQL schema...');
@@ -689,7 +689,7 @@ async function generateGraphQLTests() {
 }
 
 /**
- * Renvoie une valeur fictive adaptée au type GraphQL
+ * Renvoie une valeur fictive adaptee au type GraphQL
  */
 function getGraphqlMockValue(type) {
     switch (type.toLowerCase()) {
@@ -874,7 +874,7 @@ async function extractExpressRoutes() {
     return routes;
 }
 
-// Exécuter la fonction principale
+// Executer la fonction principale
 main();
 
 // [NINJA PRO IMPLEMENTATION] Realistic test data generation for GraphQL and REST

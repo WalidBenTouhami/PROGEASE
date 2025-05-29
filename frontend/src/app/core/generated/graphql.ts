@@ -15,7 +15,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
-  /** Type Date personnalisé */
+  /** Type Date personnalise */
   Date: { input: any; output: any; }
 };
 
@@ -258,20 +258,21 @@ export type QueryProjetArgs = {
 };
 
 export enum StatutLivrable {
-  EnAttente = 'EN_ATTENTE',
-  EnCours = 'EN_COURS',
-  EnRetard = 'EN_RETARD',
-  Rejete = 'REJETE',
-  Termine = 'TERMINE',
-  Valide = 'VALIDE'
+  EN_ATTENTE = 'En_attente',
+  EN_COURS = 'En_cours',
+  EN_RETARD = 'En_retard',
+  TERMINE = 'Termine',
+  VALIDE = 'Valide',
+  REJETE = 'Rejete'
 }
 
 export enum StatutProjet {
-  Annule = 'ANNULE',
-  Archive = 'ARCHIVE',
-  EnCours = 'EN_COURS',
-  Propose = 'PROPOSE',
-  Termine = 'TERMINE'
+  BROUILLON = 'Brouillon',
+  EN_COURS = 'En_cours',
+  TERMINE = 'Termine',
+  ARCHIVE = 'Archive',
+  EN_RETARD= 'En_retard',
+  A_VENIR= 'A_venir'
 }
 
 export type GetProjetsQueryVariables = Exact<{ [key: string]: never; }>;

@@ -2,7 +2,7 @@
 # Version: 1.0.0
 # Date: 2025-05-26
 
-# Configuration générale
+# Configuration generale
 schema: ./src/graphql/schema.graphql
 documents: ./src/graphql/operations/**/*.{graphql,gql}
 extensions:
@@ -22,9 +22,9 @@ extensions:
 
   # Configuration pour les outils de validation
   validation:
-    # Désactiver les avertissements pour les field-suggestions
+    # Desactiver les avertissements pour les field-suggestions
     disableFieldSuggestions: false
-    # Règles personnalisées pour ESLint
+    # Regles personnalisees pour ESLint
     rules:
       - "graphql-eslint/no-deprecated": "warn"
       - "graphql-eslint/no-anonymous-operations": "error"
@@ -49,20 +49,20 @@ extensions:
             StatutProjet: ./config/constants#STATUTS_PROJET
             StatutLivrable: ./config/constants#STATUTS_LIVRABLE
 
-  # Configuration pour les éditeurs
+  # Configuration pour les editeurs
   editor:
     formatOnSave: true
-    # Configuration recommandée pour VS Code
+    # Configuration recommandee pour VS Code
     vscodeExtensions:
       - apollographql.vscode-apollo
       - graphql.vscode-graphql
   
-  # Configuration des fragments pour être réutilisables
+  # Configuration des fragments pour etre reutilisables
   fragmentRegistry:
     from:
       files: ./src/graphql/fragments/**/*.{graphql,gql}
 
-  # Configuration recommandée pour les scripts
+  # Configuration recommandee pour les scripts
   scripts:
     generate: "graphql-codegen"
     validate: "graphql-schema-linter ./src/graphql/schema.graphql"

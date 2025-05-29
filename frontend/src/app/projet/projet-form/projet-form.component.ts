@@ -18,7 +18,9 @@ export class ProjetFormComponent implements OnInit {
     StatutProjet.BROUILLON,
     StatutProjet.EN_COURS,
     StatutProjet.TERMINE,
-    StatutProjet.ARCHIVE
+    StatutProjet.ARCHIVE,
+    StatutProjet.EN_RETARD,
+    StatutProjet.A_VENIR
   ];
 
   constructor(private fb: FormBuilder) {}

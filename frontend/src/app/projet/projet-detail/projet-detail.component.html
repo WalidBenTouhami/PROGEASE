@@ -4,7 +4,7 @@
       <span [class]="statutClass(projet.statut)">{{ projet.statut }}</span>
     </h2>
     <p><strong>Description&nbsp;:</strong> {{ projet.description }}</p>
-    <p><strong>Date de début&nbsp;:</strong> <time [attr.datetime]="projet.dateDebut">{{ projet.dateDebut | date:'longDate' }}</time></p>
+    <p><strong>Date de debut&nbsp;:</strong> <time [attr.datetime]="projet.dateDebut">{{ projet.dateDebut | date:'longDate' }}</time></p>
     <p><strong>Date de fin&nbsp;:</strong> <time [attr.datetime]="projet.dateFin">{{ projet.dateFin | date:'longDate' }}</time></p>
     <section aria-labelledby="membres-titre">
       <h3 id="membres-titre">Membres du projet</h3>
@@ -13,7 +13,7 @@
       </ul>
     </section>
     <section aria-labelledby="livrables-titre">
-      <h3 id="livrables-titre">Livrables associés</h3>
+      <h3 id="livrables-titre">Livrables associes</h3>
       <ul>
         <li *ngFor="let livrable of projet.livrablesComplets">
           <strong>{{ livrable.intitule }}</strong>

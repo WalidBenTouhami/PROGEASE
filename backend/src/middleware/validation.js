@@ -5,8 +5,8 @@ const { HttpStatus, ErrorMessages } = require('../../config/constants');
 
 /**
  * Middleware de validation des IDs de projet
- * @param {Object} req - Objet requête Express
- * @param {Object} res - Objet réponse Express
+ * @param {Object} req - Objet requete Express
+ * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next d'Express
  */
 const validateProjetId = (req, res, next) => {
@@ -20,16 +20,16 @@ const validateProjetId = (req, res, next) => {
 };
 
 /**
- * Middleware de validation du corps de requête pour les projets
- * @param {Object} req - Objet requête Express
- * @param {Object} res - Objet réponse Express
+ * Middleware de validation du corps de requete pour les projets
+ * @param {Object} req - Objet requete Express
+ * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next d'Express
  */
 const validateProjetBody = (req, res, next) => {
-    // Vérifier si c'est une création ou une mise à jour
+    // Verifier si c'est une creation ou une mise à jour
     const isCreation = !req.params.id;
 
-    // Validation des champs obligatoires pour la création
+    // Validation des champs obligatoires pour la creation
     if (isCreation) {
         const { titre, description } = req.body;
 
@@ -46,10 +46,10 @@ const validateProjetBody = (req, res, next) => {
         }
     }
 
-    // Pour une mise à jour, au moins un champ doit être présent
+    // Pour une mise à jour, au moins un champ doit etre present
     if (!isCreation && Object.keys(req.body).length === 0) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            erreur: 'Aucune donnée fournie pour la mise à jour.'
+            erreur: 'Aucune donnee fournie pour la mise à jour.'
         });
     }
 
@@ -58,8 +58,8 @@ const validateProjetBody = (req, res, next) => {
 
 /**
  * Middleware de validation des IDs de livrable
- * @param {Object} req - Objet requête Express
- * @param {Object} res - Objet réponse Express
+ * @param {Object} req - Objet requete Express
+ * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next d'Express
  */
 const validateLivrableId = (req, res, next) => {
@@ -73,16 +73,16 @@ const validateLivrableId = (req, res, next) => {
 };
 
 /**
- * Middleware de validation du corps de requête pour les livrables
- * @param {Object} req - Objet requête Express
- * @param {Object} res - Objet réponse Express
+ * Middleware de validation du corps de requete pour les livrables
+ * @param {Object} req - Objet requete Express
+ * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next d'Express
  */
 const validateLivrableBody = (req, res, next) => {
-    // Vérifier si c'est une création ou une mise à jour
+    // Verifier si c'est une creation ou une mise à jour
     const isCreation = !req.params.livrableId;
 
-    // Validation pour création
+    // Validation pour creation
     if (isCreation) {
         const { projetId, nom, description } = req.body;
 
@@ -111,10 +111,10 @@ const validateLivrableBody = (req, res, next) => {
         }
     }
 
-    // Pour une mise à jour, au moins un champ doit être présent
+    // Pour une mise à jour, au moins un champ doit etre present
     if (!isCreation && Object.keys(req.body).length === 0) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            erreur: 'Aucune donnée fournie pour la mise à jour.'
+            erreur: 'Aucune donnee fournie pour la mise à jour.'
         });
     }
 
@@ -122,9 +122,9 @@ const validateLivrableBody = (req, res, next) => {
 };
 
 /**
- * Middleware pour valider les résultats des validations express-validator
- * @param {Object} req - Objet requête Express
- * @param {Object} res - Objet réponse Express
+ * Middleware pour valider les resultats des validations express-validator
+ * @param {Object} req - Objet requete Express
+ * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next d'Express
  */
 const validateResults = (req, res, next) => {

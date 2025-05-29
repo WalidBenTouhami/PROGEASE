@@ -1,6 +1,6 @@
 /**
  * Fichier central pour les resolvers GraphQL
- * Combine tous les resolvers spécifiques en un seul objet
+ * Combine tous les resolvers specifiques en un seul objet
  *
  * @module graphql/resolvers/index
  * @created 2025-05-27 par WalidBenTouhami

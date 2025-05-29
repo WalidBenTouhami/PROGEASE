@@ -18,7 +18,7 @@ const { mapProjetMongoVersGraphQL } = require('./projet.resolver');
 /**
  * Transforme un document MongoDB Livrable en type GraphQL
  * @param {mongoose.Document} doc - Document MongoDB
- * @returns {Object|null} - Objet formaté pour GraphQL
+ * @returns {Object|null} - Objet formate pour GraphQL
  */
 function mapLivrableMongoVersGraphQL(doc) {
     if (!doc) return null;
@@ -44,7 +44,7 @@ function mapLivrableMongoVersGraphQL(doc) {
     }
 }
 
-// Définition des resolvers pour les livrables
+// Definition des resolvers pour les livrables
 const Query = {
     /**
      * Liste des livrables avec pagination et filtres
@@ -100,7 +100,7 @@ const Query = {
                 };
             }
 
-            // Sans projetId, faire une requête normale
+            // Sans projetId, faire une requete normale
             const skip = (page - 1) * limit;
             const livrables = await Livrable.find(filter)
                 .sort({ majLe: -1 })
@@ -124,7 +124,7 @@ const Query = {
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            logger.error('Erreur lors de la récupération des livrables:', {
+            logger.error('Erreur lors de la recuperation des livrables:', {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId,
@@ -132,7 +132,7 @@ const Query = {
             });
 
             throw new AppError(
-                'Impossible de récupérer les livrables',
+                'Impossible de recuperer les livrables',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -141,7 +141,7 @@ const Query = {
     },
 
     /**
-     * Récupérer un livrable par son ID
+     * Recuperer un livrable par son ID
      */
     livrable: async (_, { id }, context) => {
         checkAuthorization(context, 'read', 'livrables');
@@ -162,7 +162,7 @@ const Query = {
 
             if (!livrable) {
                 throw new AppError(
-                    'Livrable non trouvé',
+                    'Livrable non trouve',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
@@ -173,14 +173,14 @@ const Query = {
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            logger.error(`Erreur lors de la récupération du livrable ${id}:`, {
+            logger.error(`Erreur lors de la recuperation du livrable ${id}:`, {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId
             });
 
             throw new AppError(
-                'Erreur lors de la récupération du livrable',
+                'Erreur lors de la recuperation du livrable',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -210,19 +210,19 @@ const Mutation = {
                 );
             }
 
-            // Vérifier si le projet existe
+            // Verifier si le projet existe
             const Projet = require('../../models/projet.model');
             const projet = await Projet.findById(projetId).session(session);
             if (!projet) {
                 throw new AppError(
-                    'Projet non trouvé',
+                    'Projet non trouve',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
                 );
             }
 
-            // Valider les données d'entrée
+            // Valider les donnees d'entree
             validateInput(input, {
                 nom: { required: true, type: 'string', minLength: 2 },
                 description: { type: 'string' },
@@ -231,7 +231,7 @@ const Mutation = {
                 statut: { type: 'string', enum: ['EN_ATTENTE', 'EN_COURS', 'TERMINE', 'VALIDE', 'REJETE'] }
             });
 
-            // Créer le livrable
+            // Creer le livrable
             const livrable = new Livrable({
                 ...input,
                 projetId,
@@ -242,7 +242,7 @@ const Mutation = {
 
             const saved = await livrable.save({ session });
 
-            // Mettre à jour la référence dans le projet
+            // Mettre à jour la reference dans le projet
             await Projet.findByIdAndUpdate(
                 projetId,
                 {
@@ -260,7 +260,7 @@ const Mutation = {
             context.loaders.projetLoader.clear(projetId);
             context.loaders.livrablesByProjetLoader.clear(projetId);
 
-            logger.info(`Livrable ajouté: ${saved._id} au projet ${projetId}`, {
+            logger.info(`Livrable ajoute: ${saved._id} au projet ${projetId}`, {
                 userId: context.user?._id,
                 requestId: context.requestId
             });
@@ -308,21 +308,21 @@ const Mutation = {
                 );
             }
 
-            // Valider les données d'entrée
+            // Valider les donnees d'entree
             if (Object.keys(input).length === 0) {
                 throw new AppError(
-                    'Aucune donnée fournie pour la mise à jour',
+                    'Aucune donnee fournie pour la mise à jour',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
                 );
             }
 
-            // Vérifier si le livrable existe
+            // Verifier si le livrable existe
             const existingLivrable = await Livrable.findById(livrableId).session(session);
             if (!existingLivrable) {
                 throw new AppError(
-                    'Livrable non trouvé',
+                    'Livrable non trouve',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
@@ -394,25 +394,25 @@ const Mutation = {
                 );
             }
 
-            // Vérifier si le livrable existe
+            // Verifier si le livrable existe
             const livrable = await Livrable.findById(livrableId).session(session);
             if (!livrable) {
                 throw new AppError(
-                    'Livrable non trouvé',
+                    'Livrable non trouve',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
                 );
             }
 
-            // Garder une copie des données pour le retour
+            // Garder une copie des donnees pour le retour
             const livrableCopy = { ...livrable.toObject() };
             const projetId = livrable.projetId;
 
             // Supprimer le livrable
             await Livrable.findByIdAndDelete(livrableId, { session });
 
-            // Retirer la référence du livrable dans le projet
+            // Retirer la reference du livrable dans le projet
             const Projet = require('../../models/projet.model');
             await Projet.findByIdAndUpdate(
                 projetId,
@@ -431,7 +431,7 @@ const Mutation = {
             context.loaders.livrablesByProjetLoader.clear(projetId);
             context.loaders.projetLoader.clear(projetId);
 
-            logger.info(`Livrable supprimé: ${livrableId} du projet ${projetId}`, {
+            logger.info(`Livrable supprime: ${livrableId} du projet ${projetId}`, {
                 userId: context.user?._id,
                 requestId: context.requestId
             });
@@ -463,7 +463,7 @@ const Mutation = {
 const Types = {
     Livrable: {
         /**
-         * Résolution du projet associé au livrable
+         * Resolution du projet associe au livrable
          */
         projet: async (livrable, _, context) => {
             try {
@@ -472,7 +472,7 @@ const Types = {
                 const projet = await context.loaders.projetLoader.load(livrable.projetId);
                 return mapProjetMongoVersGraphQL(projet);
             } catch (error) {
-                logger.error('Erreur lors de la résolution du projet:', {
+                logger.error('Erreur lors de la resolution du projet:', {
                     error: error.message,
                     livrableId: livrable?._id,
                     projetId: livrable?.projetId

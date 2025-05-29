@@ -1,5 +1,5 @@
 /**
- * Générateur d'énumérations GraphQL - Version améliorée
+ * Generateur d'enumerations GraphQL - Version amelioree
  */
 'use strict';
 
@@ -12,11 +12,11 @@ const {
 } = require('../../config/constants');
 
 /**
- * Extraction centralisée des informations de constantes avec gestion d'erreurs
+ * Extraction centralisee des informations de constantes avec gestion d'erreurs
  */
 function getConstants() {
     try {
-        // Vérifications sans throw d'exceptions
+        // Verifications sans throw d'exceptions
         const defaultStatutsProjet = {
             PROPOSE: 'PROPOSE',
             EN_COURS: 'EN_COURS',
@@ -45,12 +45,12 @@ function getConstants() {
             ? defaultStatutsLivrable
             : STATUTS_LIVRABLE;
 
-        // Ajouter des logs d'avertissement si nécessaire
+        // Ajouter des logs d'avertissement si necessaire
         if (!STATUTS_PROJET || Object.keys(STATUTS_PROJET).length === 0) {
-            console.warn('STATUTS_PROJET est vide ou non défini, utilisation des valeurs par défaut');
+            console.warn('STATUTS_PROJET est vide ou non defini, utilisation des valeurs par defaut');
         }
         if (!STATUTS_LIVRABLE || Object.keys(STATUTS_LIVRABLE).length === 0) {
-            console.warn('STATUTS_LIVRABLE est vide ou non défini, utilisation des valeurs par défaut');
+            console.warn('STATUTS_LIVRABLE est vide ou non defini, utilisation des valeurs par defaut');
         }
 
         return {
@@ -61,7 +61,7 @@ function getConstants() {
     } catch (error) {
         console.error(`Erreur lors du chargement des constantes: ${error.message}`);
 
-        // Valeurs par défaut de secours
+        // Valeurs par defaut de secours
         return {
             STATUTS_PROJET: {
                 PROPOSE: 'PROPOSE',
@@ -86,11 +86,11 @@ function getConstants() {
 }
 
 /**
- * Génère une définition d'énumération GraphQL avec documentation
+ * Genere une definition d'enumeration GraphQL avec documentation
  */
 function generateEnumDefinition(name, values, descriptions = {}) {
     let definition = `"""
-Énumération des statuts ${name === 'StatutProjet' ? 'de projet' : 'de livrable'}
+enumeration des statuts ${name === 'StatutProjet' ? 'de projet' : 'de livrable'}
 """
 enum ${name} {\n`;
 
@@ -107,7 +107,7 @@ enum ${name} {\n`;
 }
 
 /**
- * Génère toutes les énumérations nécessaires pour le schéma GraphQL
+ * Genere toutes les enumerations necessaires pour le schema GraphQL
  */
 function generateAllEnums() {
     const constants = getConstants();
@@ -128,25 +128,25 @@ function generateAllEnums() {
 }
 
 /**
- * Injecte les énumérations générées dans le template de schéma
+ * Injecte les enumerations generees dans le template de schema
  */
 function injectEnumsInSchema(schemaPath) {
     try {
-        // Générer toutes les énumérations
+        // Generer toutes les enumerations
         const enums = generateAllEnums();
 
-        // Lire le schéma template
+        // Lire le schema template
         const schemaTemplate = fs.readFileSync(schemaPath, 'utf-8');
 
-        // Remplacer les balises de commentaire par les énumérations générées
+        // Remplacer les balises de commentaire par les enumerations generees
         if (schemaTemplate.includes('# ENUM_DEFINITIONS')) {
             return schemaTemplate.replace(
                 '# ENUM_DEFINITIONS',
                 `# ENUM_DEFINITIONS\n${enums}`
             );
         } else {
-            console.warn("Le marqueur '# ENUM_DEFINITIONS' n'a pas été trouvé dans le schéma template.");
-            // Ajouter après les directives
+            console.warn("Le marqueur '# ENUM_DEFINITIONS' n'a pas ete trouve dans le schema template.");
+            // Ajouter apres les directives
             const parts = schemaTemplate.split('\n\n');
             const directives = parts[0];
             const rest = parts.slice(1).join('\n\n');
@@ -154,35 +154,35 @@ function injectEnumsInSchema(schemaPath) {
             return `${directives}\n\n# ENUM_DEFINITIONS\n${enums}\n\n${rest}`;
         }
     } catch (error) {
-        console.error(`Erreur lors de la génération des énumérations: ${error.message}`);
+        console.error(`Erreur lors de la generation des enumerations: ${error.message}`);
         throw error;
     }
 }
 
 /**
- * Génère un fichier de schéma complet avec les énumérations injectées
+ * Genere un fichier de schema complet avec les enumerations injectees
  */
 function generateSchemaFile(inputPath, outputPath) {
     try {
-        // Vérification sans throw d'exception
+        // Verification sans throw d'exception
         if (!fs.existsSync(inputPath)) {
             console.error(`Erreur: Le fichier template n'existe pas: ${inputPath}`);
-            return null; // Retourner null pour indiquer l'échec
+            return null; // Retourner null pour indiquer l'echec
         }
 
         const schema = injectEnumsInSchema(inputPath);
 
-        // Vérification
+        // Verification
         if (!schema.includes('enum StatutProjet') || !schema.includes('enum StatutLivrable')) {
-            console.warn('ATTENTION: Les énumérations StatutProjet et/ou StatutLivrable ne semblent pas être présentes dans le schéma généré.');
+            console.warn('ATTENTION: Les enumerations StatutProjet et/ou StatutLivrable ne semblent pas etre presentes dans le schema genere.');
         }
 
         fs.writeFileSync(outputPath, schema, 'utf-8');
-        console.log(`Schéma GraphQL généré avec succès: ${outputPath}`);
+        console.log(`Schema GraphQL genere avec succes: ${outputPath}`);
 
         return schema;
     } catch (error) {
-        console.error(`Erreur lors de la génération du fichier de schéma: ${error.message}`);
+        console.error(`Erreur lors de la generation du fichier de schema: ${error.message}`);
         throw error;
     }
 }

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Outil de publication du schéma GraphQL pour PROGEASE
+ * Outil de publication du schema GraphQL pour PROGEASE
  * Date: 2025-05-23 15:24:10
  * Auteur: WalidBenTouhami
  */
@@ -17,7 +17,7 @@ function getCurrentDateTime() {
   return new Date().toISOString(); // Utilise la date et l'heure actuelles
 }
 
-// Configuration avec les variables d'environnement correctement chargées
+// Configuration avec les variables d'environnement correctement chargees
 const CONFIG = {
   graphRef: process.env.APOLLO_GRAPH_REF || 'PROGEASE-3h73pc@current',
   apiKey: process.env.APOLLO_KEY,
@@ -27,12 +27,12 @@ const CONFIG = {
   outputDir: path.resolve(__dirname, process.env.APOLLO_SCHEMA_OUTPUT_DIR || './schema-output')
 };
 
-// Vérification de la présence de la clé Apollo
+// Verification de la presence de la cle Apollo
 if (!CONFIG.apiKey) {
-  log('APOLLO_KEY non définie dans les variables d\'environnement', 'WARNING');
+  log('APOLLO_KEY non definie dans les variables d\'environnement', 'WARNING');
 }
 
-// Créer le répertoire de sortie s'il n'existe pas
+// Creer le repertoire de sortie s'il n'existe pas
 if (!fs.existsSync(CONFIG.outputDir)) {
   fs.mkdirSync(CONFIG.outputDir, { recursive: true });
 }
@@ -50,43 +50,43 @@ function log(message, type = 'INFO') {
   console.log(`${prefix[type] || '📝'} [${timestamp}] ${type}: ${message}`);
 }
 
-// Étapes du processus de publication
+// etapes du processus de publication
 async function main() {
   try {
-    log('Démarrage de la publication du schéma...');
+    log('Demarrage de la publication du schema...');
 
-    // 1. Extraction du schéma SDL
-    log('Extraction du schéma SDL...');
+    // 1. Extraction du schema SDL
+    log('Extraction du schema SDL...');
     let sdl;
 
     if (typeof typeDefs !== 'string') {
-      // Si on ne peut pas accéder directement au SDL, on l'extrait du fichier
+      // Si on ne peut pas acceder directement au SDL, on l'extrait du fichier
       log('Utilisation du fichier schema-template.graphql');
       try {
         const schemaFilePath = path.resolve(__dirname, '../src/graphql/schema-template.graphql');
         if (fs.existsSync(schemaFilePath)) {
           sdl = fs.readFileSync(schemaFilePath, 'utf8');
-          log('Fichier schema-template.graphql chargé avec succès');
+          log('Fichier schema-template.graphql charge avec succes');
         } else {
           // noinspection ExceptionCaughtLocallyJS
           throw new Error('Fichier schema-template.graphql introuvable');
         }
       } catch (e) {
         // noinspection ExceptionCaughtLocallyJS
-        throw new Error(`Impossible d'extraire le schéma: ${e.message}`);
+        throw new Error(`Impossible d'extraire le schema: ${e.message}`);
       }
     } else {
       sdl = typeDefs;
     }
 
-    // 2. Sauvegarde du schéma en fichier
-    log('Sauvegarde du schéma en fichier...');
+    // 2. Sauvegarde du schema en fichier
+    log('Sauvegarde du schema en fichier...');
     const schemaPath = path.join(CONFIG.outputDir, 'schema-template.graphql');
     fs.writeFileSync(schemaPath, sdl);
-    log(`Schéma sauvegardé dans ${schemaPath}`, 'SUCCESS');
+    log(`Schema sauvegarde dans ${schemaPath}`, 'SUCCESS');
 
-    // 3. Génération du fichier de métadonnées
-    log('Génération des métadonnées...');
+    // 3. Generation du fichier de metadonnees
+    log('Generation des metadonnees...');
     const metadataPath = path.join(CONFIG.outputDir, 'metadata.json');
     const metadata = {
       timestamp: getCurrentDateTime(), // Utiliser la fonction mise à jour
@@ -96,24 +96,24 @@ async function main() {
       routingUrl: CONFIG.routingUrl
     };
     fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
-    log(`Métadonnées sauvegardées dans ${metadataPath}`, 'SUCCESS');
+    log(`Metadonnees sauvegardees dans ${metadataPath}`, 'SUCCESS');
 
-    // 4. Tentative de publication vers Apollo Studio (si configuré)
+    // 4. Tentative de publication vers Apollo Studio (si configure)
     if (CONFIG.apiKey) {
       log('Publication vers Apollo Studio...');
       try {
         const result = await publishToApolloStudio(schemaPath);
-        log(`Schéma publié sur Apollo Studio: ${CONFIG.graphRef}`, 'SUCCESS');
+        log(`Schema publie sur Apollo Studio: ${CONFIG.graphRef}`, 'SUCCESS');
         log(result);
       } catch (error) {
-        log(`Échec de la publication vers Apollo Studio: ${error.message}`, 'ERROR');
+        log(`echec de la publication vers Apollo Studio: ${error.message}`, 'ERROR');
       }
     } else {
-      log('Clé Apollo non configurée. Publication locale uniquement.', 'WARNING');
+      log('Cle Apollo non configuree. Publication locale uniquement.', 'WARNING');
     }
 
     // 5. Finalisation
-    log('Publication terminée avec succès!', 'SUCCESS');
+    log('Publication terminee avec succes!', 'SUCCESS');
 
     return { success: true, schemaPath, metadataPath };
   } catch (error) {
@@ -128,7 +128,7 @@ async function publishToApolloStudio(schemaPath) {
   return new Promise((resolve, reject) => {
     const command = `npx rover subgraph publish ${CONFIG.graphRef} --name ${CONFIG.subgraphName} --schema "${schemaPath}" --routing-url ${CONFIG.routingUrl}`;
 
-    log(`Exécution: ${command}`);
+    log(`Execution: ${command}`);
 
     const execOptions = {
       env: {
@@ -139,14 +139,14 @@ async function publishToApolloStudio(schemaPath) {
 
     exec(command, execOptions, (error, stdout, stderr) => {
       if (error) {
-        return reject(new Error(`Échec de la publication: ${stderr || error.message}`));
+        return reject(new Error(`echec de la publication: ${stderr || error.message}`));
       }
       resolve(stdout);
     });
   });
 }
 
-// Exécution du script
+// Execution du script
 if (require.main === module) {
   main().catch(error => {
     log(`Erreur fatale: ${error.message}`, 'ERROR');

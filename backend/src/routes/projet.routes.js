@@ -8,7 +8,7 @@ const rateLimiter = require('../middleware/rateLimiter');
 
 /**
  * @route POST /api/projets
- * @description Créer un nouveau projet
+ * @description Creer un nouveau projet
  * @access Public
  */
 router.post('/',
@@ -18,17 +18,17 @@ router.post('/',
 
 /**
  * @route GET /api/projets
- * @description Récupérer tous les projets avec filtrage et pagination
+ * @description Recuperer tous les projets avec filtrage et pagination
  * @access Public
  */
 router.get('/',
-    rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requêtes par minute
+    rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requetes par minute
     asyncHandler(projetController.recupererProjets)
 );
 
 /**
  * @route GET /api/projets/:id
- * @description Récupérer un projet par son ID
+ * @description Recuperer un projet par son ID
  * @access Public
  */
 router.get('/:id',
@@ -63,7 +63,7 @@ router.delete('/:id',
  * @access Public
  */
 router.post('/analyse-risques',
-    rateLimiter({ windowMs: 300000, max: 10 }),  // max 10 requêtes / 5min (plus lourd)
+    rateLimiter({ windowMs: 300000, max: 10 }),  // max 10 requetes / 5min (plus lourd)
     validateId('projetId', 'body'),
     asyncHandler(projetController.analyserRisques)
 );
@@ -80,7 +80,7 @@ router.post('/suivi-taches',
 
 /**
  * @route GET /api/projets/:id/livrables
- * @description Récupérer les livrables d'un projet
+ * @description Recuperer les livrables d'un projet
  * @access Public
  */
 router.get('/:id/livrables',
@@ -93,7 +93,7 @@ router.get('/:id/livrables',
 
 /**
  * @route GET /api/projets/health
- * @description Vérifier la santé de l'API projets
+ * @description Verifier la sante de l'API projets
  * @access Public
  */
 router.get('/health', (req, res) => {

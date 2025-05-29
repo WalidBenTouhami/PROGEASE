@@ -15,18 +15,18 @@ const { ENV } = require('./constants');
 const fs = require('fs');
 
 /**
- * Charge les variables d'environnement depuis le fichier .env approprié
+ * Charge les variables d'environnement depuis le fichier .env approprie
  * @function loadEnv
  */
 const loadEnv = () => {
-    // Déterminer l'environnement actuel
+    // Determiner l'environnement actuel
     const nodeEnv = process.env.NODE_ENV || 'development';
 
-    // Fichiers de configuration à charger en ordre de priorité croissante
+    // Fichiers de configuration à charger en ordre de priorite croissante
     const envFiles = [
         '.env',                     // Fichier de base
-        `.env.${nodeEnv}`,          // Spécifique à l'environnement
-        `.env.${nodeEnv}.local`,    // Spécifique à l'environnement et la machine
+        `.env.${nodeEnv}`,          // Specifique à l'environnement
+        `.env.${nodeEnv}.local`,    // Specifique à l'environnement et la machine
         '.env.local'                // Surcharges locales
     ];
 
@@ -38,12 +38,12 @@ const loadEnv = () => {
         }
     });
 
-    // Vérifier les variables d'environnement requises
+    // Verifier les variables d'environnement requises
     validateEnv();
 };
 
 /**
- * Vérifie que les variables d'environnement requises sont présentes
+ * Verifie que les variables d'environnement requises sont presentes
  * @function validateEnv
  * @throws {Error} Si une variable d'environnement requise est manquante
  */
@@ -70,10 +70,10 @@ const validateEnv = () => {
 };
 
 /**
- * Renvoie toutes les variables d'environnement filtrées pour être sécuritaire
+ * Renvoie toutes les variables d'environnement filtrees pour etre securitaire
  * à afficher dans les diagnostics (sans secrets)
  * @function getSafeEnv
- * @returns {Object} Variables d'environnement filtrées
+ * @returns {Object} Variables d'environnement filtrees
  */
 const getSafeEnv = () => {
     // Liste des variables à ne pas exposer
@@ -89,7 +89,7 @@ const getSafeEnv = () => {
 
     // Filtrer les variables sensibles
     return Object.entries(process.env).reduce((safeEnv, [key, value]) => {
-        // Vérifier si la clé contient un mot sensible
+        // Verifier si la cle contient un mot sensible
         if (sensitiveVars.some(sensitive => key.includes(sensitive))) {
             safeEnv[key] = '******';
         } else {

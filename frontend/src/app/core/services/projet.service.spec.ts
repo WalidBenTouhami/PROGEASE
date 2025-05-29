@@ -42,7 +42,7 @@ describe('ProjetService', () => {
     httpMock.verify();
   });
 
-  it('doit récupérer tous les projets', () => {
+  it('doit recuperer tous les projets', () => {
     service.recupererProjets().subscribe(projets => {
       expect(projets.length).toBe(1);
       expect(projets[0].titre).toBe('Projet 1');
@@ -53,7 +53,7 @@ describe('ProjetService', () => {
     req.flush([mockprojet]);
   });
 
-  it('doit récupérer un projet par ID', () => {
+  it('doit recuperer un projet par ID', () => {
     service.recupererProjet('1').subscribe(projet => {
       expect(projet._id).toBe('1');
       expect(projet.titre).toBe('Projet 1');
@@ -64,7 +64,7 @@ describe('ProjetService', () => {
     req.flush(mockprojet);
   });
 
-  it('doit créer un projet', () => {
+  it('doit creer un projet', () => {
     service.creerProjet(mockprojet).subscribe(projet => {
       expect(projet.titre).toBe('Projet 1');
     });
@@ -75,9 +75,9 @@ describe('ProjetService', () => {
   });
 
   it('doit mettre à jour un projet', () => {
-    const updated = { ...mockprojet, titre: 'Projet Modifié' };
+    const updated = { ...mockprojet, titre: 'Projet Modifie' };
     service.mettreAJourProjet('1', updated).subscribe(projet => {
-      expect(projet.titre).toBe('Projet Modifié');
+      expect(projet.titre).toBe('Projet Modifie');
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);
@@ -95,9 +95,9 @@ describe('ProjetService', () => {
     req.flush({ success: true });
   });
 
-  it('doit gérer une erreur serveur (500)', () => {
+  it('doit gerer une erreur serveur (500)', () => {
     service.recupererProjets().subscribe({
-      next: () => fail('appel devait échouer'),
+      next: () => fail('appel devait echouer'),
       error: (err) => {
         expect(err.status).toBe(500);
         expect(err.statusText).toBe('Erreur interne');

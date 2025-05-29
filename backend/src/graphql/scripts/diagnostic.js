@@ -12,30 +12,30 @@ const envResult = dotenv.config({ path: envPath });
 if (envResult.error) {
     console.log(`❌ Erreur lors du chargement du fichier .env: ${envResult.error.message}`);
 } else {
-    console.log('✅ Fichier .env chargé avec succès');
+    console.log('✅ Fichier .env charge avec succes');
 }
 
-console.log('--- DÉBUT DU DIAGNOSTIC ---');
+console.log('--- DeBUT DU DIAGNOSTIC ---');
 
-// Fonction d'aide pour vérifier l'existence d'un fichier
+// Fonction d'aide pour verifier l'existence d'un fichier
 function checkFile(filePath, relativePath) {
     const fullPath = path.join(__dirname, '..', relativePath);
     const exists = fs.existsSync(fullPath);
-    console.log(`${relativePath}: ${exists ? '✅ Présent' : '❌ Manquant'}`);
+    console.log(`${relativePath}: ${exists ? '✅ Present' : '❌ Manquant'}`);
     return exists;
 }
 
-// Vérification de l'environnement
-console.log('[1] Vérification de l\'environnement...');
-console.log(`NODE_ENV: ${process.env.NODE_ENV || 'non défini'}`);
-console.log(`Système: ${os.type()} ${os.release()}`);
+// Verification de l'environnement
+console.log('[1] Verification de l\'environnement...');
+console.log(`NODE_ENV: ${process.env.NODE_ENV || 'non defini'}`);
+console.log(`Systeme: ${os.type()} ${os.release()}`);
 console.log(`Node.js: ${process.version}`);
-console.log(`Mémoire totale: ${Math.round(os.totalmem() / (1024 * 1024))} MB`);
-console.log(`Mémoire libre: ${Math.round(os.freemem() / (1024 * 1024))} MB`);
+console.log(`Memoire totale: ${Math.round(os.totalmem() / (1024 * 1024))} MB`);
+console.log(`Memoire libre: ${Math.round(os.freemem() / (1024 * 1024))} MB`);
 console.log('');
 
-// Vérification des fichiers critiques
-console.log('[2] Vérification des fichiers critiques...');
+// Verification des fichiers critiques
+console.log('[2] Verification des fichiers critiques...');
 const criticalFiles = [
     '.env',
     'server.js',
@@ -49,8 +49,8 @@ const criticalFiles = [
 criticalFiles.forEach(file => checkFile(file, file));
 console.log('');
 
-// Vérification des configurations
-console.log('[3] Vérification des configurations...');
+// Verification des configurations
+console.log('[3] Verification des configurations...');
 const envVars = [
     'NODE_ENV',
     'PORT',
@@ -60,36 +60,36 @@ const envVars = [
 ];
 
 envVars.forEach(envVar => {
-    console.log(`${envVar}: ${process.env[envVar] ? '✅ Défini' : '❌ Non défini'}`);
+    console.log(`${envVar}: ${process.env[envVar] ? '✅ Defini' : '❌ Non defini'}`);
 });
 console.log('');
 
-// Vérification de la connexion MongoDB
-console.log('[4] Vérification de la connexion MongoDB...');
+// Verification de la connexion MongoDB
+console.log('[4] Verification de la connexion MongoDB...');
 const mongoUri = process.env.MONGO_URI;
-console.log(`URI MongoDB: ${mongoUri ? '✅ Définie' : '❌ Non définie'}`);
+console.log(`URI MongoDB: ${mongoUri ? '✅ Definie' : '❌ Non definie'}`);
 
 if (mongoUri) {
     try {
         const mongoose = require('mongoose');
         mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
             .then(() => {
-                console.log('✅ Connexion à MongoDB réussie');
+                console.log('✅ Connexion à MongoDB reussie');
                 mongoose.connection.close();
             })
             .catch(err => {
                 console.log(`❌ Erreur de connexion MongoDB: ${err.message}`);
             });
     } catch (error) {
-        console.log('❌ Échec du test de connexion MongoDB:', error.message);
+        console.log('❌ echec du test de connexion MongoDB:', error.message);
     }
 } else {
-    console.log('❌ Impossible de tester la connexion MongoDB: URI non définie');
+    console.log('❌ Impossible de tester la connexion MongoDB: URI non definie');
 }
 console.log('');
 
-// Vérification des packages installés
-console.log('[5] Vérification des packages critiques...');
+// Verification des packages installes
+console.log('[5] Verification des packages critiques...');
 const criticalPackages = [
     'express',
     'mongoose',
@@ -105,9 +105,9 @@ const criticalPackages = [
 criticalPackages.forEach(packageName => {
     try {
         require(packageName);
-        console.log(`${packageName}: ✅ Installé`);
+        console.log(`${packageName}: ✅ Installe`);
     } catch (error) {
-        console.log(`${packageName}: ❌ Non installé ou introuvable`);
+        console.log(`${packageName}: ❌ Non installe ou introuvable`);
     }
 });
 

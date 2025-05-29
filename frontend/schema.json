@@ -252,7 +252,7 @@
       {
         "kind": "SCALAR",
         "name": "Date",
-        "description": "Type Date personnalisé",
+        "description": "Type Date personnalise",
         "isOneOf": null,
         "fields": null,
         "inputFields": null,

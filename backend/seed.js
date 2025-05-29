@@ -27,7 +27,7 @@ async function seed() {
   const projets = await Projet.insertMany([
     {
       titre: 'Plateforme de gestion de projets',
-      description: 'Développer une plateforme pour gérer les projets étudiants.',
+      description: 'Developper une plateforme pour gerer les projets etudiants.',
       equipe: [randomId(), randomId()],
       tuteur: randomId(),
       competences: ['Node.js', 'Angular', 'MongoDB'],
@@ -38,7 +38,7 @@ async function seed() {
     },
     {
       titre: 'Application mobile de suivi',
-      description: 'Créer une application mobile pour le suivi des livrables.',
+      description: 'Creer une application mobile pour le suivi des livrables.',
       equipe: [randomId()],
       tuteur: randomId(),
       competences: ['Flutter', 'Firebase'],
@@ -54,14 +54,14 @@ async function seed() {
   await Livrable.insertMany([
     {
       intitule: 'Cahier des charges',
-      description: 'Document de spécification du projet.',
+      description: 'Document de specification du projet.',
       dateLimite: new Date(now + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       projetId: projets[0]._id,
       statut: 'en_attente'
     },
     {
       intitule: 'Prototype',
-      description: 'Première version fonctionnelle.',
+      description: 'Premiere version fonctionnelle.',
       dateLimite: new Date(now + 30 * 24 * 60 * 60 * 1000), // 30 days from now
       projetId: projets[0]._id,
       statut: 'en_retard'

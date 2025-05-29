@@ -15,7 +15,7 @@ export class ProjetService {
   recupererProjets(): Observable<Projet[]> {
     return this.http.get<Projet[]>(this.baseUrl).pipe(
       catchError(error => {
-        console.error('Erreur lors de la récupération des projets:', error);
+        console.error('Erreur lors de la recuperation des projets:', error);
         return throwError(() => error);
       })
     );
@@ -24,7 +24,7 @@ export class ProjetService {
   recupererProjet(id: string): Observable<Projet> {
     return this.http.get<Projet>(`${this.baseUrl}/${id}`).pipe(
       catchError(error => {
-        console.error(`Erreur lors de la récupération du projet ${id}:`, error);
+        console.error(`Erreur lors de la recuperation du projet ${id}:`, error);
         return throwError(() => error);
       })
     );
@@ -33,7 +33,7 @@ export class ProjetService {
   creerProjet(projet: Projet): Observable<Projet> {
     return this.http.post<Projet>(this.baseUrl, projet).pipe(
       catchError(error => {
-        console.error('Erreur lors de la création du projet:', error);
+        console.error('Erreur lors de la creation du projet:', error);
         return throwError(() => error);
       })
     );

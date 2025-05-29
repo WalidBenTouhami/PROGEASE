@@ -15,7 +15,7 @@ describe('LivrableDetailComponent', () => {
     fixture.detectChanges();
   });
 
-  it('devrait être créé', () => {
+  it('devrait etre cree', () => {
     expect(component).toBeTruthy();
   });
 });

@@ -50,7 +50,7 @@ export class ProjetListComponent implements OnInit, OnDestroy {
       }
     } catch (error) {
       console.error('Erreur de navigation:', error);
-      this.erreur = 'Impossible d\'accéder au projet demandé.';
+      this.erreur = 'Impossible d\'acceder au projet demande.';
     }
   }
 

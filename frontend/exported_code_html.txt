@@ -29,7 +29,7 @@
     <router-outlet></router-outlet>
   </main>
   <footer class="app-footer">
-    <p>&copy; 2025 PROGEASE – Plateforme de gestion de projets académiques</p>
+    <p>&copy; 2025 PROGEASE – Plateforme de gestion de projets academiques</p>
   </footer>
 </div>
 
@@ -48,12 +48,12 @@
       <span class="stat-value">{{ livrablesACorriger }}</span>
     </div>
     <div class="stat-card" role="listitem">
-      <h3>Étudiants inscrits</h3>
+      <h3>etudiants inscrits</h3>
       <span class="stat-value">{{ nbEtudiants }}</span>
     </div>
   </div>
   <section aria-labelledby="dernieres-actions-titre">
-    <h3 id="dernieres-actions-titre">Dernières actions</h3>
+    <h3 id="dernieres-actions-titre">Dernieres actions</h3>
     <ul>
       <li *ngFor="let action of dernieresActions">
         {{ action.description }}
@@ -86,7 +86,7 @@
       <input id="endpoint" name="endpoint" type="text" [(ngModel)]="endpoint" required aria-required="true" #endpointInput="ngModel">
     </div>
     <div class="form-group">
-      <label for="method">Méthode</label>
+      <label for="method">Methode</label>
       <select id="method" name="method" [(ngModel)]="method" required aria-required="true">
         <option value="GET">GET</option>
         <option value="POST">POST</option>
@@ -96,12 +96,12 @@
     </div>
     <div class="form-group">
       <label for="body">Corps (JSON)</label>
-      <textarea id="body" name="body" [(ngModel)]="body" rows="4" placeholder='{"key": "value"}' aria-label="Corps de la requête"></textarea>
+      <textarea id="body" name="body" [(ngModel)]="body" rows="4" placeholder='{"key": "value"}' aria-label="Corps de la requete"></textarea>
     </div>
     <button type="submit" [disabled]="apiForm.invalid">Envoyer</button>
   </form>
   <section *ngIf="response" aria-labelledby="response-title">
-    <h3 id="response-title">Réponse</h3>
+    <h3 id="response-title">Reponse</h3>
     <pre>{{ response | json }}</pre>
   </section>
 </section>
@@ -116,8 +116,8 @@
     </h2>
     <p><strong>Description&nbsp;:</strong> {{ livrable.description }}</p>
     <p><strong>Date limite&nbsp;:</strong> <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'longDate' }}</time></p>
-    <p *ngIf="livrable.urlDepot"><strong>URL de dépôt&nbsp;:</strong> <a [href]="livrable.urlDepot" rel="noopener" target="_blank">{{ livrable.urlDepot }}</a></p>
-    <p *ngIf="livrable.projetId"><strong>Projet associé</strong>&nbsp;: {{ livrable.projetId }}</p>
+    <p *ngIf="livrable.urlDepot"><strong>URL de depôt&nbsp;:</strong> <a [href]="livrable.urlDepot" rel="noopener" target="_blank">{{ livrable.urlDepot }}</a></p>
+    <p *ngIf="livrable.projetId"><strong>Projet associe</strong>&nbsp;: {{ livrable.projetId }}</p>
   </article>
 </ng-container>
 <ng-template #loading>
@@ -152,7 +152,7 @@
   </div>
 
   <div class="form-group">
-    <label for="urlDepot">URL de dépôt</label>
+    <label for="urlDepot">URL de depôt</label>
     <input id="urlDepot" formControlName="urlDepot" type="url" required aria-required="true">
   </div>
 
@@ -179,13 +179,13 @@
     <li *ngFor="let livrable of livrables">
       <span class="livrable-nom">{{ livrable.nom }}</span>
       <span class="status" [ngClass]="{
-        'termine': livrable.statut === 'Terminé',
+        'termine': livrable.statut === 'Termine',
         'attente': livrable.statut === 'En attente',
         'retard': livrable.statut === 'En retard'
       }">{{ livrable.statut }}</span>
       <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant le <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
       <span *ngIf="livrable.urlDepot">
-        &nbsp;| <a [href]="livrable.urlDepot" target="_blank" rel="noopener">Dépôt</a>
+        &nbsp;| <a [href]="livrable.urlDepot" target="_blank" rel="noopener">Depôt</a>
       </span>
     </li>
   </ul>
@@ -199,7 +199,7 @@
 // ======= Contenu de src/app/front-office/dashboard/dashboard.component.html =======
 
 <section class="dashboard-container" aria-labelledby="tableau-bord-titre">
-  <h2 id="tableau-bord-titre" class="title">Tableau de bord étudiant</h2>
+  <h2 id="tableau-bord-titre" class="title">Tableau de bord etudiant</h2>
   <div class="stats-grid" role="list" aria-label="Statistiques principales">
     <div class="stat-card" role="listitem">
       <h3>Projets en cours</h3>
@@ -215,11 +215,11 @@
     </div>
   </div>
   <section aria-labelledby="projets-recents-titre">
-    <h3 id="projets-recents-titre">Projets récents</h3>
+    <h3 id="projets-recents-titre">Projets recents</h3>
     <ul>
       <li *ngFor="let projet of projetsRecents">
         <a [routerLink]="['/projets', projet.id]">{{ projet.nom }}</a>
-        <span class="sr-only">, projet récent</span>
+        <span class="sr-only">, projet recent</span>
       </li>
     </ul>
   </section>
@@ -253,7 +253,7 @@
     <th>Titre</th>
     <th>Description</th>
     <th>Statut</th>
-    <th>Date de début</th>
+    <th>Date de debut</th>
     <th>Date de fin</th>
     <th>Actions</th>
   </tr>
@@ -271,7 +271,7 @@
   </tr>
   </tbody>
 </table>
-<div *ngIf="!projets.length && !chargement">Aucun projet trouvé.</div>
+<div *ngIf="!projets.length && !chargement">Aucun projet trouve.</div>
 
 
 // ======= Contenu de src/app/projet/projet-detail/projet-detail.component.html =======
@@ -282,7 +282,7 @@
       <span [class]="statutClass(projet.statut)">{{ projet.statut }}</span>
     </h2>
     <p><strong>Description&nbsp;:</strong> {{ projet.description }}</p>
-    <p><strong>Date de début&nbsp;:</strong> <time [attr.datetime]="projet.dateDebut">{{ projet.dateDebut | date:'longDate' }}</time></p>
+    <p><strong>Date de debut&nbsp;:</strong> <time [attr.datetime]="projet.dateDebut">{{ projet.dateDebut | date:'longDate' }}</time></p>
     <p><strong>Date de fin&nbsp;:</strong> <time [attr.datetime]="projet.dateFin">{{ projet.dateFin | date:'longDate' }}</time></p>
     <section aria-labelledby="membres-titre">
       <h3 id="membres-titre">Membres du projet</h3>
@@ -291,7 +291,7 @@
       </ul>
     </section>
     <section aria-labelledby="livrables-titre">
-      <h3 id="livrables-titre">Livrables associés</h3>
+      <h3 id="livrables-titre">Livrables associes</h3>
       <ul>
         <li *ngFor="let livrable of projet.livrables">
           <strong>{{ livrable.nom }}</strong>
@@ -310,7 +310,7 @@
 // ======= Contenu de src/app/projet/projet-form/projet-form.component.html =======
 
 <form [formGroup]="projetForm" (ngSubmit)="onSubmit()" aria-labelledby="formulaire-projet-titre" class="form-container">
-  <h2 id="formulaire-projet-titre">Créer ou modifier un projet</h2>
+  <h2 id="formulaire-projet-titre">Creer ou modifier un projet</h2>
 
   <div class="form-group">
     <label for="titre">Titre du projet</label>
@@ -329,7 +329,7 @@
   </div>
 
   <div class="form-group">
-    <label for="equipe">Membres de l'équipe (séparés par une virgule)</label>
+    <label for="equipe">Membres de l'equipe (separes par une virgule)</label>
     <input id="equipe" formControlName="equipe" type="text" required aria-required="true" placeholder="Ex: Alice,Bob,Charlie">
   </div>
 
@@ -339,12 +339,12 @@
   </div>
 
   <div class="form-group">
-    <label for="competences">Compétences requises (séparées par une virgule)</label>
-    <input id="competences" formControlName="competences" type="text" required aria-required="true" placeholder="Ex: Angular,Node.js,Agilité">
+    <label for="competences">Competences requises (separees par une virgule)</label>
+    <input id="competences" formControlName="competences" type="text" required aria-required="true" placeholder="Ex: Angular,Node.js,Agilite">
   </div>
 
   <div class="form-group">
-    <label for="dateDebut">Date de début</label>
+    <label for="dateDebut">Date de debut</label>
     <input id="dateDebut" formControlName="dateDebut" type="date" required aria-required="true">
   </div>
 
@@ -377,9 +377,9 @@
       <a (click)="voirDetails(projet._id)" tabindex="0">{{ projet.titre }}</a>
       <span class="status" [ngClass]="{
         'encours': projet.statut === 'En cours',
-        'termine': projet.statut === 'Terminé',
+        'termine': projet.statut === 'Termine',
         'brouillon': projet.statut === 'Brouillon',
-        'archive': projet.statut === 'Archivé'
+        'archive': projet.statut === 'Archive'
       }">{{ projet.statut }}</span>
     </li>
   </ul>

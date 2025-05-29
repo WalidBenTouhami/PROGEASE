@@ -1,8 +1,8 @@
 # Tests GraphQL pour Projet
-# Générés automatiquement le 2025-05-27 19:27:50
+# Generes automatiquement le 2025-05-27 19:27:50
 # Auteur: WalidBenTouhami
 
-# Requête pour récupérer tous les projets
+# Requete pour recuperer tous les projets
 query GetAllProjets {
   projet {
     _id
@@ -19,7 +19,7 @@ query GetAllProjets {
   }
 }
 
-# Requête pour récupérer un projet spécifique
+# Requete pour recuperer un projet specifique
 query GetProjetById($id: ID!) {
   projet(id: $id) {
     _id

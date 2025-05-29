@@ -4,11 +4,11 @@
     <li *ngFor="let livrable of livrables">
       <a [routerLink]="['/livrables', livrable._id]">{{ livrable.nom }}</a>
       <span *ngIf="isStatus(livrable.statut, 'En attente')" class="status attente">En attente</span>
-      <span *ngIf="isStatus(livrable.statut, 'Terminé')" class="status termine">Terminé</span>
+      <span *ngIf="isStatus(livrable.statut, 'Termine')" class="status termine">Termine</span>
       <span *ngIf="isStatus(livrable.statut, 'En retard')" class="status retard">En retard</span>
     </li>
   </ul>
   <p *ngIf="erreur" class="error-message">{{ erreur }}</p>
   <p *ngIf="chargement" class="loading-message">Chargement des livrables...</p>
-  <p *ngIf="!chargement && livrables.length === 0" class="empty-message">Aucun livrable trouvé.</p>
+  <p *ngIf="!chargement && livrables.length === 0" class="empty-message">Aucun livrable trouve.</p>
 </section>

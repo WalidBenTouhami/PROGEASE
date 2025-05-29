@@ -4,7 +4,7 @@ const logger = require('./logger');
 /**
  * Formate un document MongoDB Projet pour l'API REST
  * @param {Object} projet - Document projet brut
- * @returns {Object} - Document formaté
+ * @returns {Object} - Document formate
  */
 function formatProjetResponse(projet) {
     if (!projet) return null;
@@ -66,7 +66,7 @@ function formatProjetResponse(projet) {
 /**
  * Formate un document MongoDB Livrable pour l'API REST
  * @param {Object} livrable - Document livrable brut
- * @returns {Object} - Document formaté
+ * @returns {Object} - Document formate
  */
 function formatLivrableResponse(livrable) {
     if (!livrable) return null;
@@ -97,12 +97,12 @@ function formatLivrableResponse(livrable) {
 }
 
 /**
- * Détermine si un livrable est en retard
+ * Determine si un livrable est en retard
  * @param {Object} livrable - Document livrable
  * @returns {boolean} - true si le livrable est en retard
  */
 function estLivrableEnRetard(livrable) {
-    if (!livrable || !livrable.dateLimite || livrable.statut === 'Terminé') {
+    if (!livrable || !livrable.dateLimite || livrable.statut === 'Termine') {
         return false;
     }
 
@@ -114,8 +114,8 @@ function estLivrableEnRetard(livrable) {
 /**
  * Formate une date pour l'affichage
  * @param {Date|string} date - Date à formater
- * @param {string} format - Format souhaité (court, long)
- * @returns {string} - Date formatée
+ * @param {string} format - Format souhaite (court, long)
+ * @returns {string} - Date formatee
  */
 function formatDate(date, format = 'court') {
     if (!date) return '';
@@ -144,9 +144,9 @@ function formatDate(date, format = 'court') {
 }
 
 /**
- * Formate une durée en jours en expression lisible
+ * Formate une duree en jours en expression lisible
  * @param {number} jours - Nombre de jours
- * @returns {string} - Durée formatée
+ * @returns {string} - Duree formatee
  */
 function formatDureeLisible(jours) {
     if (jours === 0) return 'Aujourd\'hui';

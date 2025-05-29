@@ -1,8 +1,8 @@
 # Tests GraphQL pour Livrable
-# Générés automatiquement le 2025-05-27 19:27:50
+# Generes automatiquement le 2025-05-27 19:27:50
 # Auteur: WalidBenTouhami
 
-# Requête pour récupérer tous les livrables
+# Requete pour recuperer tous les livrables
 query GetAllLivrables {
   livrable {
     _id
@@ -21,7 +21,7 @@ query GetAllLivrables {
   }
 }
 
-# Requête pour récupérer un livrable spécifique
+# Requete pour recuperer un livrable specifique
 query GetLivrableById($id: ID!) {
   livrable(id: $id) {
     _id

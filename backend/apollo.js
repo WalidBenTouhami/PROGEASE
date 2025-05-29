@@ -10,10 +10,10 @@ const logger = require('./src/utils/logger');
 const { resolvers } = require('./src/graphql');
 
 /**
- * Crée et démarre une instance Apollo Server
+ * Cree et demarre une instance Apollo Server
  * @param {import('http').Server} httpServer - Serveur HTTP Express (optionnel)
- * @param {Object} options - Options supplémentaires pour Apollo Server
- * @returns {Promise<ApolloServer>} Instance Apollo Server démarrée
+ * @param {Object} options - Options supplementaires pour Apollo Server
+ * @returns {Promise<ApolloServer>} Instance Apollo Server demarree
  */
 async function createApolloServer(httpServer = null, options = {}) {
     // Configuration des plugins
@@ -21,18 +21,18 @@ async function createApolloServer(httpServer = null, options = {}) {
         // Plugin de fermeture propre du serveur HTTP
         ...(httpServer ? [ApolloServerPluginDrainHttpServer({ httpServer })] : []),
 
-        // Page d'accueil GraphQL différente selon l'environnement
+        // Page d'accueil GraphQL differente selon l'environnement
         process.env.NODE_ENV === 'production'
             ? ApolloServerPluginLandingPageDisabled()
             : ApolloServerPluginLandingPageLocalDefault({ footer: false })
     ];
 
-    // Ajout des plugins personnalisés
+    // Ajout des plugins personnalises
     if (options.plugins) {
         plugins.push(...options.plugins);
     }
 
-    // Création du serveur avec la configuration
+    // Creation du serveur avec la configuration
     const server = new ApolloServer({
         typeDefs,
         resolvers,
@@ -40,9 +40,9 @@ async function createApolloServer(httpServer = null, options = {}) {
         csrfPrevention: process.env.NODE_ENV === 'production',
         cache: 'bounded',
         plugins,
-        // Remplacer formatError par la version non dépréciée
+        // Remplacer formatError par la version non depreciee
         formatError: (formattedError, error) => {
-            // Log de l'erreur pour le débogage
+            // Log de l'erreur pour le debogage
             logger.error(`GraphQL Error: ${formattedError.message}`, {
                 path: formattedError.path,
                 code: formattedError.extensions?.code,
@@ -61,11 +61,11 @@ async function createApolloServer(httpServer = null, options = {}) {
             }
 
             if (process.env.NODE_ENV === 'production') {
-                // Masquer stacktrace et détails sensibles
+                // Masquer stacktrace et details sensibles
                 return baseError;
             }
 
-            // En développement, ajouter la stacktrace
+            // En developpement, ajouter la stacktrace
             return {
                 ...baseError,
                 stacktrace: error.originalError?.stack || formattedError.extensions?.exception?.stacktrace
@@ -75,37 +75,37 @@ async function createApolloServer(httpServer = null, options = {}) {
     });
 
     await server.start();
-    logger.info('Apollo Server 4 démarré avec succès');
+    logger.info('Apollo Server 4 demarre avec succes');
 
     return server;
 }
 
 /**
- * Crée le middleware Express pour Apollo Server
- * @param {ApolloServer} server - Instance Apollo Server démarrée
- * @param {Object} options - Options supplémentaires pour le middleware
- * @returns {Function} Middleware Express pour intégrer Apollo Server à Express
+ * Cree le middleware Express pour Apollo Server
+ * @param {ApolloServer} server - Instance Apollo Server demarree
+ * @param {Object} options - Options supplementaires pour le middleware
+ * @returns {Function} Middleware Express pour integrer Apollo Server à Express
  */
 function createApolloMiddleware(server, options = {}) {
     return expressMiddleware(server, {
         context: async ({ req, res }) => {
-            // Extraction du contexte à partir de la requête
+            // Extraction du contexte à partir de la requete
             const context = {
-                // Métadonnées de requête pour le traçage et le débogage
+                // Metadonnees de requete pour le traçage et le debogage
                 ip: req.ip || req.connection?.remoteAddress,
                 userAgent: req.headers['user-agent'],
 
-                // Ajout de l'objet requête pour accéder aux headers
+                // Ajout de l'objet requete pour acceder aux headers
                 req,
 
-                // Ajout de l'objet réponse pour les en-têtes personnalisés
+                // Ajout de l'objet reponse pour les en-tetes personnalises
                 res,
 
-                // Ajout d'un timestamp pour calculer la durée d'exécution
+                // Ajout d'un timestamp pour calculer la duree d'execution
                 requestStartTime: Date.now()
             };
 
-            // Fusionner avec le contexte personnalisé
+            // Fusionner avec le contexte personnalise
             return {
                 ...context,
                 ...(options.context ?
@@ -118,7 +118,7 @@ function createApolloMiddleware(server, options = {}) {
     });
 }
 
-// Ces fonctions sont utilisées dans "standalone server.js".
+// Ces fonctions sont utilisees dans "standalone server.js".
 module.exports = {
     createApolloServer,
     createApolloMiddleware

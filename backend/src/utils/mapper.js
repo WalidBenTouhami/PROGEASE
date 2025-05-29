@@ -1,11 +1,11 @@
 /**
- * Fonctions utilitaires pour mapper les modèles entre MongoDB et GraphQL/API REST
+ * Fonctions utilitaires pour mapper les modeles entre MongoDB et GraphQL/API REST
  */
 
 /**
  * Mappe un document Livrable MongoDB vers un format GraphQL/API
  * @param {Object} doc - Document Livrable MongoDB
- * @return {Object|null} - Document formaté ou null
+ * @return {Object|null} - Document formate ou null
  */
 function mapperLivrable(doc) {
     if (!doc) return null;
@@ -25,7 +25,7 @@ function mapperLivrable(doc) {
 /**
  * Mappe un document Projet MongoDB vers un format GraphQL/API
  * @param {Object} doc - Document Projet MongoDB
- * @return {Object|null} - Document formaté ou null
+ * @return {Object|null} - Document formate ou null
  */
 function mapperProjet(doc) {
     if (!doc) return null;

@@ -17,7 +17,7 @@ const { handleMongooseError } = require('../../utils/errorUtils');
 /**
  * Transforme un document MongoDB Projet en type GraphQL
  * @param {mongoose.Document} doc - Document MongoDB
- * @returns {Object|null} - Objet formaté pour GraphQL
+ * @returns {Object|null} - Objet formate pour GraphQL
  */
 function mapProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
@@ -50,7 +50,7 @@ function mapProjetMongoVersGraphQL(doc) {
     }
 }
 
-// Définition des resolvers pour les projets
+// Definition des resolvers pour les projets
 const Query = {
     /**
      * Liste des projets avec pagination et filtres
@@ -77,7 +77,7 @@ const Query = {
             // Calculer le skip pour la pagination
             const skip = (page - 1) * limit;
 
-            // Récupérer les projets avec pagination
+            // Recuperer les projets avec pagination
             const projets = await Projet.find(filter)
                 .sort({ majLe: -1 })
                 .skip(skip)
@@ -99,7 +99,7 @@ const Query = {
                 }
             };
         } catch (error) {
-            logger.error('Erreur lors de la récupération des projets:', {
+            logger.error('Erreur lors de la recuperation des projets:', {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId,
@@ -107,7 +107,7 @@ const Query = {
             });
 
             throw new AppError(
-                'Impossible de récupérer les projets',
+                'Impossible de recuperer les projets',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -116,7 +116,7 @@ const Query = {
     },
 
     /**
-     * Récupérer un projet par son ID
+     * Recuperer un projet par son ID
      */
     projet: async (_, { id }, context) => {
         checkAuthorization(context, 'read', 'projets');
@@ -132,12 +132,12 @@ const Query = {
                 );
             }
 
-            // Utiliser le dataloader pour éviter les requêtes en double
+            // Utiliser le dataloader pour eviter les requetes en double
             const projet = await context.loaders.projetLoader.load(id);
 
             if (!projet) {
                 throw new AppError(
-                    'Projet non trouvé',
+                    'Projet non trouve',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
@@ -148,14 +148,14 @@ const Query = {
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            logger.error(`Erreur lors de la récupération du projet ${id}:`, {
+            logger.error(`Erreur lors de la recuperation du projet ${id}:`, {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId
             });
 
             throw new AppError(
-                'Erreur lors de la récupération du projet',
+                'Erreur lors de la recuperation du projet',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -166,7 +166,7 @@ const Query = {
 
 const Mutation = {
     /**
-     * Créer un nouveau projet
+     * Creer un nouveau projet
      */
     creerProjet: async (_, { input }, context) => {
         checkAuthorization(context, 'create', 'projets');
@@ -175,7 +175,7 @@ const Mutation = {
         try {
             session.startTransaction();
 
-            // Valider les données d'entrée
+            // Valider les donnees d'entree
             validateInput(input, {
                 titre: { required: true, type: 'string', minLength: 3 },
                 description: { required: true, type: 'string' },
@@ -186,7 +186,7 @@ const Mutation = {
                 dateFin: { type: 'date' }
             });
 
-            // Créer le projet
+            // Creer le projet
             const projet = new Projet({
                 ...input,
                 createur: context.user?._id,
@@ -196,8 +196,8 @@ const Mutation = {
 
             const saved = await projet.save({ session });
 
-            // Ajouter l'activité d'audit
-            logger.info(`Projet créé: ${saved._id}`, {
+            // Ajouter l'activite d'audit
+            logger.info(`Projet cree: ${saved._id}`, {
                 userId: context.user?._id,
                 requestId: context.requestId
             });
@@ -213,11 +213,11 @@ const Mutation = {
 
             const appError = handleMongooseError(
                 error,
-                'Impossible de créer le projet',
+                'Impossible de creer le projet',
                 context.requestId
             );
 
-            logger.error('Erreur lors de la création du projet:', {
+            logger.error('Erreur lors de la creation du projet:', {
                 error: error.message,
                 stack: error.stack,
                 input,
@@ -250,21 +250,21 @@ const Mutation = {
                 );
             }
 
-            // Valider les données d'entrée
+            // Valider les donnees d'entree
             if (Object.keys(input).length === 0) {
                 throw new AppError(
-                    'Aucune donnée fournie pour la mise à jour',
+                    'Aucune donnee fournie pour la mise à jour',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
                 );
             }
 
-            // Vérifier si le projet existe
+            // Verifier si le projet existe
             const existingProjet = await Projet.findById(id).session(session);
             if (!existingProjet) {
                 throw new AppError(
-                    'Projet non trouvé',
+                    'Projet non trouve',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
@@ -316,7 +316,7 @@ const Mutation = {
     },
 
     /**
-     * Supprimer un projet et ses livrables associés
+     * Supprimer un projet et ses livrables associes
      */
     supprimerProjet: async (_, { id }, context) => {
         checkAuthorization(context, 'delete', 'projets');
@@ -335,24 +335,24 @@ const Mutation = {
                 );
             }
 
-            // Vérifier si le projet existe et le récupérer
+            // Verifier si le projet existe et le recuperer
             const projet = await Projet.findById(id).session(session);
             if (!projet) {
                 throw new AppError(
-                    'Projet non trouvé',
+                    'Projet non trouve',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
                 );
             }
 
-            // Garder une copie des données pour le retour
+            // Garder une copie des donnees pour le retour
             const projetCopy = { ...projet.toObject() };
 
             // Supprimer le projet
             await Projet.findByIdAndDelete(id, { session });
 
-            // Supprimer également les livrables associés
+            // Supprimer egalement les livrables associes
             const { deletedCount } = await require('../../models/livrable.model').deleteMany(
                 { projetId: id },
                 { session }
@@ -369,7 +369,7 @@ const Mutation = {
             }
             context.loaders.livrablesByProjetLoader.clear(id);
 
-            logger.info(`Projet supprimé: ${id}, avec ${deletedCount} livrables`, {
+            logger.info(`Projet supprime: ${id}, avec ${deletedCount} livrables`, {
                 userId: context.user?._id,
                 requestId: context.requestId
             });
@@ -430,11 +430,11 @@ const Types = {
         },
 
         /**
-         * Résolution des livrables associés au projet
+         * Resolution des livrables associes au projet
          */
         livrables: async (projet, _, context) => {
             try {
-                // Si les livrables sont déjà chargés et référencés par ID
+                // Si les livrables sont dejà charges et references par ID
                 if (projet.livrables && projet.livrables.length > 0) {
                     // Utiliser le DataLoader pour charger les livrables en batch
                     const livrablesRefs = await context.loaders.livrablesByProjetLoader.load(projet._id);
@@ -442,7 +442,7 @@ const Types = {
                 }
                 return [];
             } catch (error) {
-                logger.error('Erreur lors de la résolution des livrables:', {
+                logger.error('Erreur lors de la resolution des livrables:', {
                     error: error.message,
                     projetId: projet?._id
                 });

@@ -7,9 +7,9 @@ const { formatProjetResponse } = require('../utils/formatters');
 const authUtils = require('../utils/authUtils');
 
 /**
- * Crée un nouveau projet
- * @param {Object} data - Données du projet à créer
- * @returns {Promise<Object>} - Projet créé
+ * Cree un nouveau projet
+ * @param {Object} data - Donnees du projet à creer
+ * @returns {Promise<Object>} - Projet cree
  */
 async function creerProjet(data) {
     try {
@@ -17,19 +17,19 @@ async function creerProjet(data) {
         const projetSauvegarde = await projet.save();
         return formatProjetResponse(projetSauvegarde);
     } catch (error) {
-        logger.error(`Erreur lors de la création du projet: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la creation du projet: ${error.message}`, { stack: error.stack });
         throw error;
     }
 }
 
 /**
- * Récupère tous les projets avec filtres et pagination optionnels
+ * Recupere tous les projets avec filtres et pagination optionnels
  * @param {Object} options - Options de filtrage et pagination
- * @param {number} options.page - Page à récupérer
- * @param {number} options.limit - Nombre d'éléments par page
+ * @param {number} options.page - Page à recuperer
+ * @param {number} options.limit - Nombre d'elements par page
  * @param {string} options.statut - Filtre par statut
  * @param {string} options.tri - Champ de tri
- * @returns {Promise<Object>} - Liste paginée de projets
+ * @returns {Promise<Object>} - Liste paginee de projets
  */
 async function recupererTousProjets(options = {}) {
     try {
@@ -42,7 +42,7 @@ async function recupererTousProjets(options = {}) {
             searchQuery
         } = options;
 
-        // Construction de la requête selon les filtres
+        // Construction de la requete selon les filtres
         const query = {};
 
         if (statut) query.statut = statut;
@@ -54,7 +54,7 @@ async function recupererTousProjets(options = {}) {
             ];
         }
 
-        // Exécution parallèle pour optimisation
+        // Execution parallele pour optimisation
         const [projets, total] = await Promise.all([
             Projet.find(query)
                 .sort(tri)
@@ -75,16 +75,16 @@ async function recupererTousProjets(options = {}) {
             }
         };
     } catch (error) {
-        logger.error(`Erreur lors de la récupération des projets: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la recuperation des projets: ${error.message}`, { stack: error.stack });
         throw error;
     }
 }
 
 /**
- * Récupère un projet par son ID
+ * Recupere un projet par son ID
  * @param {string} id - ID du projet
- * @param {boolean} includeDetails - Si true, inclut les détails complets (population)
- * @returns {Promise<Object|null>} - Projet trouvé ou null
+ * @param {boolean} includeDetails - Si true, inclut les details complets (population)
+ * @returns {Promise<Object|null>} - Projet trouve ou null
  */
 async function recupererProjetParId(id, includeDetails = true) {
     try {
@@ -104,7 +104,7 @@ async function recupererProjetParId(id, includeDetails = true) {
 
         return projet ? formatProjetResponse(projet) : null;
     } catch (error) {
-        logger.error(`Erreur lors de la récupération du projet ${id}: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la recuperation du projet ${id}: ${error.message}`, { stack: error.stack });
         throw error;
     }
 }
@@ -112,7 +112,7 @@ async function recupererProjetParId(id, includeDetails = true) {
 /**
  * Met à jour un projet existant
  * @param {string} id - ID du projet
- * @param {Object} updateData - Données de mise à jour
+ * @param {Object} updateData - Donnees de mise à jour
  * @returns {Promise<Object|null>} - Projet mis à jour ou null
  */
 async function mettreAJourProjet(id, updateData) {
@@ -123,7 +123,7 @@ async function mettreAJourProjet(id, updateData) {
 
         const options = {
             new: true,           // Retourne le document mis à jour
-            runValidators: true, // Applique les validateurs du schéma
+            runValidators: true, // Applique les validateurs du schema
         };
 
         const projetMisAJour = await Projet.findByIdAndUpdate(
@@ -143,10 +143,10 @@ async function mettreAJourProjet(id, updateData) {
 /**
  * Supprime un projet par son ID
  * @param {string} id - ID du projet
- * @returns {Promise<Object|null>} - Projet supprimé ou null
+ * @returns {Promise<Object|null>} - Projet supprime ou null
  */
 async function supprimerProjet(id) {
-    // Utilisation d'une session pour assurer la cohérence transactionnelle
+    // Utilisation d'une session pour assurer la coherence transactionnelle
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -155,7 +155,7 @@ async function supprimerProjet(id) {
             throw new Error('ID de projet invalide');
         }
 
-        // Récupérer le projet pour la valeur de retour
+        // Recuperer le projet pour la valeur de retour
         const projetASupprimer = await Projet.findById(id).session(session);
 
         if (!projetASupprimer) {
@@ -167,7 +167,7 @@ async function supprimerProjet(id) {
         // Suppression du projet
         const resultatSuppression = await Projet.findByIdAndDelete(id).session(session);
 
-        // Suppression des livrables associés (optionnel - dépend de votre logique métier)
+        // Suppression des livrables associes (optionnel - depend de votre logique metier)
         await Livrable.deleteMany({ projetId: id }).session(session);
 
         // Finaliser la transaction
@@ -186,7 +186,7 @@ async function supprimerProjet(id) {
 }
 
 /**
- * Ajoute un membre à l'équipe du projet
+ * Ajoute un membre à l'equipe du projet
  * @param {string} projetId - ID du projet
  * @param {string} membreId - ID du membre à ajouter
  * @returns {Promise<Object>} - Projet mis à jour
@@ -202,24 +202,24 @@ async function ajouterMembreEquipe(projetId, membreId) {
             throw new Error('Projet introuvable');
         }
 
-        // Vérifier si le membre est déjà dans l'équipe
+        // Verifier si le membre est dejà dans l'equipe
         if (projet.equipe.includes(membreId)) {
             return formatProjetResponse(projet);
         }
 
-        // Ajouter le membre à l'équipe
+        // Ajouter le membre à l'equipe
         projet.equipe.push(membreId);
         await projet.save();
 
         return formatProjetResponse(projet);
     } catch (error) {
-        logger.error(`Erreur lors de l'ajout du membre à l'équipe: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de l'ajout du membre à l'equipe: ${error.message}`, { stack: error.stack });
         throw error;
     }
 }
 
 /**
- * Retire un membre de l'équipe du projet
+ * Retire un membre de l'equipe du projet
  * @param {string} projetId - ID du projet
  * @param {string} membreId - ID du membre à retirer
  * @returns {Promise<Object>} - Projet mis à jour
@@ -235,25 +235,25 @@ async function retirerMembreEquipe(projetId, membreId) {
             throw new Error('Projet introuvable');
         }
 
-        // Retirer le membre de l'équipe
+        // Retirer le membre de l'equipe
         projet.equipe = projet.equipe.filter(id => id.toString() !== membreId);
         await projet.save();
 
         return formatProjetResponse(projet);
     } catch (error) {
-        logger.error(`Erreur lors du retrait du membre de l'équipe: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors du retrait du membre de l'equipe: ${error.message}`, { stack: error.stack });
         throw error;
     }
 }
 
 /**
  * Analyse les risques d'un projet
- * @param {Object} params - Paramètres de l'analyse
+ * @param {Object} params - Parametres de l'analyse
  * @param {Object} params.projet - Objet projet (optionnel)
  * @param {string} params.descriptionProjet - Description du projet (optionnel)
  * @param {Array} params.jalons - Liste des jalons du projet
  * @param {Object} params.ressources - Ressources disponibles
- * @returns {Promise<Array>} - Liste des risques identifiés
+ * @returns {Promise<Array>} - Liste des risques identifies
  */
 async function analyserRisques({ projet, descriptionProjet, jalons, ressources }) {
     try {
@@ -262,7 +262,7 @@ async function analyserRisques({ projet, descriptionProjet, jalons, ressources }
             throw new Error('Le projet ou sa description est requis pour l\'analyse des risques');
         }
 
-        // Données du projet pour l'analyse
+        // Donnees du projet pour l'analyse
         const donneeProjet = projet ? {
             titre: projet.titre,
             description: projet.description,
@@ -277,47 +277,47 @@ async function analyserRisques({ projet, descriptionProjet, jalons, ressources }
         const risques = [
             {
                 risque: 'Manque de ressources',
-                gravite: 'Élevée',
+                gravite: 'elevee',
                 probabilite: 'Moyenne',
                 impact: 'Fort',
-                mitigation: 'Allouer des ressources supplémentaires ou réduire la portée du projet.',
-                indicateurs: ['Retards répétés', 'Surcharge de travail signalée']
+                mitigation: 'Allouer des ressources supplementaires ou reduire la portee du projet.',
+                indicateurs: ['Retards repetes', 'Surcharge de travail signalee']
             },
             {
                 risque: 'Retard dans les jalons',
                 gravite: 'Moyenne',
-                probabilite: 'Élevée',
+                probabilite: 'elevee',
                 impact: 'Moyen',
-                mitigation: 'Revoir les échéances et les priorités. Implémenter un suivi plus régulier.',
-                indicateurs: ['Premiers jalons manqués', 'Communication irrégulière']
+                mitigation: 'Revoir les echeances et les priorites. Implementer un suivi plus regulier.',
+                indicateurs: ['Premiers jalons manques', 'Communication irreguliere']
             },
             {
-                risque: 'Défi technique',
+                risque: 'Defi technique',
                 gravite: 'Moyenne',
                 probabilite: 'Moyenne',
                 impact: 'Moyen',
-                mitigation: 'Planifier une formation technique pour l\'équipe ou obtenir une expertise externe.',
-                indicateurs: ['Difficultés techniques signalées', 'Questions fréquentes']
+                mitigation: 'Planifier une formation technique pour l\'equipe ou obtenir une expertise externe.',
+                indicateurs: ['Difficultes techniques signalees', 'Questions frequentes']
             },
             {
                 risque: 'Communication inefficace',
                 gravite: 'Faible',
-                probabilite: 'Élevée',
+                probabilite: 'elevee',
                 impact: 'Moyen',
-                mitigation: 'Établir des canaux de communication clairs et des réunions régulières.',
-                indicateurs: ['Malentendus fréquents', 'Absence aux réunions']
+                mitigation: 'etablir des canaux de communication clairs et des reunions regulieres.',
+                indicateurs: ['Malentendus frequents', 'Absence aux reunions']
             }
         ];
 
-        // Ajustement de l'analyse en fonction des données spécifiques
+        // Ajustement de l'analyse en fonction des donnees specifiques
         if (projet && projet.equipe && projet.equipe.length < 3) {
             risques.push({
-                risque: 'Équipe sous-dimensionnée',
-                gravite: 'Élevée',
-                probabilite: 'Élevée',
+                risque: 'equipe sous-dimensionnee',
+                gravite: 'elevee',
+                probabilite: 'elevee',
                 impact: 'Fort',
-                mitigation: 'Ajouter des membres à l\'équipe ou ajuster la portée du projet.',
-                indicateurs: ['Membres de l\'équipe surchargés', 'Retards accumulés']
+                mitigation: 'Ajouter des membres à l\'equipe ou ajuster la portee du projet.',
+                indicateurs: ['Membres de l\'equipe surcharges', 'Retards accumules']
             });
         }
 
@@ -328,11 +328,11 @@ async function analyserRisques({ projet, descriptionProjet, jalons, ressources }
 
             if (joursRestants < 14) {
                 risques.push({
-                    risque: 'Délai de livraison serré',
-                    gravite: 'Élevée',
-                    probabilite: 'Élevée',
+                    risque: 'Delai de livraison serre',
+                    gravite: 'elevee',
+                    probabilite: 'elevee',
                     impact: 'Fort',
-                    mitigation: 'Revoir les priorités, simplifier certains livrables ou demander une extension.',
+                    mitigation: 'Revoir les priorites, simplifier certains livrables ou demander une extension.',
                     indicateurs: [`Seulement ${joursRestants} jours restants`, 'Nombreuses tâches en attente']
                 });
             }
@@ -348,13 +348,13 @@ async function analyserRisques({ projet, descriptionProjet, jalons, ressources }
 /**
  * Suit les tâches d'un projet avec filtrage optionnel
  * @param {Array} taches - Liste des tâches à suivre
- * @param {Object} filtre - Critères de filtrage
+ * @param {Object} filtre - Criteres de filtrage
  * @returns {Promise<Object>} - Statistiques de suivi des tâches
  */
 async function suiviTaches(taches, filtre = {}) {
     try {
         if (!taches || taches.length === 0) {
-            throw new Error('La liste des tâches est vide. Impossible de générer un rapport.');
+            throw new Error('La liste des tâches est vide. Impossible de generer un rapport.');
         }
 
         // Appliquer les filtres si fournis
@@ -366,17 +366,17 @@ async function suiviTaches(taches, filtre = {}) {
 
         // Calculs statistiques
         const total = tachesFiltrees.length;
-        const termine = tachesFiltrees.filter(t => t.statut === 'Terminé' || t.statut === 'terminé').length;
+        const termine = tachesFiltrees.filter(t => t.statut === 'Termine' || t.statut === 'termine').length;
         const enCours = tachesFiltrees.filter(t => t.statut === 'En cours').length;
         const aFaire = tachesFiltrees.filter(t => t.statut === 'À faire').length;
-        const enRetard = tachesFiltrees.filter(t => new Date(t.dateLimite) < new Date() && t.statut !== 'Terminé').length;
+        const enRetard = tachesFiltrees.filter(t => new Date(t.dateLimite) < new Date() && t.statut !== 'Termine').length;
 
         const progression = total > 0 ? Math.round((termine / total) * 100) : 0;
 
         // Regroupement par responsable
         const parResponsable = {};
         tachesFiltrees.forEach(tache => {
-            const responsable = tache.responsable || 'Non assigné';
+            const responsable = tache.responsable || 'Non assigne';
             if (!parResponsable[responsable]) {
                 parResponsable[responsable] = {
                     total: 0,
@@ -389,7 +389,7 @@ async function suiviTaches(taches, filtre = {}) {
 
             parResponsable[responsable].total += 1;
 
-            if (tache.statut === 'Terminé' || tache.statut === 'terminé') {
+            if (tache.statut === 'Termine' || tache.statut === 'termine') {
                 parResponsable[responsable].termine += 1;
             } else if (tache.statut === 'En cours') {
                 parResponsable[responsable].enCours += 1;
@@ -397,7 +397,7 @@ async function suiviTaches(taches, filtre = {}) {
                 parResponsable[responsable].aFaire += 1;
             }
 
-            if (new Date(tache.dateLimite) < new Date() && tache.statut !== 'Terminé') {
+            if (new Date(tache.dateLimite) < new Date() && tache.statut !== 'Termine') {
                 parResponsable[responsable].enRetard += 1;
             }
         });
@@ -419,7 +419,7 @@ async function suiviTaches(taches, filtre = {}) {
 }
 
 /**
- * Récupère les projets en retard qui nécessitent une attention
+ * Recupere les projets en retard qui necessitent une attention
  * @returns {Promise<Array>} - Liste des projets en retard
  */
 async function recupererProjetsEnRetard() {
@@ -429,9 +429,9 @@ async function recupererProjetsEnRetard() {
         thresholdDate.setDate(today.getDate() + 14); // Projets avec moins de 14 jours restants
 
         const projetsEnRetard = await Projet.find({
-            statut: { $ne: 'Terminé' },
+            statut: { $ne: 'Termine' },
             $or: [
-                { dateFin: { $lt: today } }, // Date de fin passée
+                { dateFin: { $lt: today } }, // Date de fin passee
                 { dateFin: { $lt: thresholdDate } } // Moins de 14 jours restants
             ]
         }).populate('tuteur', 'nom prenom email')
@@ -444,7 +444,7 @@ async function recupererProjetsEnRetard() {
             estEnRetard: new Date(projet.dateFin) < today
         }));
     } catch (error) {
-        logger.error(`Erreur lors de la récupération des projets en retard: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la recuperation des projets en retard: ${error.message}`, { stack: error.stack });
         throw error;
     }
 }

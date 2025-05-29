@@ -12,15 +12,15 @@ const { ValidationError } = require('../middleware/errorHandlers');
 const logger = require('../utils/logger');
 
 /**
- * Middleware de validation pour les requêtes projet
+ * Middleware de validation pour les requetes projet
  * @function validateProjet
- * @param {Object} req - Objet requête Express
- * @param {Object} res - Objet réponse Express
+ * @param {Object} req - Objet requete Express
+ * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next
  */
 const validateProjet = (schema) => async (req, res, next) => {
     try {
-        // Valider les données avec le schéma Yup fourni
+        // Valider les donnees avec le schema Yup fourni
         await schema.validate(req.body, {
             abortEarly: false,
             stripUnknown: true,
@@ -31,10 +31,10 @@ const validateProjet = (schema) => async (req, res, next) => {
             }
         });
 
-        // Validation réussie
+        // Validation reussie
         next();
     } catch (error) {
-        // Convertir les erreurs Yup en format standardisé
+        // Convertir les erreurs Yup en format standardise
         const errors = error.inner.map(err => ({
             field: err.path,
             message: err.message,
@@ -42,15 +42,15 @@ const validateProjet = (schema) => async (req, res, next) => {
         }));
 
         // Journaliser l'erreur
-        logger.warn('Validation du projet échouée', {
+        logger.warn('Validation du projet echouee', {
             path: req.path,
             method: req.method,
             errors
         });
 
-        // Créer une erreur de validation standardisée
+        // Creer une erreur de validation standardisee
         const validationError = new ValidationError(
-            'Validation du projet échouée',
+            'Validation du projet echouee',
             errors
         );
 
@@ -60,46 +60,46 @@ const validateProjet = (schema) => async (req, res, next) => {
 };
 
 /**
- * Middleware pour vérifier les autorisations de modification d'un projet
+ * Middleware pour verifier les autorisations de modification d'un projet
  * @function checkProjetPermissions
- * @param {Object} req - Objet requête Express
- * @param {Object} res - Objet réponse Express
+ * @param {Object} req - Objet requete Express
+ * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next
  */
 const checkProjetPermissions = async (req, res, next) => {
     try {
-        // Si l'utilisateur est admin, autoriser toutes les opérations
+        // Si l'utilisateur est admin, autoriser toutes les operations
         if (req.user && req.user.role === 'ADMIN') {
             return next();
         }
 
-        // Récupérer le projet
+        // Recuperer le projet
         const Projet = require('../models/projet.model');
         const projet = await Projet.findById(req.params.id);
 
-        // Vérifier si le projet existe
+        // Verifier si le projet existe
         if (!projet) {
             return next(new ValidationError('Projet introuvable'));
         }
 
-        // Vérifier si l'utilisateur est le créateur ou le tuteur
+        // Verifier si l'utilisateur est le createur ou le tuteur
         const isTuteur = projet.tuteur.equals(req.user._id);
         const isCreateur = projet.createur.equals(req.user._id);
         const isTeamMember = projet.equipe.some(membre => membre.equals(req.user._id));
 
-        // Si c'est un membre de l'équipe et qu'on est en GET, autoriser
+        // Si c'est un membre de l'equipe et qu'on est en GET, autoriser
         if (req.method === 'GET' && (isTeamMember || isTuteur || isCreateur)) {
             return next();
         }
 
-        // Pour les autres méthodes, vérifier les droits plus restrictifs
+        // Pour les autres methodes, verifier les droits plus restrictifs
         if (isTuteur || isCreateur) {
             return next();
         }
 
-        // Sinon, refuser l'accès
+        // Sinon, refuser l'acces
         throw new ValidationError(
-            'Vous n\'avez pas les autorisations nécessaires pour cette opération',
+            'Vous n\'avez pas les autorisations necessaires pour cette operation',
             403
         );
     } catch (error) {

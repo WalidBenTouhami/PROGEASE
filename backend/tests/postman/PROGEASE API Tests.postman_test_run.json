@@ -14,7 +14,7 @@
 	"results": [
 		{
 			"id": "534528f6-9672-4cb8-885f-b9a8b23862fe",
-			"name": "Vérifier l'état du serveur",
+			"name": "Verifier l'etat du serveur",
 			"url": "http://localhost:3000/health",
 			"time": 4,
 			"responseCode": {
@@ -47,7 +47,7 @@
 		},
 		{
 			"id": "d78a1387-12bb-48a5-a043-71b551c700a8",
-			"name": "2.1 Créer un projet",
+			"name": "2.1 Creer un projet",
 			"url": "http://localhost:3000/api/projets",
 			"time": 86,
 			"responseCode": {
@@ -212,7 +212,7 @@
 		},
 		{
 			"id": "b7dfc3e0-49cc-42fb-ad84-05a9d7bdf5c0",
-			"name": "3.1 Créer un livrable",
+			"name": "3.1 Creer un livrable",
 			"url": "http://localhost:3000/api/livrables",
 			"time": 3,
 			"responseCode": {

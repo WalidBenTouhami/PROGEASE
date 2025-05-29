@@ -18,8 +18,11 @@ export class LivrableFormComponent implements OnInit {
   livrableForm!: FormGroup;
   statutsLivrable = [
     StatutLivrable.EN_ATTENTE,
+    StatutLivrable.EN_COURS,
     StatutLivrable.EN_RETARD,
-    StatutLivrable.TERMINE
+    StatutLivrable.TERMINE,
+    StatutLivrable.VALIDE,
+    StatutLivrable.REJETE
   ];
 
   constructor(private fb: FormBuilder) {}

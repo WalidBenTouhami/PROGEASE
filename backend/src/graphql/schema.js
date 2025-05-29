@@ -2,7 +2,7 @@
 const { gql } = require('apollo-server-express');
 const { resolvers } = require('./index');
 
-// Définition du schéma GraphQL simplifié pour passer les tests Newman
+// Definition du schema GraphQL simplifie pour passer les tests Newman
 const typeDefs = gql`
   scalar Date
 

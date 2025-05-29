@@ -19,5 +19,5 @@ dataSources.local.xml
 # Task management files
 todo
 
-# Ignorer tous les répertoires node_modules
+# Ignorer tous les repertoires node_modules
 **/node_modules/

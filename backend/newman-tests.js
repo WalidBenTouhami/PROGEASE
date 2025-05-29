@@ -7,18 +7,18 @@ const fs = require('fs');
 const currentUser = 'WalidBenTouhami';
 const baseUrl = 'http://localhost:5000';
 
-// Vérifier que le serveur est accessible avant d'exécuter les tests
+// Verifier que le serveur est accessible avant d'executer les tests
 async function checkServerAvailability() {
   try {
     await axios.get(`${baseUrl}/health`, { timeout: 5000 });
-    console.log('✅ Serveur accessible, exécution des tests...');
+    console.log('✅ Serveur accessible, execution des tests...');
     return true;
   } catch (error) {
-    console.error('❌ Impossible de se connecter au serveur. Assurez-vous que le serveur est en cours d\'exécution sur', baseUrl);
+    console.error('❌ Impossible de se connecter au serveur. Assurez-vous que le serveur est en cours d\'execution sur', baseUrl);
     if (error.response) {
       console.error(`Code d'erreur: ${error.response.status}`);
     } else if (error.request) {
-      console.error('Aucune réponse reçue du serveur');
+      console.error('Aucune reponse reçue du serveur');
     } else {
       console.error('Erreur:', error.message);
     }
@@ -26,7 +26,7 @@ async function checkServerAvailability() {
   }
 }
 
-// Vérifier l'existence des fichiers de test
+// Verifier l'existence des fichiers de test
 function checkFilesExist() {
   const collection = path.join(__dirname, 'tests', 'postman', 'PROGEASE.postman_collection.json');
   const environment = path.join(__dirname, 'tests', 'postman', 'PROGEASE.postman_environment.json');
@@ -48,19 +48,19 @@ function formatDate(date) {
   return date.toISOString().replace('T', ' ').slice(0, 19);
 }
 
-// Exécuter les tests Newman
+// Executer les tests Newman
 async function runNewmanTests() {
-  // Vérifier la disponibilité du serveur
+  // Verifier la disponibilite du serveur
   const serverAvailable = await checkServerAvailability();
   if (!serverAvailable) {
-    console.error('Tests annulés: serveur inaccessible');
+    console.error('Tests annules: serveur inaccessible');
     process.exit(1);
   }
 
-  // Vérifier l'existence des fichiers
+  // Verifier l'existence des fichiers
   const files = checkFilesExist();
   if (!files) {
-    console.error('Tests annulés: fichiers de test manquants');
+    console.error('Tests annules: fichiers de test manquants');
     process.exit(1);
   }
 
@@ -68,7 +68,7 @@ async function runNewmanTests() {
   const now = new Date();
   const dateFormat = now.toISOString().replace(/[T:\.]/g, '-').slice(0, -5);
 
-  // Date formatée pour les logs
+  // Date formatee pour les logs
   const formattedDate = formatDate(now);
 
   // Assurer l'existence du dossier de rapports
@@ -78,14 +78,14 @@ async function runNewmanTests() {
       fs.mkdirSync(reportsDir, { recursive: true });
     }
   } catch (error) {
-    console.error('❌ Erreur lors de la création du dossier de rapports:', error.message);
+    console.error('❌ Erreur lors de la creation du dossier de rapports:', error.message);
     process.exit(1);
   }
 
   // Nom du rapport avec timestamp actuel
   const reportName = `rapport-${dateFormat}`;
 
-  console.log(`Exécution des tests Newman par ${currentUser} à ${formattedDate}`);
+  console.log(`Execution des tests Newman par ${currentUser} à ${formattedDate}`);
 
   // Options de Newman
   newman.run({
@@ -110,16 +110,16 @@ async function runNewmanTests() {
       { key: "baseUrl", value: baseUrl },
       { key: "testDate", value: "2025-05-27 19:36:32" }
     ],
-    timeoutRequest: 10000, // 10 secondes de timeout pour chaque requête
+    timeoutRequest: 10000, // 10 secondes de timeout pour chaque requete
     timeout: 120000, // 2 minutes de timeout global
     color: "on"
   }, function (err, summary) {
     if (err) {
-      console.error('❌ Échec de l\'exécution Newman:', err);
+      console.error('❌ echec de l\'execution Newman:', err);
       process.exit(1);
     }
 
-    // Afficher un résumé des résultats
+    // Afficher un resume des resultats
     if (summary && summary.run && summary.run.stats) {
       const stats = summary.run.stats;
       const failures = stats.failures ? stats.failures.length : 0;
@@ -127,26 +127,26 @@ async function runNewmanTests() {
       const success = total - failures;
       const successRate = total > 0 ? Math.round((success / total) * 100) : 0;
 
-      console.log('\n📊 Résumé des tests:');
+      console.log('\n📊 Resume des tests:');
       console.log('┌───────────────┬─────────────┐');
       console.log(`│ Total         │ ${String(total).padStart(11)} │`);
-      console.log(`│ Réussis       │ ${String(success).padStart(11)} │`);
-      console.log(`│ Échoués       │ ${String(failures).padStart(11)} │`);
-      console.log(`│ Taux de succès│ ${String(successRate + '%').padStart(11)} │`);
+      console.log(`│ Reussis       │ ${String(success).padStart(11)} │`);
+      console.log(`│ echoues       │ ${String(failures).padStart(11)} │`);
+      console.log(`│ Taux de succes│ ${String(successRate + '%').padStart(11)} │`);
       console.log('└───────────────┴─────────────┘');
-      console.log(`📄 Rapport généré: ${path.join(reportsDir, `${reportName}.html`)}`);
+      console.log(`📄 Rapport genere: ${path.join(reportsDir, `${reportName}.html`)}`);
 
       if (failures > 0) {
-        console.log('⚠️  Des tests ont échoué, consultez le rapport pour plus de détails.');
+        console.log('⚠️  Des tests ont echoue, consultez le rapport pour plus de details.');
       } else {
-        console.log('✅ Tous les tests ont réussi!');
+        console.log('✅ Tous les tests ont reussi!');
       }
     }
   });
 }
 
-// Exécuter les tests
+// Executer les tests
 runNewmanTests().catch(error => {
-  console.error('❌ Erreur non gérée:', error);
+  console.error('❌ Erreur non geree:', error);
   process.exit(1);
 });

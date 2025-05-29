@@ -1,13 +1,13 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-// Tableau des variables nécessaires et fonction pour vérifier/logger sans crash
+// Tableau des variables necessaires et fonction pour verifier/logger sans crash
 const VARIABLES_ENV_OBLIGATOIRES = {
     CRITIQUES: ["MONGO_URI", "JWT_SECRET"],
     RECOMMANDEES: ["PORT", "DEEPSEEK_API_KEY"]
 };
 
-// Vérification sans crash immédiat pour les variables recommandées
+// Verification sans crash immediat pour les variables recommandees
 const variablesManquantes = {
     critiques: [],
     recommandees: []
@@ -31,25 +31,30 @@ if (variablesManquantes.critiques.length) {
 }
 
 if (variablesManquantes.recommandees.length) {
-    console.warn(`⚠️ Variables d'environnement recommandées manquantes: ${variablesManquantes.recommandees.join(', ')}`);
+    console.warn(`⚠️ Variables d'environnement recommandees manquantes: ${variablesManquantes.recommandees.join(', ')}`);
 }
 
-// Enum utilisés dans le système
+// Enum utilises dans le systeme
 const Enum = Object.freeze({
     StatutProjet: {
         BROUILLON: "Brouillon",
-        EN_COURS: "En cours",
-        TERMINE: "Terminé",
-        ARCHIVE: "Archivé",
+        EN_COURS: "En_cours",
+        TERMINE: "Termine",
+        ARCHIVE: "Archive",
+        EN_RETARD: "En_retard",
+        A_VENIR: "A_venir",
     },
     StatutLivrable: {
-        TERMINE: "Termine",
-        EN_ATTENTE: "En attente",
-        EN_RETARD: "En retard",
+        EN_ATTENTE: 'En_attente',
+        EN_COURS: 'En_cours',
+        EN_RETARD: 'En_retard',
+        TERMINE: 'Termine',
+        VALIDE: 'Valide',
+        REJETE: 'Rejete'
     },
 });
 
-// Sécurité avec valeurs de production plus strictes
+// Securite avec valeurs de production plus strictes
 const ConfigSecurite = Object.freeze({
     JWT: {
         // 1 jour en dev, 2h en production
@@ -66,7 +71,7 @@ const ConfigSecurite = Object.freeze({
     },
     RATE_LIMIT: {
         WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000, // 15 minutes
-        MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX, 10) || 100, // 100 requêtes
+        MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX, 10) || 100, // 100 requetes
     }
 });
 
@@ -78,15 +83,15 @@ const PaginationParDefaut = Object.freeze({
 
 const MessagesErreur = Object.freeze({
     GENERAL: {
-        NON_TROUVE: "Ressource non trouvée.",
+        NON_TROUVE: "Ressource non trouvee.",
         ERREUR_SERVEUR: "Erreur serveur interne.",
-        NON_AUTORISE: "Accès non autorisé.",
+        NON_AUTORISE: "Acces non autorise.",
         INTERDIT: "Action interdite.",
         ID_INVALIDE: "ID invalide.",
-        VALIDATION: "Erreur de validation des données."
+        VALIDATION: "Erreur de validation des donnees."
     },
     PROJET: {
-        MEMBRE_EQUIPE_INVALIDE: "Un membre de l'équipe est invalide.",
+        MEMBRE_EQUIPE_INVALIDE: "Un membre de l'equipe est invalide.",
         NON_TROUVE: "Projet introuvable.",
     },
     LIVRABLE: {
@@ -118,16 +123,6 @@ module.exports = {
     MessagesErreur,
     StatutHttp,
     NODE_ENV: process.env.NODE_ENV || 'development',
-    STATUTS_PROJET: Object.freeze({
-        BROUILLON: "Brouillon",
-        EN_COURS: "En cours",
-        TERMINE: "Terminé",
-        ARCHIVE: "Archivé",
-    }),
-    STATUTS_LIVRABLE: Object.freeze({
-        TERMINE: "Termine",
-        EN_ATTENTE: "En attente",
-        EN_RETARD: "En retard",
-    })
+
 };
 

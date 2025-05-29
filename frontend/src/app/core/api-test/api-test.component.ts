@@ -155,7 +155,7 @@ export class ApiTestComponent {
     this.aiResult = null;
     this.aiError = null;
 
-    const prompt = "Résumer les avantages d'une gestion de projet académique";
+    const prompt = "Resumer les avantages d'une gestion de projet academique";
 
     this.apiTester.testAIService(prompt).subscribe({
       next: (result) => {

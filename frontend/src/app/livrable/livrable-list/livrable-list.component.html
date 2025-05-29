@@ -14,7 +14,7 @@
       }">{{ livrable.statut }}</span>
       <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant le <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
       <!-- <span *ngIf="livrable.urlDepot">
-        &nbsp;| <a [href]="livrable.urlDepot" target="_blank" rel="noopener">Dépôt</a>
+        &nbsp;| <a [href]="livrable.urlDepot" target="_blank" rel="noopener">Depôt</a>
       </span> -->
     </li>
   </ul>

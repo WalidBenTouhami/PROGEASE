@@ -1,74 +1,74 @@
 /**
- * Module de cache pour les requêtes fréquentes
- * Utilise la mémoire par défaut mais peut être connecté à Redis
+ * Module de cache pour les requetes frequentes
+ * Utilise la memoire par defaut mais peut etre connecte à Redis
  */
 
 const NodeCache = require('node-cache');
 const logger = require('./logger');
 
-// Cache en mémoire par défaut
+// Cache en memoire par defaut
 const memoryCache = new NodeCache({
-    stdTTL: 600,  // 10 minutes par défaut
-    checkperiod: 120,  // Vérification toutes les 2 minutes
+    stdTTL: 600,  // 10 minutes par defaut
+    checkperiod: 120,  // Verification toutes les 2 minutes
     useClones: false
 });
 
-// Interface commune pour différents types de cache
+// Interface commune pour differents types de cache
 class Cache {
     constructor() {
         this.provider = memoryCache;
         this.isConnected = true;
-        logger.info('Cache mémoire initialisé');
+        logger.info('Cache memoire initialise');
     }
 
     /**
-     * Récupérer une valeur du cache
-     * @param {string} key - Clé d'accès
-     * @returns {Promise<Object|null>} Valeur ou null si non trouvée
+     * Recuperer une valeur du cache
+     * @param {string} key - Cle d'acces
+     * @returns {Promise<Object|null>} Valeur ou null si non trouvee
      */
     async get(key) {
         try {
             return this.provider.get(key) || null;
         } catch (error) {
-            logger.error(`Erreur de cache (get) pour la clé ${key}:`, error);
+            logger.error(`Erreur de cache (get) pour la cle ${key}:`, error);
             return null;
         }
     }
 
     /**
      * Mettre en cache une valeur
-     * @param {string} key - Clé d'accès
+     * @param {string} key - Cle d'acces
      * @param {Object} value - Valeur à mettre en cache
-     * @param {number} ttl - Durée de vie en secondes
-     * @returns {Promise<boolean>} Succès de l'opération
+     * @param {number} ttl - Duree de vie en secondes
+     * @returns {Promise<boolean>} Succes de l'operation
      */
     async set(key, value, ttl = 600) {
         try {
             return this.provider.set(key, value, ttl);
         } catch (error) {
-            logger.error(`Erreur de cache (set) pour la clé ${key}:`, error);
+            logger.error(`Erreur de cache (set) pour la cle ${key}:`, error);
             return false;
         }
     }
 
     /**
      * Supprimer une valeur du cache
-     * @param {string} key - Clé d'accès
-     * @returns {Promise<boolean>} Succès de l'opération
+     * @param {string} key - Cle d'acces
+     * @returns {Promise<boolean>} Succes de l'operation
      */
     async del(key) {
         try {
             return this.provider.del(key) > 0;
         } catch (error) {
-            logger.error(`Erreur de cache (del) pour la clé ${key}:`, error);
+            logger.error(`Erreur de cache (del) pour la cle ${key}:`, error);
             return false;
         }
     }
 
     /**
-     * Supprimer les entrées par préfixe
-     * @param {string} prefix - Préfixe de clé
-     * @returns {Promise<number>} Nombre d'entrées supprimées
+     * Supprimer les entrees par prefixe
+     * @param {string} prefix - Prefixe de cle
+     * @returns {Promise<number>} Nombre d'entrees supprimees
      */
     async delByPrefix(prefix) {
         try {
@@ -80,14 +80,14 @@ class Cache {
             }
             return 0;
         } catch (error) {
-            logger.error(`Erreur de cache (delByPrefix) pour le préfixe ${prefix}:`, error);
+            logger.error(`Erreur de cache (delByPrefix) pour le prefixe ${prefix}:`, error);
             return 0;
         }
     }
 
     /**
-     * Vider complètement le cache
-     * @returns {Promise<boolean>} Succès de l'opération
+     * Vider completement le cache
+     * @returns {Promise<boolean>} Succes de l'operation
      */
     async flush() {
         try {

@@ -13,17 +13,17 @@ const { ValidationError } = require('../middleware/errorHandlers');
 const logger = require('../utils/logger');
 
 /**
- * Middleware de validation pour les requêtes de livrables
+ * Middleware de validation pour les requetes de livrables
  * @function validateLivrable
- * @param {Object} req - Objet requête Express
- * @param {Object} res - Objet réponse Express
+ * @param {Object} req - Objet requete Express
+ * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next d'Express
  */
 const validateLivrable = (req, res, next) => {
-    // Récupérer les erreurs de validation
+    // Recuperer les erreurs de validation
     const errors = validationResult(req);
 
-    // Si des erreurs sont présentes, les traiter
+    // Si des erreurs sont presentes, les traiter
     if (!errors.isEmpty()) {
         // Formater les erreurs de validation
         const formattedErrors = errors.array().map(err => ({
@@ -33,15 +33,15 @@ const validateLivrable = (req, res, next) => {
         }));
 
         // Journaliser l'erreur
-        logger.warn('Validation du livrable échouée', {
+        logger.warn('Validation du livrable echouee', {
             path: req.path,
             method: req.method,
             errors: formattedErrors
         });
 
-        // Créer une erreur de validation standardisée
+        // Creer une erreur de validation standardisee
         const validationError = new ValidationError(
-            'Validation du livrable échouée',
+            'Validation du livrable echouee',
             formattedErrors
         );
 
@@ -54,52 +54,52 @@ const validateLivrable = (req, res, next) => {
 };
 
 /**
- * Middleware pour vérifier les autorisations d'accès à un livrable
+ * Middleware pour verifier les autorisations d'acces à un livrable
  * @function checkLivrablePermissions
- * @param {Object} req - Objet requête Express
- * @param {Object} res - Objet réponse Express
+ * @param {Object} req - Objet requete Express
+ * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next d'Express
  */
 const checkLivrablePermissions = async (req, res, next) => {
     try {
-        // Si l'utilisateur est admin, autoriser toutes les opérations
+        // Si l'utilisateur est admin, autoriser toutes les operations
         if (req.user && req.user.role === 'ADMIN') {
             return next();
         }
 
-        // Récupérer le livrable et le projet associé
+        // Recuperer le livrable et le projet associe
         const Livrable = require('../models/livrable.model');
         const Projet = require('../models/projet.model');
 
         const livrable = await Livrable.findById(req.params.id);
 
-        // Vérifier si le livrable existe
+        // Verifier si le livrable existe
         if (!livrable) {
             return next(new ValidationError('Livrable introuvable'));
         }
 
-        // Récupérer le projet associé
+        // Recuperer le projet associe
         const projet = await Projet.findById(livrable.projetId);
 
-        // Vérifier si l'utilisateur est le tuteur ou le créateur du projet
+        // Verifier si l'utilisateur est le tuteur ou le createur du projet
         const isTuteur = projet.tuteur.equals(req.user._id);
         const isProjetCreateur = projet.createur.equals(req.user._id);
         const isLivrableCreateur = livrable.createur && livrable.createur.equals(req.user._id);
         const isTeamMember = projet.equipe.some(membre => membre.equals(req.user._id));
 
-        // Pour les lectures, autoriser l'équipe
+        // Pour les lectures, autoriser l'equipe
         if (req.method === 'GET' && (isTeamMember || isTuteur || isProjetCreateur || isLivrableCreateur)) {
             return next();
         }
 
-        // Pour les modifications, vérifier les droits plus restrictifs
+        // Pour les modifications, verifier les droits plus restrictifs
         if (isTuteur || isProjetCreateur || isLivrableCreateur) {
             return next();
         }
 
-        // Sinon, refuser l'accès
+        // Sinon, refuser l'acces
         throw new ValidationError(
-            'Vous n\'avez pas les autorisations nécessaires pour cette opération',
+            'Vous n\'avez pas les autorisations necessaires pour cette operation',
             403
         );
     } catch (error) {
@@ -107,7 +107,7 @@ const checkLivrablePermissions = async (req, res, next) => {
     }
 };
 
-// Exportations pour compatibilité avec le code existant
+// Exportations pour compatibilite avec le code existant
 module.exports = validateLivrable;
 
 // Exportations des fonctions individuelles

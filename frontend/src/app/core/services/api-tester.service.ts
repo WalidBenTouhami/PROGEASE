@@ -47,7 +47,7 @@ export class ApiTesterService {
   }
 
   private handleError(error: any): Observable<never> {
-    const errorMessage = 'Erreur lors de la requête API : ' + (error.message || error.statusText);
+    const errorMessage = 'Erreur lors de la requete API : ' + (error.message || error.statusText);
     this.alertService.error(errorMessage);
     return throwError(() => new Error(errorMessage));
   }

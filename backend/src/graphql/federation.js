@@ -3,13 +3,13 @@
 const { GraphQLScalarType, Kind } = require('graphql');
 const { resolvers } = require('./index');
 
-// Définition du schéma GraphQL
+// Definition du schema GraphQL
 const typeDefs = `#graphql
-# Directive pour la fédération Apollo v2
+# Directive pour la federation Apollo v2
 extend schema
 @link(url: "https://specs.apollo.dev/federation/v2.3", import: ["@key"])
 
-# 📌 Enumération StatutLivrable
+# 📌 Enumeration StatutLivrable
 enum StatutLivrable {
     EN_RETARD
     EN_ATTENTE
@@ -29,7 +29,7 @@ type Livrable {
     majLe: String
 }
 
-# 📌 Type d'entrée pour Livrable
+# 📌 Type d'entree pour Livrable
 input LivrableInput {
     nom: String!
     description: String!
@@ -38,7 +38,7 @@ input LivrableInput {
     statut: StatutLivrable
 }
 
-# 📌 Type Projet avec directive de fédération
+# 📌 Type Projet avec directive de federation
 type Projet @key(fields: "_id") {
     _id: ID!
     titre: String!

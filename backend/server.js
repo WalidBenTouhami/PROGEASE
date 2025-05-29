@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const path = require('path');
 const http = require('http');
-const helmet = require('helmet'); // Ajouter helmet pour la sécurité
+const helmet = require('helmet'); // Ajouter helmet pour la securite
 const logger = require('./src/utils/logger');
 const connecterBD = require('./config/db');
 const { createStandaloneServer } = require('./src/graphql/standalone-server');
@@ -14,12 +14,12 @@ const { NODE_ENV } = require('./config/constants');
 const { globalRateLimiter } = require('./src/middleware/rateLimiter');
 const { graphqlHTTP } = require('express-graphql');
 
-// Import du schéma GraphQL principal (typeDefs)
+// Import du schema GraphQL principal (typeDefs)
 const { typeDefs } = require('./src/graphql/schema');
 const { makeExecutableSchema } = require('@graphql-tools/schema');
 const { resolvers } = require('./src/graphql');
 
-// Créer le schéma exécutable à partir des typeDefs et resolvers
+// Creer le schema executable à partir des typeDefs et resolvers
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
 const {
@@ -41,9 +41,9 @@ setupProcessErrorHandlers();
 // Configuration des gestionnaires d'erreurs HTTP
 setupHttpErrorHandlers(httpServer, PORT);
 
-// Middlewares de sécurité et performance
+// Middlewares de securite et performance
 app.use(helmet({
-    contentSecurityPolicy: false // Désactiver pour GraphQL Playground en dev
+    contentSecurityPolicy: false // Desactiver pour GraphQL Playground en dev
 }));
 app.use(cors({
     origin: process.env.ALLOWED_ORIGINS?.split(',') ||
@@ -61,11 +61,11 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'src', 'public')));
 
-// Logging des requêtes
+// Logging des requetes
 if (NODE_ENV === 'development') {
     app.use(morgan('dev'));
 } else {
-    // Format personnalisé pour la production
+    // Format personnalise pour la production
     app.use(morgan(':remote-addr - :method :url :status :res[content-length] - :response-time ms', {
         stream: {
             write: (message) => logger.http(message.trim())
@@ -78,7 +78,7 @@ app.use((req, res, next) => {
     req.currentUser = req.headers['x-user'] || 'WalidBenTouhami';
     req.timestamp = new Date().toISOString();
 
-    // Ajouter des en-têtes de sécurité
+    // Ajouter des en-tetes de securite
     res.set('X-XSS-Protection', '1; mode=block');
     res.set('X-Content-Type-Options', 'nosniff');
     res.set('X-Frame-Options', 'DENY');
@@ -86,7 +86,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// Gestion simple du favicon pour éviter les 404
+// Gestion simple du favicon pour eviter les 404
 app.get('/favicon.ico', (req, res) => {
     res.status(204).end();
 });
@@ -101,7 +101,7 @@ app.use('/api/projets', projetRoutes);
 app.use('/api/livrables', livrableRoutes);
 app.use('/api/ai', aiRoutes);
 
-// Point d'entrée API
+// Point d'entree API
 app.get('/api', (req, res) => {
     res.json({
         status: 'ok',
@@ -112,7 +112,7 @@ app.get('/api', (req, res) => {
     });
 });
 
-// Endpoint de santé
+// Endpoint de sante
 app.get('/health', (req, res) => {
     const uptime = process.uptime();
     res.json({
@@ -128,12 +128,12 @@ app.get('/health', (req, res) => {
 
 // Configuration GraphQL
 if (process.env.USE_APOLLO_SERVER === 'true') {
-    // Apollo Server (moderne, recommandé)
+    // Apollo Server (moderne, recommande)
     createStandaloneServer(app, httpServer, schema)
-        .then(() => logger.info('Serveur Apollo Standalone configuré'))
+        .then(() => logger.info('Serveur Apollo Standalone configure'))
         .catch(error => {
             logger.error('Erreur Apollo Server, fallback sur express-graphql:', error.message);
-            // Fallback express graphql si Apollo échoue
+            // Fallback express graphql si Apollo echoue
             app.use('/graphql', graphqlHTTP({
                 schema,
                 graphiql: true,
@@ -174,31 +174,31 @@ if (process.env.USE_APOLLO_SERVER === 'true') {
 // Serveur principal
 async function startServer() {
     try {
-        // Connexion à la base de données
+        // Connexion à la base de donnees
         await connecterBD(process.env.MONGO_URI || 'mongodb://localhost:27017/progease');
-        logger.info('Connecté à MongoDB avec succès');
+        logger.info('Connecte à MongoDB avec succes');
 
-        // Créer les données de test pour Newman
+        // Creer les donnees de test pour Newman
         try {
             const { createTestData } = require('./src/utils/testData');
             if (NODE_ENV === 'development') {
                 await createTestData();
-                logger.info('Données de test créées/vérifiées avec succès');
+                logger.info('Donnees de test creees/verifiees avec succes');
             }
         } catch (error) {
-            logger.warn('Impossible de créer les données de test:', error.message);
+            logger.warn('Impossible de creer les donnees de test:', error.message);
         }
 
-        // Middleware d'erreurs 404 - doit être après les routes ET après Apollo/GraphQL
+        // Middleware d'erreurs 404 - doit etre apres les routes ET apres Apollo/GraphQL
         app.use(notFoundHandler);
 
         // Middleware de gestion des erreurs
         app.use(errorHandler);
 
-        // Démarrage du serveur HTTP
+        // Demarrage du serveur HTTP
         await new Promise(resolve => {
             httpServer.listen(PORT, () => {
-                logger.info(`Serveur Express démarré sur le port ${PORT} en mode ${NODE_ENV}`);
+                logger.info(`Serveur Express demarre sur le port ${PORT} en mode ${NODE_ENV}`);
                 logger.info(`API REST disponible sur http://localhost:${PORT}/api`);
                 logger.info(`GraphQL v4 disponible sur http://localhost:${PORT}/graphql`);
 

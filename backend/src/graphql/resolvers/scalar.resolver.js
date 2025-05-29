@@ -1,5 +1,5 @@
 /**
- * Resolvers GraphQL pour les scalaires personnalisés
+ * Resolvers GraphQL pour les scalaires personnalises
  *
  * @module graphql/resolvers/scalar
  * @created 2025-05-27 par WalidBenTouhami
@@ -9,10 +9,10 @@
 
 const { GraphQLScalarType, Kind } = require('graphql');
 
-// Scalar Date personnalisé
+// Scalar Date personnalise
 const DateScalar = new GraphQLScalarType({
     name: 'Date',
-    description: 'Type Date personnalisé',
+    description: 'Type Date personnalise',
 
     // Serialization du serveur vers le client
     serialize(value) {

@@ -1,6 +1,6 @@
 /**
- * PROGEASE - Exécution des tests GraphQL
- * Ce script exécute les tests GraphQL générés
+ * PROGEASE - Execution des tests GraphQL
+ * Ce script execute les tests GraphQL generes
  * Date: 2025-05-28 09:25:45
  * Utilisateur: WalidBenTouhami
  */
@@ -29,12 +29,12 @@ const config = {
     currentDate: '2025-05-28 09:25:45'
 };
 
-// Fonction d'aide pour les textes colorés
+// Fonction d'aide pour les textes colores
 function colorize(text, color) {
     return `${colors[color]}${text}${colors.reset}`;
 }
 
-// Bannière d'information
+// Banniere d'information
 function showBanner() {
     console.log('╔══════════════════════════════════════════════════════════════╗');
     console.log('║                  PROGEASE - Tests GraphQL                    ║');
@@ -47,19 +47,19 @@ function showBanner() {
 // Traiter les fichiers de test GraphQL
 async function processGraphQLTests() {
     try {
-        // Vérifier l'existence du dossier de tests
+        // Verifier l'existence du dossier de tests
         try {
             await fs.access(config.testsDir);
         } catch (err) {
             console.error(colorize(`Le dossier des tests GraphQL n'existe pas: ${config.testsDir}`, 'red'));
-            console.log(colorize('Exécutez d\'abord le générateur de tests avec: node tools/test-generator.js', 'yellow'));
-            console.log(colorize('\nTentative de création du dossier de tests...', 'blue'));
+            console.log(colorize('Executez d\'abord le generateur de tests avec: node tools/test-generator.js', 'yellow'));
+            console.log(colorize('\nTentative de creation du dossier de tests...', 'blue'));
 
             try {
                 await fs.mkdir(config.testsDir, { recursive: true });
-                console.log(colorize('Dossier de tests créé avec succès. Générez des tests avec le générateur.', 'green'));
+                console.log(colorize('Dossier de tests cree avec succes. Generez des tests avec le generateur.', 'green'));
             } catch (mkdirErr) {
-                console.error(colorize('Impossible de créer le dossier de tests.', 'red'));
+                console.error(colorize('Impossible de creer le dossier de tests.', 'red'));
             }
 
             process.exit(1);
@@ -70,11 +70,11 @@ async function processGraphQLTests() {
         const graphqlFiles = files.filter(file => file.endsWith('.graphql'));
 
         if (graphqlFiles.length === 0) {
-            console.log(colorize('Aucun fichier de test GraphQL trouvé.', 'yellow'));
+            console.log(colorize('Aucun fichier de test GraphQL trouve.', 'yellow'));
             return;
         }
 
-        console.log(colorize(`\n📝 Fichiers de test trouvés: ${graphqlFiles.length}\n`, 'blue'));
+        console.log(colorize(`\n📝 Fichiers de test trouves: ${graphqlFiles.length}\n`, 'blue'));
 
         let totalTests = 0;
         let passedTests = 0;
@@ -84,22 +84,22 @@ async function processGraphQLTests() {
             const filePath = path.join(config.testsDir, file);
             const content = await fs.readFile(filePath, 'utf8');
 
-            // Extraire les requêtes individuelles
+            // Extraire les requetes individuelles
             const queries = extractQueries(content);
 
-            console.log(colorize(`\n🧪 Exécution des tests pour ${file} (${queries.length} requêtes)\n`, 'cyan'));
+            console.log(colorize(`\n🧪 Execution des tests pour ${file} (${queries.length} requetes)\n`, 'cyan'));
 
-            // Exécuter chaque requête
+            // Executer chaque requete
             for (const query of queries) {
                 totalTests++;
 
                 try {
-                    // Ignorer les commentaires dans le contenu des requêtes
+                    // Ignorer les commentaires dans le contenu des requetes
                     const cleanQuery = query.content.replace(/^\s*#.*$/gm, '');
 
-                    // Vérifier si la requête est vide après nettoyage
+                    // Verifier si la requete est vide apres nettoyage
                     if (!cleanQuery.trim()) {
-                        console.log(colorize(`  - Requête vide ignorée`, 'gray'));
+                        console.log(colorize(`  - Requete vide ignoree`, 'gray'));
                         continue;
                     }
 
@@ -114,11 +114,11 @@ async function processGraphQLTests() {
                             const cleanedVars = variablesMatch[1].replace(/^\s*#\s*/gm, '').trim();
                             variables = JSON.parse(cleanedVars);
                         } catch (e) {
-                            console.log(colorize(`    Variables non analysables, utilisation des valeurs par défaut`, 'yellow'));
+                            console.log(colorize(`    Variables non analysables, utilisation des valeurs par defaut`, 'yellow'));
                         }
                     }
 
-                    // Exécuter la requête GraphQL
+                    // Executer la requete GraphQL
                     const response = await axios.post(config.baseUrl, {
                         query: cleanQuery,
                         variables
@@ -131,7 +131,7 @@ async function processGraphQLTests() {
                         timeout: 3000
                     });
 
-                    // Vérifier la présence d'erreurs GraphQL
+                    // Verifier la presence d'erreurs GraphQL
                     if (response.data.errors) {
                         console.log(colorize(`    ❌ Erreur: ${response.data.errors[0].message}`, 'red'));
                         if (response.data.errors[0].path) {
@@ -139,7 +139,7 @@ async function processGraphQLTests() {
                         }
                         console.log(colorize(`    Query: ${cleanQuery.replace(/\s+/g, ' ').slice(0, 50)}...`, 'gray'));
                     } else {
-                        console.log(colorize(`    ✅ Succès`, 'green'));
+                        console.log(colorize(`    ✅ Succes`, 'green'));
                         passedTests++;
                     }
                 } catch (err) {
@@ -147,55 +147,55 @@ async function processGraphQLTests() {
 
                     if (err.response) {
                         if (err.response.status === 500 && err.response.data && err.response.data.errors) {
-                            // Afficher des informations plus détaillées sur les erreurs de schéma
+                            // Afficher des informations plus detaillees sur les erreurs de schema
                             const errorMsg = err.response.data.errors[0].message;
 
                             if (errorMsg.includes('schema-template.graphql')) {
-                                console.log(colorize(`    💡 Problème détecté: Erreur dans le fichier de schéma GraphQL`, 'yellow'));
-                                console.log(colorize(`    👉 Solution: Vérifiez le fichier src/graphql/schema-template.graphql`, 'blue'));
+                                console.log(colorize(`    💡 Probleme detecte: Erreur dans le fichier de schema GraphQL`, 'yellow'));
+                                console.log(colorize(`    👉 Solution: Verifiez le fichier src/graphql/schema-template.graphql`, 'blue'));
                             }
 
                             // Limiter la longueur de l'erreur
                             const shortErrorMsg = JSON.stringify(err.response.data).substring(0, 100) + '...';
-                            console.log(colorize(`    Détails: ${shortErrorMsg}`, 'gray'));
+                            console.log(colorize(`    Details: ${shortErrorMsg}`, 'gray'));
                         } else if (err.response.data) {
-                            console.log(colorize(`    Détails: ${JSON.stringify(err.response.data).slice(0, 100)}...`, 'gray'));
+                            console.log(colorize(`    Details: ${JSON.stringify(err.response.data).slice(0, 100)}...`, 'gray'));
                         }
                     }
                 }
             }
         }
 
-        // Afficher le résumé
+        // Afficher le resume
         const successRate = Math.round((passedTests / totalTests) * 100) || 0;
 
         console.log('\n' + colorize('╔══════════════════════════════════════════════╗', 'bold'));
-        console.log(colorize(`║            RÉSUMÉ DES TESTS GRAPHQL          ║`, 'bold'));
+        console.log(colorize(`║            ReSUMe DES TESTS GRAPHQL          ║`, 'bold'));
         console.log(colorize('╟──────────────────────────┬───────────────────╢', 'bold'));
-        console.log(colorize(`║ Total des requêtes       │ ${String(totalTests).padStart(17)} ║`, 'bold'));
-        console.log(colorize(`║ Requêtes réussies        │ ${String(passedTests).padStart(17)} ║`, 'bold'));
-        console.log(colorize(`║ Requêtes échouées        │ ${String(totalTests - passedTests).padStart(17)} ║`, 'bold'));
-        console.log(colorize(`║ Taux de réussite         │ ${String(successRate + '%').padStart(17)} ║`, 'bold'));
+        console.log(colorize(`║ Total des requetes       │ ${String(totalTests).padStart(17)} ║`, 'bold'));
+        console.log(colorize(`║ Requetes reussies        │ ${String(passedTests).padStart(17)} ║`, 'bold'));
+        console.log(colorize(`║ Requetes echouees        │ ${String(totalTests - passedTests).padStart(17)} ║`, 'bold'));
+        console.log(colorize(`║ Taux de reussite         │ ${String(successRate + '%').padStart(17)} ║`, 'bold'));
         console.log(colorize('╚══════════════════════════╧═══════════════════╝', 'bold'));
 
         if (successRate === 0 && totalTests > 0) {
-            console.log('\n' + colorize('⚠️ Tous les tests ont échoué. Vérifions le problème:', 'yellow'));
+            console.log('\n' + colorize('⚠️ Tous les tests ont echoue. Verifions le probleme:', 'yellow'));
             await diagnoseGraphQLIssues();
         }
 
         return { total: totalTests, passed: passedTests };
     } catch (err) {
-        console.error(colorize('Erreur lors de l\'exécution des tests GraphQL:', 'red'), err);
+        console.error(colorize('Erreur lors de l\'execution des tests GraphQL:', 'red'), err);
         process.exit(1);
     }
 }
 
-// Diagnostic des problèmes GraphQL
+// Diagnostic des problemes GraphQL
 async function diagnoseGraphQLIssues() {
-    console.log(colorize('\n🔍 DIAGNOSTIC DES PROBLÈMES GRAPHQL', 'blue'));
+    console.log(colorize('\n🔍 DIAGNOSTIC DES PROBLeMES GRAPHQL', 'blue'));
 
     try {
-        // Vérifier si le schéma GraphQL existe
+        // Verifier si le schema GraphQL existe
         const possibleSchemaLocations = [
             path.join(__dirname, 'src', 'graphql', 'schema-template.graphql'),
             path.join(__dirname, 'src', 'graphql', 'schema.graphql'),
@@ -217,20 +217,20 @@ async function diagnoseGraphQLIssues() {
         }
 
         if (!schemaExists) {
-            console.log(colorize('❌ Aucun fichier de schéma GraphQL trouvé.', 'red'));
-            console.log(colorize('💡 Créez un fichier schema-template.graphql dans le dossier src/graphql/', 'yellow'));
+            console.log(colorize('❌ Aucun fichier de schema GraphQL trouve.', 'red'));
+            console.log(colorize('💡 Creez un fichier schema-template.graphql dans le dossier src/graphql/', 'yellow'));
 
-            // Proposer un modèle de schéma de base
-            console.log(colorize('\n📝 MODÈLE DE SCHÉMA GraphQL RECOMMANDÉ:', 'green'));
-            console.log(colorize('Créez un fichier src/graphql/schema-template.graphql avec ce contenu:', 'blue'));
+            // Proposer un modele de schema de base
+            console.log(colorize('\n📝 MODeLE DE SCHeMA GraphQL RECOMMANDe:', 'green'));
+            console.log(colorize('Creez un fichier src/graphql/schema-template.graphql avec ce contenu:', 'blue'));
 
             const sampleSchema = `"""
-Schéma GraphQL pour PROGEASE
+Schema GraphQL pour PROGEASE
 """
 
 type Query {
   """
-  Informations sur l'état du système
+  Informations sur l'etat du systeme
   """
   health: Health!
 
@@ -294,48 +294,48 @@ type PaginationInfo {
 `;
             console.log(colorize(sampleSchema, 'gray'));
         } else {
-            console.log(colorize(`✅ Schéma GraphQL trouvé à: ${schemaLocation}`, 'green'));
+            console.log(colorize(`✅ Schema GraphQL trouve à: ${schemaLocation}`, 'green'));
 
-            // Analyser le contenu du schéma pour détecter des problèmes
+            // Analyser le contenu du schema pour detecter des problemes
             const schemaContent = await fs.readFile(schemaLocation, 'utf8');
 
-            // Vérifier la présence de certains types essentiels
+            // Verifier la presence de certains types essentiels
             if (!schemaContent.includes('type Query')) {
-                console.log(colorize('❌ Le schéma ne contient pas de type Query!', 'red'));
+                console.log(colorize('❌ Le schema ne contient pas de type Query!', 'red'));
             }
 
             if (!schemaContent.includes('type Projet') && !schemaContent.includes('type Projet')) {
-                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Projet/Projet!', 'yellow'));
+                console.log(colorize('⚠️ Le schema ne semble pas definir de type Projet/Projet!', 'yellow'));
             }
 
             if (!schemaContent.includes('type Livrable') && !schemaContent.includes('type Livrable')) {
-                console.log(colorize('⚠️ Le schéma ne semble pas définir de type Livrable/Livrable!', 'yellow'));
+                console.log(colorize('⚠️ Le schema ne semble pas definir de type Livrable/Livrable!', 'yellow'));
             }
         }
 
-        // Vérifier la configuration du serveur GraphQL
-        console.log(colorize('\n⚙️ VÉRIFICATION DE LA CONFIGURATION SERVEUR:', 'blue'));
+        // Verifier la configuration du serveur GraphQL
+        console.log(colorize('\n⚙️ VeRIFICATION DE LA CONFIGURATION SERVEUR:', 'blue'));
 
         try {
             const response = await axios.get(`${config.baseUrl.split('/graphql')[0]}/health`, { timeout: 2000 });
             console.log(colorize('✅ API REST accessible', 'green'));
-            console.log(colorize(`   Version: ${response.data.version}, GraphQL: ${response.data.graphqlVersion || 'Non spécifiée'}`, 'gray'));
+            console.log(colorize(`   Version: ${response.data.version}, GraphQL: ${response.data.graphqlVersion || 'Non specifiee'}`, 'gray'));
         } catch (err) {
-            console.log(colorize('⚠️ API REST inaccessible. Le serveur est-il démarré?', 'yellow'));
+            console.log(colorize('⚠️ API REST inaccessible. Le serveur est-il demarre?', 'yellow'));
         }
 
         console.log(colorize('\n💡 RECOMMANDATIONS:', 'blue'));
-        console.log(colorize('1. Vérifiez que votre fichier schema-template.graphql est bien formaté', 'cyan'));
-        console.log(colorize('2. Assurez-vous que le serveur GraphQL est correctement configuré dans server.js', 'cyan'));
-        console.log(colorize('3. Redémarrez le serveur après les modifications', 'cyan'));
-        console.log(colorize('4. Exécutez à nouveau ce script de test', 'cyan'));
+        console.log(colorize('1. Verifiez que votre fichier schema-template.graphql est bien formate', 'cyan'));
+        console.log(colorize('2. Assurez-vous que le serveur GraphQL est correctement configure dans server.js', 'cyan'));
+        console.log(colorize('3. Redemarrez le serveur apres les modifications', 'cyan'));
+        console.log(colorize('4. Executez à nouveau ce script de test', 'cyan'));
 
     } catch (err) {
         console.error(colorize('Erreur lors du diagnostic:', 'red'), err);
     }
 }
 
-// Extraire les requêtes individuelles d'un fichier GraphQL
+// Extraire les requetes individuelles d'un fichier GraphQL
 function extractQueries(content) {
     const queries = [];
     const queryRegex = /(query|mutation)\s+(\w+)[\s\S]*?{([\s\S]*?)}/g;
@@ -343,7 +343,7 @@ function extractQueries(content) {
 
     while ((match = queryRegex.exec(content)) !== null) {
         const type = match[1]; // query ou mutation
-        const name = match[2]; // nom de la requête/mutation
+        const name = match[2]; // nom de la requete/mutation
         const body = match[0]; // contenu complet
 
         queries.push({
@@ -356,12 +356,12 @@ function extractQueries(content) {
     return queries;
 }
 
-// Vérifier que le serveur est accessible
+// Verifier que le serveur est accessible
 async function checkServerAvailability() {
-    console.log(colorize('🔄 Vérification de la disponibilité du serveur GraphQL...', 'blue'));
+    console.log(colorize('🔄 Verification de la disponibilite du serveur GraphQL...', 'blue'));
 
     try {
-        // Faire une requête d'introspection (qui devrait être supportée par tous les serveurs GraphQL)
+        // Faire une requete d'introspection (qui devrait etre supportee par tous les serveurs GraphQL)
         await axios.post(config.baseUrl, {
             query: `{ __schema { queryType { name } } }`
         }, { timeout: 3000 });
@@ -375,22 +375,22 @@ async function checkServerAvailability() {
             console.error(colorize(`   Code d'erreur: ${err.response.status}`, 'red'));
 
             if (err.response.status === 500) {
-                console.log(colorize('   💡 Erreur 500: Problème de configuration du serveur GraphQL', 'yellow'));
+                console.log(colorize('   💡 Erreur 500: Probleme de configuration du serveur GraphQL', 'yellow'));
             } else if (err.response.status === 400) {
-                console.log(colorize('   💡 Erreur 400: Le serveur répond mais n\'accepte pas la requête d\'introspection', 'yellow'));
+                console.log(colorize('   💡 Erreur 400: Le serveur repond mais n\'accepte pas la requete d\'introspection', 'yellow'));
             }
         } else if (err.request) {
-            console.error(colorize('   Aucune réponse reçue du serveur', 'red'));
-            console.log(colorize('   💡 Vérifiez que le serveur est bien démarré sur le port 5000', 'yellow'));
+            console.error(colorize('   Aucune reponse reçue du serveur', 'red'));
+            console.log(colorize('   💡 Verifiez que le serveur est bien demarre sur le port 5000', 'yellow'));
         } else {
             console.error(colorize(`   Erreur: ${err.message}`, 'red'));
         }
 
-        // Demander à l'utilisateur s'il souhaite continuer malgré l'erreur
-        console.log('\n' + colorize('   Souhaitez-vous continuer malgré l\'erreur? (o/N)', 'yellow'));
+        // Demander à l'utilisateur s'il souhaite continuer malgre l'erreur
+        console.log('\n' + colorize('   Souhaitez-vous continuer malgre l\'erreur? (o/N)', 'yellow'));
 
         // Simuler une lecture de stdin (dans un environnement de production, utilisez readline)
-        console.log(colorize('   Continuation forcée pour la démonstration...', 'blue'));
+        console.log(colorize('   Continuation forcee pour la demonstration...', 'blue'));
         return true;
     }
 }
@@ -399,18 +399,18 @@ async function checkServerAvailability() {
 async function main() {
     showBanner();
 
-    // Vérifier la disponibilité du serveur
+    // Verifier la disponibilite du serveur
     const serverAvailable = await checkServerAvailability();
     if (!serverAvailable) {
         process.exit(1);
     }
 
-    // Exécuter les tests
+    // Executer les tests
     await processGraphQLTests();
 }
 
-// Exécuter le script
+// Executer le script
 main().catch(err => {
-    console.error(colorize('Erreur non gérée:', 'red'), err);
+    console.error(colorize('Erreur non geree:', 'red'), err);
     process.exit(1);
 });

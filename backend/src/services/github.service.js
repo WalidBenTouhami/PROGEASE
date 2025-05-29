@@ -22,16 +22,16 @@ const CONFIG = {
 };
 
 /**
- * Attends un délai spécifié
- * @param {number} ms - Délai en millisecondes
+ * Attends un delai specifie
+ * @param {number} ms - Delai en millisecondes
  * @returns {Promise<void>}
  */
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
- * Vérifie si un dépôt GitHub existe
- * @param {string} url - URL du dépôt GitHub (format: https://github.com/owner/repo)
- * @returns {Promise<boolean>} - true si le dépôt existe et est accessible
+ * Verifie si un depôt GitHub existe
+ * @param {string} url - URL du depôt GitHub (format: https://github.com/owner/repo)
+ * @returns {Promise<boolean>} - true si le depôt existe et est accessible
  */
 async function checkGithubRepoExists(url) {
     // Validation du format de l'URL
@@ -46,7 +46,7 @@ async function checkGithubRepoExists(url) {
     const [, owner, repo] = match;
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}`;
 
-    // Préparer les headers avec token si disponible
+    // Preparer les headers avec token si disponible
     const headers = {
         'User-Agent': 'progease-app/2.0'
     };
@@ -62,17 +62,17 @@ async function checkGithubRepoExists(url) {
             const response = await client.get(apiUrl, { headers });
             logger.debug(`GitHub API Response: Status ${response.status}`);
 
-            // Validation du statut de réponse
+            // Validation du statut de reponse
             return response.status === 200;
         } catch (error) {
             retries++;
 
-            // Log différencié selon le type d'erreur
+            // Log differencie selon le type d'erreur
             if (error.response) {
-                // La requête a été effectuée, mais le serveur a répondu avec un code d'erreur
+                // La requete a ete effectuee, mais le serveur a repondu avec un code d'erreur
                 if (error.response.status === 404) {
-                    // Dépôt non trouvé - ne pas retenter
-                    logger.info(`Dépôt GitHub non trouvé: ${owner}/${repo}`);
+                    // Depôt non trouve - ne pas retenter
+                    logger.info(`Depôt GitHub non trouve: ${owner}/${repo}`);
                     return false;
                 }
 
@@ -82,16 +82,16 @@ async function checkGithubRepoExists(url) {
                     logger.warn(`Erreur GitHub API: ${error.response.status} - ${error.response.statusText}`);
                 }
             } else if (error.request) {
-                // La requête a été effectuée mais aucune réponse n'a été reçue
-                logger.warn('Aucune réponse de l\'API GitHub');
+                // La requete a ete effectuee mais aucune reponse n'a ete reçue
+                logger.warn('Aucune reponse de l\'API GitHub');
             } else {
-                // Erreur lors de la configuration de la requête
-                logger.warn(`Erreur de configuration de la requête GitHub: ${error.message}`);
+                // Erreur lors de la configuration de la requete
+                logger.warn(`Erreur de configuration de la requete GitHub: ${error.message}`);
             }
 
             // Si nous avons atteint la limite de tentatives, retourner false
             if (retries >= CONFIG.RETRY_LIMIT) {
-                logger.error(`Échec de vérification du dépôt GitHub après ${CONFIG.RETRY_LIMIT} tentatives.`);
+                logger.error(`echec de verification du depôt GitHub apres ${CONFIG.RETRY_LIMIT} tentatives.`);
                 return false;
             }
 
@@ -102,12 +102,12 @@ async function checkGithubRepoExists(url) {
         }
     }
 
-    return false; // Par défaut, considérer que le dépôt n'existe pas
+    return false; // Par defaut, considerer que le depôt n'existe pas
 }
 
 /**
- * Récupère la liste des branches d'un dépôt GitHub
- * @param {string} url - URL du dépôt GitHub
+ * Recupere la liste des branches d'un depôt GitHub
+ * @param {string} url - URL du depôt GitHub
  * @returns {Promise<string[]>} - Liste des branches ou []
  */
 async function getGithubRepoBranches(url) {
@@ -122,7 +122,7 @@ async function getGithubRepoBranches(url) {
     const [, owner, repo] = match;
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/branches`;
 
-    // Préparer les headers
+    // Preparer les headers
     const headers = {
         'User-Agent': 'progease-app/2.0'
     };
@@ -140,15 +140,15 @@ async function getGithubRepoBranches(url) {
 
         return [];
     } catch (error) {
-        logger.error(`Erreur lors de la récupération des branches: ${error.message}`);
+        logger.error(`Erreur lors de la recuperation des branches: ${error.message}`);
         return [];
     }
 }
 
 /**
- * Récupère les derniers commits d'un dépôt
- * @param {string} url - URL du dépôt GitHub
- * @param {number} limit - Nombre maximum de commits à récupérer
+ * Recupere les derniers commits d'un depôt
+ * @param {string} url - URL du depôt GitHub
+ * @param {number} limit - Nombre maximum de commits à recuperer
  * @returns {Promise<Array>} - Liste des commits ou []
  */
 async function getGithubRepoCommits(url, limit = 5) {
@@ -163,7 +163,7 @@ async function getGithubRepoCommits(url, limit = 5) {
     const [, owner, repo] = match;
     const apiUrl = `https://api.github.com/repos/${owner}/${repo}/commits?per_page=${limit}`;
 
-    // Préparer les headers
+    // Preparer les headers
     const headers = {
         'User-Agent': 'progease-app/2.0'
     };
@@ -186,7 +186,7 @@ async function getGithubRepoCommits(url, limit = 5) {
 
         return [];
     } catch (error) {
-        logger.error(`Erreur lors de la récupération des commits: ${error.message}`);
+        logger.error(`Erreur lors de la recuperation des commits: ${error.message}`);
         return [];
     }
 }

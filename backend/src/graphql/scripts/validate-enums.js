@@ -2,13 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const { STATUTS_PROJET, STATUTS_LIVRABLE } = require('../../../config/constants');
 
-console.log('Vérification des énumérations...');
+console.log('Verification des enumerations...');
 
-// Lire le schéma GraphQL
+// Lire le schema GraphQL
 const schemaPath = path.resolve(__dirname, '../src/graphql/schema-template.graphql');
 const schemaContent = fs.readFileSync(schemaPath, 'utf8');
 
-// Extraire les énumérations du schéma
+// Extraire les enumerations du schema
 function extractEnum(name, content) {
     const regex = new RegExp(`enum ${name} \\{([\\s\\S]*?)\\}`, 'g');
     const match = regex.exec(content);
@@ -24,7 +24,7 @@ function extractEnum(name, content) {
 const schemaStatutProjet = extractEnum('StatutProjet', schemaContent);
 const schemaStatutLivrable = extractEnum('StatutLivrable', schemaContent);
 
-// Vérifier la correspondance
+// Verifier la correspondance
 function checkSync(schemaValues, constantValues, name) {
     const constKeys = Object.keys(constantValues);
 
@@ -32,7 +32,7 @@ function checkSync(schemaValues, constantValues, name) {
     const missingInConst = schemaValues.filter(key => !constKeys.includes(key));
 
     if (missingInSchema.length || missingInConst.length) {
-        console.error(`❌ ${name}: Les énumérations ne sont pas synchronisées!`);
+        console.error(`❌ ${name}: Les enumerations ne sont pas synchronisees!`);
 
         if (missingInSchema.length) {
             console.error(`   Valeurs manquantes dans schema.graphql: ${missingInSchema.join(', ')}`);
@@ -45,7 +45,7 @@ function checkSync(schemaValues, constantValues, name) {
         return false;
     }
 
-    console.log(`✅ ${name}: Les énumérations sont synchronisées`);
+    console.log(`✅ ${name}: Les enumerations sont synchronisees`);
     return true;
 }
 
@@ -53,9 +53,9 @@ const projetSync = checkSync(schemaStatutProjet, STATUTS_PROJET, 'StatutProjet')
 const livrableSync = checkSync(schemaStatutLivrable, STATUTS_LIVRABLE, 'StatutLivrable');
 
 if (projetSync && livrableSync) {
-    console.log('✅ Toutes les énumérations sont synchronisées!');
+    console.log('✅ Toutes les enumerations sont synchronisees!');
     process.exit(0);
 } else {
-    console.error('❌ Certaines énumérations ne sont pas synchronisées!');
+    console.error('❌ Certaines enumerations ne sont pas synchronisees!');
     process.exit(1);
 }

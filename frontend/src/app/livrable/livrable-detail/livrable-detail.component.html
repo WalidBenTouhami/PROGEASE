@@ -5,8 +5,8 @@
     </h2>
     <p><strong>Description&nbsp;:</strong> {{ livrable.description }}</p>
     <p><strong>Date limite&nbsp;:</strong> <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'longDate' }}</time></p>
-    <!-- <p *ngIf="livrable.urlDepot"><strong>URL de dépôt&nbsp;:</strong> <a [href]="livrable.urlDepot" rel="noopener" target="_blank">{{ livrable.urlDepot }}</a></p> -->
-    <p *ngIf="livrable.projetId"><strong>Projet associé</strong>&nbsp;: {{ livrable.projetId }}</p>
+    <!-- <p *ngIf="livrable.urlDepot"><strong>URL de depôt&nbsp;:</strong> <a [href]="livrable.urlDepot" rel="noopener" target="_blank">{{ livrable.urlDepot }}</a></p> -->
+    <p *ngIf="livrable.projetId"><strong>Projet associe</strong>&nbsp;: {{ livrable.projetId }}</p>
   </article>
 </ng-container>
 <ng-template #loading>

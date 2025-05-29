@@ -21,10 +21,14 @@ export interface Projet {
 }
 
 export enum StatutProjet {
-    BROUILLON = 'brouillon',
-    EN_COURS = 'en_cours',
-    TERMINE = 'termine',
-    ARCHIVE = 'archive'
+    BROUILLON = 'Brouillon',
+    EN_COURS = 'En_cours',
+    TERMINE = 'Termine',
+    ARCHIVE = 'Archive',
+    EN_RETARD= 'En_retard',
+    A_VENIR= 'A_venir'
 }
+
+
 
 

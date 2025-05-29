@@ -1,10 +1,10 @@
-[undefined] ERROR: ❌ Erreur lors de la génération du schéma: ENOENT: no such file or directory, open 'D:\pi\PROGEASE\backend\scripts\"""
-Schéma GraphQL pour PROGEASE
+[undefined] ERROR: ❌ Erreur lors de la generation du schema: ENOENT: no such file or directory, open 'D:\pi\PROGEASE\backend\scripts\"""
+Schema GraphQL pour PROGEASE
 """
 
 type Query {
     """
-    Informations sur l'état du système
+    Informations sur l'etat du systeme
     """
     health: Health!
 
@@ -31,7 +31,7 @@ type Query {
 
 type Mutation {
     """
-    Créer un nouveau projet
+    Creer un nouveau projet
     """
     createProjet(input: ProjetInput!): Projet!
 
@@ -46,7 +46,7 @@ type Mutation {
     deleteProjet(id: ID!): DeleteResponse!
 
     """
-    Créer un nouveau livrable
+    Creer un nouveau livrable
     """
     createLivrable(input: LivrableInput!): Livrable!
 
@@ -118,13 +118,13 @@ type DeleteResponse {
     success: Boolean!
     message: String
 }' {"metadata":{"service":"progease-api","timestamp":"2025-05-28 12:00:04"}}
-[undefined] ERROR: ❌ Erreur lors de la génération du schéma: ENOENT: no such file or directory, open 'D:\pi\PROGEASE\backend\scripts\"""
-Schéma GraphQL pour PROGEASE
+[undefined] ERROR: ❌ Erreur lors de la generation du schema: ENOENT: no such file or directory, open 'D:\pi\PROGEASE\backend\scripts\"""
+Schema GraphQL pour PROGEASE
 """
 
 type Query {
     """
-    Informations sur l'état du système
+    Informations sur l'etat du systeme
     """
     health: Health!
 
@@ -151,7 +151,7 @@ type Query {
 
 type Mutation {
     """
-    Créer un nouveau projet
+    Creer un nouveau projet
     """
     createProjet(input: ProjetInput!): Projet!
 
@@ -166,7 +166,7 @@ type Mutation {
     deleteProjet(id: ID!): DeleteResponse!
 
     """
-    Créer un nouveau livrable
+    Creer un nouveau livrable
     """
     createLivrable(input: LivrableInput!): Livrable!
 

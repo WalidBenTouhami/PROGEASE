@@ -17,10 +17,10 @@ router.post('/analyze', async (req, res) => {
         }
         // On passe tout le body pour permettre l'analyse flexible
         const analyse = await aiService.analyserProjet({ text, document });
-        logger.monitoring('Analyse IA effectuée', { user: req.currentUser });
+        logger.monitoring('Analyse IA effectuee', { user: req.currentUser });
         res.status(200).json({
             success: true,
-            message: 'Analyse IA effectuée avec succès',
+            message: 'Analyse IA effectuee avec succes',
             data: analyse
         });
     } catch (error) {
@@ -33,7 +33,7 @@ router.post('/analyze', async (req, res) => {
     }
 });
 
-// Route pour générer du texte (français)
+// Route pour generer du texte (français)
 router.post('/generer-texte', async (req, res) => {
     try {
         const { prompt } = req.body;
@@ -45,10 +45,10 @@ router.post('/generer-texte', async (req, res) => {
             });
         }
         const texte = await aiService.genererTexte(prompt);
-        logger.monitoring('Génération de texte IA (FR)', { user: req.currentUser });
+        logger.monitoring('Generation de texte IA (FR)', { user: req.currentUser });
         res.status(200).json({
             success: true,
-            message: 'Texte généré avec succès',
+            message: 'Texte genere avec succes',
             data: {
                 text: texte,
                 prompt: prompt.substring(0, 100),
@@ -56,10 +56,10 @@ router.post('/generer-texte', async (req, res) => {
             }
         });
     } catch (error) {
-        logger.error("Erreur lors de la génération de texte:", error);
+        logger.error("Erreur lors de la generation de texte:", error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la génération de texte',
+            message: 'Erreur lors de la generation de texte',
             error: error.message
         });
     }
@@ -77,7 +77,7 @@ router.post('/generate-text', async (req, res) => {
             });
         }
         const texte = await aiService.genererTexte(prompt);
-        logger.monitoring('Génération de texte IA (EN)', { user: req.currentUser });
+        logger.monitoring('Generation de texte IA (EN)', { user: req.currentUser });
         res.status(200).json({
             success: true,
             message: 'Text generated successfully',

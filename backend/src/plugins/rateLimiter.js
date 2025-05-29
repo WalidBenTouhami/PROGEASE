@@ -1,5 +1,5 @@
 /**
- * Plugin Apollo Server pour limiter le débit des requêtes GraphQL
+ * Plugin Apollo Server pour limiter le debit des requetes GraphQL
  *
  * @module plugins/rateLimiter
  */
@@ -9,13 +9,13 @@
 const { AppError } = require('../middleware/errorHandlers');
 const logger = require('../utils/logger');
 
-// Map pour suivre les requêtes par IP
+// Map pour suivre les requetes par IP
 const requestMap = new Map();
 
 /**
- * Nettoie les entrées expirées dans la map des requêtes
+ * Nettoie les entrees expirees dans la map des requetes
  * @param {Map} map - La map à nettoyer
- * @param {number} windowMs - Fenêtre de temps en millisecondes
+ * @param {number} windowMs - Fenetre de temps en millisecondes
  */
 function cleanupExpiredEntries(map, windowMs) {
     const now = Date.now();
@@ -27,30 +27,30 @@ function cleanupExpiredEntries(map, windowMs) {
 }
 
 /**
- * Crée un plugin de limitation de débit pour Apollo Server
+ * Cree un plugin de limitation de debit pour Apollo Server
  * @param {Object} options - Options de configuration
- * @param {number} options.windowMs - Fenêtre de temps en millisecondes (défaut: 15min)
- * @param {number} options.max - Nombre maximum de requêtes par IP (défaut: 100)
- * @param {Function} options.keyGenerator - Fonction pour générer la clé (défaut: IP)
- * @param {Function} options.skip - Fonction pour ignorer certaines requêtes
+ * @param {number} options.windowMs - Fenetre de temps en millisecondes (defaut: 15min)
+ * @param {number} options.max - Nombre maximum de requetes par IP (defaut: 100)
+ * @param {Function} options.keyGenerator - Fonction pour generer la cle (defaut: IP)
+ * @param {Function} options.skip - Fonction pour ignorer certaines requetes
  * @returns {Object} Plugin Apollo Server
  */
 function GraphQLRateLimiterPlugin(options = {}) {
-    const windowMs = options.windowMs || 15 * 60 * 1000; // 15 minutes par défaut
-    const max = options.max || 100; // 100 requêtes par défaut
+    const windowMs = options.windowMs || 15 * 60 * 1000; // 15 minutes par defaut
+    const max = options.max || 100; // 100 requetes par defaut
     const keyGenerator = options.keyGenerator ||
         (requestContext => requestContext.request.http.headers.get('x-forwarded-for') ||
             requestContext.contextValue?.ip ||
             'anonymous');
     const skip = options.skip || (() => false);
 
-    // Nettoyage périodique des entrées expirées (toutes les minutes)
+    // Nettoyage periodique des entrees expirees (toutes les minutes)
     setInterval(() => cleanupExpiredEntries(requestMap, windowMs), 60 * 1000);
 
     return {
-        // Utiliser requestDidStart pour intercepter chaque requête
+        // Utiliser requestDidStart pour intercepter chaque requete
         async requestDidStart(requestContext) {
-            // Ignorer certaines requêtes si nécessaire
+            // Ignorer certaines requetes si necessaire
             if (skip(requestContext)) {
                 return {};
             }
@@ -58,39 +58,39 @@ function GraphQLRateLimiterPlugin(options = {}) {
             const key = keyGenerator(requestContext);
             const now = Date.now();
 
-            // Récupérer ou initialiser les données pour cette IP
+            // Recuperer ou initialiser les donnees pour cette IP
             const current = requestMap.get(key) || {
                 count: 0,
                 timestamp: now,
                 firstRequest: now
             };
 
-            // Réinitialiser le compteur si la fenêtre de temps est dépassée
+            // Reinitialiser le compteur si la fenetre de temps est depassee
             if (now - current.firstRequest > windowMs) {
                 current.count = 0;
                 current.firstRequest = now;
             }
 
-            // Incrémenter le compteur
+            // Incrementer le compteur
             current.count += 1;
             current.timestamp = now;
 
             // Mettre à jour la map
             requestMap.set(key, current);
 
-            // Vérifier si la limite est dépassée
+            // Verifier si la limite est depassee
             if (current.count > max) {
-                logger.warn(`Limite de débit dépassée pour ${key}: ${current.count} requêtes`);
+                logger.warn(`Limite de debit depassee pour ${key}: ${current.count} requetes`);
 
-                // Retourner une erreur formatée
+                // Retourner une erreur formatee
                 throw new AppError(
-                    `Trop de requêtes, veuillez réessayer après un moment`,
+                    `Trop de requetes, veuillez reessayer apres un moment`,
                     429,
                     'ERR_RATE_LIMIT'
                 );
             }
 
-            // Permettre à la requête de continuer normalement
+            // Permettre à la requete de continuer normalement
             return {};
         }
     };

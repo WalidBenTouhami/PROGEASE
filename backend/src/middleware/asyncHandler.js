@@ -1,6 +1,6 @@
 /**
- * Middleware pour gérer les exceptions dans les routes asynchrones
- * Évite de répéter les blocs try/catch dans chaque contrôleur
+ * Middleware pour gerer les exceptions dans les routes asynchrones
+ * evite de repeter les blocs try/catch dans chaque contrôleur
  *
  * @param {Function} fn - Fonction de gestionnaire de route asynchrone
  * @returns {Function} Middleware Express

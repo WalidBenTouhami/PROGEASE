@@ -2,13 +2,13 @@ const winston = require('winston');
 const path = require('path');
 const fs = require('fs');
 
-// S'assurer que le répertoire logs existe
+// S'assurer que le repertoire logs existe
 const logsDir = path.join(process.cwd(), 'logs');
 if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
 }
 
-// Format personnalisé
+// Format personnalise
 const customFormat = winston.format.printf(({ level, message, timestamp, ...metadata }) => {
     const metaStr = Object.keys(metadata).length ? JSON.stringify(metadata) : '';
     return `[${timestamp}] ${level.toUpperCase()}: ${message} ${metaStr}`;
@@ -25,7 +25,7 @@ const logger = winston.createLogger({
     ),
     defaultMeta: { service: 'progease-api' },
     transports: [
-        // Logs console en développement
+        // Logs console en developpement
         new winston.transports.Console({
             level: 'debug',
             format: winston.format.combine(
@@ -52,12 +52,12 @@ const logger = winston.createLogger({
     handleRejections: true
 });
 
-// Réduction des logs en test
+// Reduction des logs en test
 if (process.env.NODE_ENV === 'test') {
     logger.transports.forEach((t) => (t.silent = true));
 }
 
-// Ajout d'un niveau personnalisé pour le monitoring
+// Ajout d'un niveau personnalise pour le monitoring
 logger.monitoring = function(message, metadata) {
     this.log({
         level: 'info',
@@ -67,7 +67,7 @@ logger.monitoring = function(message, metadata) {
     });
 };
 
-// Ajout d'un niveau personnalisé pour la sécurité
+// Ajout d'un niveau personnalise pour la securite
 logger.security = function(message, metadata) {
     this.log({
         level: 'warn',

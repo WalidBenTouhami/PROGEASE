@@ -12,7 +12,10 @@ export interface Livrable {
 }
 
 export enum StatutLivrable {
-    EN_ATTENTE = 'en_attente',
-    EN_RETARD = 'en_retard',
-    TERMINE = 'termine'
+  EN_ATTENTE = 'En_attente',
+  EN_COURS = 'En_cours',
+  EN_RETARD = 'En_retard',
+  TERMINE = 'Termine',
+  VALIDE = 'Valide',
+  REJETE = 'Rejete'
 }

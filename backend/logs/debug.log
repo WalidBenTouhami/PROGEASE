@@ -14,15 +14,15 @@
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:18:01] [INFO]: Démarrage du serveur PROGEASE...
+[2025-05-23 12:18:01] [INFO]: Demarrage du serveur PROGEASE...
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:18:01] [INFO]: Connecté à MongoDB avec succès
+[2025-05-23 12:18:01] [INFO]: Connecte à MongoDB avec succes
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:18:01] [INFO]: Serveur Express démarré sur le port 5000 en mode development
+[2025-05-23 12:18:01] [INFO]: Serveur Express demarre sur le port 5000 en mode development
 {
   "service": "progease-backend"
 }
@@ -34,15 +34,15 @@
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:18:48] [INFO]: Démarrage du serveur PROGEASE...
+[2025-05-23 12:18:48] [INFO]: Demarrage du serveur PROGEASE...
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:18:48] [INFO]: Connecté à MongoDB avec succès
+[2025-05-23 12:18:48] [INFO]: Connecte à MongoDB avec succes
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:18:48] [INFO]: Serveur Express démarré sur le port 5000 en mode development
+[2025-05-23 12:18:48] [INFO]: Serveur Express demarre sur le port 5000 en mode development
 {
   "service": "progease-backend"
 }
@@ -54,15 +54,15 @@
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:19:18] [INFO]: Démarrage du serveur PROGEASE...
+[2025-05-23 12:19:18] [INFO]: Demarrage du serveur PROGEASE...
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:19:18] [INFO]: Connecté à MongoDB avec succès
+[2025-05-23 12:19:18] [INFO]: Connecte à MongoDB avec succes
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:19:18] [INFO]: Serveur Express démarré sur le port 5000 en mode development
+[2025-05-23 12:19:18] [INFO]: Serveur Express demarre sur le port 5000 en mode development
 {
   "service": "progease-backend"
 }
@@ -90,15 +90,15 @@
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:20:01] [INFO]: Démarrage du serveur PROGEASE...
+[2025-05-23 12:20:01] [INFO]: Demarrage du serveur PROGEASE...
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:20:01] [INFO]: Connecté à MongoDB avec succès
+[2025-05-23 12:20:01] [INFO]: Connecte à MongoDB avec succes
 {
   "service": "progease-backend"
 }
-[2025-05-23 12:20:01] [INFO]: Serveur Express démarré sur le port 5000 en mode development
+[2025-05-23 12:20:01] [INFO]: Serveur Express demarre sur le port 5000 en mode development
 {
   "service": "progease-backend"
 }

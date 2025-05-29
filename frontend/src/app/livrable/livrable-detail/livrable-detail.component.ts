@@ -16,7 +16,7 @@ export class LivrableDetailComponent implements OnInit {
 
   statutClass(statut: string): string {
     switch (statut) {
-      case 'Terminé': return 'status termine';
+      case 'Termine': return 'status termine';
       case 'En attente': return 'status attente';
       case 'En retard': return 'status retard';
       default: return 'status';

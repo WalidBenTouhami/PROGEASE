@@ -41,8 +41,8 @@ export class DashboardComponent implements OnInit {
   notifications: Notification[] = [];
   livrables: Livrable[] = [];
   users: User[] = [{ nom: 'Jean', role: 'Administrateur' }];
-  roles: string[] = ['Administrateur', 'Tuteur', 'Étudiant'];
-  projetTemplates: Template[] = [{ nom: 'Modèle 1' }, { nom: 'Modèle 2' }];
+  roles: string[] = ['Administrateur', 'Tuteur', 'etudiant'];
+  projetTemplates: Template[] = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
   tutorPerformance: { nom?: string; score?: number }[] = [];
   aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
@@ -82,10 +82,10 @@ export class DashboardComponent implements OnInit {
   // Importe une liste d'utilisateurs
   importUsers(): void {}
 
-  // Crée un nouveau modèle de projet
+  // Cree un nouveau modele de projet
   createTemplate(): void {}
 
-  // Modifie un modèle de projet existant
+  // Modifie un modele de projet existant
   editTemplate(template: Template): void {}
 
   // Met à jour la configuration de l'IA

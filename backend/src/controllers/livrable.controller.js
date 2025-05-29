@@ -5,7 +5,7 @@ const Projet = require('../models/projet.model');
 const logger = require('../utils/logger');
 
 /**
- * Récupérer tous les livrables
+ * Recuperer tous les livrables
  */
 exports.getAllLivrables = async (req, res) => {
   try {
@@ -30,7 +30,7 @@ exports.getAllLivrables = async (req, res) => {
       ];
     }
 
-    // Gestion des dates limites (compatibilité avec les deux champs)
+    // Gestion des dates limites (compatibilite avec les deux champs)
     if (dateLimiteMin) {
       filter.$or = filter.$or || [];
       filter.$or.push(
@@ -56,21 +56,21 @@ exports.getAllLivrables = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Liste des livrables récupérée avec succès',
+      message: 'Liste des livrables recuperee avec succes',
       data: livrables
     });
   } catch (error) {
-    logger.error('Erreur lors de la récupération des livrables:', error);
+    logger.error('Erreur lors de la recuperation des livrables:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération des livrables',
+      message: 'Erreur lors de la recuperation des livrables',
       error: error.message
     });
   }
 };
 
 /**
- * Récupérer un livrable par son ID
+ * Recuperer un livrable par son ID
  */
 exports.getLivrableById = async (req, res) => {
   try {
@@ -89,28 +89,28 @@ exports.getLivrableById = async (req, res) => {
     if (!livrable) {
       return res.status(404).json({
         success: false,
-        message: `Livrable avec l'ID ${id} non trouvé`,
-        error: `Livrable avec l'ID ${id} non trouvé`
+        message: `Livrable avec l'ID ${id} non trouve`,
+        error: `Livrable avec l'ID ${id} non trouve`
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Livrable récupéré avec succès',
+      message: 'Livrable recupere avec succes',
       data: livrable
     });
   } catch (error) {
-    logger.error(`Erreur lors de la récupération du livrable ${req.params.id}:`, error);
+    logger.error(`Erreur lors de la recuperation du livrable ${req.params.id}:`, error);
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération du livrable',
+      message: 'Erreur lors de la recuperation du livrable',
       error: error.message
     });
   }
 };
 
 /**
- * Récupérer les livrables d'un projet
+ * Recuperer les livrables d'un projet
  */
 exports.getLivrablesByProjetId = async (req, res) => {
   try {
@@ -127,17 +127,17 @@ exports.getLivrablesByProjetId = async (req, res) => {
 
     res.status(200).json(livrables);
   } catch (error) {
-    logger.error(`Erreur lors de la récupération des livrables du projet ${req.params.projetId}:`, error);
+    logger.error(`Erreur lors de la recuperation des livrables du projet ${req.params.projetId}:`, error);
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la récupération des livrables du projet',
+      message: 'Erreur lors de la recuperation des livrables du projet',
       error: error.message
     });
   }
 };
 
 /**
- * Créer un nouveau livrable
+ * Creer un nouveau livrable
  */
 exports.createLivrable = async (req, res) => {
   try {
@@ -174,17 +174,17 @@ exports.createLivrable = async (req, res) => {
 
     // Mettre à jour la date du projet
     await Projet.findByIdAndUpdate(projetId, { majLe: new Date() });
-    logger.monitoring('Livrable créé', { livrableId: nouveauLivrable._id, projetId, user: req.user?.id });
+    logger.monitoring('Livrable cree', { livrableId: nouveauLivrable._id, projetId, user: req.user?.id });
     res.status(201).json({
       success: true,
-      message: 'Livrable créé avec succès',
+      message: 'Livrable cree avec succes',
       data: nouveauLivrable
     });
   } catch (error) {
-    logger.error('Erreur lors de la création du livrable:', error);
+    logger.error('Erreur lors de la creation du livrable:', error);
     res.status(500).json({
       success: false,
-      message: 'Erreur lors de la création du livrable',
+      message: 'Erreur lors de la creation du livrable',
       error: error.message
     });
   }
@@ -218,8 +218,8 @@ exports.updateLivrable = async (req, res) => {
     if (!livrable) {
       return res.status(404).json({
         success: false,
-        message: `Livrable avec l'ID ${id} non trouvé`,
-        error: `Livrable avec l'ID ${id} non trouvé`
+        message: `Livrable avec l'ID ${id} non trouve`,
+        error: `Livrable avec l'ID ${id} non trouve`
       });
     }
 
@@ -242,7 +242,7 @@ exports.updateLivrable = async (req, res) => {
     logger.monitoring('Livrable mis à jour', { livrableId: id, user: req.user?.id });
     res.status(200).json({
       success: true,
-      message: 'Livrable mis à jour avec succès',
+      message: 'Livrable mis à jour avec succes',
       data: livableMisAJour
     });
   } catch (error) {
@@ -275,22 +275,22 @@ exports.deleteLivrable = async (req, res) => {
     if (!livrable) {
       return res.status(404).json({
         success: false,
-        message: `Livrable avec l'ID ${id} non trouvé`,
-        error: `Livrable avec l'ID ${id} non trouvé`
+        message: `Livrable avec l'ID ${id} non trouve`,
+        error: `Livrable avec l'ID ${id} non trouve`
       });
     }
 
     await Livrable.findByIdAndDelete(id);
 
-    logger.monitoring('Livrable supprimé', { livrableId: id, user: req.user?.id });
+    logger.monitoring('Livrable supprime', { livrableId: id, user: req.user?.id });
     res.status(200).json({
       success: true,
-      message: 'Livrable supprimé avec succès',
+      message: 'Livrable supprime avec succes',
       data: {
         _id: id,
-        intitule: 'Livrable supprimé',
-        titre: 'Livrable supprimé',
-        nom: 'Livrable supprimé',
+        intitule: 'Livrable supprime',
+        titre: 'Livrable supprime',
+        nom: 'Livrable supprime',
         statut: 'SUPPRIME'
       }
     });

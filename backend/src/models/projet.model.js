@@ -7,14 +7,14 @@ const projetSchema = new Schema({
         type: String,
         required: [true, 'Le titre du projet est requis.'],
         trim: true,
-        minlength: [5, 'Le titre doit contenir au moins 5 caractères.'],
-        maxlength: [200, 'Le titre ne peut pas dépasser 200 caractères.']
+        minlength: [5, 'Le titre doit contenir au moins 5 caracteres.'],
+        maxlength: [200, 'Le titre ne peut pas depasser 200 caracteres.']
     },
     description: {
         type: String,
         required: [true, 'La description du projet est requise.'],
         trim: true,
-        minlength: [10, 'La description doit contenir au moins 10 caractères.']
+        minlength: [10, 'La description doit contenir au moins 10 caracteres.']
     },
     equipe: [{
         type: Schema.Types.ObjectId,
@@ -42,17 +42,17 @@ const projetSchema = new Schema({
             validator: function(arr) {
                 return Array.isArray(arr) && arr.length > 0;
             },
-            message: 'Le projet doit comporter au moins une compétence.'
+            message: 'Le projet doit comporter au moins une competence.'
         }
     },
     dateDebut: {
         type: Date,
-        required: [true, 'La date de début est requise.'],
+        required: [true, 'La date de debut est requise.'],
         validate: {
             validator: function(v) {
                 return v instanceof Date && !isNaN(v);
             },
-            message: 'Format de date de début invalide.'
+            message: 'Format de date de debut invalide.'
         }
     },
     dateFin: {
@@ -63,7 +63,7 @@ const projetSchema = new Schema({
                 validator: function(value) {
                     return value > this.dateDebut;
                 },
-                message: 'La date de fin doit être postérieure à la date de début.'
+                message: 'La date de fin doit etre posterieure à la date de debut.'
             },
             {
                 validator: function(v) {
@@ -87,15 +87,15 @@ const projetSchema = new Schema({
         type: String,
         enum: {
             values: Object.values(Enum.StatutProjet),
-            message: `Le statut doit être l'un des suivants: ${Object.values(Enum.StatutProjet).join(', ')}`
+            message: `Le statut doit etre l'un des suivants: ${Object.values(Enum.StatutProjet).join(', ')}`
         },
         default: Enum.StatutProjet.BROUILLON,
         index: true
     },
     progression: {
         type: Number,
-        min: [0, 'La progression ne peut pas être négative.'],
-        max: [100, 'La progression ne peut pas dépasser 100%.'],
+        min: [0, 'La progression ne peut pas etre negative.'],
+        max: [100, 'La progression ne peut pas depasser 100%.'],
         default: 0,
         get: v => Math.round(v),
         set: v => Math.round(v)
@@ -131,7 +131,7 @@ projetSchema.virtual('livrablesComplets', {
     foreignField: 'projetId'
 });
 
-// Index optimisés
+// Index optimises
 projetSchema.index({ titre: 1 });
 projetSchema.index({ statut: 1 });
 projetSchema.index({ creeLe: -1 });
@@ -140,39 +140,56 @@ projetSchema.index({ equipe: 1 });
 projetSchema.index({ tuteur: 1 });
 projetSchema.index({ dateDebut: 1, dateFin: 1 });
 
-// Middleware pré-sauvegarde
-projetSchema.pre('save', function(next) {
+// Middleware pre-sauvegarde
+projetSchema.pre('save', async function(next) {
     this.majLe = new Date();
 
-    // Auto-calcul de progression si livrables présents
+    // Mise à jour automatique du statut en fonction des dates
+    if (this.statut !== Enum.StatutProjet.ARCHIVE) {
+        const maintenant = new Date();
+        if (this.progression >= 100 && this.statut !== Enum.StatutProjet.TERMINE) {
+            this.statut = Enum.StatutProjet.TERMINE;
+        } else if (maintenant > this.dateFin && this.statut !== Enum.StatutProjet.TERMINE) {
+            this.statut = Enum.StatutProjet.EN_RETARD;
+        } else if (maintenant >= this.dateDebut && maintenant <= this.dateFin) {
+            if (this.statut === Enum.StatutProjet.BROUILLON || this.statut === Enum.StatutProjet.A_VENIR) {
+                this.statut = Enum.StatutProjet.EN_COURS;
+            }
+        } else if (maintenant < this.dateDebut && this.statut === Enum.StatutProjet.BROUILLON) {
+            this.statut = Enum.StatutProjet.A_VENIR;
+        }
+    }
+
+    // Auto-calcul de progression si livrables presents
     if (this.isModified('livrables') && this.livrables.length > 0) {
-        this.calculerProgression();
+        await this.calculerProgression();
     }
 
     next();
 });
 
-// Middlewares "pré-mise" à jour
+// Middlewares "pre-mise" à jour
 projetSchema.pre(['updateOne', 'findOneAndUpdate'], function(next) {
     this.set({ majLe: new Date() });
     next();
 });
 
-// Méthode pour calculer la progression
+// Methode pour calculer la progression
 projetSchema.methods.calculerProgression = async function() {
-    const livrable = mongoose.model('livrable');
+    const livrable = mongoose.model('Livrable');
     const livrables = await livrable.find({ _id: { $in: this.livrables } }).lean();
 
-    if (!livrables.lengh) {
+    if (!livrables.length) {
         this.progression = 0;
         return;
     }
 
-    const termines = livrables.filter(l => l.statut === 'termine').length;
+    // Utilisation de la constante Enum.StatutLivrable.TERMINE pour la comparaison
+    const termines = livrables.filter(l => l.statut === Enum.StatutLivrable.TERMINE).length;
     this.progression = Math.round((termines / livrables.length) * 100);
 };
 
-// Méthode statique pour recherche avancée
+// Methode statique pour recherche avancee
 projetSchema.statics.rechercheAvancee = async function(criteres = {}) {
     const { titre, statut, competences, dateDebut, dateFin, page = 1, limit = 20 } = criteres;
 
@@ -182,13 +199,8 @@ projetSchema.statics.rechercheAvancee = async function(criteres = {}) {
     if (statut) query.statut = statut;
     if (competences && competences.length) query.competences = { $all: competences };
 
-    if (dateDebut || dateFin) {
-        query.dateDebut = {};
-        query.dateFin = {};
-
-        if (dateDebut) query.dateDebut.$gte = new Date(dateDebut);
-        if (dateFin) query.dateFin.$lte = new Date(dateFin);
-    }
+    if (dateDebut) query.dateDebut = { $gte: new Date(dateDebut) };
+    if (dateFin) query.dateFin = { $lte: new Date(dateFin) };
 
     const options = {
         page: parseInt(page),

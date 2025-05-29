@@ -2,14 +2,14 @@ const yup = require('yup');
 const mongoose = require('mongoose');
 const { MessagesErreur, StatutHttp, Enum } = require('../../config/constants');
 
-// Schéma de validation Yup pour les projets
+// Schema de validation Yup pour les projets
 const projetSchema = yup.object().shape({
     titre: yup.string()
-        .min(5, 'Le titre doit contenir au moins 5 caractères.')
-        .max(200, 'Le titre ne peut pas dépasser 200 caractères.')
+        .min(5, 'Le titre doit contenir au moins 5 caracteres.')
+        .max(200, 'Le titre ne peut pas depasser 200 caracteres.')
         .required('Le titre est requis.'),
     description: yup.string()
-        .min(10, 'La description doit contenir au moins 10 caractères.')
+        .min(10, 'La description doit contenir au moins 10 caracteres.')
         .required('La description est requise.'),
     equipe: yup.array()
         .of(
@@ -22,20 +22,20 @@ const projetSchema = yup.object().shape({
             val => !val || mongoose.Types.ObjectId.isValid(val)),
     competences: yup.array()
         .of(yup.string())
-        .min(1, 'Au moins une compétence requise.'),
+        .min(1, 'Au moins une competence requise.'),
     dateDebut: yup.date()
-        .required('La date de début est requise.'),
+        .required('La date de debut est requise.'),
     dateFin: yup.date()
-        .min(yup.ref('dateDebut'), 'La date de fin doit être postérieure à la date de début.')
+        .min(yup.ref('dateDebut'), 'La date de fin doit etre posterieure à la date de debut.')
         .required('La date de fin est requise.'),
     statut: yup.string()
         .oneOf(Object.values(Enum.StatutProjet), 'Statut de projet invalide.')
 });
 
-// Middleware de validation des données de projet
+// Middleware de validation des donnees de projet
 const validateProjetData = async (req, res, next) => {
     try {
-        // Adapter les dates au format si nécessaire
+        // Adapter les dates au format si necessaire
         const body = { ...req.body };
         if (body.dateDebut && typeof body.dateDebut === 'string') {
             body.dateDebut = new Date(body.dateDebut);
@@ -75,5 +75,5 @@ const validateId = (paramName, source = 'params') => {
 module.exports = {
     validateProjetData,
     validateId,
-    projetSchema // Export pour tests et réutilisation
+    projetSchema // Export pour tests et reutilisation
 };

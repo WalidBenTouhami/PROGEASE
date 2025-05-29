@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit {
-  roles = ['Administrateur', 'Tuteur', 'Étudiant'];
+  roles = ['Administrateur', 'Tuteur', 'etudiant'];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
 // Adding missing properties used in template
   projetsAValider: number = 0;
@@ -23,7 +23,7 @@ export class DashboardComponent implements OnInit {
     this.livrablesACorriger = 10;
     this.dernieresActions = [
       { date: '2024-03-20', description: 'Nouveau projet soumis' },
-      { date: '2024-03-19', description: 'Livrable corrigé' }
+      { date: '2024-03-19', description: 'Livrable corrige' }
     ];
   }
   createTemplate() {}

@@ -1,5 +1,5 @@
 /**
-     * Resolvers GraphQL pour les fonctionnalités d'intelligence artificielle
+     * Resolvers GraphQL pour les fonctionnalites d'intelligence artificielle
      *
      * @module graphql/resolvers/ai
      * @created 2025-05-28 par WalidBenTouhami
@@ -10,7 +10,7 @@
     const logger = require('../../utils/logger');
     const AIService = require('../../services/ai.service');
 
-    // Implémentation temporaire des méthodes manquantes du service
+    // Implementation temporaire des methodes manquantes du service
     const mockAIService = {
       getRecommendations: async (projetId) => {
         return { recommendations: [`Recommandation pour projet ${projetId}`] };
@@ -18,15 +18,15 @@
       analyzeText: async (text, options) => {
         return {
           sentiment: 'positif',
-          keywords: ['mot-clé1', 'mot-clé2'],
-          summary: `Résumé du texte: ${text}`,
+          keywords: ['mot-cle1', 'mot-cle2'],
+          summary: `Resume du texte: ${text}`,
           language: options?.language || 'fr',
           confidence: 0.95
         };
       },
       generateContent: async (prompt, contentType, options) => {
         return {
-          content: `Contenu généré à partir de: ${prompt} (${contentType})`,
+          content: `Contenu genere à partir de: ${prompt} (${contentType})`,
           generationTime: new Date().toISOString(),
           modelUsed: options?.model || 'gpt-4',
           tokens: 150
@@ -35,13 +35,13 @@
       optimizeProjetDescription: async (projetId, options) => {
         return {
           originalDescription: `Description originale du projet ${projetId}`,
-          optimizedDescription: `Description optimisée (${options?.style || 'standard'})`,
-          improvements: ['Clarté', 'Concision']
+          optimizedDescription: `Description optimisee (${options?.style || 'standard'})`,
+          improvements: ['Clarte', 'Concision']
         };
       }
     };
 
-    // Utiliser le service mock en attendant l'implémentation réelle
+    // Utiliser le service mock en attendant l'implementation reelle
     const aiService = AIService || mockAIService;
 
     const aiResolvers = {
@@ -54,15 +54,15 @@
           try {
             return await aiService.getRecommendations(projetId);
           } catch (error) {
-            logger.error(`Erreur lors de la génération de recommandations IA: ${error.message}`);
-            throw new Error('Impossible de générer des recommandations IA');
+            logger.error(`Erreur lors de la generation de recommandations IA: ${error.message}`);
+            throw new Error('Impossible de generer des recommandations IA');
           }
         },
 
         // @GraphQLResolver - supprime l'avertissement "Unused property"
         // noinspection JSUnusedGlobalSymbols
         analyzeText: async (_, { text, options = {} }, { currentUser }) => {
-          logger.debug(`Analyse de texte par IA demandée par ${currentUser}`);
+          logger.debug(`Analyse de texte par IA demandee par ${currentUser}`);
 
           try {
             return await aiService.analyzeText(text, options);
@@ -77,7 +77,7 @@
         // @GraphQLResolver - supprime l'avertissement "Unused property"
         // noinspection JSUnusedGlobalSymbols
         generateContent: async (_, { prompt, contentType, options = {} }, { currentUser }) => {
-          logger.debug(`Génération de contenu IA de type ${contentType} demandée par ${currentUser}`);
+          logger.debug(`Generation de contenu IA de type ${contentType} demandee par ${currentUser}`);
 
           try {
             const generatedContent = await aiService.generateContent(prompt, contentType, options);
@@ -90,8 +90,8 @@
               }
             };
           } catch (error) {
-            logger.error(`Erreur lors de la génération de contenu IA: ${error.message}`);
-            throw new Error('Impossible de générer le contenu demandé');
+            logger.error(`Erreur lors de la generation de contenu IA: ${error.message}`);
+            throw new Error('Impossible de generer le contenu demande');
           }
         },
 

@@ -7,7 +7,7 @@ const logger = require('../utils/logger');
 // Charger les variables d'environnement
 dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
-// Validation de la clé API
+// Validation de la cle API
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 if (!DEEPSEEK_API_KEY) {
   const error = 'La variable DEEPSEEK_API_KEY est manquante';
@@ -15,7 +15,7 @@ if (!DEEPSEEK_API_KEY) {
   throw new Error(error);
 }
 
-logger.info('✅ Clé API Deepseek chargée');
+logger.info('✅ Cle API Deepseek chargee');
 
 // Configuration du client HTTP
 const client = axios.create({
@@ -28,7 +28,7 @@ const client = axios.create({
   validateStatus: status => status < 500 // Accepter tous les codes de statut < 500
 });
 
-// Configuration des modèles IA
+// Configuration des modeles IA
 const CONFIG = {
   MODEL: process.env.AI_MODEL || 'deepseek-chat',
   MAX_TOKENS: parseInt(process.env.AI_MAX_TOKENS || '1000', 10),
@@ -38,17 +38,17 @@ const CONFIG = {
 };
 
 /**
- * Attends un délai spécifié
- * @param {number} ms - Délai en millisecondes
+ * Attends un delai specifie
+ * @param {number} ms - Delai en millisecondes
  * @returns {Promise<void>}
  */
 const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
- * Gère les erreurs dans le processus IA avec logging détaillé
- * @param {Error} erreur - L'erreur rencontrée
- * @param {string} prompt - Le prompt ayant généré l'erreur
- * @param {any} reponse - La réponse éventuelle de l'API
+ * Gere les erreurs dans le processus IA avec logging detaille
+ * @param {Error} erreur - L'erreur rencontree
+ * @param {string} prompt - Le prompt ayant genere l'erreur
+ * @param {any} reponse - La reponse eventuelle de l'API
  * @throws {Error} - Erreur enrichie avec contexte
  */
 async function gererErreurIA(erreur, prompt = 'N/A', reponse = null) {
@@ -64,21 +64,21 @@ async function gererErreurIA(erreur, prompt = 'N/A', reponse = null) {
   logger.error('❌ Erreur lors du traitement IA', errorDetails);
 
   if (reponse) {
-    logger.error('❌ Réponse IA partielle:', {
+    logger.error('❌ Reponse IA partielle:', {
       response: typeof reponse === 'string'
           ? reponse.substring(0, 500)
           : JSON.stringify(reponse).substring(0, 500)
     });
   }
 
-  throw new Error(`Échec de traitement IA: ${erreur.message}`);
+  throw new Error(`echec de traitement IA: ${erreur.message}`);
 }
 
 /**
- * Génère du texte avec l'API Deepseek avec gestion des retries
+ * Genere du texte avec l'API Deepseek avec gestion des retries
  * @param {string} prompt - Le prompt à envoyer à l'IA
- * @returns {Promise<string>} - Texte généré
- * @throws {Error} - Si la génération échoue après les retries
+ * @returns {Promise<string>} - Texte genere
+ * @throws {Error} - Si la generation echoue apres les retries
  */
 async function genererTexte(prompt) {
   let retries = 0;
@@ -103,9 +103,9 @@ async function genererTexte(prompt) {
         presence_penalty: 0
       });
 
-      // Validation de la réponse de l'API
+      // Validation de la reponse de l'API
       if (!response.data || !response.data.choices || !response.data.choices[0]) {
-        throw new Error('Structure de réponse API inattendue');
+        throw new Error('Structure de reponse API inattendue');
       }
 
       return response.data.choices[0].message.content.trim();
@@ -114,7 +114,7 @@ async function genererTexte(prompt) {
       retries++;
 
       // Log l'erreur de tentative
-      logger.warn(`Échec de la tentative ${retries}/${CONFIG.RETRY_LIMIT}: ${erreur.message}`);
+      logger.warn(`echec de la tentative ${retries}/${CONFIG.RETRY_LIMIT}: ${erreur.message}`);
 
       // Si nous avons atteint la limite de tentatives, propager l'erreur
       if (retries >= CONFIG.RETRY_LIMIT) {
@@ -129,37 +129,37 @@ async function genererTexte(prompt) {
     }
   }
 
-  // Cette ligne ne devrait jamais être atteinte grâce au throw dans gererErreurIA
-  throw new Error("Échec de génération de texte après plusieurs tentatives");
+  // Cette ligne ne devrait jamais etre atteinte grâce au throw dans gererErreurIA
+  throw new Error("echec de generation de texte apres plusieurs tentatives");
 }
 
 /**
  * Parse une chaîne JSON avec gestion d'erreurs
  * @param {string} reponse - Chaîne JSON à parser
- * @returns {any} - Objet JS résultant
- * @throws {Error} - Si le parsing échoue
+ * @returns {any} - Objet JS resultant
+ * @throws {Error} - Si le parsing echoue
  */
 function validerReponseJSON(reponse) {
   try {
     return JSON.parse(reponse);
   } catch (erreur) {
-    logger.warn('Échec de parsing JSON direct', {
+    logger.warn('echec de parsing JSON direct', {
       error: erreur.message,
       responsePreview: reponse.substring(0, 100)
     });
-    throw new Error('La réponse de l\'IA n\'est pas un JSON valide');
+    throw new Error('La reponse de l\'IA n\'est pas un JSON valide');
   }
 }
 
 /**
- * Tente d'extraire du JSON depuis une réponse textuelle
+ * Tente d'extraire du JSON depuis une reponse textuelle
  * @param {string} reponse - Texte contenant potentiellement du JSON
  * @returns {any} - Objet JS extrait
- * @throws {Error} - Si l'extraction échoue
+ * @throws {Error} - Si l'extraction echoue
  */
 function extraireJSONDepuisReponse(reponse) {
   try {
-    // Stratégie 1: Rechercher un objet JSON complet
+    // Strategie 1: Rechercher un objet JSON complet
     const jsonRegex = /{[\s\S]*?}(?=\s*$)/;
     const matches = reponse.match(jsonRegex);
 
@@ -167,7 +167,7 @@ function extraireJSONDepuisReponse(reponse) {
       return JSON.parse(matches[0]);
     }
 
-    // Stratégie 2: Chercher entre délimiteurs de code
+    // Strategie 2: Chercher entre delimiteurs de code
     const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
     const codeMatches = reponse.match(codeBlockRegex);
 
@@ -175,29 +175,29 @@ function extraireJSONDepuisReponse(reponse) {
       return JSON.parse(codeMatches[1]);
     }
 
-    // Stratégie 3: Approche plus agressive - prendre tout ce qui ressemble à du JSON
+    // Strategie 3: Approche plus agressive - prendre tout ce qui ressemble à du JSON
     const lastDitchAttempt = reponse.match(/{[\s\S]*}/);
     if (lastDitchAttempt && lastDitchAttempt[0]) {
       return JSON.parse(lastDitchAttempt[0]);
     }
 
-    throw new Error('Aucun JSON trouvé dans la réponse');
+    throw new Error('Aucun JSON trouve dans la reponse');
   } catch (erreur) {
-    logger.error('Échec d\'extraction JSON', {
+    logger.error('echec d\'extraction JSON', {
       error: erreur.message,
       responsePreview: reponse.substring(0, 300)
     });
-    throw new Error('Impossible d\'extraire le JSON de la réponse IA');
+    throw new Error('Impossible d\'extraire le JSON de la reponse IA');
   }
 }
 
 /**
- * Traite une requête IA et tente d'extraire un résultat JSON
+ * Traite une requete IA et tente d'extraire un resultat JSON
  * @param {string} prompt - Le prompt à envoyer
- * @returns {Promise<any>} - Objet JS résultant
+ * @returns {Promise<any>} - Objet JS resultant
  */
 async function traiterReponseIA(prompt) {
-  logger.info('Traitement d\'une requête IA', {
+  logger.info('Traitement d\'une requete IA', {
     promptLength: prompt.length,
     model: CONFIG.MODEL
   });
@@ -208,16 +208,16 @@ async function traiterReponseIA(prompt) {
     // Tentative directe de parsing JSON
     return validerReponseJSON(reponse);
   } catch (erreur) {
-    // Si échec, tenter l'extraction
-    logger.warn('⚠️ Tentative d\'extraction JSON depuis la réponse IA');
+    // Si echec, tenter l'extraction
+    logger.warn('⚠️ Tentative d\'extraction JSON depuis la reponse IA');
     return extraireJSONDepuisReponse(reponse);
   }
 }
 
 /**
  * Analyse d'un projet avec l'IA
- * @param {Object} donnees - Données du projet à analyser
- * @returns {Promise<Object>} - Résultats de l'analyse
+ * @param {Object} donnees - Donnees du projet à analyser
+ * @returns {Promise<Object>} - Resultats de l'analyse
  */
 async function analyserProjet(donnees) {
   try {
@@ -225,7 +225,7 @@ async function analyserProjet(donnees) {
       dataSize: JSON.stringify(donnees).length
     });
 
-    // Préparation d'un prompt structuré
+    // Preparation d'un prompt structure
     const prompt = `
             Analyser le projet suivant et fournir des recommandations :
             
@@ -233,12 +233,12 @@ async function analyserProjet(donnees) {
             
             Points à analyser :
             1. Risques potentiels
-            2. Points d'amélioration
+            2. Points d'amelioration
             3. Recommandations
             4. Estimation de la progression
-            5. Prochaines étapes suggérées
+            5. Prochaines etapes suggerees
             
-            FORMAT: Fournir la réponse sous forme de texte structuré.
+            FORMAT: Fournir la reponse sous forme de texte structure.
         `;
 
     const response = await genererTexte(prompt);
@@ -250,19 +250,19 @@ async function analyserProjet(donnees) {
     };
   } catch (error) {
     logger.error('Erreur lors de l\'analyse du projet :', error);
-    throw new Error('Échec de l\'analyse du projet : ' + error.message);
+    throw new Error('echec de l\'analyse du projet : ' + error.message);
   }
 }
 
 /**
- * Calcule le suivi de progression basé sur les tâches
+ * Calcule le suivi de progression base sur les tâches
  * @param {Array} taches - Liste des tâches à analyser
  * @returns {Object} - Statistiques de progression
  */
 async function suiviProgression(taches) {
   // Validation
   if (!Array.isArray(taches)) {
-    throw new Error('Le paramètre taches doit être un tableau');
+    throw new Error('Le parametre taches doit etre un tableau');
   }
 
   // Si aucune tâche, retourner 0%
@@ -277,9 +277,9 @@ async function suiviProgression(taches) {
 
   // Calculer les statistiques
   const terminees = taches.filter(t =>
-      t.statut === 'terminée' ||
-      t.statut === 'complété' ||
-      t.statut === 'Terminé'
+      t.statut === 'terminee' ||
+      t.statut === 'complete' ||
+      t.statut === 'Termine'
   ).length;
 
   const enCours = taches.filter(t =>
@@ -300,24 +300,24 @@ async function suiviProgression(taches) {
 }
 
 /**
- * Prédit la performance basée sur l'historique
- * @param {Array<number>} historique - Durées des tâches précédentes
- * @returns {Object} - Prédictions de performance
+ * Predit la performance basee sur l'historique
+ * @param {Array<number>} historique - Durees des tâches precedentes
+ * @returns {Object} - Predictions de performance
  */
 async function predirePerformance(historique) {
   // Validation
   if (!Array.isArray(historique) || historique.length === 0) {
-    throw new Error('Un historique non vide est requis pour la prédiction de performance');
+    throw new Error('Un historique non vide est requis pour la prediction de performance');
   }
 
   // Calcul simple de la moyenne
   const tempsMoyen = historique.reduce((s, t) => s + t, 0) / historique.length;
 
-  // Calcul de l'écart-type pour estimer l'incertitude
+  // Calcul de l'ecart-type pour estimer l'incertitude
   const sommeEcartsCarres = historique.reduce((s, t) => s + Math.pow(t - tempsMoyen, 2), 0);
   const ecartType = Math.sqrt(sommeEcartsCarres / historique.length);
 
-  // Calcul de la tendance (amélioration ou détérioration)
+  // Calcul de la tendance (amelioration ou deterioration)
   const moitieTaille = Math.floor(historique.length / 2);
   const premiereMoitie = historique.slice(0, moitieTaille);
   const secondeMoitie = historique.slice(-moitieTaille);
@@ -325,7 +325,7 @@ async function predirePerformance(historique) {
   const moyennePremiere = premiereMoitie.reduce((s, t) => s + t, 0) / premiereMoitie.length;
   const moyenneSeconde = secondeMoitie.reduce((s, t) => s + t, 0) / secondeMoitie.length;
 
-  const tendance = moyenneSeconde < moyennePremiere ? 'amélioration' : 'détérioration';
+  const tendance = moyenneSeconde < moyennePremiere ? 'amelioration' : 'deterioration';
   const tauxVariation = Math.abs((moyenneSeconde - moyennePremiere) / moyennePremiere) * 100;
 
   return {
@@ -334,34 +334,34 @@ async function predirePerformance(historique) {
     tendance,
     tauxVariation: tauxVariation.toFixed(1) + '%',
     estimation: `${tempsMoyen.toFixed(1)} ± ${ecartType.toFixed(1)} heures`,
-    prediction: `Temps estimé pour la prochaine tâche: ${tempsMoyen.toFixed(2)} heures avec tendance à l'${tendance}.`
+    prediction: `Temps estime pour la prochaine tâche: ${tempsMoyen.toFixed(2)} heures avec tendance à l'${tendance}.`
   };
 }
 
 /**
- * Génère un planning optimisé en fonction des priorités et durées
- * @param {Array<Object>} taches - Liste des tâches avec priorité et durée
- * @returns {Array<Object>} - Planning optimisé
+ * Genere un planning optimise en fonction des priorites et durees
+ * @param {Array<Object>} taches - Liste des tâches avec priorite et duree
+ * @returns {Array<Object>} - Planning optimise
  */
 async function genererPlanning(taches) {
   // Validation
   if (!Array.isArray(taches) || taches.length === 0) {
-    throw new Error('Liste de tâches vide. Impossible de générer un planning.');
+    throw new Error('Liste de tâches vide. Impossible de generer un planning.');
   }
 
-  // Vérifier que chaque tâche a priorité et durée
+  // Verifier que chaque tâche a priorite et duree
   const tachesInvalides = taches.filter(t =>
       typeof t.priorite === 'undefined' || typeof t.duree === 'undefined'
   );
 
   if (tachesInvalides.length > 0) {
-    throw new Error('Certaines tâches n\'ont pas de priorité ou de durée définie.');
+    throw new Error('Certaines tâches n\'ont pas de priorite ou de duree definie.');
   }
 
-  // Tri par priorité décroissante (plus la priorité est élevée, plus tôt la tâche est planifiée)
+  // Tri par priorite decroissante (plus la priorite est elevee, plus tôt la tâche est planifiee)
   const tachesTriees = [...taches].sort((a, b) => b.priorite - a.priorite);
 
-  // Calcul des heures de début et fin pour chaque tâche
+  // Calcul des heures de debut et fin pour chaque tâche
   let heureCourante = 0;
   const planning = tachesTriees.map(tache => {
     const debut = heureCourante;
@@ -379,28 +379,28 @@ async function genererPlanning(taches) {
 }
 
 /**
- * Forme des équipes optimisées en fonction des compétences et affinités
- * @param {Array<Object>} membres - Liste des membres avec leurs compétences
- * @returns {Promise<Array<Object>>} - Équipes optimisées
+ * Forme des equipes optimisees en fonction des competences et affinites
+ * @param {Array<Object>} membres - Liste des membres avec leurs competences
+ * @returns {Promise<Array<Object>>} - equipes optimisees
  */
 async function creerEquipes(membres) {
   // Validation
   if (!Array.isArray(membres) || membres.length === 0) {
-    throw new Error('Liste de membres vide. Impossible de créer les équipes.');
+    throw new Error('Liste de membres vide. Impossible de creer les equipes.');
   }
 
-  // Utilisation de l'IA pour former les équipes
+  // Utilisation de l'IA pour former les equipes
   const prompt = `
-        Forme des équipes optimisées en fonction des compétences, disponibilités et préférences suivantes.
+        Forme des equipes optimisees en fonction des competences, disponibilites et preferences suivantes.
         
-        Données des membres:
+        Donnees des membres:
         ${JSON.stringify(membres, null, 2)}
         
         Contraintes:
-        - Distribuer les compétences équitablement
-        - Equilibrer le niveau d'expérience dans chaque équipe
-        - Respecter les préférences de collaboration si spécifiées
-        - Former des équipes de taille similaire
+        - Distribuer les competences equitablement
+        - Equilibrer le niveau d'experience dans chaque equipe
+        - Respecter les preferences de collaboration si specifiees
+        - Former des equipes de taille similaire
         
         Retourne uniquement un objet JSON avec le format suivant:
         {
@@ -420,7 +420,7 @@ async function creerEquipes(membres) {
 }
 
 /**
- * Association optimale tuteurs-projets basée sur les compétences
+ * Association optimale tuteurs-projets basee sur les competences
  * @param {Array<Object>} membres - Liste des membres à associer
  * @returns {Promise<Array<Object>>} - Associations optimales
  */
@@ -430,18 +430,18 @@ async function associerTuteurs(membres) {
     throw new Error('Liste de membres vide. Impossible d\'associer les tuteurs.');
   }
 
-  // Utilisation de l'IA pour associer tuteurs et équipes
+  // Utilisation de l'IA pour associer tuteurs et equipes
   const prompt = `
-        Associe les tuteurs et les équipes selon leurs compétences et besoins.
+        Associe les tuteurs et les equipes selon leurs competences et besoins.
         
-        Données des membres et tuteurs:
+        Donnees des membres et tuteurs:
         ${JSON.stringify(membres, null, 2)}
         
         Contraintes:
-        - Un tuteur doit avoir au moins une compétence correspondant au projet
-        - Équilibrer la charge des tuteurs
-        - Maximiser la compatibilité thématique entre tuteurs et projets
-        - Tenir compte des disponibilités
+        - Un tuteur doit avoir au moins une competence correspondant au projet
+        - equilibrer la charge des tuteurs
+        - Maximiser la compatibilite thematique entre tuteurs et projets
+        - Tenir compte des disponibilites
         
         Retourne uniquement un objet JSON avec le format suivant:
         {
@@ -449,7 +449,7 @@ async function associerTuteurs(membres) {
             {
               "equipe": "equipe1",
               "tuteur": "tuteur3",
-              "raisonAssociation": "Expertise en développement web et base de données",
+              "raisonAssociation": "Expertise en developpement web et base de donnees",
               "scoreCompatibilite": 0.85
             },
             ...
@@ -461,26 +461,26 @@ async function associerTuteurs(membres) {
 }
 
 /**
- * Recommande des ressources d'apprentissage pour des compétences
- * @param {Array<string>} competences - Liste des compétences
- * @returns {Promise<Object>} - Ressources recommandées
+ * Recommande des ressources d'apprentissage pour des competences
+ * @param {Array<string>} competences - Liste des competences
+ * @returns {Promise<Object>} - Ressources recommandees
  */
 async function recommanderApprentissage(competences) {
   // Validation
   if (!Array.isArray(competences) || competences.length === 0) {
-    throw new Error('Liste de compétences vide. Impossible de recommander des ressources.');
+    throw new Error('Liste de competences vide. Impossible de recommander des ressources.');
   }
 
-  // Utilisez l'IA pour générer des recommandations personnalisées
+  // Utilisez l'IA pour generer des recommandations personnalisees
   const prompt = `
-        Recommande des ressources d'apprentissage pour les compétences suivantes: 
+        Recommande des ressources d'apprentissage pour les competences suivantes: 
         ${competences.join(', ')}.
         
-        Pour chaque compétence, recommande:
-        - 1 cours en ligne (avec lien fictif mais réaliste)
-        - 1 livre de référence
+        Pour chaque competence, recommande:
+        - 1 cours en ligne (avec lien fictif mais realiste)
+        - 1 livre de reference
         - 1 projet pratique pour s'exercer
-        - 1 communauté en ligne pour obtenir de l'aide
+        - 1 communaute en ligne pour obtenir de l'aide
         
         Retourne uniquement un objet JSON avec ce format:
         {

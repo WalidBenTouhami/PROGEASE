@@ -1,27 +1,27 @@
-// Fichier de test pour vérifier le système de logs
+// Fichier de test pour verifier le systeme de logs
 const logger = require('./src/utils/logger');
 
-console.log('Démarrage des tests de logs...');
+console.log('Demarrage des tests de logs...');
 
-// Générer des logs pour chaque niveau
+// Generer des logs pour chaque niveau
 logger.error('Erreur de test critique', { code: 'E001', source: 'test-script' });
-logger.warn('Avertissement de test', { component: 'système de fichiers' });
+logger.warn('Avertissement de test', { component: 'systeme de fichiers' });
 logger.info('Information de test standard', { user: 'admin' });
-logger.debug('Message de débogage détaillé', { data: { id: 123, value: 'test' } });
+logger.debug('Message de debogage detaille', { data: { id: 123, value: 'test' } });
 
 // Test de la gestion des exceptions
 try {
     throw new Error('Exception de test');
 } catch (error) {
-    logger.error('Une exception a été capturée', { error });
+    logger.error('Une exception a ete capturee', { error });
 }
 
 // Test d'objets complexes
-logger.info('Test avec données complexes', {
+logger.info('Test avec donnees complexes', {
     utilisateur: {
         id: 1,
         nom: 'Test User',
-        roles: ['admin', 'développeur']
+        roles: ['admin', 'developpeur']
     },
     statistiques: {
         tempsExecution: 235,
@@ -29,6 +29,6 @@ logger.info('Test avec données complexes', {
     }
 });
 
-console.log('Tests de logs terminés. Vérifiez le dossier logs/ pour les résultats.');
+console.log('Tests de logs termines. Verifiez le dossier logs/ pour les resultats.');
 
 // [NINJA REFACTOR] Check that logs are written to the correct files/locations. Add comments for maintainers. Improve error handling.
