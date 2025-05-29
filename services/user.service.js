@@ -67,7 +67,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
     },
   });
 
-  const verificationLink = `http://localhost:3000/verify-email?token=${verificationToken}`;
+  const verificationLink = `http://localhost:3000/api/verify-email?token=${verificationToken}`;
 
   const mailOptions = {
     from: 'attestationauto@gmail.com',  

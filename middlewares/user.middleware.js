@@ -1,12 +1,13 @@
 // src/modules/user-management/middlewares/user.middleware.js
 
 const dotenv = require('dotenv');  
+
 dotenv.config();
 
 const jwt = require('jsonwebtoken');  
 
-const JWT_SECRET = process.env.JWT_SECRET;
 
+const JWT_SECRET = process.env.JWT_SECRET;
 // Vérifier le token JWT
 const verifyToken = (req, res, next) => {
   const token = req.header("Authorization")?.replace("Bearer ", "");
