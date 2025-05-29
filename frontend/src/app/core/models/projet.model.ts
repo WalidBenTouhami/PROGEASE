@@ -1,4 +1,4 @@
-import { Livrable } from './livrable.model';
+import { Livrable } from '../../core/models/livrable.model';
 
 // Synced with backend/src/models/projet.model.js
 export interface Projet {
