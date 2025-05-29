@@ -1,0 +1,101 @@
+<div class="container mt-4">
+  <h2>Créer une Formation</h2>
+  <form [formGroup]="formationForm" (ngSubmit)="onSubmit()">
+
+    <!-- Titre -->
+    <div class="mb-3">
+      <label for="titre">Titre</label>
+      <input id="titre" class="form-control" formControlName="titre">
+      <div *ngIf="formationForm.get('titre')?.touched && formationForm.get('titre')?.invalid" class="text-danger">
+        Le titre est requis.
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="mb-3">
+      <label for="description">Description</label>
+      <textarea id="description" class="form-control" formControlName="description"></textarea>
+    </div>
+
+    <!-- Catégorie -->
+    <div class="mb-3">
+      <label for="categorie">Catégorie</label>
+      <select id="categorie" class="form-control" formControlName="categorie">
+        <option value="Developpement">Développement</option>
+        <option value="IA">IA</option>
+        <option value="Gestion de projet">Gestion de projet</option>
+      </select>
+      <div *ngIf="formationForm.get('categorie')?.touched && formationForm.get('categorie')?.invalid" class="text-danger">
+        La catégorie est requise.
+      </div>
+    </div>
+
+    <!-- Durée -->
+    <div class="mb-3">
+      <label for="duree">Durée (heures)</label>
+      <input id="duree" type="number" class="form-control" formControlName="duree">
+<div *ngIf="formationForm.get('duree') as dureeControl">
+  <div *ngIf="dureeControl.touched && dureeControl.errors" class="text-danger">
+    <div *ngIf="dureeControl.errors['required']">La durée est requise.</div>
+    <div *ngIf="dureeControl.errors['min']">La durée doit être supérieure à 0.</div>
+  </div>
+</div>
+
+    </div>
+
+    <!-- Modules -->
+    <div class="mb-3" formArrayName="modules">
+      <label>Modules</label>
+      <div *ngFor="let m of modules.controls; let i = index">
+        <input class="form-control mb-2" [formControlName]="i">
+        <div *ngIf="m.touched && m.invalid" class="text-danger">Ce module est requis.</div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" (click)="addModule()">+ Ajouter un module</button>
+    </div>
+
+    <!-- Videos -->
+    <div class="mb-3" formArrayName="videos">
+      <label>Vidéos</label>
+      <div *ngFor="let v of videos.controls; let i = index">
+        <input class="form-control mb-2" [formControlName]="i">
+        <div *ngIf="v.touched && v.invalid" class="text-danger">Cette vidéo est requise.</div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" (click)="addVideo()">+ Ajouter une vidéo</button>
+    </div>
+
+    <!-- PDFs -->
+    <div class="mb-3" formArrayName="pdfs">
+      <label>PDFs</label>
+      <div *ngFor="let p of pdfs.controls; let i = index">
+        <input class="form-control mb-2" [formControlName]="i">
+        <div *ngIf="p.touched && p.invalid" class="text-danger">Ce PDF est requis.</div>
+      </div>
+      <button type="button" class="btn btn-secondary btn-sm" (click)="addPdf()">+ Ajouter un PDF</button>
+    </div>
+
+    <!-- Quizzes -->
+    <div class="mb-3">
+      <label>Quizzes</label>
+      <div *ngFor="let quiz of allQuizzes">
+        <ng-container *ngIf="quiz._id">
+          <input
+            type="checkbox"
+            [checked]="selectedQuizIds.includes(quiz._id)"
+            (change)="onQuizChange(quiz._id, $event)"
+          />
+          {{ quiz.titre }}
+        </ng-container>
+      </div>
+    </div>
+
+    <div *ngIf="formationForm.errors?.['requiredArraysMissing'] && formationForm.touched" class="text-danger">
+  Veuillez ajouter au moins une vidéo, un PDF et un quiz.
+</div>
+
+
+    <!-- Submit button -->
+    <button type="submit" class="btn btn-success" [disabled]="formationForm.pristine">
+      Créer
+    </button>
+  </form>
+</div>

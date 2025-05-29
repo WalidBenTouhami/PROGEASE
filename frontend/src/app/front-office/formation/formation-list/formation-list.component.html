@@ -1,0 +1,43 @@
+<div class="container mt-4">
+  <h1>Formations disponibles</h1>
+
+  <div *ngIf="loading" class="alert alert-info">Chargement...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && !error && formations.length === 0" class="alert alert-warning">
+    Aucune formation disponible pour le moment.
+  </div>
+
+  <div class="row" *ngIf="formations.length > 0">
+    <div class="col-md-4 mb-4" *ngFor="let formation of formations">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ formation.titre }}</h5>
+          <p class="card-text">{{ formation.description || 'Pas de description' }}</p>
+          <p><strong>Catégorie:</strong> {{ formation.categorie }}</p>
+          <p><strong>Durée:</strong> {{ formation.duree }} heures</p>
+<p><strong>Modules:</strong> {{ formation.modules?.join(', ') || 'Aucun module' }}</p>
+
+<div *ngIf="formation.contenu.quiz.length > 0">
+            <strong>Quizzes :</strong>
+            <ul>
+                <div *ngIf="formation.contenu.quiz && formation.contenu.quiz.length > 0">
+              <li *ngFor="let quiz of formation.contenu.quiz">
+                {{ quiz.titre }}
+              </li>
+              </div>
+            </ul>
+          </div>
+          
+<button 
+  class="btn btn-primary mt-auto"
+  (click)="joinFormation(formation._id!)"
+  [disabled]="checkIfUserIsEnrolled(formation._id!)">
+  {{ checkIfUserIsEnrolled(formation._id!) ? 'Déjà inscrit' : 'Rejoindre la formation' }}
+</button>
+          <button class="btn btn-secondary mt-auto" [routerLink]="['/front-office/formations', formation._id]">Voir détails</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

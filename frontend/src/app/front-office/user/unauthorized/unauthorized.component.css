@@ -1,0 +1,15 @@
+.unauthorized-container {
+  text-align: center;
+  margin-top: 5rem;
+}
+.unauthorized-container h2 {
+  color: red;
+  font-size: 2rem;
+}
+.unauthorized-container a {
+  display: inline-block;
+  margin-top: 1rem;
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+}

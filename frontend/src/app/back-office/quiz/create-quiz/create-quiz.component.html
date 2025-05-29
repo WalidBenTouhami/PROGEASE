@@ -1,0 +1,78 @@
+<div class="container mt-4">
+  <h2 class="mb-4">Créer un nouveau quiz</h2>
+
+  <form [formGroup]="quizForm" (ngSubmit)="submitQuiz()">
+    <div class="mb-3">
+      <label class="form-label">Titre</label>
+      <input type="text" class="form-control" formControlName="titre" />
+      <div class="text-danger" *ngIf="quizForm.get('titre')?.touched && quizForm.get('titre')?.invalid">
+        Le titre est requis.
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <textarea class="form-control" formControlName="description"></textarea>
+    </div>
+
+    <div formArrayName="questions">
+      <div
+        *ngFor="let questionGroup of questions.controls; let i = index"
+        [formGroupName]="i"
+        class="border p-3 mb-3"
+      >
+        <label>Question {{ i + 1 }}</label>
+        <input type="text" class="form-control mb-2" formControlName="question" />
+        <div class="text-danger" *ngIf="questionGroup.get('question')?.touched && questionGroup.get('question')?.invalid">
+          La question est requise.
+        </div>
+
+        <div formArrayName="options" class="mb-2">
+          <div
+            *ngFor="let option of getOptions(i).controls; let j = index"
+            class="d-flex align-items-center mb-1"
+          >
+            <input
+              type="text"
+              class="form-control me-2"
+              [formControlName]="j"
+              placeholder="Option {{ j + 1 }}"
+            />
+            <div class="text-danger" *ngIf="option.touched && option.invalid">
+              L'option est requise.
+            </div>
+          </div>
+          <button type="button" class="btn btn-sm btn-secondary" (click)="addOption(i)">
+            Ajouter option
+          </button>
+        </div>
+
+        <label>Bonne réponse</label>
+        <input type="text" class="form-control mb-2" formControlName="answer" />
+        <div class="text-danger" *ngIf="questionGroup.get('answer')?.touched && questionGroup.get('answer')?.invalid">
+          La bonne réponse est requise.
+        </div>
+        <div class="text-danger" *ngIf="questionGroup.errors?.['answerNotInOptions'] && questionGroup.get('answer')?.touched">
+          La bonne réponse doit correspondre à une des options.
+        </div>
+
+
+        <button
+          type="button"
+          class="btn btn-sm btn-danger"
+          (click)="removeQuestion(i)"
+        >
+          Supprimer question
+        </button>
+      </div>
+    </div>
+
+    <button type="button" class="btn btn-outline-primary" (click)="addQuestion()">
+      Ajouter une question
+    </button>
+
+    <div class="mt-4">
+      <button type="submit" class="btn btn-success" [disabled]="quizForm.pristine">Enregistrer</button>
+    </div>
+  </form>
+</div>

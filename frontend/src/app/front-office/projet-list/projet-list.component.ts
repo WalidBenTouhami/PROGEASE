@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProjetService } from '../../core/services/projet.service';
-import { Project } from '../../core/models/projet.model';
+import { Projet } from '../../core/models/projet.model';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./projet-list.component.css']
 })
 export class ProjetListComponent implements OnInit, OnDestroy {
-  projets: Project[] = [];
+  projets: Projet[] = [];
   chargement = false;
   erreur = '';
   private subscription?: Subscription;

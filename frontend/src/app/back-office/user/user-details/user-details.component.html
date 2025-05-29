@@ -1,0 +1,12 @@
+<div *ngIf="isLoading">Loading user details...</div>
+
+<div *ngIf="errorMessage" class="error">{{ errorMessage }}</div>
+
+<div *ngIf="user && !isLoading">
+  <h2>Détails de l'utilisateur</h2>
+  <ul>
+    <li><strong>Nom:</strong> {{ user.name }}</li>
+    <li><strong>Email:</strong> {{ user.email }}</li>
+    <li><strong>Rôle:</strong> {{ user.role }}</li>
+  </ul>
+</div>

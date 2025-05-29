@@ -1,0 +1,30 @@
+          <button class="btn btn-secondary mt-auto" [routerLink]="['/front-office/formations']">Retour a la liste</button>
+
+<div *ngIf="quiz">
+  <h2>{{ quiz.titre }}</h2>
+  <p>{{ quiz.description }}</p>
+
+  <form (ngSubmit)="submit()">
+    <div *ngFor="let question of quiz.questions; let i = index">
+      <p><strong>Q{{ i + 1 }}:</strong> {{ question.question }}</p>
+      <div *ngFor="let option of question.options">
+        <label>
+          <input
+            type="radio"
+            [name]="'q' + i"
+            [value]="option"
+            [(ngModel)]="userAnswers[i]"
+            required
+          />
+          {{ option }}
+        </label>
+      </div>
+    </div>
+
+    <button type="submit">Soumettre</button>
+  </form>
+
+  <div *ngIf="resultMessage" style="margin-top: 20px;">
+    <strong>{{ resultMessage }}</strong>
+  </div>
+</div>

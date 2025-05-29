@@ -3,28 +3,39 @@
   --primary-light: #1D8A99;
   --primary-dark: #0B4D57;
   --accent-color: #17B5B5;
-  --background-light: #f7fbfc;
+  --background-light: #f9fbfc;
   --background-medium: #e4f0f2;
+  --background-dark: #e1ecee;
   --error-color: #b00020;
+  --text-color: #222;
+  --font-base: 'Segoe UI', Arial, sans-serif;
+
+  --radius: 0.5rem;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --transition-fast: 0.2s ease-in-out;
 }
 
 body {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  background: var(--background-light);
-  color: #222;
+  font-family: var(--font-base);
+  background-color: var(--background-light);
+  color: var(--text-color);
   margin: 0;
+  line-height: 1.6;
 }
+
 a {
   color: var(--primary-color);
   text-decoration: none;
-  transition: color 0.2s;
+  transition: color var(--transition-fast), text-decoration var(--transition-fast);
 }
 a:focus, a:hover {
   color: var(--accent-color);
   text-decoration: underline;
   outline: 2px solid var(--accent-color);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
+
 .skip-link {
   position: absolute;
   left: -999px;
@@ -32,11 +43,12 @@ a:focus, a:hover {
   width: 1px;
   height: 1px;
   overflow: hidden;
-  background: #fff;
+  background: white;
   color: var(--primary-color);
-  padding: 0.5em;
-  border-radius: 0 0 0.5em 0.5em;
+  padding: 0.75em 1em;
+  border-radius: var(--radius);
   z-index: 100;
+  transition: left var(--transition-fast);
 }
 .skip-link:focus {
   left: 0;
@@ -46,50 +58,80 @@ a:focus, a:hover {
   font-size: 1rem;
   outline: 2px solid var(--primary-color);
 }
+
 button, input, select, textarea {
   font-family: inherit;
   font-size: 1rem;
-  border-radius: .3em;
+  border-radius: var(--radius);
   border: 1px solid #ccc;
-  padding: .5em;
-  margin-bottom: .5em;
+  padding: 0.6em 0.75em;
+  margin-bottom: 0.75em;
   box-sizing: border-box;
 }
+
 button {
   background: var(--primary-color);
   color: #fff;
   border: none;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  box-shadow: var(--shadow-sm);
 }
-button:focus, button:hover {
+button:hover,
+button:focus {
   background: var(--primary-dark);
+  transform: scale(1.02);
 }
+
 .form-group {
-  margin-bottom: 1em;
+  margin-bottom: 1.25em;
 }
+
 .error {
   color: var(--error-color);
-  font-size: .95em;
+  font-size: 0.95em;
+  margin-top: -0.5em;
 }
+
 .status {
   display: inline-block;
   font-size: 0.85em;
   margin-left: 0.5em;
-  padding: 0.2em 0.6em;
-  border-radius: 1em;
+  padding: 0.3em 0.8em;
+  border-radius: 2em;
+  font-weight: 600;
 }
+
 .status.termine { background: #c8e6c9; color: #256029; }
 .status.encours { background: #ffe082; color: #996c00; }
-.status.soumis { background: #bbdefb; color: #0d47a1; }
+.status.soumis  { background: #bbdefb; color: #0d47a1; }
 .status.attente { background: #fff3e0; color: #bf360c; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 1rem 0;
+}
+
+.stat-card {
+  background-color: var(--background-dark);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-md);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
 
 @media (max-width: 600px) {
   .dashboard-container, .form-container {
     padding: 1rem;
   }
   .stats-grid {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
 }

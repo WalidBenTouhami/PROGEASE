@@ -1,0 +1,45 @@
+<button class="btn btn-secondary mt-auto" [routerLink]="backLink">
+  Retour à la liste
+</button>
+<div class="container mt-4" *ngIf="!loading && formation; else loadingOrError">
+  <h2 class="mb-3">{{ formation.titre }}</h2>
+  <p *ngIf="formation.description">{{ formation.description }}</p>
+
+  <p><strong>Catégorie :</strong> {{ formation.categorie }}</p>
+  <p><strong>Durée :</strong> {{ formation.duree }} heures</p>
+  <p><strong>Modules :</strong> {{ formation.modules.join(', ') }}</p>
+
+  <div *ngIf="formation.contenu">
+    <div *ngIf="formation.contenu.quiz.length > 0">
+      <h4>Quizzes</h4>
+      <ul class="list-group mb-3">
+        <li class="list-group-item" *ngFor="let quiz of formation.contenu.quiz">
+         <a routerLink="/front-office/quiz/{{ quiz._id }}"> {{ quiz.titre }}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div *ngIf="formation.contenu.videos.length > 0">
+      <h4>Vidéos</h4>
+      <ul class="list-group mb-3">
+        <li class="list-group-item" *ngFor="let video of formation.contenu.videos; let i = index">
+         <a href="{{ video }}">Voir la video {{i +1}}</a>
+        </li>
+      </ul>
+    </div>
+
+    <div *ngIf="formation.contenu.pdfs.length > 0">
+      <h4>PDFs</h4>
+      <ul class="list-group mb-3">
+        <li class="list-group-item" *ngFor="let pdf of formation.contenu.pdfs">
+          {{ pdf }}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingOrError>
+  <div *ngIf="loading" class="text-center">Chargement...</div>
+  <div *ngIf="!loading && error" class="alert alert-danger">{{ error }}</div>
+</ng-template>

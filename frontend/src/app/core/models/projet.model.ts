@@ -1,4 +1,4 @@
-import { Deliverable } from './livrable.model';
+import { Livrable } from './livrable.model';
 
 export interface Projet {
     _id?: string;

@@ -7,6 +7,8 @@ import { ProjetListComponent } from './projet-list/projet-list.component';
   imports: [
     CommonModule,
     ProjetRoutingModule,
+  ],
+  declarations: [
     ProjetListComponent
   ]
 })

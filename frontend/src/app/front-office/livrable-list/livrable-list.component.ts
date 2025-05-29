@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { Deliverable, StatutLivrable } from '../../core/models/livrable.model';
+import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
 import { LivrableService } from '../../core/services/livrable.service';
 
 @Component({
@@ -13,7 +13,7 @@ import { LivrableService } from '../../core/services/livrable.service';
 })
 export class LivrableListComponent implements OnInit {
   @Input() projetId!: string;
-  livrables: Deliverable[] = [];
+  livrables: Livrable[] = [];
   chargement = false;
   erreur = '';
 

@@ -1,0 +1,25 @@
+<div class="container mt-4">
+  <h1>Quiz disponibles</h1>
+
+  <div *ngIf="loading" class="alert alert-info">Chargement...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <div *ngIf="!loading && !error && quizs.length === 0" class="alert alert-warning">
+    Aucune Quiz disponible pour le moment.
+  </div>
+
+  <div class="row" *ngIf="quizs.length > 0">
+    <div class="col-md-4 mb-4" *ngFor="let quiz of quizs">
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column">
+          <h5 class="card-title">{{ quiz.titre }}</h5>
+          <p class="card-text">{{ quiz.description || 'Pas de description' }}</p>
+
+
+          
+          <button class="btn btn-primary mt-auto" [routerLink]="['/front-office/quiz', quiz._id]">Voir détails</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

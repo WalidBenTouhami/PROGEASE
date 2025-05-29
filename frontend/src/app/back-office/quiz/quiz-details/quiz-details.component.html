@@ -1,0 +1,26 @@
+<div class="container mt-4" *ngIf="!loading && quiz; else loadingOrError">
+  <h2 class="mb-3">{{ quiz.titre }}</h2>
+  <p *ngIf="quiz.description">{{ quiz.description }}</p>
+
+  <div *ngFor="let question of quiz.questions; let i = index" class="card mb-3">
+    <div class="card-body">
+      <h5 class="card-title">Question {{ i + 1 }}</h5>
+      <p class="card-text"><strong>{{ question.question }}</strong></p>
+
+      <ul class="list-group">
+        <li class="list-group-item" *ngFor="let option of question.options">
+          {{ option }}
+        </li>
+      </ul>
+
+      
+      <p class="mt-2 text-success"><strong>Réponse:</strong> {{ question.answer }}</p>
+      
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingOrError>
+  <div *ngIf="loading" class="text-center">Chargement...</div>
+  <div *ngIf="!loading && error" class="alert alert-danger">{{ error }}</div>
+</ng-template>

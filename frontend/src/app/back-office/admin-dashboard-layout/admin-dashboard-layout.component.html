@@ -1,0 +1,18 @@
+<div class="admin-dashboard">
+  <aside class="sidebar" aria-label="Navigation de gestion">
+    <nav>
+      <ul>
+        <li routerLink="dashboard" routerLinkActive="active">Tableau de bord</li>
+        <li routerLink="projets" routerLinkActive="active">Gestion des projets</li>
+        <li routerLink="livrables" routerLinkActive="active">Gestion des livrables</li>
+        <li routerLink="utilisateurs" routerLinkActive="active">Gestion des utilisateurs</li>
+        <li routerLink="quiz" routerLinkActive="active">Gestion des Quiz</li>
+        <li routerLink="formations" routerLinkActive="active">Gestion des Formations</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>
