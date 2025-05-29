@@ -1,0 +1,30 @@
+{
+  "database": {
+    "host": "localhost",
+    "port": 27017,
+    "name": "progease",
+    "user": "Walid",
+    "password": "securePassword"
+  },
+  "projects": [
+    {
+      "id": "1",
+      "title": "Gestion des Tâches",
+      "description": "Application pour gérer les tâches d'une équipe.",
+      "status": "draft"
+    }
+  ],
+  "users": [
+    {
+      "id": "645aef123456789012345678",
+      "name": "John Doe",
+      "role": "student"
+    }
+  ],
+  "env": {
+    "PORT": 3000,
+    "MONGO_URI": "mongodb://localhost:27017/progease",
+    "JWT_SECRET": "yourSuperSecretKey",
+    "CORS_ORIGINS": ["http://localhost:3000"]
+  }
+}
