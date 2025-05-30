@@ -1,22 +1,21 @@
-import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { ProjetService } from '../../core/services/projet.service';
 import { Projet, StatutProjet } from '../../core/models/projet.model';
 import { Subscription } from 'rxjs';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { MatCardModule } from '@angular/material/card';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatSortModule } from '@angular/material/sort';
-import { MatButtonModule } from '@angular/material/button';
-import { MatPaginatorModule } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-projet-list',
@@ -24,17 +23,18 @@ import { MatPaginatorModule } from '@angular/material/paginator';
   imports: [
     CommonModule,
     FormsModule,
-    MatCardModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
+    MatTableModule,
+    MatPaginatorModule,
     MatSortModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
     MatButtonModule,
-    MatPaginatorModule
+    MatIconModule,
+    MatCardModule
   ],
   templateUrl: './projet-list.component.html',
-  styleUrls: ['./projet-list.component.css']
+  styleUrls: ['./projet-list.component.scss']
 })
 export class ProjetListComponent implements OnInit, OnDestroy, AfterViewInit {
   projets: Projet[] = [];
@@ -75,8 +75,8 @@ export class ProjetListComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscription = this.projetService.recupererProjets().subscribe({
       next: (projets) => {
         this.projets = projets;
-        this.chargement = false;
         this.dataSource.data = projets;
+        this.chargement = false;
       },
       error: (err) => {
         this.erreur = "Erreur lors du chargement des projets.";

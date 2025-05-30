@@ -99,7 +99,7 @@ async function processGraphQLTests() {
 
                     // Verifier si la requete est vide apres nettoyage
                     if (!cleanQuery.trim()) {
-                        console.log(colorize(`  - Requete vide ignoree`, 'gray'));
+                        console.log(colorize('  - Requete vide ignoree', 'gray'));
                         continue;
                     }
 
@@ -114,7 +114,7 @@ async function processGraphQLTests() {
                             const cleanedVars = variablesMatch[1].replace(/^\s*#\s*/gm, '').trim();
                             variables = JSON.parse(cleanedVars);
                         } catch (e) {
-                            console.log(colorize(`    Variables non analysables, utilisation des valeurs par defaut`, 'yellow'));
+                            console.log(colorize('    Variables non analysables, utilisation des valeurs par defaut', 'yellow'));
                         }
                     }
 
@@ -139,7 +139,7 @@ async function processGraphQLTests() {
                         }
                         console.log(colorize(`    Query: ${cleanQuery.replace(/\s+/g, ' ').slice(0, 50)}...`, 'gray'));
                     } else {
-                        console.log(colorize(`    ✅ Succes`, 'green'));
+                        console.log(colorize('    ✅ Succes', 'green'));
                         passedTests++;
                     }
                 } catch (err) {
@@ -151,8 +151,8 @@ async function processGraphQLTests() {
                             const errorMsg = err.response.data.errors[0].message;
 
                             if (errorMsg.includes('schema-template.graphql')) {
-                                console.log(colorize(`    💡 Probleme detecte: Erreur dans le fichier de schema GraphQL`, 'yellow'));
-                                console.log(colorize(`    👉 Solution: Verifiez le fichier src/graphql/schema-template.graphql`, 'blue'));
+                                console.log(colorize('    💡 Probleme detecte: Erreur dans le fichier de schema GraphQL', 'yellow'));
+                                console.log(colorize('    👉 Solution: Verifiez le fichier src/graphql/schema-template.graphql', 'blue'));
                             }
 
                             // Limiter la longueur de l'erreur
@@ -170,7 +170,7 @@ async function processGraphQLTests() {
         const successRate = Math.round((passedTests / totalTests) * 100) || 0;
 
         console.log('\n' + colorize('╔══════════════════════════════════════════════╗', 'bold'));
-        console.log(colorize(`║            ReSUMe DES TESTS GRAPHQL          ║`, 'bold'));
+        console.log(colorize('║            ReSUMe DES TESTS GRAPHQL          ║', 'bold'));
         console.log(colorize('╟──────────────────────────┬───────────────────╢', 'bold'));
         console.log(colorize(`║ Total des requetes       │ ${String(totalTests).padStart(17)} ║`, 'bold'));
         console.log(colorize(`║ Requetes reussies        │ ${String(passedTests).padStart(17)} ║`, 'bold'));
@@ -363,7 +363,7 @@ async function checkServerAvailability() {
     try {
         // Faire une requete d'introspection (qui devrait etre supportee par tous les serveurs GraphQL)
         await axios.post(config.baseUrl, {
-            query: `{ __schema { queryType { name } } }`
+            query: '{ __schema { queryType { name } } }'
         }, { timeout: 3000 });
 
         console.log(colorize('✅ Serveur GraphQL accessible', 'green'));

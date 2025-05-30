@@ -40,7 +40,18 @@ const rateLimiter = (options = {}) => {
 };
 
 // Middleware global pour toutes les routes
-const globalRateLimiter = rateLimiter();
+const globalRateLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limite chaque IP à 100 requêtes par fenêtre
+    message: {
+        status: 'error',
+        message: 'Trop de requêtes, veuillez réessayer plus tard.'
+    },
+    standardHeaders: true,
+    legacyHeaders: false
+});
 
-module.exports = rateLimiter;
-module.exports.globalRateLimiter = globalRateLimiter;
+module.exports = {
+    rateLimiter,
+    globalRateLimiter
+};

@@ -101,8 +101,7 @@ const projetSchema = new Schema({
             },
             message: props => `${props.value} n'est pas une URL valide!`
         }
-    }
-},
+    },
     progression: {
         type: Number,
         min: [0, 'La progression ne peut pas etre negative.'],
@@ -118,7 +117,7 @@ const projetSchema = new Schema({
     majLe: {
         type: Date,
         default: Date.now,
-    },
+    }
 }, {
     toJSON: { virtuals: true, getters: true },
     toObject: { virtuals: true, getters: true }
@@ -195,7 +194,6 @@ projetSchema.methods.calculerProgression = async function() {
         return;
     }
 
-    // Utilisation de la constante Enum.StatutLivrable.TERMINE pour la comparaison
     const termines = livrables.filter(l => l.statut === Enum.StatutLivrable.TERMINE).length;
     this.progression = Math.round((termines / livrables.length) * 100);
 };
@@ -211,8 +209,9 @@ projetSchema.statics.rechercheAvancee = async function(criteres = {}) {
     if (competences && competences.length) query.competences = { $all: competences };
 
     if (dateDebut || dateFin) {
-        if (dateDebut) query.dateDebut = { $gte: new Date(dateDebut) };
-        if (dateFin) query.dateFin = { $lte: new Date(dateFin) };
+        query.dateDebut = {};
+        if (dateDebut) query.dateDebut.$gte = new Date(dateDebut);
+        if (dateFin) query.dateDebut.$lte = new Date(dateFin);
     }
 
     const options = {

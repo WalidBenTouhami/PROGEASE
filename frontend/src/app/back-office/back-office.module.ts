@@ -35,7 +35,8 @@ import { BreadcrumbComponent } from '../shared/components/breadcrumb/breadcrumb.
     BackOfficeRoutingModule,
     BackOfficeDashboardComponent,
     ProjetManagementComponent,
-    LivrableManagementComponent
+    LivrableManagementComponent,
+    BackOfficeTemplateComponent
   ]
 })
 export class BackOfficeModule {}

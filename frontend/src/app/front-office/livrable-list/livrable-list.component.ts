@@ -12,6 +12,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatBadgeModule } from '@angular/material/badge';
 
 @Component({
   selector: 'app-livrable-list',
@@ -27,7 +29,9 @@ import { MatIconModule } from '@angular/material/icon';
     MatPaginatorModule,
     MatSelectModule,
     MatButtonModule,
-    RouterModule
+    RouterModule,
+    MatListModule,
+    MatBadgeModule
   ],
   templateUrl: './livrable-list.component.html',
   styleUrl: './livrable-list.component.css'

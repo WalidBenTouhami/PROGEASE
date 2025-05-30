@@ -1,6 +1,5 @@
 // src/graphql/schema.js
 // Compatible avec Apollo Server 4+ et Apollo Federation
-const { GraphQLScalarType, Kind } = require('graphql');
 const { resolvers } = require('./index');
 
 // Definition du schema GraphQL
@@ -103,9 +102,5 @@ type Mutation {
     supprimerLivrable(livrableId: ID!): Livrable
 }
 `;
-
-// Date actuelle pour tous les resolvers
-const currentDate = "2025-05-23 14:31:13";
-const currentUser = "WalidBenTouhami";
 
 module.exports = { typeDefs, resolvers };

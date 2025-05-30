@@ -10,31 +10,31 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 // Validation de la cle API
 const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 if (!DEEPSEEK_API_KEY) {
-  const error = 'La variable DEEPSEEK_API_KEY est manquante';
-  logger.error(`❌ ${error}`);
-  throw new Error(error);
+    const error = 'La variable DEEPSEEK_API_KEY est manquante';
+    logger.error(`❌ ${error}`);
+    throw new Error(error);
 }
 
 logger.info('✅ Cle API Deepseek chargee');
 
 // Configuration du client HTTP
 const client = axios.create({
-  baseURL: 'https://api.deepseek.com/v1',
-  headers: {
-    'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-    'Content-Type': 'application/json'
-  },
-  timeout: 30000, // 30s timeout
-  validateStatus: status => status < 500 // Accepter tous les codes de statut < 500
+    baseURL: 'https://api.deepseek.com/v1',
+    headers: {
+        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
+        'Content-Type': 'application/json'
+    },
+    timeout: 30000, // 30s timeout
+    validateStatus: status => status < 500 // Accepter tous les codes de statut < 500
 });
 
 // Configuration des modeles IA
 const CONFIG = {
-  MODEL: process.env.AI_MODEL || 'deepseek-chat',
-  MAX_TOKENS: parseInt(process.env.AI_MAX_TOKENS || '1000', 10),
-  TEMPERATURE: parseFloat(process.env.AI_TEMPERATURE || '0.7'),
-  RETRY_LIMIT: parseInt(process.env.AI_RETRY_LIMIT || '3', 10),
-  RETRY_DELAY: parseInt(process.env.AI_RETRY_DELAY || '1000', 10)
+    MODEL: process.env.AI_MODEL || 'deepseek-chat',
+    MAX_TOKENS: parseInt(process.env.AI_MAX_TOKENS || '1000', 10),
+    TEMPERATURE: parseFloat(process.env.AI_TEMPERATURE || '0.7'),
+    RETRY_LIMIT: parseInt(process.env.AI_RETRY_LIMIT || '3', 10),
+    RETRY_DELAY: parseInt(process.env.AI_RETRY_DELAY || '1000', 10)
 };
 
 /**
@@ -52,26 +52,26 @@ const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
  * @throws {Error} - Erreur enrichie avec contexte
  */
 async function gererErreurIA(erreur, prompt = 'N/A', reponse = null) {
-  const errorDetails = {
-    message: erreur.message,
-    code: erreur.code,
-    status: erreur.response?.status,
-    promptLength: prompt.length,
-    modelUsed: CONFIG.MODEL,
-    timestamp: new Date().toISOString()
-  };
+    const errorDetails = {
+        message: erreur.message,
+        code: erreur.code,
+        status: erreur.response?.status,
+        promptLength: prompt.length,
+        modelUsed: CONFIG.MODEL,
+        timestamp: new Date().toISOString()
+    };
 
-  logger.error('❌ Erreur lors du traitement IA', errorDetails);
+    logger.error('❌ Erreur lors du traitement IA', errorDetails);
 
-  if (reponse) {
-    logger.error('❌ Reponse IA partielle:', {
-      response: typeof reponse === 'string'
-          ? reponse.substring(0, 500)
-          : JSON.stringify(reponse).substring(0, 500)
-    });
-  }
+    if (reponse) {
+        logger.error('❌ Reponse IA partielle:', {
+            response: typeof reponse === 'string'
+                ? reponse.substring(0, 500)
+                : JSON.stringify(reponse).substring(0, 500)
+        });
+    }
 
-  throw new Error(`echec de traitement IA: ${erreur.message}`);
+    throw new Error(`echec de traitement IA: ${erreur.message}`);
 }
 
 /**
@@ -81,56 +81,75 @@ async function gererErreurIA(erreur, prompt = 'N/A', reponse = null) {
  * @throws {Error} - Si la generation echoue apres les retries
  */
 async function genererTexte(prompt) {
-  let retries = 0;
-  let lastError = null;
+    let retries = 0;
+    let lastError = null;
 
-  while (retries < CONFIG.RETRY_LIMIT) {
-    try {
-      logger.debug(`Appel à l'API Deepseek (tentative ${retries + 1}/${CONFIG.RETRY_LIMIT})`, {
-        modelUsed: CONFIG.MODEL,
-        promptLength: prompt.length,
-        maxTokens: CONFIG.MAX_TOKENS
-      });
+    while (retries < CONFIG.RETRY_LIMIT) {
+        try {
+            logger.debug(`Appel à l'API Deepseek (tentative ${retries + 1}/${CONFIG.RETRY_LIMIT})`, {
+                modelUsed: CONFIG.MODEL,
+                promptLength: prompt.length,
+                maxTokens: CONFIG.MAX_TOKENS
+            });
 
-      const response = await client.post('/chat/completions', {
-        model: CONFIG.MODEL,
-        messages: [{ role: 'user', content: prompt }],
-        max_tokens: CONFIG.MAX_TOKENS,
-        temperature: CONFIG.TEMPERATURE,
-        stream: false,
-        top_p: 1,
-        frequency_penalty: 0,
-        presence_penalty: 0
-      });
+            const response = await client.post('/chat/completions', {
+                model: CONFIG.MODEL,
+                messages: [
+                    {
+                        role: 'system',
+                        content: 'Vous êtes un assistant IA expert en analyse de projets et en génération de texte.'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: CONFIG.MAX_TOKENS,
+                temperature: CONFIG.TEMPERATURE,
+                stream: false
+            });
 
-      // Validation de la reponse de l'API
-      if (!response.data || !response.data.choices || !response.data.choices[0]) {
-        throw new Error('Structure de reponse API inattendue');
-      }
+            logger.debug('Reponse de l\'API Deepseek:', {
+                status: response.status,
+                headers: response.headers,
+                data: response.data
+            });
 
-      return response.data.choices[0].message.content.trim();
-    } catch (erreur) {
-      lastError = erreur;
-      retries++;
+            // Validation de la reponse de l'API
+            const hasValidResponse = response.data &&
+                response.data.choices &&
+                response.data.choices[0] &&
+                response.data.choices[0].message;
+            if (!hasValidResponse) {
+                throw new Error('Structure de reponse API inattendue');
+            }
 
-      // Log l'erreur de tentative
-      logger.warn(`echec de la tentative ${retries}/${CONFIG.RETRY_LIMIT}: ${erreur.message}`);
+            return response.data.choices[0].message.content.trim();
+        } catch (erreur) {
+            lastError = erreur;
+            retries++;
 
-      // Si nous avons atteint la limite de tentatives, propager l'erreur
-      if (retries >= CONFIG.RETRY_LIMIT) {
-        await gererErreurIA(lastError, prompt);
-        break;
-      }
+            // Log l'erreur de tentative
+            logger.warn(`echec de la tentative ${retries}/${CONFIG.RETRY_LIMIT}: ${erreur.message}`, {
+                error: erreur,
+                response: erreur.response?.data
+            });
 
-      // Attente exponentielle entre les tentatives
-      const backoffMs = Math.pow(2, retries) * CONFIG.RETRY_DELAY;
-      logger.warn(`Nouvelle tentative dans ${backoffMs}ms...`);
-      await sleep(backoffMs);
+            // Si nous avons atteint la limite de tentatives, propager l'erreur
+            if (retries >= CONFIG.RETRY_LIMIT) {
+                await gererErreurIA(lastError, prompt);
+                break;
+            }
+
+            // Attente exponentielle entre les tentatives
+            const backoffMs = Math.pow(2, retries) * CONFIG.RETRY_DELAY;
+            logger.warn(`Nouvelle tentative dans ${backoffMs}ms...`);
+            await sleep(backoffMs);
+        }
     }
-  }
 
-  // Cette ligne ne devrait jamais etre atteinte grâce au throw dans gererErreurIA
-  throw new Error("echec de generation de texte apres plusieurs tentatives");
+    // Cette ligne ne devrait jamais etre atteinte grâce au throw dans gererErreurIA
+    throw new Error('echec de generation de texte apres plusieurs tentatives');
 }
 
 /**
@@ -140,15 +159,15 @@ async function genererTexte(prompt) {
  * @throws {Error} - Si le parsing echoue
  */
 function validerReponseJSON(reponse) {
-  try {
-    return JSON.parse(reponse);
-  } catch (erreur) {
-    logger.warn('echec de parsing JSON direct', {
-      error: erreur.message,
-      responsePreview: reponse.substring(0, 100)
-    });
-    throw new Error('La reponse de l\'IA n\'est pas un JSON valide');
-  }
+    try {
+        return JSON.parse(reponse);
+    } catch (erreur) {
+        logger.warn('echec de parsing JSON direct', {
+            error: erreur.message,
+            responsePreview: reponse.substring(0, 100)
+        });
+        throw new Error('La reponse de l\'IA n\'est pas un JSON valide');
+    }
 }
 
 /**
@@ -158,37 +177,37 @@ function validerReponseJSON(reponse) {
  * @throws {Error} - Si l'extraction echoue
  */
 function extraireJSONDepuisReponse(reponse) {
-  try {
+    try {
     // Strategie 1: Rechercher un objet JSON complet
-    const jsonRegex = /{[\s\S]*?}(?=\s*$)/;
-    const matches = reponse.match(jsonRegex);
+        const jsonRegex = /{[\s\S]*?}(?=\s*$)/;
+        const matches = reponse.match(jsonRegex);
 
-    if (matches && matches[0]) {
-      return JSON.parse(matches[0]);
+        if (matches && matches[0]) {
+            return JSON.parse(matches[0]);
+        }
+
+        // Strategie 2: Chercher entre delimiteurs de code
+        const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
+        const codeMatches = reponse.match(codeBlockRegex);
+
+        if (codeMatches && codeMatches[1]) {
+            return JSON.parse(codeMatches[1]);
+        }
+
+        // Strategie 3: Approche plus agressive - prendre tout ce qui ressemble à du JSON
+        const lastDitchAttempt = reponse.match(/{[\s\S]*}/);
+        if (lastDitchAttempt && lastDitchAttempt[0]) {
+            return JSON.parse(lastDitchAttempt[0]);
+        }
+
+        throw new Error('Aucun JSON trouve dans la reponse');
+    } catch (erreur) {
+        logger.error('echec d\'extraction JSON', {
+            error: erreur.message,
+            responsePreview: reponse.substring(0, 300)
+        });
+        throw new Error('Impossible d\'extraire le JSON de la reponse IA');
     }
-
-    // Strategie 2: Chercher entre delimiteurs de code
-    const codeBlockRegex = /```(?:json)?\s*([\s\S]*?)\s*```/;
-    const codeMatches = reponse.match(codeBlockRegex);
-
-    if (codeMatches && codeMatches[1]) {
-      return JSON.parse(codeMatches[1]);
-    }
-
-    // Strategie 3: Approche plus agressive - prendre tout ce qui ressemble à du JSON
-    const lastDitchAttempt = reponse.match(/{[\s\S]*}/);
-    if (lastDitchAttempt && lastDitchAttempt[0]) {
-      return JSON.parse(lastDitchAttempt[0]);
-    }
-
-    throw new Error('Aucun JSON trouve dans la reponse');
-  } catch (erreur) {
-    logger.error('echec d\'extraction JSON', {
-      error: erreur.message,
-      responsePreview: reponse.substring(0, 300)
-    });
-    throw new Error('Impossible d\'extraire le JSON de la reponse IA');
-  }
 }
 
 /**
@@ -197,21 +216,21 @@ function extraireJSONDepuisReponse(reponse) {
  * @returns {Promise<any>} - Objet JS resultant
  */
 async function traiterReponseIA(prompt) {
-  logger.info('Traitement d\'une requete IA', {
-    promptLength: prompt.length,
-    model: CONFIG.MODEL
-  });
+    logger.info('Traitement d\'une requete IA', {
+        promptLength: prompt.length,
+        model: CONFIG.MODEL
+    });
 
-  const reponse = await genererTexte(prompt);
+    const reponse = await genererTexte(prompt);
 
-  try {
+    try {
     // Tentative directe de parsing JSON
-    return validerReponseJSON(reponse);
-  } catch (erreur) {
+        return validerReponseJSON(reponse);
+    } catch (erreur) {
     // Si echec, tenter l'extraction
-    logger.warn('⚠️ Tentative d\'extraction JSON depuis la reponse IA');
-    return extraireJSONDepuisReponse(reponse);
-  }
+        logger.warn('⚠️ Tentative d\'extraction JSON depuis la reponse IA');
+        return extraireJSONDepuisReponse(reponse);
+    }
 }
 
 /**
@@ -220,13 +239,13 @@ async function traiterReponseIA(prompt) {
  * @returns {Promise<Object>} - Resultats de l'analyse
  */
 async function analyserProjet(donnees) {
-  try {
-    logger.info('Analyse de projet en cours', {
-      dataSize: JSON.stringify(donnees).length
-    });
+    try {
+        logger.info('Analyse de projet en cours', {
+            dataSize: JSON.stringify(donnees).length
+        });
 
-    // Preparation d'un prompt structure
-    const prompt = `
+        // Preparation d'un prompt structure
+        const prompt = `
             Analyser le projet suivant et fournir des recommandations :
             
             ${JSON.stringify(donnees, null, 2)}
@@ -241,17 +260,17 @@ async function analyserProjet(donnees) {
             FORMAT: Fournir la reponse sous forme de texte structure.
         `;
 
-    const response = await genererTexte(prompt);
+        const response = await genererTexte(prompt);
 
-    return {
-      analyse: response,
-      timestamp: new Date(),
-      status: 'success'
-    };
-  } catch (error) {
-    logger.error('Erreur lors de l\'analyse du projet :', error);
-    throw new Error('echec de l\'analyse du projet : ' + error.message);
-  }
+        return {
+            analyse: response,
+            timestamp: new Date(),
+            status: 'success'
+        };
+    } catch (error) {
+        logger.error('Erreur lors de l\'analyse du projet :', error);
+        throw new Error('echec de l\'analyse du projet : ' + error.message);
+    }
 }
 
 /**
@@ -260,43 +279,43 @@ async function analyserProjet(donnees) {
  * @returns {Object} - Statistiques de progression
  */
 async function suiviProgression(taches) {
-  // Validation
-  if (!Array.isArray(taches)) {
-    throw new Error('Le parametre taches doit etre un tableau');
-  }
+    // Validation
+    if (!Array.isArray(taches)) {
+        throw new Error('Le parametre taches doit etre un tableau');
+    }
 
-  // Si aucune tâche, retourner 0%
-  if (taches.length === 0) {
-    return {
-      totalTaches: 0,
-      tachesTerminees: 0,
-      tachesEnCours: 0,
-      pourcentageProgression: 0,
-    };
-  }
+    // Si aucune tâche, retourner 0%
+    if (taches.length === 0) {
+        return {
+            totalTaches: 0,
+            tachesTerminees: 0,
+            tachesEnCours: 0,
+            pourcentageProgression: 0,
+        };
+    }
 
-  // Calculer les statistiques
-  const terminees = taches.filter(t =>
-      t.statut === 'terminee' ||
+    // Calculer les statistiques
+    const terminees = taches.filter(t =>
+        t.statut === 'terminee' ||
       t.statut === 'complete' ||
       t.statut === 'Termine'
-  ).length;
+    ).length;
 
-  const enCours = taches.filter(t =>
-      t.statut === 'en cours' ||
+    const enCours = taches.filter(t =>
+        t.statut === 'en cours' ||
       t.statut === 'En cours' ||
       t.statut === 'En attente'
-  ).length;
+    ).length;
 
-  const total = taches.length;
-  const pourcentage = Math.round((terminees / total) * 100);
+    const total = taches.length;
+    const pourcentage = Math.round((terminees / total) * 100);
 
-  return {
-    totalTaches: total,
-    tachesTerminees: terminees,
-    tachesEnCours: enCours,
-    pourcentageProgression: pourcentage,
-  };
+    return {
+        totalTaches: total,
+        tachesTerminees: terminees,
+        tachesEnCours: enCours,
+        pourcentageProgression: pourcentage,
+    };
 }
 
 /**
@@ -305,37 +324,37 @@ async function suiviProgression(taches) {
  * @returns {Object} - Predictions de performance
  */
 async function predirePerformance(historique) {
-  // Validation
-  if (!Array.isArray(historique) || historique.length === 0) {
-    throw new Error('Un historique non vide est requis pour la prediction de performance');
-  }
+    // Validation
+    if (!Array.isArray(historique) || historique.length === 0) {
+        throw new Error('Un historique non vide est requis pour la prediction de performance');
+    }
 
-  // Calcul simple de la moyenne
-  const tempsMoyen = historique.reduce((s, t) => s + t, 0) / historique.length;
+    // Calcul simple de la moyenne
+    const tempsMoyen = historique.reduce((s, t) => s + t, 0) / historique.length;
 
-  // Calcul de l'ecart-type pour estimer l'incertitude
-  const sommeEcartsCarres = historique.reduce((s, t) => s + Math.pow(t - tempsMoyen, 2), 0);
-  const ecartType = Math.sqrt(sommeEcartsCarres / historique.length);
+    // Calcul de l'ecart-type pour estimer l'incertitude
+    const sommeEcartsCarres = historique.reduce((s, t) => s + Math.pow(t - tempsMoyen, 2), 0);
+    const ecartType = Math.sqrt(sommeEcartsCarres / historique.length);
 
-  // Calcul de la tendance (amelioration ou deterioration)
-  const moitieTaille = Math.floor(historique.length / 2);
-  const premiereMoitie = historique.slice(0, moitieTaille);
-  const secondeMoitie = historique.slice(-moitieTaille);
+    // Calcul de la tendance (amelioration ou deterioration)
+    const moitieTaille = Math.floor(historique.length / 2);
+    const premiereMoitie = historique.slice(0, moitieTaille);
+    const secondeMoitie = historique.slice(-moitieTaille);
 
-  const moyennePremiere = premiereMoitie.reduce((s, t) => s + t, 0) / premiereMoitie.length;
-  const moyenneSeconde = secondeMoitie.reduce((s, t) => s + t, 0) / secondeMoitie.length;
+    const moyennePremiere = premiereMoitie.reduce((s, t) => s + t, 0) / premiereMoitie.length;
+    const moyenneSeconde = secondeMoitie.reduce((s, t) => s + t, 0) / secondeMoitie.length;
 
-  const tendance = moyenneSeconde < moyennePremiere ? 'amelioration' : 'deterioration';
-  const tauxVariation = Math.abs((moyenneSeconde - moyennePremiere) / moyennePremiere) * 100;
+    const tendance = moyenneSeconde < moyennePremiere ? 'amelioration' : 'deterioration';
+    const tauxVariation = Math.abs((moyenneSeconde - moyennePremiere) / moyennePremiere) * 100;
 
-  return {
-    tempsMoyenRealisation: tempsMoyen.toFixed(2),
-    ecartType: ecartType.toFixed(2),
-    tendance,
-    tauxVariation: tauxVariation.toFixed(1) + '%',
-    estimation: `${tempsMoyen.toFixed(1)} ± ${ecartType.toFixed(1)} heures`,
-    prediction: `Temps estime pour la prochaine tâche: ${tempsMoyen.toFixed(2)} heures avec tendance à l'${tendance}.`
-  };
+    return {
+        tempsMoyenRealisation: tempsMoyen.toFixed(2),
+        ecartType: ecartType.toFixed(2),
+        tendance,
+        tauxVariation: tauxVariation.toFixed(1) + '%',
+        estimation: `${tempsMoyen.toFixed(1)} ± ${ecartType.toFixed(1)} heures`,
+        prediction: `Temps estime pour la prochaine tâche: ${tempsMoyen.toFixed(2)} heures avec tendance à l'${tendance}.`
+    };
 }
 
 /**
@@ -344,38 +363,38 @@ async function predirePerformance(historique) {
  * @returns {Array<Object>} - Planning optimise
  */
 async function genererPlanning(taches) {
-  // Validation
-  if (!Array.isArray(taches) || taches.length === 0) {
-    throw new Error('Liste de tâches vide. Impossible de generer un planning.');
-  }
+    // Validation
+    if (!Array.isArray(taches) || taches.length === 0) {
+        throw new Error('Liste de tâches vide. Impossible de generer un planning.');
+    }
 
-  // Verifier que chaque tâche a priorite et duree
-  const tachesInvalides = taches.filter(t =>
-      typeof t.priorite === 'undefined' || typeof t.duree === 'undefined'
-  );
+    // Verifier que chaque tâche a priorite et duree
+    const tachesInvalides = taches.filter(t =>
+        typeof t.priorite === 'undefined' || typeof t.duree === 'undefined'
+    );
 
-  if (tachesInvalides.length > 0) {
-    throw new Error('Certaines tâches n\'ont pas de priorite ou de duree definie.');
-  }
+    if (tachesInvalides.length > 0) {
+        throw new Error('Certaines tâches n\'ont pas de priorite ou de duree definie.');
+    }
 
-  // Tri par priorite decroissante (plus la priorite est elevee, plus tôt la tâche est planifiee)
-  const tachesTriees = [...taches].sort((a, b) => b.priorite - a.priorite);
+    // Tri par priorite decroissante (plus la priorite est elevee, plus tôt la tâche est planifiee)
+    const tachesTriees = [...taches].sort((a, b) => b.priorite - a.priorite);
 
-  // Calcul des heures de debut et fin pour chaque tâche
-  let heureCourante = 0;
-  const planning = tachesTriees.map(tache => {
-    const debut = heureCourante;
-    const fin = debut + tache.duree;
-    heureCourante = fin;
+    // Calcul des heures de debut et fin pour chaque tâche
+    let heureCourante = 0;
+    const planning = tachesTriees.map(tache => {
+        const debut = heureCourante;
+        const fin = debut + tache.duree;
+        heureCourante = fin;
 
-    return {
-      ...tache,
-      debut,
-      fin
-    };
-  });
+        return {
+            ...tache,
+            debut,
+            fin
+        };
+    });
 
-  return planning;
+    return planning;
 }
 
 /**
@@ -384,13 +403,13 @@ async function genererPlanning(taches) {
  * @returns {Promise<Array<Object>>} - equipes optimisees
  */
 async function creerEquipes(membres) {
-  // Validation
-  if (!Array.isArray(membres) || membres.length === 0) {
-    throw new Error('Liste de membres vide. Impossible de creer les equipes.');
-  }
+    // Validation
+    if (!Array.isArray(membres) || membres.length === 0) {
+        throw new Error('Liste de membres vide. Impossible de creer les equipes.');
+    }
 
-  // Utilisation de l'IA pour former les equipes
-  const prompt = `
+    // Utilisation de l'IA pour former les equipes
+    const prompt = `
         Forme des equipes optimisees en fonction des competences, disponibilites et preferences suivantes.
         
         Donnees des membres:
@@ -416,7 +435,7 @@ async function creerEquipes(membres) {
         }
     `;
 
-  return await traiterReponseIA(prompt);
+    return await traiterReponseIA(prompt);
 }
 
 /**
@@ -425,13 +444,13 @@ async function creerEquipes(membres) {
  * @returns {Promise<Array<Object>>} - Associations optimales
  */
 async function associerTuteurs(membres) {
-  // Validation
-  if (!Array.isArray(membres) || membres.length === 0) {
-    throw new Error('Liste de membres vide. Impossible d\'associer les tuteurs.');
-  }
+    // Validation
+    if (!Array.isArray(membres) || membres.length === 0) {
+        throw new Error('Liste de membres vide. Impossible d\'associer les tuteurs.');
+    }
 
-  // Utilisation de l'IA pour associer tuteurs et equipes
-  const prompt = `
+    // Utilisation de l'IA pour associer tuteurs et equipes
+    const prompt = `
         Associe les tuteurs et les equipes selon leurs competences et besoins.
         
         Donnees des membres et tuteurs:
@@ -457,7 +476,7 @@ async function associerTuteurs(membres) {
         }
     `;
 
-  return await traiterReponseIA(prompt);
+    return await traiterReponseIA(prompt);
 }
 
 /**
@@ -466,13 +485,13 @@ async function associerTuteurs(membres) {
  * @returns {Promise<Object>} - Ressources recommandees
  */
 async function recommanderApprentissage(competences) {
-  // Validation
-  if (!Array.isArray(competences) || competences.length === 0) {
-    throw new Error('Liste de competences vide. Impossible de recommander des ressources.');
-  }
+    // Validation
+    if (!Array.isArray(competences) || competences.length === 0) {
+        throw new Error('Liste de competences vide. Impossible de recommander des ressources.');
+    }
 
-  // Utilisez l'IA pour generer des recommandations personnalisees
-  const prompt = `
+    // Utilisez l'IA pour generer des recommandations personnalisees
+    const prompt = `
         Recommande des ressources d'apprentissage pour les competences suivantes: 
         ${competences.join(', ')}.
         
@@ -499,17 +518,17 @@ async function recommanderApprentissage(competences) {
         }
     `;
 
-  return await traiterReponseIA(prompt);
+    return await traiterReponseIA(prompt);
 }
 
 // Exportation des fonctions du service
 module.exports = {
-  analyserProjet,
-  genererTexte,
-  suiviProgression,
-  predirePerformance,
-  genererPlanning,
-  creerEquipes,
-  associerTuteurs,
-  recommanderApprentissage,
+    analyserProjet,
+    genererTexte,
+    suiviProgression,
+    predirePerformance,
+    genererPlanning,
+    creerEquipes,
+    associerTuteurs,
+    recommanderApprentissage,
 };

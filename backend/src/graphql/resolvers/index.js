@@ -8,17 +8,17 @@ const livrableResolvers = require('./livrable.resolver');
 
 // Fusion des resolvers
 module.exports = {
-  ...scalarResolvers,
-  Query: {
-    ...aiResolvers.Query,
-    ...projetResolvers.Query,
-    ...livrableResolvers.Query
-  },
-  Mutation: {
-    ...aiResolvers.Mutation,
-    ...projetResolvers.Mutation,
-    ...livrableResolvers.Mutation
-  },
-  ...(projetResolvers.Types || {}),
-  ...(livrableResolvers.Types || {})
+    ...scalarResolvers,
+    Query: {
+        ...aiResolvers.Query,
+        ...projetResolvers.Query,
+        ...livrableResolvers.Query
+    },
+    Mutation: {
+        ...aiResolvers.Mutation,
+        ...projetResolvers.Mutation,
+        ...livrableResolvers.Mutation
+    },
+    Projet: projetResolvers.Projet || {},
+    Livrable: livrableResolvers.Livrable || {}
 };

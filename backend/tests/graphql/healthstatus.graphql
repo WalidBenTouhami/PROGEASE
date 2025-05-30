@@ -2,13 +2,56 @@
 # Generes automatiquement le 2025-05-27 19:27:50
 # Auteur: WalidBenTouhami
 
-# Requete pour recuperer tous les healthstatuss
-query GetAllHealthstatuss {
-  health {
-    _id
+# Requete pour verifier l'etat du serveur
+query HealthCheck {
+  healthCheck {
     status
     timestamp
-    user
+    version
+    message
+    uptime
+    database {
+      status
+      connections
+      collections
+    }
+    memory {
+      used
+      total
+      percentage
+    }
+  }
+}
+
+# Requete pour verifier l'etat de la base de donnees
+query DatabaseStatus {
+  databaseStatus {
+    status
+    collections {
+      name
+      count
+      size
+    }
+    indexes {
+      name
+      size
+    }
+    stats {
+      avgObjSize
+      totalSize
+      storageSize
+    }
+  }
+}
+
+# Requete pour verifier les performances
+query PerformanceMetrics {
+  performanceMetrics {
+    requestsPerMinute
+    averageResponseTime
+    errorRate
+    activeConnections
+    cacheHitRatio
   }
 }
 

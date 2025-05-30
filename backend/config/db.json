@@ -3,8 +3,42 @@
     "host": "localhost",
     "port": 27017,
     "name": "progease",
-    "user": "Walid",
-    "password": "securePassword"
+    "options": {
+      "retryWrites": true,
+      "w": "majority",
+      "maxPoolSize": 10,
+      "minPoolSize": 2
+    }
+  },
+  "collections": {
+    "projets": {
+      "indexes": [
+        { "titre": 1 },
+        { "statut": 1 },
+        { "dateDebut": 1 },
+        { "dateFin": 1 },
+        { "tuteur": 1 },
+        { "equipe": 1 }
+      ],
+      "validations": {
+        "titre": { "type": "string", "required": true },
+        "description": { "type": "string", "required": true },
+        "statut": { "enum": ["BROUILLON", "EN_COURS", "TERMINE", "ARCHIVE", "EN_RETARD", "A_VENIR"] }
+      }
+    },
+    "livrables": {
+      "indexes": [
+        { "intitule": 1 },
+        { "statut": 1 },
+        { "dateLimite": 1 },
+        { "projetId": 1 }
+      ],
+      "validations": {
+        "intitule": { "type": "string", "required": true },
+        "description": { "type": "string", "required": true },
+        "statut": { "enum": ["EN_ATTENTE", "EN_COURS", "EN_RETARD", "TERMINE", "VALIDE", "REJETE"] }
+      }
+    }
   },
   "projets": [
     {
@@ -22,9 +56,25 @@
     }
   ],
   "env": {
-    "PORT": 3000,
-    "MONGO_URI": "mongodb://localhost:27017/progease",
-    "JWT_SECRET": "yourSuperSecretKey",
-    "CORS_ORIGINS": ["http://localhost:3000"]
+    "development": {
+      "PORT": 3000,
+      "CORS_ORIGINS": ["http://localhost:3000"],
+      "LOG_LEVEL": "debug"
+    },
+    "test": {
+      "PORT": 3001,
+      "CORS_ORIGINS": ["http://localhost:3000"],
+      "LOG_LEVEL": "debug"
+    },
+    "staging": {
+      "PORT": 3000,
+      "CORS_ORIGINS": ["https://staging.progease.com"],
+      "LOG_LEVEL": "info"
+    },
+    "production": {
+      "PORT": 3000,
+      "CORS_ORIGINS": ["https://progease.com"],
+      "LOG_LEVEL": "warn"
+    }
   }
 }

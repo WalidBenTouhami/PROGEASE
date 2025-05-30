@@ -7,9 +7,14 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
 
 @Component({
-  selector: 'app-backoffice-dashboard',
+  selector: 'app-back-office-dashboard',
   standalone: true,
   imports: [
     CommonModule,
@@ -18,7 +23,12 @@ import { MatBadgeModule } from '@angular/material/badge';
     MatCardModule,
     MatIconModule,
     MatListModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatProgressSpinnerModule,
+    MatButtonModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
@@ -48,6 +58,16 @@ export class BackOfficeDashboardComponent implements OnInit {
 
   barChartType: ChartType = 'bar';
 
+  chargement = true;
+  statistiques = {
+    totalProjets: 0,
+    projetsActifs: 0,
+    projetsTermines: 0,
+    projetsEnRetard: 0
+  };
+
+  constructor() {}
+
   ngOnInit() {
     // Initialize dashboard data
     this.projetsAValider = 5;
@@ -57,5 +77,16 @@ export class BackOfficeDashboardComponent implements OnInit {
       { date: '2024-03-19', description: 'Livrable corrige' }
     ];
     this.barChartData.datasets[0].data = [this.projetsAValider, this.livrablesACorriger, this.nbEtudiants];
+
+    // Simuler un chargement des données
+    setTimeout(() => {
+      this.statistiques = {
+        totalProjets: 15,
+        projetsActifs: 8,
+        projetsTermines: 5,
+        projetsEnRetard: 2
+      };
+      this.chargement = false;
+    }, 1000);
   }
 }

@@ -1,20 +1,29 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, isDevMode } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideHttpClient } from '@angular/common/http';
+import { provideStore } from '@ngrx/store';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { provideEffects } from '@ngrx/effects';
+
 import { routes } from './app.routes';
-import { provideClientHydration } from '@angular/platform-browser';
-import { apolloProviders } from './core/apollo.config';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { reducers } from './store';
+import { ErrorService } from './services/error.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideClientHydration(),
-    provideHttpClient(
-      withInterceptors([authInterceptor])
-    ),
-    ...apolloProviders, provideAnimationsAsync()
+    provideAnimations(),
+    provideHttpClient(),
+    provideStore(reducers),
+    provideEffects([]),
+    provideStoreDevtools({
+      maxAge: 25,
+      logOnly: !isDevMode(),
+      autoPause: true,
+      trace: false,
+      traceLimit: 75,
+    }),
+    ErrorService
   ]
 };

@@ -23,11 +23,21 @@ module.exports = {
         'semi': ['error', 'always'],
         'quotes': ['error', 'single'],
         'indent': ['error', 4],
-        'max-len': ['error', { 
-            code: 100,
+        'max-len': ['error', {
+            code: 120,
             ignoreComments: true,
             ignoreStrings: true,
-            ignoreTemplateLiterals: true
+            ignoreTemplateLiterals: true,
+            ignoreUrls: true
         }]
-    }
-}; 
+    },
+    overrides: [
+        {
+            // Allow console.log in test files
+            files: ['**/test/**/*', '**/*.test.js', '**/*.spec.js', '**/tests/**/*'],
+            rules: {
+                'no-console': 'off'
+            }
+        }
+    ]
+};

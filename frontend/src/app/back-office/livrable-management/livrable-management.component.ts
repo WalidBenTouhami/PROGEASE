@@ -13,6 +13,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatListModule } from '@angular/material/list';
+import { MatBadgeModule } from '@angular/material/badge';
+import { RouterModule } from '@angular/router';
 
 interface Livrable {
   id: number;
@@ -43,7 +46,10 @@ interface Livrable {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatListModule,
+    MatBadgeModule,
+    RouterModule
   ]
 })
 export class LivrableManagementComponent implements OnInit {

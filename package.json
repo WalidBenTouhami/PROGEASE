@@ -40,6 +40,8 @@
     "@graphql-codegen/typescript-apollo-angular": "^4.0.1",
     "@graphql-codegen/typescript-operations": "^4.6.1",
     "concurrently": "^8.2.2",
+    "eslint-config-prettier": "^10.1.5",
+    "prettier": "^3.5.3",
     "rimraf": "^6.0.1"
   }
 }

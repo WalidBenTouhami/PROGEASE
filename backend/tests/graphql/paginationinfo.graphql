@@ -2,21 +2,46 @@
 # Generes automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
-# Ce type est generalement utilise comme partie d'autres types plutôt que directement requete
-# Exemple d'utilisation dans une requete paginee:
-query GetPaginatedResults {
-  paginatedResults {
+# Exemple de requete paginee pour les projets
+query GetPaginatedProjets($page: Int, $limit: Int) {
+  projets(page: $page, limit: $limit) {
     items {
       _id
-      # autres champs...
+      titre
+      statut
     }
     pagination {
-      totalItems
-      totalPages
-      currentPage
-      pageSize
+      total
+      pages
+      page
+      limit
       hasNextPage
       hasPreviousPage
     }
   }
 }
+
+# Exemple de requete paginee pour les livrables
+query GetPaginatedLivrables($page: Int, $limit: Int) {
+  livrables(page: $page, limit: $limit) {
+    items {
+      _id
+      intitule
+      statut
+    }
+    pagination {
+      total
+      pages
+      page
+      limit
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+
+# Variables d'exemple:
+# {
+#   "page": 1,
+#   "limit": 10
+# }

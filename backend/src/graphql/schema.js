@@ -1,168 +1,87 @@
 // src/graphql/schema.js
-const { gql } = require('apollo-server-express');
+const { gql } = require('graphql-tag');
 const { resolvers } = require('./index');
-const { Enum } = require('../../config/constants');
 
 // Definition du schema GraphQL aligné avec les constantes et modèles
 const typeDefs = gql`
-scalar Date
+  type Query {
+    health: Health!
+    projets: [Projet!]!
+    projet(id: ID!): Projet
+    livrables: [Livrable!]!
+    livrable(id: ID!): Livrable
+  }
 
-enum StatutLivrable {
-  En_attente
-  En_cours
-  En_retard
-  Termine
-  Valide
-  Rejete
-}
+  type Mutation {
+    createProjet(input: ProjetInput!): Projet!
+    updateProjet(id: ID!, input: ProjetInput!): Projet!
+    deleteProjet(id: ID!): Boolean!
+    
+    createLivrable(input: LivrableInput!): Livrable!
+    updateLivrable(id: ID!, input: LivrableInput!): Livrable!
+    deleteLivrable(id: ID!): Boolean!
+  }
 
-enum StatutProjet {
-  Brouillon
-  En_cours
-  Termine
-  Archive
-  En_retard
-  A_venir
-}
+  type Health {
+    status: String!
+    timestamp: String!
+    version: String!
+    environment: String!
+  }
 
-type Livrable {
-  _id: ID!
-  intitule: String!
-  description: String!
-  dateLimite: Date!
-  projetId: ID!
-  statut: StatutLivrable!
-  creeLe: Date
-  majLe: Date
-  projet: Projet
-}
+  type Projet {
+    id: ID!
+    nom: String!
+    description: String
+    dateDebut: String!
+    dateFin: String
+    statut: StatutProjet!
+    livrables: [Livrable!]!
+    createdAt: String!
+    updatedAt: String!
+  }
 
-input LivrableInput {
-  intitule: String!
-  titre: String
-  description: String!
-  dateLimite: Date!
-  statut: StatutLivrable
-  projetId: ID!
-}
+  type Livrable {
+    id: ID!
+    nom: String!
+    description: String
+    dateEcheance: String!
+    statut: StatutLivrable!
+    projet: Projet!
+    createdAt: String!
+    updatedAt: String!
+  }
 
-input LivrableUpdateInput {
-  intitule: String
-  titre: String
-  description: String
-  dateLimite: Date
-  statut: StatutLivrable
-}
+  input ProjetInput {
+    nom: String!
+    description: String
+    dateDebut: String!
+    dateFin: String
+    statut: StatutProjet
+  }
 
-type Projet {
-  _id: ID!
-  titre: String!
-  description: String!
-  equipe: [ID]
-  tuteur: ID
-  competences: [String]!
-  dateDebut: Date!
-  dateFin: Date!
-  livrables: [Livrable]
-  statut: StatutProjet!
-  progression: Int
-  creeLe: Date
-  majLe: Date
-}
+  input LivrableInput {
+    nom: String!
+    description: String
+    dateEcheance: String!
+    statut: StatutLivrable
+    projetId: ID!
+  }
 
-input ProjetInput {
-  titre: String!
-  description: String!
-  equipe: [ID]
-  tuteur: ID
-  competences: [String]!
-  dateDebut: Date!
-  dateFin: Date!
-  statut: StatutProjet
-}
+  enum StatutProjet {
+    EN_COURS
+    TERMINE
+    EN_PAUSE
+    ANNULE
+  }
 
-type HealthCheckResult {
-  status: String!
-  timestamp: String!
-  version: String
-  message: String
-}
-
-type AIRecommendationResult {
-  recommendations: [String!]
-}
-
-type AnalyzeTextResult {
-  sentiment: String
-  keywords: [String!]
-  summary: String
-  language: String
-  confidence: Float
-}
-
-input AnalyzeTextOptions {
-  language: String
-  model: String
-}
-
-type PingResult {
-  success: Boolean!
-  message: String
-  timestamp: String!
-}
-
-type GenerateContentMetadata {
-  generationTime: String
-  modelUsed: String
-  tokens: Int
-}
-
-type GenerateContentResult {
-  content: String!
-  metadata: GenerateContentMetadata
-}
-
-input GenerateContentOptions {
-  model: String
-  temperature: Float
-  maxTokens: Int
-}
-
-type OptimizeProjetDescriptionResult {
-  originalDescription: String!
-  optimizedDescription: String!
-  improvements: [String!]
-}
-
-input OptimizeProjetDescriptionOptions {
-  style: String
-  language: String
-}
-
-type Query {
-  projets: [Projet]
-  projet(id: ID!): Projet
-  livrables: [Livrable]
-  livrable(id: ID!): Livrable
-  livrablesByProjet(projetId: ID!): [Livrable]
-  healthCheck: HealthCheckResult
-  aiRecommendations(projetId: ID!): AIRecommendationResult
-  analyzeText(text: String!, options: AnalyzeTextOptions): AnalyzeTextResult
-}
-
-type Mutation {
-  creerProjet(input: ProjetInput!): Projet
-  mettreAJourProjet(id: ID!, input: ProjetInput!): Projet
-  supprimerProjet(id: ID!): Projet
-  
-  creerLivrable(input: LivrableInput!): Livrable
-  ajouterLivrable(projetId: ID!, input: LivrableInput!): Livrable
-  mettreAJourLivrable(livrableId: ID!, input: LivrableUpdateInput!): Livrable
-  supprimerLivrable(livrableId: ID!): Livrable
-  ping(message: String): PingResult
-  generateContent(prompt: String!, contentType: String!, options: GenerateContentOptions): GenerateContentResult
-  optimizeProjetDescription(projetId: ID!, options: OptimizeProjetDescriptionOptions): OptimizeProjetDescriptionResult
-}
+  enum StatutLivrable {
+    A_FAIRE
+    EN_COURS
+    TERMINE
+    EN_RETARD
+    ANNULE
+  }
 `;
 
 module.exports = { typeDefs, resolvers };

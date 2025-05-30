@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const { Schema, model } = mongoose;
 const { Enum } = require('../../config/constants');
 
-
 const livrableSchema = new Schema({
     intitule: {
         type: String,
@@ -31,19 +30,32 @@ const livrableSchema = new Schema({
         type: Schema.Types.ObjectId,
         ref: 'Projet',
         required: [true, 'L\'ID du projet est requis.'],
-        index: true // Indexation pour ameliorer les performances
-    },
-        statut: {
-            type: String,
-            enum: {
-                values: Object.values(Enum.StatutLivrable),
-                message: `Le statut doit etre l'un des suivants: ${Object.values(Enum.StatutLivrable).join(', ')}`
+        validate: {
+            validator: function(v) {
+                return mongoose.Types.ObjectId.isValid(v);
             },
-            default: Enum.StatutLivrable.EN_ATTENTE,
-            index: true
+            message: props => `${props.value} n'est pas un ID de projet valide!`
         },
+        index: true
     },
-     {
+    statut: {
+        type: String,
+        enum: {
+            values: Object.values(Enum.StatutLivrable),
+            message: `Le statut doit etre l'un des suivants: ${Object.values(Enum.StatutLivrable).join(', ')}`
+        },
+        default: Enum.StatutLivrable.EN_ATTENTE,
+        index: true
+    },
+    creeLe: {
+        type: Date,
+        default: Date.now
+    },
+    majLe: {
+        type: Date,
+        default: Date.now
+    }
+}, {
     timestamps: {
         createdAt: 'creeLe',
         updatedAt: 'majLe'
@@ -57,7 +69,7 @@ livrableSchema.index({ projetId: 1, statut: 1 });
 
 // Methode pour verifier si un livrable est en retard
 livrableSchema.methods.estEnRetard = function() {
-    return this.statut !== 'termine' && new Date() > this.dateLimite;
+    return this.statut !== Enum.StatutLivrable.TERMINE && new Date() > this.dateLimite;
 };
 
 // Virtual pour acceder au projet
@@ -71,10 +83,16 @@ livrableSchema.virtual('projet', {
 // Middleware "pre_save" pour mettre à jour le statut si necessaire
 livrableSchema.pre('save', function(next) {
     if (this.isModified('dateLimite') || this.isModified('statut')) {
-        if (this.statut !== 'termine' && new Date() > this.dateLimite) {
-            this.statut = 'en_retard';
+        if (this.statut !== Enum.StatutLivrable.TERMINE && new Date() > this.dateLimite) {
+            this.statut = Enum.StatutLivrable.EN_RETARD;
         }
     }
+    next();
+});
+
+// Middleware pour mettre à jour la date de modification
+livrableSchema.pre(['updateOne', 'findOneAndUpdate'], function(next) {
+    this.set({ majLe: new Date() });
     next();
 });
 

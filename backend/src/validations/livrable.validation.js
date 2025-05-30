@@ -4,13 +4,10 @@ const { MessagesErreur, StatutHttp, Enum } = require('../../config/constants');
 
 // Schema de validation Yup pour les livrables
 const livrableSchema = yup.object().shape({
-    titre: yup.string()
-        .min(3, 'Le titre doit contenir au moins 3 caracteres.')
-        .max(150, 'Le titre ne peut pas depasser 150 caracteres.')
-        .required('Le titre est requis.'),
     intitule: yup.string()
         .min(3, 'L\'intitule doit contenir au moins 3 caracteres.')
-        .max(150, 'L\'intitule ne peut pas depasser 150 caracteres.'),
+        .max(150, 'L\'intitule ne peut pas depasser 150 caracteres.')
+        .required('L\'intitule est requis.'),
     description: yup.string()
         .min(10, 'La description doit contenir au moins 10 caracteres.')
         .required('La description est requise.'),
@@ -20,22 +17,18 @@ const livrableSchema = yup.object().shape({
         .required('L\'ID du projet est requis.'),
     dateLimite: yup.date()
         .min(new Date(), 'La date limite doit etre future.')
-        .required('La date limite est requise.'),
+        .required('La date limite est requise.')
+        .test('date-valide', 'La date limite doit être valide.',
+            val => val instanceof Date && !isNaN(val)),
     statut: yup.string()
         .oneOf(Object.values(Enum.StatutLivrable), 'Statut invalide.')
+        .default(Enum.StatutLivrable.EN_ATTENTE)
 });
 
 // Middleware de validation des donnees de livrable
 const validateLivrableData = async (req, res, next) => {
     try {
-        // Permettre titre OU intitule
         const body = { ...req.body };
-        if (body.titre && !body.intitule) body.intitule = body.titre;
-        if (body.intitule && !body.titre) body.titre = body.intitule;
-
-        // Gérer la compatibilité entre dateLimite et dateEcheance
-        if (body.dateEcheance && !body.dateLimite) body.dateLimite = body.dateEcheance;
-        if (body.dateLimite && !body.dateEcheance) body.dateEcheance = body.dateLimite;
 
         // Adapter les dates au format
         if (body.dateLimite && typeof body.dateLimite === 'string') {
@@ -53,7 +46,7 @@ const validateLivrableData = async (req, res, next) => {
     }
 };
 
-// Middleware de validation des IDs (inchangé)
+// Middleware de validation des IDs
 const validateId = (paramName, source = 'params') => {
     return (req, res, next) => {
         const id = source === 'params' ? req.params[paramName] : req.body[paramName];
@@ -71,5 +64,5 @@ const validateId = (paramName, source = 'params') => {
 module.exports = {
     validateLivrableData,
     validateId,
-    livrableSchema // Export pour tests et reutilisation
+    livrableSchema // Export pour tests et réutilisation
 };

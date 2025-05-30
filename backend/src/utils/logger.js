@@ -8,21 +8,27 @@ if (!fs.existsSync(logsDir)) {
     fs.mkdirSync(logsDir, { recursive: true });
 }
 
-// Format personnalise
-const customFormat = winston.format.printf(({ level, message, timestamp, ...metadata }) => {
-    const metaStr = Object.keys(metadata).length ? JSON.stringify(metadata) : '';
-    return `[${timestamp}] ${level.toUpperCase()}: ${message} ${metaStr}`;
-});
+// Configuration des niveaux de log
+const levels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    debug: 3
+};
+
+// Configuration du format
+const format = winston.format.combine(
+    winston.format.timestamp({
+        format: 'YYYY-MM-DD HH:mm:ss'
+    }),
+    winston.format.json()
+);
 
 // Configuration du logger
 const logger = winston.createLogger({
     level: process.env.LOG_LEVEL || 'info',
-    format: winston.format.combine(
-        winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        winston.format.errors({ stack: true }),
-        winston.format.metadata(),
-        customFormat
-    ),
+    levels,
+    format,
     defaultMeta: { service: 'progease-api' },
     transports: [
         // Logs console en developpement
@@ -30,7 +36,11 @@ const logger = winston.createLogger({
             level: 'debug',
             format: winston.format.combine(
                 winston.format.colorize(),
-                customFormat
+                winston.format.printf(
+                    info => `${info.timestamp} ${info.level}: ${info.message} ${
+                        info.metadata ? JSON.stringify(info.metadata) : ''
+                    }`
+                )
             )
         }),
 

@@ -1,8 +1,8 @@
 'use strict';
 
-const express = require('express');
-const { createApolloServer, createApolloMiddleware } = require('../../apollo');
-const { initLoaders } = require('./index');
+const { ApolloServer } = require('@apollo/server');
+const { expressMiddleware } = require('@apollo/server/express4');
+const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
 const logger = require('../utils/logger');
 
 /**
@@ -10,40 +10,37 @@ const logger = require('../utils/logger');
  *
  * @param {express.Application} app - L'application Express existante
  * @param {import('http').Server} httpServer - Le serveur HTTP existant
+ * @param {import('graphql').GraphQLSchema} schema - Le schéma GraphQL
  * @returns {Promise<void>}
  */
-async function createStandaloneServer(app, httpServer) {
+async function createStandaloneServer(app, httpServer, schema) {
     try {
         logger.info('Configuration du serveur Apollo standalone...');
 
-        // Creation et demarrage du serveur Apollo
-        const apolloServer = await createApolloServer(httpServer, {
-            plugins: [
-                // Plugins personnalises si necessaires
-            ]
-        });
-
-        // Creation du middleware Express pour Apollo Server
-        const apolloMiddleware = createApolloMiddleware(apolloServer, {
-            context: async ({ req }) => {
-                // Contexte personnalise à partager avec les resolvers
-                return {
-                    // Initialiser les DataLoaders
-                    loaders: initLoaders(),
-
-                    // Donnees utilisateur et de requete
-                    currentUser: req.currentUser || 'anonyme',
-                    timestamp: new Date().toISOString()
-                };
+        const server = new ApolloServer({
+            schema,
+            plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+            formatError: (error) => {
+                logger.error('GraphQL Error:', error);
+                return error;
             }
         });
 
-        // Enregistrement du middleware Apollo sur le chemin /graphql-apollo
-        app.use('/graphql-apollo', express.json(), apolloMiddleware);
+        await server.start();
 
-        logger.info('Serveur Apollo standalone configure avec succes sur /graphql-apollo');
+        app.use(
+            '/graphql',
+            expressMiddleware(server, {
+                context: async ({ req }) => ({
+                    currentUser: req.currentUser,
+                    timestamp: req.timestamp
+                })
+            })
+        );
 
-        return apolloServer;
+        logger.info('Serveur Apollo standalone configure avec succes sur /graphql');
+
+        return server;
     } catch (error) {
         logger.error(`Erreur lors de la configuration du serveur Apollo: ${error.message}`);
         throw error;

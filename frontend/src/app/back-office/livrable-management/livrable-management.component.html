@@ -1,82 +1,57 @@
 <div class="livrable-management">
-  <mat-card class="filters-card">
+  <mat-card class="livrable-card">
     <mat-card-header>
-      <mat-card-title>Gestion des Livrables</mat-card-title>
+      <mat-card-title>Gestion des livrables</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <div class="filters">
-        <mat-form-field>
+      <div class="search-filters">
+        <mat-form-field appearance="outline">
           <mat-label>Rechercher</mat-label>
           <input matInput [(ngModel)]="searchTerm" (ngModelChange)="filterLivrables()" placeholder="Rechercher un livrable...">
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
 
-        <mat-form-field>
+        <mat-form-field appearance="outline">
           <mat-label>Statut</mat-label>
           <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="filterLivrables()">
             <mat-option value="">Tous</mat-option>
+            <mat-option value="En attente">En attente</mat-option>
             <mat-option value="En cours">En cours</mat-option>
             <mat-option value="Terminé">Terminé</mat-option>
-            <mat-option value="En attente">En attente</mat-option>
           </mat-select>
         </mat-form-field>
       </div>
+
+      <div class="livrables-list">
+        <mat-list>
+          <mat-list-item *ngFor="let livrable of filteredLivrables">
+            <div class="livrable-item">
+              <div class="livrable-info">
+                <h3>{{ livrable.titre }}</h3>
+                <p>{{ livrable.description }}</p>
+                <p class="date">Créé le: {{ livrable.dateCreation | date }}</p>
+              </div>
+              <div class="livrable-status">
+                <mat-chip-set>
+                  <mat-chip [color]="livrable.statut === 'Terminé' ? 'accent' : 'primary'" selected>
+                    {{ livrable.statut }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+              <div class="livrable-actions">
+                <button mat-icon-button color="primary" matTooltip="Éditer">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
     </mat-card-content>
   </mat-card>
-
-  <table mat-table [dataSource]="filteredLivrables" class="mat-elevation-z8">
-    <ng-container matColumnDef="id">
-      <th mat-header-cell *matHeaderCellDef>ID</th>
-      <td mat-cell *matCellDef="let livrable">{{livrable.id}}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="titre">
-      <th mat-header-cell *matHeaderCellDef>Titre</th>
-      <td mat-cell *matCellDef="let livrable">{{livrable.titre}}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="description">
-      <th mat-header-cell *matHeaderCellDef>Description</th>
-      <td mat-cell *matCellDef="let livrable">{{livrable.description}}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="dateCreation">
-      <th mat-header-cell *matHeaderCellDef>Date de création</th>
-      <td mat-cell *matCellDef="let livrable">{{livrable.dateCreation | date}}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="statut">
-      <th mat-header-cell *matHeaderCellDef>Statut</th>
-      <td mat-cell *matCellDef="let livrable">
-        <mat-chip-list>
-          <mat-chip [color]="livrable.statut === 'Terminé' ? 'primary' : 'accent'"
-                   [selected]="true">
-            {{livrable.statut}}
-          </mat-chip>
-        </mat-chip-list>
-      </td>
-    </ng-container>
-
-    <ng-container matColumnDef="projet">
-      <th mat-header-cell *matHeaderCellDef>Projet</th>
-      <td mat-cell *matCellDef="let livrable">{{livrable.projet}}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef>Actions</th>
-      <td mat-cell *matCellDef="let livrable">
-        <button mat-icon-button color="primary" matTooltip="Modifier">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" matTooltip="Supprimer">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="['id', 'titre', 'description', 'dateCreation', 'statut', 'projet', 'actions']"></tr>
-    <tr mat-row *matRowDef="let row; columns: ['id', 'titre', 'description', 'dateCreation', 'statut', 'projet', 'actions'];"></tr>
-  </table>
 
   <mat-paginator [pageSize]="10"
                  [pageSizeOptions]="[5, 10, 25, 100]"

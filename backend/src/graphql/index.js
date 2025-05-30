@@ -9,60 +9,124 @@
 
 'use strict';
 
-const resolvers = require('./resolvers');
-const DataLoader = require('dataloader');
+const { NODE_ENV } = require('../../config/constants');
 const logger = require('../utils/logger');
-const Projet = require('../models/projet.model');
-const Livrable = require('../models/livrable.model');
 
-function createLoaders() {
-    logger.debug('Initialisation des DataLoaders GraphQL');
-    return {
-        projetLoader: new DataLoader(async (ids) => {
-            logger.debug(`Chargement de ${ids.length} projets par DataLoader`);
-            const projets = await Projet.find({ _id: { $in: ids } }).lean().exec();
-            const projetsMap = {};
-            (projets || []).forEach(projet => {
-                if (projet && projet._id) {
-                    projetsMap[projet._id.toString()] = projet;
-                }
-            });
-            return ids.map(id => projetsMap[id.toString()] || null);
-        }, { cache: true }),
-        livrableLoader: new DataLoader(async (ids) => {
-            logger.debug(`Chargement de ${ids.length} livrables par DataLoader`);
-            const livrables = await Livrable.find({ _id: { $in: ids } }).lean().exec();
-            const livrablesMap = {};
-            (livrables || []).forEach(livrable => {
-                if (livrable && livrable._id) {
-                    livrablesMap[livrable._id.toString()] = livrable;
-                }
-            });
-            return ids.map(id => livrablesMap[id.toString()] || null);
-        }, { cache: true }),
-        livrablesByProjetLoader: new DataLoader(async (projetIds) => {
-            logger.debug(`Chargement des livrables pour ${projetIds.length} projets par DataLoader`);
-            const livrables = await Livrable.find({ projetId: { $in: projetIds } }).lean().exec();
-            const livrablesMap = {};
-            for (const id of projetIds) {
-                livrablesMap[id.toString()] = [];
+const resolvers = {
+    Query: {
+        health: () => ({
+            status: 'ok',
+            timestamp: new Date().toISOString(),
+            version: '2.0.0',
+            environment: NODE_ENV
+        }),
+        projets: async (_, __, { models }) => {
+            try {
+                return await models.Projet.find().sort({ createdAt: -1 });
+            } catch (error) {
+                logger.error('Erreur lors de la récupération des projets:', error);
+                throw error;
             }
-            for (const livrable of (livrables || [])) {
-                if (livrable && livrable.projetId) {
-                    const projetId = livrable.projetId.toString();
-                    if (livrablesMap[projetId]) {
-                        livrablesMap[projetId].push(livrable);
-                    }
-                }
+        },
+        projet: async (_, { id }, { models }) => {
+            try {
+                return await models.Projet.findById(id);
+            } catch (error) {
+                logger.error(`Erreur lors de la récupération du projet ${id}:`, error);
+                throw error;
             }
-            return projetIds.map(id => livrablesMap[id.toString()] || []);
-        }, { cache: true })
-    };
-}
+        },
+        livrables: async (_, __, { models }) => {
+            try {
+                return await models.Livrable.find().sort({ dateEcheance: 1 });
+            } catch (error) {
+                logger.error('Erreur lors de la récupération des livrables:', error);
+                throw error;
+            }
+        },
+        livrable: async (_, { id }, { models }) => {
+            try {
+                return await models.Livrable.findById(id);
+            } catch (error) {
+                logger.error(`Erreur lors de la récupération du livrable ${id}:`, error);
+                throw error;
+            }
+        }
+    },
+    Mutation: {
+        createProjet: async (_, { input }, { models }) => {
+            try {
+                return await models.Projet.create(input);
+            } catch (error) {
+                logger.error('Erreur lors de la création du projet:', error);
+                throw error;
+            }
+        },
+        updateProjet: async (_, { id, input }, { models }) => {
+            try {
+                return await models.Projet.findByIdAndUpdate(id, input, { new: true });
+            } catch (error) {
+                logger.error(`Erreur lors de la mise à jour du projet ${id}:`, error);
+                throw error;
+            }
+        },
+        deleteProjet: async (_, { id }, { models }) => {
+            try {
+                await models.Projet.findByIdAndDelete(id);
+                return true;
+            } catch (error) {
+                logger.error(`Erreur lors de la suppression du projet ${id}:`, error);
+                throw error;
+            }
+        },
+        createLivrable: async (_, { input }, { models }) => {
+            try {
+                return await models.Livrable.create(input);
+            } catch (error) {
+                logger.error('Erreur lors de la création du livrable:', error);
+                throw error;
+            }
+        },
+        updateLivrable: async (_, { id, input }, { models }) => {
+            try {
+                return await models.Livrable.findByIdAndUpdate(id, input, { new: true });
+            } catch (error) {
+                logger.error(`Erreur lors de la mise à jour du livrable ${id}:`, error);
+                throw error;
+            }
+        },
+        deleteLivrable: async (_, { id }, { models }) => {
+            try {
+                await models.Livrable.findByIdAndDelete(id);
+                return true;
+            } catch (error) {
+                logger.error(`Erreur lors de la suppression du livrable ${id}:`, error);
+                throw error;
+            }
+        }
+    },
+    Projet: {
+        livrables: async (projet, _, { models }) => {
+            try {
+                return await models.Livrable.find({ projetId: projet.id });
+            } catch (error) {
+                logger.error(`Erreur lors de la récupération des livrables du projet ${projet.id}:`, error);
+                throw error;
+            }
+        }
+    },
+    Livrable: {
+        projet: async (livrable, _, { models }) => {
+            try {
+                return await models.Projet.findById(livrable.projetId);
+            } catch (error) {
+                logger.error(`Erreur lors de la récupération du projet du livrable ${livrable.id}:`, error);
+                throw error;
+            }
+        }
+    }
+};
 
-function initLoaders() {
-    return createLoaders();
-}
-
-exports.resolvers = resolvers;
-exports.initLoaders = initLoaders;
+module.exports = {
+    resolvers
+};

@@ -2,13 +2,26 @@ import { Component, OnInit, HostListener } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { filter } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
 import { AuthService } from '../core/services/auth.service';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatListModule } from '@angular/material/list';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { BreadcrumbComponent } from '../shared/components/breadcrumb/breadcrumb.component';
+
+interface BreadcrumbItem {
+  label: string;
+  url: string;
+}
 
 @Component({
   selector: 'app-back-office-template',
   templateUrl: './back-office-template.component.html',
-  styleUrls: ['./back-office-template.component.css'],
+  styleUrls: ['./back-office-template.component.scss'],
   animations: [
     trigger('fadeAnimation', [
       transition('* => *', [
@@ -16,13 +29,27 @@ import { AuthService } from '../core/services/auth.service';
         animate('0.3s', style({ opacity: 1 }))
       ])
     ])
+  ],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatListModule,
+    MatIconModule,
+    MatButtonModule,
+    BreadcrumbComponent
   ]
 })
 export class BackOfficeTemplateComponent implements OnInit {
   showBackToTop = false;
   currentYear = new Date().getFullYear();
   version = environment.version;
-  breadcrumbItems: Array<{label: string, url?: string}> = [];
+  appName = environment.appName;
+  breadcrumbItems: BreadcrumbItem[] = [
+    { label: 'Accueil', url: '/back-office' }
+  ];
 
   constructor(
     private router: Router,
@@ -71,21 +98,21 @@ export class BackOfficeTemplateComponent implements OnInit {
 
   private updateBreadcrumb() {
     const urlSegments = this.router.url.split('/').filter(segment => segment);
-    this.breadcrumbItems = [
-      { label: 'Back Office', url: '/back-office' }
-    ];
-
-    if (urlSegments.length > 1) {
-      const currentPage = urlSegments[urlSegments.length - 1];
+    let currentPath = '';
+    
+    this.breadcrumbItems = [{ label: 'Accueil', url: '/back-office' }];
+    
+    for (let i = 1; i < urlSegments.length; i++) {
+      currentPath += '/' + urlSegments[i];
       this.breadcrumbItems.push({
-        label: this.formatPageName(currentPage)
+        label: this.formatPageName(urlSegments[i]),
+        url: '/back-office' + currentPath
       });
     }
   }
 
-  private formatPageName(page: string): string {
-    // Convert kebab-case to Title Case
-    return page
+  private formatPageName(segment: string): string {
+    return segment
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');

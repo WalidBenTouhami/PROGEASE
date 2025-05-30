@@ -1,13 +1,37 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { trigger, transition, style, animate } from '@angular/animations';
 import { filter } from 'rxjs/operators';
-import { environment } from '../../../environments/environment';
+import { environment } from '../../environments/environment';
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { RouterModule } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { MatListModule } from '@angular/material/list';
+import { BreadcrumbComponent } from '../shared/components/breadcrumb/breadcrumb.component';
+
+interface BreadcrumbItem {
+  label: string;
+  url: string;
+}
 
 @Component({
   selector: 'app-front-office-template',
   templateUrl: './front-office-template.component.html',
-  styleUrls: ['./front-office-template.component.css'],
+  styleUrls: ['./front-office-template.component.scss'],
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatListModule,
+    MatIconModule,
+    MatButtonModule,
+    BreadcrumbComponent
+  ],
   animations: [
     trigger('fadeAnimation', [
       transition('* => *', [
@@ -18,10 +42,15 @@ import { environment } from '../../../environments/environment';
   ]
 })
 export class FrontOfficeTemplateComponent implements OnInit {
+  @ViewChild('sidenav') sidenav!: MatSidenav;
   showBackToTop = false;
   currentYear = new Date().getFullYear();
+  appName = environment.appName;
   version = environment.version;
-  breadcrumbItems: Array<{label: string, url?: string}> = [];
+  breadcrumbItems: BreadcrumbItem[] = [
+    { label: 'Accueil', url: '/front-office' },
+    { label: 'Mes projets', url: '/front-office/projets' }
+  ];
 
   constructor(private router: Router) {
     // Subscribe to router events to update breadcrumb
@@ -61,7 +90,8 @@ export class FrontOfficeTemplateComponent implements OnInit {
     if (urlSegments.length > 1) {
       const currentPage = urlSegments[urlSegments.length - 1];
       this.breadcrumbItems.push({
-        label: this.formatPageName(currentPage)
+        label: this.formatPageName(currentPage),
+        url: this.router.url
       });
     }
   }
@@ -72,5 +102,9 @@ export class FrontOfficeTemplateComponent implements OnInit {
       .split('-')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+  }
+
+  toggleSidenav() {
+    this.sidenav?.toggle();
   }
 } 

@@ -87,108 +87,6 @@ async function scanDirectory(directory, filePattern) {
 }
 
 /**
- * Analyse les fichiers de modeles pour extraire les structures de donnees
- */
-async function analyzeModels() {
-    console.log('Analyse des modeles...');
-    const modelFiles = await scanDirectory(config.paths.models, /\.(js|ts)$/);
-
-    for (const file of modelFiles) {
-        try {
-            const content = await readFile(file, 'utf8');
-            const modelName = path.basename(file, path.extname(file));
-
-            // Extraction des proprietes du modele
-            const fields = [];
-            const schemaRegex = /new\s+Schema\s*\(\s*{([^}]*)}/s;
-            const schemaMatch = content.match(schemaRegex);
-
-            if (schemaMatch && schemaMatch[1]) {
-                const fieldsContent = schemaMatch[1];
-                const fieldRegex = /(\w+)\s*:\s*{([^}]*)}/g;
-                let fieldMatch;
-
-                while ((fieldMatch = fieldRegex.exec(fieldsContent)) !== null) {
-                    const fieldName = fieldMatch[1];
-                    const fieldDef = fieldMatch[2];
-
-                    const typeRegex = /type\s*:\s*(\w+)/;
-                    const requiredRegex = /required\s*:\s*(true|false)/;
-                    const defaultRegex = /default\s*:\s*([^,\n]+)/;
-
-                    const typeMatch = fieldDef.match(typeRegex);
-                    const requiredMatch = fieldDef.match(requiredRegex);
-                    const defaultMatch = fieldDef.match(defaultRegex);
-
-                    fields.push({
-                        name: fieldName,
-                        type: typeMatch ? typeMatch[1] : 'String',
-                        required: requiredMatch ? requiredMatch[1] === 'true' : false,
-                        default: defaultMatch ? defaultMatch[1].trim() : undefined
-                    });
-                }
-            }
-
-            projetStructure.models.push({
-                name: modelName,
-                fields: fields,
-                file: path.relative(path.join(__dirname, '..'), file)
-            });
-        } catch (err) {
-            console.error(`Erreur lors de l'analyse du fichier ${file}:`, err);
-        }
-    }
-
-    console.log(`${projetStructure.models.length} modeles analyses.`);
-}
-
-/**
- * Analyse les fichiers de routes pour detecter les endpoints API
- */
-async function analyzeRoutes() {
-    console.log('Analyse des routes...');
-    const routeFiles = await scanDirectory(config.paths.routes, /\.(js|ts)$/);
-
-    for (const file of routeFiles) {
-        try {
-            const content = await readFile(file, 'utf8');
-            const routeName = path.basename(file, path.extname(file));
-
-            // Extraction des endpoints (routes)
-            const routeRegex = /router\.(get|post|put|delete|patch)\s*\(\s*['"]([^'"]+)['"]/g;
-            let routeMatch;
-
-            while ((routeMatch = routeRegex.exec(content)) !== null) {
-                const method = routeMatch[1].toUpperCase();
-                const endpoint = routeMatch[2];
-
-                // Extraction du contrôleur associe
-                const lineContext = content.substring(
-                    Math.max(0, routeMatch.index - 100),
-                    Math.min(content.length, routeMatch.index + 200)
-                );
-
-                const controllerRegex = new RegExp(`${method.toLowerCase()}\\s*\\(\\s*['"]${endpoint.replace(/\//g, '\\/')}['"]\\s*,\\s*([\\w.]+)`, 'i');
-                const controllerMatch = lineContext.match(controllerRegex);
-                const controller = controllerMatch ? controllerMatch[1] : 'unknown';
-
-                projetStructure.endpoints.push({
-                    method: method,
-                    path: endpoint,
-                    controller: controller,
-                    routeFile: routeName,
-                    file: path.relative(path.join(__dirname, '..'), file)
-                });
-            }
-        } catch (err) {
-            console.error(`Erreur lors de l'analyse du fichier ${file}:`, err);
-        }
-    }
-
-    console.log(`${projetStructure.endpoints.length} endpoints detectes.`);
-}
-
-/**
  * Analyse les fichiers GraphQL pour extraire les types, requetes et mutations
  */
 async function analyzeGraphQL() {
@@ -197,7 +95,7 @@ async function analyzeGraphQL() {
     // Chercher les fichiers GraphQL dans differents endroits possibles
     const gqlFolders = [
         path.join(__dirname, '..', 'src'),
-        ];
+    ];
 
     let gqlFiles = [];
     for (const folder of gqlFolders) {
@@ -280,385 +178,6 @@ async function analyzeGraphQL() {
 }
 
 /**
- * Genere une collection Postman/Newman à partir des donnees analysees
- */
-async function generateNewmanCollection() {
-    console.log('Generation de la collection Newman/Postman...');
-
-    // Creer la structure de la collection
-    const timestamp = Date.now();
-    const collection = {
-        info: {
-            _postman_id: `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.replace(/[xy]/g, (c) => {
-                const r = (timestamp + Math.random() * 16) % 16 | 0;
-                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-            }),
-            name: "PROGEASE API Tests (Auto-generes)",
-            schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-            description: `Collection de tests auto-generes pour l'API PROGEASE - ${config.metadata.date}`
-        },
-        item: [
-            {
-                name: "1. Tests de Sante",
-                item: [
-                    {
-                        name: "Verifier l'etat du serveur",
-                        request: {
-                            method: "GET",
-                            header: [],
-                            url: "{{baseUrl}}/health"
-                        }
-                    },
-                    {
-                        name: "Verifier l'API principale",
-                        request: {
-                            method: "GET",
-                            header: [],
-                            url: "{{baseUrl}}/api"
-                        }
-                    }
-                ]
-            }
-        ],
-        variable: [
-            {
-                key: "baseUrl",
-                value: config.baseUrl,
-                type: "string"
-            }
-        ]
-    };
-
-    // Regrouper les endpoints par ressource (base sur le premier segment de l'URL)
-    const endpointGroups = {};
-
-    projetStructure.endpoints.forEach(endpoint => {
-        // Ignorer les routes de sante et API principale dejà incluses
-        if (endpoint.path === '/health' || endpoint.path === '/api') {
-            return;
-        }
-
-        // Determiner le groupe (ressource) base sur le chemin
-        const segments = endpoint.path.split('/').filter(s => s);
-        const resourceName = segments.length > 0 ? segments[0] : 'autres';
-
-        if (!endpointGroups[resourceName]) {
-            endpointGroups[resourceName] = [];
-        }
-
-        endpointGroups[resourceName].push(endpoint);
-    });
-
-    // Ajouter les groupes d'endpoints à la collection
-    let groupCounter = 2; // commencer à 2 car nous avons dejà les tests de sante
-
-    for (const [resource, endpoints] of Object.entries(endpointGroups)) {
-        const itemGroup = {
-            name: `${groupCounter}. Tests de ${resource}`,
-            item: []
-        };
-
-        // Trouver le modele associe à cette ressource
-        const associatedModel = projetStructure.models.find(m =>
-            m.name.toLowerCase() === resource.toLowerCase() ||
-            m.name.toLowerCase() === resource.toLowerCase().slice(0, -1) // singulier
-        );
-
-        // Generer des exemples de donnees pour les tests
-        const testData = associatedModel ? generateTestData(associatedModel) : {};
-
-        // Trier les endpoints pour avoir un ordre logique: GET all, POST, GET one, PUT, DELETE
-        endpoints.sort((a, b) => {
-            const methodOrder = { GET: 1, POST: 2, PUT: 3, PATCH: 4, DELETE: 5 };
-            if (a.method !== b.method) {
-                return methodOrder[a.method] - methodOrder[b.method];
-            }
-            return a.path.localeCompare(b.path);
-        });
-
-        let subCounter = 1;
-        endpoints.forEach(endpoint => {
-            const testItem = {
-                name: `${groupCounter}.${subCounter} ${endpoint.method} ${endpoint.path}`,
-                request: {
-                    method: endpoint.method,
-                    header: [
-                        {
-                            key: "Content-Type",
-                            value: "application/json"
-                        }
-                    ],
-                    url: `{{baseUrl}}${endpoint.path}`
-                }
-            };
-
-            // Ajouter un corps de requete pour POST, PUT, PATCH
-            if (['POST', 'PUT', 'PATCH'].includes(endpoint.method) && Object.keys(testData).length > 0) {
-                testItem.request.body = {
-                    mode: "raw",
-                    raw: JSON.stringify(testData, null, 2)
-                };
-            }
-
-            // Scripts de test pour verifier les reponses
-            testItem.event = [
-                {
-                    listen: "test",
-                    script: {
-                        type: "text/javascript",
-                        exec: generateTestScript(endpoint, resource)
-                    }
-                }
-            ];
-
-            itemGroup.item.push(testItem);
-            subCounter++;
-        });
-
-        collection.item.push(itemGroup);
-        groupCounter++;
-    }
-
-    // Ajouter une section pour les tests GraphQL si presents
-    if (projetStructure.graphqlQueries.length > 0 || projetStructure.graphqlMutations.length > 0) {
-        const graphqlGroup = {
-            name: `${groupCounter}. Tests GraphQL`,
-            item: []
-        };
-
-        // Ajouter des requetes pour chaque query GraphQL
-        let gqlCounter = 1;
-        projetStructure.graphqlQueries.forEach(query => {
-            const testItem = {
-                name: `${groupCounter}.${gqlCounter} Query ${query.name}`,
-                request: {
-                    method: "POST",
-                    header: [
-                        {
-                            key: "Content-Type",
-                            value: "application/json"
-                        }
-                    ],
-                    body: {
-                        mode: "raw",
-                        raw: JSON.stringify({
-                            query: `query { ${query.name} { _id } }`
-                        }, null, 2)
-                    },
-                    url: "{{baseUrl}}/graphql"
-                },
-                event: [
-                    {
-                        listen: "test",
-                        script: {
-                            type: "text/javascript",
-                            exec: [
-                                "pm.test(\"Status code is 200\", function () {",
-                                "    pm.response.to.have.status(200);",
-                                "});",
-                                "",
-                                "pm.test(\"Response has valid GraphQL data\", function () {",
-                                "    var jsonData = pm.response.json();",
-                                "    pm.expect(jsonData.data).to.exist;",
-                                "});"
-                            ]
-                        }
-                    }
-                ]
-            };
-
-            graphqlGroup.item.push(testItem);
-            gqlCounter++;
-        });
-
-        // Ajouter des requetes pour chaque mutation GraphQL
-        projetStructure.graphqlMutations.forEach(mutation => {
-            const testItem = {
-                name: `${groupCounter}.${gqlCounter} Mutation ${mutation.name}`,
-                request: {
-                    method: "POST",
-                    header: [
-                        {
-                            key: "Content-Type",
-                            value: "application/json"
-                        }
-                    ],
-                    body: {
-                        mode: "raw",
-                        raw: JSON.stringify({
-                            query: `mutation { ${mutation.name}(input: {}) { _id } }`
-                        }, null, 2)
-                    },
-                    url: "{{baseUrl}}/graphql"
-                },
-                event: [
-                    {
-                        listen: "test",
-                        script: {
-                            type: "text/javascript",
-                            exec: [
-                                "pm.test(\"Status code is 200\", function () {",
-                                "    pm.response.to.have.status(200);",
-                                "});",
-                                "",
-                                "pm.test(\"Response has valid GraphQL data\", function () {",
-                                "    var jsonData = pm.response.json();",
-                                "    pm.expect(jsonData.data).to.exist;",
-                                "});"
-                            ]
-                        }
-                    }
-                ]
-            };
-
-            graphqlGroup.item.push(testItem);
-            gqlCounter++;
-        });
-
-        collection.item.push(graphqlGroup);
-    }
-
-    // Creer le repertoire de sortie s'il n'existe pas
-    await mkdir(config.paths.output.newman, { recursive: true });
-
-    // ecrire le fichier de collection
-    const outputPath = path.join(config.paths.output.newman, 'PROGEASE.postman_collection.json');
-    await writeFile(outputPath, JSON.stringify(collection, null, 2), 'utf8');
-
-    console.log(`Collection Newman/Postman generee dans: ${outputPath}`);
-
-    // Generer egalement un fichier d'environnement
-    const environment = {
-        id: `xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx`.replace(/[xy]/g, (c) => {
-            const r = (timestamp + Math.random() * 16) % 16 | 0;
-            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-        }),
-        name: "PROGEASE Environment",
-        values: [
-            {
-                key: "baseUrl",
-                value: config.baseUrl,
-                type: "default"
-            },
-            {
-                key: "currentUser",
-                value: config.metadata.author,
-                type: "default"
-            }
-        ],
-        _postman_variable_scope: "environment"
-    };
-
-    const envOutputPath = path.join(config.paths.output.newman, 'PROGEASE.postman_environment.json');
-    await writeFile(envOutputPath, JSON.stringify(environment, null, 2), 'utf8');
-
-    console.log(`Environnement Newman/Postman genere dans: ${envOutputPath}`);
-}
-
-/**
- * Genere des scripts de test pour un endpoint specifique
- */
-function generateTestScript(endpoint, resource) {
-    const scripts = [
-        "pm.test(\"Status code is successful\", function () {",
-        "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-        "});",
-        ""
-    ];
-
-    if (endpoint.method === 'GET') {
-        scripts.push("pm.test(\"Response format is correct\", function () {");
-        scripts.push("    var jsonData = pm.response.json();");
-
-        if (endpoint.path.match(/\/\w+\/:\w+/) || endpoint.path.includes('/:id')) {
-            // GET detail
-            scripts.push("    pm.expect(jsonData).to.be.an('object');");
-            scripts.push(`    pm.expect(jsonData._id || jsonData.id).to.exist;`);
-        } else {
-            // GET liste
-            scripts.push("    if (Array.isArray(jsonData)) {");
-            scripts.push("        pm.expect(jsonData).to.be.an('array');");
-            scripts.push("    } else if (jsonData.data || jsonData.items || jsonData." + resource + ") {");
-            scripts.push(`        pm.expect(jsonData.data || jsonData.items || jsonData.${resource}).to.be.an('array');`);
-            scripts.push("    }");
-        }
-        scripts.push("});");
-    }
-
-    else if (endpoint.method === 'POST') {
-        scripts.push("pm.test(\"Response contains created item\", function () {");
-        scripts.push("    var jsonData = pm.response.json();");
-        scripts.push("    pm.expect(jsonData._id || jsonData.id).to.exist;");
-        scripts.push("    ");
-        scripts.push(`    pm.environment.set("${resource.toLowerCase()}Id", jsonData._id || jsonData.id);`);
-        scripts.push("});");
-    }
-
-    else if (endpoint.method === 'PUT' || endpoint.method === 'PATCH') {
-        scripts.push("pm.test(\"Item updated successfully\", function () {");
-        scripts.push("    var jsonData = pm.response.json();");
-        scripts.push("    pm.expect(jsonData._id || jsonData.id).to.exist;");
-        scripts.push("});");
-    }
-
-    else if (endpoint.method === 'DELETE') {
-        scripts.push("pm.test(\"Item deleted successfully\", function () {");
-        scripts.push("    if (pm.response.headers.get('Content-Type') && pm.response.headers.get('Content-Type').includes('application/json')) {");
-        scripts.push("        var jsonData = pm.response.json();");
-        scripts.push("        pm.expect(jsonData.success || jsonData.deleted || jsonData.message).to.exist;");
-        scripts.push("    }");
-        scripts.push("});");
-    }
-
-    return scripts;
-}
-
-/**
- * Genere des donnees de test fictives basees sur un modele
- */
-function generateTestData(model) {
-    const testData = {};
-
-    if (!model || !model.fields) return testData;
-
-    model.fields.forEach(field => {
-        // Ne pas inclure les champs automatiquement generes
-        if (field.name === '_id' || field.name === 'id' || field.name === 'createdAt' || field.name === 'updatedAt') {
-            return;
-        }
-
-        switch (field.type.toLowerCase()) {
-            case 'string':
-                testData[field.name] = `Test ${field.name} ${Date.now()}`;
-                break;
-            case 'number':
-                testData[field.name] = Math.floor(Math.random() * 100);
-                break;
-            case 'boolean':
-                testData[field.name] = true;
-                break;
-            case 'date':
-                testData[field.name] = new Date().toISOString();
-                break;
-            case 'objectid':
-                // Laisser vide pour les relations, sauf si c'est requis
-                if (field.required) {
-                    testData[field.name] = "5f8f8f8f8f8f8f8f8f8f8f8f"; // ID fictif
-                }
-                break;
-            case 'array':
-                testData[field.name] = field.name === 'tags' ? ["test", "auto-generated"] : [];
-                break;
-            default:
-                // Si type inconnu, assigner une valeur simple
-                testData[field.name] = `Default value for ${field.name}`;
-        }
-    });
-
-    return testData;
-}
-
-/**
  * Genere des fichiers de requetes GraphQL à partir des types et requetes detectes
  */
 async function generateGraphQLTests() {
@@ -693,29 +212,29 @@ async function generateGraphQLTests() {
  */
 function getGraphqlMockValue(type) {
     switch (type.toLowerCase()) {
-        case 'string':
-            return '"Exemple de texte"';
-        case 'int':
-        case 'integer':
-        case 'number':
-            return '42';
-        case 'float':
-            return '3.14';
-        case 'boolean':
-            return 'true';
-        case 'id':
-            return '"5f8f8f8f8f8f8f8f8f8f8f8f"';
-        case 'date':
-        case 'datetime':
-            return `"${new Date().toISOString()}"`;
-        case '[string]':
-            return '["item1", "item2"]';
-        case '[int]':
-        case '[integer]':
-        case '[number]':
-            return '[1, 2, 3]';
-        default:
-            return '"valeur"';
+    case 'string':
+        return '"Exemple de texte"';
+    case 'int':
+    case 'integer':
+    case 'number':
+        return '42';
+    case 'float':
+        return '3.14';
+    case 'boolean':
+        return 'true';
+    case 'id':
+        return '"5f8f8f8f8f8f8f8f8f8f8f8f"';
+    case 'date':
+    case 'datetime':
+        return `"${new Date().toISOString()}"`;
+    case '[string]':
+        return '["item1", "item2"]';
+    case '[int]':
+    case '[integer]':
+    case '[number]':
+        return '[1, 2, 3]';
+    default:
+        return '"valeur"';
     }
 }
 
@@ -723,24 +242,13 @@ function getGraphqlMockValue(type) {
  * Fonction principale
  */
 async function main() {
-    const arg = process.argv[2];
-    if (!arg || arg === '--help') {
-        console.log(`\nUsage:\n  node tools/test-generator.js --graphql            # Regenerate GraphQL tests from live schema\n  node tools/test-generator.js --validate-graphql   # Validate GraphQL tests against live schema\n  node tools/test-generator.js --rest               # Regenerate REST/Postman tests from Express app\n  node tools/test-generator.js --validate-rest      # Validate Postman collection against Express app\n  node tools/test-generator.js --docs               # Auto-generate API documentation from schema and route definitions\n`);
-        process.exit(0);
-    }
-    if (arg === '--graphql') {
-        await generateGraphQLTests();
-    } else if (arg === '--validate-graphql') {
+    try {
         await validateGraphQLTests();
-    } else if (arg === '--rest') {
         await generateRestTests();
-    } else if (arg === '--validate-rest') {
-        await validateRestTests();
-    } else if (arg === '--docs') {
         await generateApiDocs();
-        process.exit(0);
-    } else {
-        console.log('Unknown option:', arg);
+        console.log('[NINJA] Test generation completed successfully!');
+    } catch (error) {
+        console.error('[NINJA] Error during test generation:', error);
         process.exit(1);
     }
 }
@@ -829,10 +337,11 @@ function buildQueryOrMutation(field, type, inputTypes) {
 async function validateGraphQLTests() {
     console.log('[NINJA] Validating GraphQL test files against live schema...');
     const schema = await introspectGraphQLSchema();
-    const validFields = new Set([
-        ...schema.types.find(t => t.name === schema.queryType.name).fields.map(f => f.name),
-        ...(schema.mutationType ? schema.types.find(t => t.name === schema.mutationType.name).fields.map(f => f.name) : [])
-    ]);
+    const queryFields = schema.types.find(t => t.name === schema.queryType.name).fields.map(f => f.name);
+    const mutationFields = schema.mutationType
+        ? schema.types.find(t => t.name === schema.mutationType.name).fields.map(f => f.name)
+        : [];
+    const validFields = new Set([...queryFields, ...mutationFields]);
     const files = await readdir(TESTS_DIR);
     let valid = true;
     for (const file of files) {
@@ -873,9 +382,6 @@ async function extractExpressRoutes() {
     });
     return routes;
 }
-
-// Executer la fonction principale
-main();
 
 // [NINJA PRO IMPLEMENTATION] Realistic test data generation for GraphQL and REST
 
@@ -966,7 +472,7 @@ async function generateRestTests() {
         variable: [{ key: 'baseUrl', value: 'http://localhost:5000', type: 'string' }]
     };
     // Try to require models for mock data
-    let models = {};
+    const models = {};
     try {
         const modelsDir = path.join(__dirname, '..', 'src', 'models');
         for (const file of fs.readdirSync(modelsDir)) {
@@ -975,7 +481,9 @@ async function generateRestTests() {
                 models[modelName.toLowerCase()] = require(path.join(modelsDir, file));
             }
         }
-    } catch (e) {}
+    } catch (e) {
+        console.warn('[NINJA] Warning: Could not load some models for test generation:', e.message);
+    }
     for (const route of routes) {
         const item = {
             name: `${route.method} ${route.path}`,
@@ -1010,8 +518,8 @@ async function generateApiDocs() {
     await mkdir(docsDir, { recursive: true });
     // --- GraphQL Docs ---
     const schema = await introspectGraphQLSchema();
-    let md = `# GraphQL API Documentation\n\n`;
-    md += `## Types\n`;
+    let md = '# GraphQL API Documentation\n\n';
+    md += '## Types\n';
     for (const type of schema.types) {
         if (type.name.startsWith('__') || ['Query', 'Mutation', 'Subscription'].includes(type.name)) continue;
         md += `### ${type.name}\n`;
@@ -1029,7 +537,7 @@ async function generateApiDocs() {
         }
         md += '\n';
     }
-    md += `## Queries\n`;
+    md += '## Queries\n';
     const queries = schema.types.find(t => t.name === schema.queryType.name).fields;
     for (const q of queries) {
         md += `### ${q.name}\n`;
@@ -1043,7 +551,7 @@ async function generateApiDocs() {
         md += `**Returns:** ${getTypeName(q.type)}\n\n`;
     }
     if (schema.mutationType) {
-        md += `## Mutations\n`;
+        md += '## Mutations\n';
         const mutations = schema.types.find(t => t.name === schema.mutationType.name).fields;
         for (const m of mutations) {
             md += `### ${m.name}\n`;
@@ -1062,14 +570,14 @@ async function generateApiDocs() {
 
     // --- REST Docs ---
     const routes = await extractExpressRoutes();
-    let restMd = `# REST API Documentation\n\n`;
+    let restMd = '# REST API Documentation\n\n';
     restMd += '| Method | Path |\n|---|---|\n';
     for (const r of routes) {
         restMd += `| ${r.method} | ${r.path} |\n`;
     }
     restMd += '\n';
     // Try to require models for example bodies
-    let models = {};
+    const models = {};
     try {
         const modelsDir = path.join(__dirname, '..', 'src', 'models');
         for (const file of fs.readdirSync(modelsDir)) {
@@ -1078,7 +586,9 @@ async function generateApiDocs() {
                 models[modelName.toLowerCase()] = require(path.join(modelsDir, file));
             }
         }
-    } catch (e) {}
+    } catch (e) {
+        console.warn('[NINJA] Warning: Could not load some models for documentation:', e.message);
+    }
     for (const r of routes) {
         if (['POST', 'PUT', 'PATCH'].includes(r.method)) {
             const seg = r.path.split('/').filter(Boolean)[0];

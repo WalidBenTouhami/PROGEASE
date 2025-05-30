@@ -58,7 +58,7 @@ dataSources/
 dataSources.local.xml
 
 # Environment variables
-.env
+
 
 # Task management files
 todo

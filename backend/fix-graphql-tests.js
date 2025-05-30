@@ -4,9 +4,8 @@
  * Utilisateur: WalidBenTouhami
  */
 
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
-const axios = require('axios');
 
 // Couleurs ANSI pour le terminal
 const colors = {
@@ -32,8 +31,8 @@ function showBanner() {
     console.log('╔══════════════════════════════════════════════════════════════╗');
     console.log('║             PROGEASE - Correction Tests GraphQL              ║');
     console.log('╟──────────────────────────────────────────────────────────────╢');
-    console.log(`║ Utilisateur: WalidBenTouhami                                ║`);
-    console.log(`║ Date: 2025-05-28 09:42:02                                   ║`);
+    console.log('║ Utilisateur: WalidBenTouhami                                ║');
+    console.log('║ Date: 2025-05-28 09:42:02                                   ║');
     console.log('╚══════════════════════════════════════════════════════════════╝');
 }
 
@@ -144,13 +143,13 @@ async function main() {
     try {
         // Verifier l'existence du dossier de tests
         try {
-            await fs.access(testsDir);
+            await fs.promises.access(testsDir);
         } catch (err) {
             console.error(colorize(`Le dossier des tests GraphQL n'existe pas: ${testsDir}`, 'red'));
             console.log(colorize('Creation du dossier...', 'yellow'));
 
             try {
-                await fs.mkdir(testsDir, { recursive: true });
+                await fs.promises.mkdir(testsDir, { recursive: true });
                 console.log(colorize('Dossier cree avec succes.', 'green'));
             } catch (mkdirErr) {
                 console.error(colorize('echec de la creation du dossier.', 'red'));
@@ -215,7 +214,7 @@ ${correctQueries.paginationinfo.example}
 async function createOrUpdateTestFile(filename, content) {
     const filePath = path.join(testsDir, filename);
     try {
-        await fs.writeFile(filePath, content);
+        await fs.promises.writeFile(filePath, content);
         console.log(colorize(`  ✓ ${filename} cree/mis à jour avec succes`, 'green'));
     } catch (err) {
         console.error(colorize(`  ✗ echec de la mise à jour de ${filename}: ${err.message}`, 'red'));

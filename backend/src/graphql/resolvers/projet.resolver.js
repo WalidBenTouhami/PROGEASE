@@ -13,6 +13,8 @@ const logger = require('../../utils/logger');
 const { AppError, ERROR_CODES } = require('../../middleware/errorHandlers');
 const { validateInput } = require('../../utils/validators');
 const { handleMongooseError } = require('../../utils/errorUtils');
+const { Enum } = require('../../../config/constants');
+const { checkAuthorization } = require('../../utils/auth.utils');
 
 /**
  * Transforme un document MongoDB Projet en type GraphQL
@@ -36,9 +38,13 @@ function mapProjetMongoVersGraphQL(doc) {
             livrables: Array.isArray(doc.livrables)
                 ? doc.livrables.map(id => id?.toString() || '')
                 : [],
-            statut: doc.statut || 'EN_COURS',
+            statut: doc.statut || Enum.StatutProjet.EN_COURS,
+            urlDepot: doc.urlDepot || '',
+            progression: doc.progression || 0,
             creeLe: doc.creeLe || new Date(),
             majLe: doc.majLe || new Date(),
+            duree: doc.duree || 0,
+            estEnRetard: doc.estEnRetard || false,
             __typename: 'Projet'
         };
     } catch (error) {
@@ -59,19 +65,48 @@ const Query = {
         page = 1,
         limit = 10,
         statut = null,
-        recherche = null
+        recherche = null,
+        dateDebutMin = null,
+        dateFinMax = null,
+        tuteurId = null,
+        membreEquipe = null,
+        competence = null
     }, context) => {
         checkAuthorization(context, 'read', 'projets');
 
         try {
             // Construire le filtre
             const filter = {};
-            if (statut) filter.statut = statut;
+
+            if (statut && Object.values(Enum.StatutProjet).includes(statut)) {
+                filter.statut = statut;
+            }
+
             if (recherche) {
                 filter.$or = [
                     { titre: { $regex: recherche, $options: 'i' } },
                     { description: { $regex: recherche, $options: 'i' } }
                 ];
+            }
+
+            if (dateDebutMin) {
+                filter.dateDebut = { $gte: new Date(dateDebutMin) };
+            }
+
+            if (dateFinMax) {
+                filter.dateFin = { $lte: new Date(dateFinMax) };
+            }
+
+            if (tuteurId && mongoose.Types.ObjectId.isValid(tuteurId)) {
+                filter.tuteur = tuteurId;
+            }
+
+            if (membreEquipe && mongoose.Types.ObjectId.isValid(membreEquipe)) {
+                filter.equipe = membreEquipe;
+            }
+
+            if (competence) {
+                filter.competences = competence;
             }
 
             // Calculer le skip pour la pagination
@@ -82,7 +117,9 @@ const Query = {
                 .sort({ majLe: -1 })
                 .skip(skip)
                 .limit(limit)
-                .select('-__v')
+                .populate('tuteur', 'nom prenom email')
+                .populate('equipe', 'nom prenom email')
+                .populate('livrablesComplets')
                 .lean()
                 .exec();
 
@@ -95,7 +132,9 @@ const Query = {
                     page,
                     limit,
                     total,
-                    pages: Math.ceil(total / limit)
+                    pages: Math.ceil(total / limit),
+                    hasNextPage: skip + limit < total,
+                    hasPreviousPage: page > 1
                 }
             };
         } catch (error) {
@@ -162,6 +201,74 @@ const Query = {
             );
         }
     },
+
+    /**
+     * Analyser les risques d'un projet
+     */
+    analyserRisquesProjet: async (_, { projetId }, context) => {
+        checkAuthorization(context, 'read', 'projets');
+
+        try {
+            const projet = await Projet.findById(projetId)
+                .populate('livrablesComplets')
+                .populate('equipe', 'nom prenom email');
+
+            if (!projet) {
+                throw new AppError(
+                    'Projet non trouve',
+                    404,
+                    ERROR_CODES.NOT_FOUND,
+                    true
+                );
+            }
+
+            // Analyse des risques basée sur plusieurs facteurs
+            const risques = {
+                retard: projet.estEnRetard,
+                progression: projet.progression < 50 && projet.dateFin < new Date(),
+                livrables: projet.livrablesComplets.some(l => l.estEnRetard()),
+                equipe: projet.equipe.length < 2
+            };
+
+            const niveauRisque = Object.values(risques).filter(Boolean).length;
+
+            const recommandations = [];
+            if (risques.retard) {
+                recommandations.push('Revoir le planning du projet et ajuster les échéances');
+            }
+            if (risques.progression) {
+                recommandations.push('Augmenter les ressources allouées au projet');
+            }
+            if (risques.livrables) {
+                recommandations.push('Organiser une réunion de suivi des livrables en retard');
+            }
+            if (risques.equipe) {
+                recommandations.push('Renforcer l\'équipe projet');
+            }
+
+            return {
+                ...risques,
+                niveauRisque,
+                recommandations
+            };
+        } catch (error) {
+            if (error instanceof AppError) throw error;
+
+            logger.error('Erreur lors de l\'analyse des risques:', {
+                error: error.message,
+                stack: error.stack,
+                requestId: context.requestId,
+                projetId
+            });
+
+            throw new AppError(
+                'Erreur lors de l\'analyse des risques',
+                500,
+                ERROR_CODES.SERVER_ERROR,
+                false
+            );
+        }
+    }
 };
 
 const Mutation = {
@@ -177,18 +284,21 @@ const Mutation = {
 
             // Valider les donnees d'entree
             validateInput(input, {
-                titre: { required: true, type: 'string', minLength: 3 },
-                description: { required: true, type: 'string' },
+                titre: { required: true, type: 'string', minLength: 5 },
+                description: { required: true, type: 'string', minLength: 10 },
                 equipe: { type: 'array', itemType: 'string' },
                 tuteur: { type: 'string' },
-                competences: { type: 'array', itemType: 'string' },
-                dateDebut: { type: 'date' },
-                dateFin: { type: 'date' }
+                competences: { required: true, type: 'array', itemType: 'string', minLength: 1 },
+                dateDebut: { required: true, type: 'date' },
+                dateFin: { required: true, type: 'date' },
+                urlDepot: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ }
             });
 
             // Creer le projet
             const projet = new Projet({
                 ...input,
+                statut: input.statut || Enum.StatutProjet.BROUILLON,
+                progression: 0,
                 createur: context.user?._id,
                 creeLe: new Date(),
                 majLe: new Date()
@@ -251,18 +361,34 @@ const Mutation = {
             }
 
             // Valider les donnees d'entree
-            if (Object.keys(input).length === 0) {
-                throw new AppError(
-                    'Aucune donnee fournie pour la mise à jour',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
+            if (input.titre) validateInput({ titre: input.titre }, { titre: { type: 'string', minLength: 5 } });
+            if (input.description) validateInput({ description: input.description }, { description: { type: 'string', minLength: 10 } });
+            if (input.competences) validateInput({ competences: input.competences }, { competences: { type: 'array', itemType: 'string', minLength: 1 } });
+            if (input.urlDepot) validateInput({ urlDepot: input.urlDepot }, { urlDepot: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ } });
 
-            // Verifier si le projet existe
-            const existingProjet = await Projet.findById(id).session(session);
-            if (!existingProjet) {
+            const updateData = {
+                ...input,
+                majLe: new Date(),
+                majPar: context.user?._id
+            };
+
+            // Conversion des dates si présentes
+            if (updateData.dateDebut) updateData.dateDebut = new Date(updateData.dateDebut);
+            if (updateData.dateFin) updateData.dateFin = new Date(updateData.dateFin);
+
+            const projetMisAJour = await Projet.findByIdAndUpdate(
+                id,
+                updateData,
+                {
+                    new: true,
+                    runValidators: true,
+                    session
+                }
+            ).populate('tuteur', 'nom prenom email')
+                .populate('equipe', 'nom prenom email')
+                .populate('livrablesComplets');
+
+            if (!projetMisAJour) {
                 throw new AppError(
                     'Projet non trouve',
                     404,
@@ -271,20 +397,15 @@ const Mutation = {
                 );
             }
 
-            // Mettre à jour le projet
-            const maj = await Projet.findByIdAndUpdate(
-                id,
-                {
-                    ...input,
-                    majLe: new Date(),
-                    majPar: context.user?._id
-                },
-                { new: true, runValidators: true, session }
-            ).lean();
+            // Recalculer la progression si nécessaire
+            if (input.livrables || input.statut) {
+                await projetMisAJour.calculerProgression();
+                await projetMisAJour.save({ session });
+            }
 
             await session.commitTransaction();
 
-            // Invalider les caches
+            // Invalider le cache DataLoader
             context.loaders.projetLoader.clear(id);
 
             logger.info(`Projet mis à jour: ${id}`, {
@@ -292,13 +413,15 @@ const Mutation = {
                 requestId: context.requestId
             });
 
-            return mapProjetMongoVersGraphQL(maj);
+            return mapProjetMongoVersGraphQL(projetMisAJour);
         } catch (error) {
             await session.abortTransaction();
 
+            if (error instanceof AppError) throw error;
+
             const appError = handleMongooseError(
                 error,
-                `Impossible de mettre à jour le projet ${id}`,
+                'Impossible de mettre à jour le projet',
                 context.requestId
             );
 
@@ -316,7 +439,7 @@ const Mutation = {
     },
 
     /**
-     * Supprimer un projet et ses livrables associes
+     * Supprimer un projet
      */
     supprimerProjet: async (_, { id }, context) => {
         checkAuthorization(context, 'delete', 'projets');
@@ -335,9 +458,13 @@ const Mutation = {
                 );
             }
 
-            // Verifier si le projet existe et le recuperer
-            const projet = await Projet.findById(id).session(session);
-            if (!projet) {
+            // Supprimer d'abord les livrables associés
+            const Livrable = require('../../models/livrable.model');
+            await Livrable.deleteMany({ projetId: id }).session(session);
+
+            const projetSupprime = await Projet.findByIdAndDelete(id).session(session);
+
+            if (!projetSupprime) {
                 throw new AppError(
                     'Projet non trouve',
                     404,
@@ -346,43 +473,21 @@ const Mutation = {
                 );
             }
 
-            // Garder une copie des donnees pour le retour
-            const projetCopy = { ...projet.toObject() };
-
-            // Supprimer le projet
-            await Projet.findByIdAndDelete(id, { session });
-
-            // Supprimer egalement les livrables associes
-            const { deletedCount } = await require('../../models/livrable.model').deleteMany(
-                { projetId: id },
-                { session }
-            );
-
             await session.commitTransaction();
 
-            // Invalider les caches
+            // Invalider le cache DataLoader
             context.loaders.projetLoader.clear(id);
-            if (projet.livrables && projet.livrables.length > 0) {
-                projet.livrables.forEach(livId => {
-                    context.loaders.livrableLoader.clear(livId);
-                });
-            }
-            context.loaders.livrablesByProjetLoader.clear(id);
 
-            logger.info(`Projet supprime: ${id}, avec ${deletedCount} livrables`, {
+            logger.info(`Projet supprime: ${id}`, {
                 userId: context.user?._id,
                 requestId: context.requestId
             });
 
-            return mapProjetMongoVersGraphQL(projetCopy);
+            return mapProjetMongoVersGraphQL(projetSupprime);
         } catch (error) {
             await session.abortTransaction();
 
-            const appError = handleMongooseError(
-                error,
-                `Impossible de supprimer le projet ${id}`,
-                context.requestId
-            );
+            if (error instanceof AppError) throw error;
 
             logger.error(`Erreur lors de la suppression du projet ${id}:`, {
                 error: error.message,
@@ -390,11 +495,16 @@ const Mutation = {
                 requestId: context.requestId
             });
 
-            throw appError;
+            throw new AppError(
+                'Impossible de supprimer le projet',
+                500,
+                ERROR_CODES.SERVER_ERROR,
+                false
+            );
         } finally {
             await session.endSession();
         }
-    },
+    }
 };
 
 // Resolvers pour les champs complexes du type Projet

@@ -4,17 +4,25 @@ const router = express.Router();
 const projetController = require('../controllers/projet.controller');
 const { validateProjetData, validateId } = require('../validations/projet.validation');
 const { asyncHandler } = require('../middleware/asyncHandler');
-const rateLimiter = require('../middleware/rateLimiter');
+const { rateLimiter } = require('../middleware/rateLimiter');
 
 /**
- * @route POST /api/projets
- * @description Creer un nouveau projet
+ * @route GET /api/projets/health
+ * @description Verifier la sante de l'API projets
  * @access Public
  */
-router.post('/',
-    validateProjetData,
-    asyncHandler(projetController.creerProjet)
-);
+router.get('/health', (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: 'Health check OK',
+        data: {
+            status: 'ok',
+            service: 'projets-api',
+            timestamp: new Date().toISOString(),
+            user: req.currentUser || 'anonymous'
+        }
+    });
+});
 
 /**
  * @route GET /api/projets
@@ -24,6 +32,16 @@ router.post('/',
 router.get('/',
     rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requetes par minute
     asyncHandler(projetController.recupererProjets)
+);
+
+/**
+ * @route POST /api/projets
+ * @description Creer un nouveau projet
+ * @access Public
+ */
+router.post('/',
+    validateProjetData,
+    asyncHandler(projetController.creerProjet)
 );
 
 /**
@@ -87,26 +105,9 @@ router.get('/:id/livrables',
     validateId('id'),
     asyncHandler(async (req, res) => {
         const livrableController = require('../controllers/livrable.controller');
+        req.params.projetId = req.params.id;
         await livrableController.findByProjet(req, res);
     })
 );
-
-/**
- * @route GET /api/projets/health
- * @description Verifier la sante de l'API projets
- * @access Public
- */
-router.get('/health', (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: 'Health check OK',
-        data: {
-            status: 'ok',
-            service: 'projets-api',
-            timestamp: new Date().toISOString(),
-            user: req.currentUser || 'anonymous'
-        }
-    });
-});
 
 module.exports = router;

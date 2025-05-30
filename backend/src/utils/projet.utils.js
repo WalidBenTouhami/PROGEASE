@@ -7,7 +7,7 @@ const ProjetUtils = {
 
     calculerScoreRisque: ({ dureeJours, equipe }) => {
         if (!equipe || equipe.length === 0) {
-            throw new Error("L'equipe doit contenir au moins un membre.");
+            throw new Error('L\'equipe doit contenir au moins un membre.');
         }
         const tailleEquipe = equipe.length;
         const scoreRisque = (dureeJours / 100) * (1 / tailleEquipe);

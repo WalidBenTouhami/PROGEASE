@@ -4,7 +4,6 @@ const Livrable = require('../models/livrable.model');
 const mongoose = require('mongoose');
 const logger = require('../utils/logger');
 const { formatProjetResponse } = require('../utils/formatters');
-const authUtils = require('../utils/authUtils');
 
 /**
  * Cree un nouveau projet
@@ -115,7 +114,7 @@ async function recupererProjetParId(id, includeDetails = true) {
  * @param {Object} updateData - Donnees de mise à jour
  * @returns {Promise<Object|null>} - Projet mis à jour ou null
  */
-async function mettreAJourProjet(id, updateData) {
+async function mettreAJourProjet(id, { nom, description, dateDebut, dateFin, statut, priorite }) {
     try {
         if (!mongoose.Types.ObjectId.isValid(id)) {
             throw new Error('ID de projet invalide');
@@ -128,7 +127,7 @@ async function mettreAJourProjet(id, updateData) {
 
         const projetMisAJour = await Projet.findByIdAndUpdate(
             id,
-            updateData,
+            { nom, description, dateDebut, dateFin, statut, priorite },
             options
         ).populate('tuteur', 'nom prenom email')
             .populate('livrables');
@@ -251,11 +250,9 @@ async function retirerMembreEquipe(projetId, membreId) {
  * @param {Object} params - Parametres de l'analyse
  * @param {Object} params.projet - Objet projet (optionnel)
  * @param {string} params.descriptionProjet - Description du projet (optionnel)
- * @param {Array} params.jalons - Liste des jalons du projet
- * @param {Object} params.ressources - Ressources disponibles
  * @returns {Promise<Array>} - Liste des risques identifies
  */
-async function analyserRisques({ projet, descriptionProjet, jalons, ressources }) {
+async function analyserRisques({ projet, descriptionProjet }) {
     try {
         // Validation minimale
         if (!projet && !descriptionProjet) {
@@ -272,12 +269,11 @@ async function analyserRisques({ projet, descriptionProjet, jalons, ressources }
             tailleEquipe: projet.equipe ? projet.equipe.length : 0
         } : { description: descriptionProjet };
 
-        // Simulation d'analyse des risques
-        // En production, vous pourriez utiliser un service IA ou un algorithme d'analyse de risques
+        // Simulation d'analyse des risques basée sur les données du projet
         const risques = [
             {
                 risque: 'Manque de ressources',
-                gravite: 'elevee',
+                gravite: donneeProjet.tailleEquipe < 3 ? 'elevee' : 'Moyenne',
                 probabilite: 'Moyenne',
                 impact: 'Fort',
                 mitigation: 'Allouer des ressources supplementaires ou reduire la portee du projet.',

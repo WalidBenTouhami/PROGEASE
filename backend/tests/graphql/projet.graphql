@@ -2,20 +2,41 @@
 # Generes automatiquement le 2025-05-27 19:27:50
 # Auteur: WalidBenTouhami
 
-# Requete pour recuperer tous les projets
-query GetAllProjets {
-  projet {
-    _id
-    _id
-    titre
-    description
-    tuteur
-    dateDebut
-    dateFin
-    statut
-    progression
-    creeLe
-    majLe
+# Requete pour recuperer tous les projets avec pagination
+query GetAllProjets($page: Int, $limit: Int, $statut: StatutProjet, $recherche: String) {
+  projets(page: $page, limit: $limit, statut: $statut, recherche: $recherche) {
+    items {
+      _id
+      titre
+      description
+      equipe
+      tuteur
+      competences
+      dateDebut
+      dateFin
+      livrables {
+        _id
+        intitule
+        statut
+        dateLimite
+        estEnRetard
+      }
+      statut
+      urlDepot
+      progression
+      creeLe
+      majLe
+      duree
+      estEnRetard
+    }
+    pagination {
+      total
+      pages
+      page
+      limit
+      hasNextPage
+      hasPreviousPage
+    }
   }
 }
 
@@ -23,21 +44,108 @@ query GetAllProjets {
 query GetProjetById($id: ID!) {
   projet(id: $id) {
     _id
+    titre
+    description
+    equipe
+    tuteur
+    competences
+    dateDebut
+    dateFin
+    livrables {
+      _id
+      intitule
+      description
+      dateLimite
+      statut
+      urlDepot
+      estEnRetard
+    }
+    statut
+    urlDepot
+    progression
+    creeLe
+    majLe
+    duree
+    estEnRetard
+  }
+}
+
+# Analyser les risques d'un projet
+query AnalyserRisquesProjet($projetId: ID!) {
+  analyserRisquesProjet(projetId: $projetId) {
+    retard
+    progression
+    livrables
+    equipe
+    niveauRisque
+    recommandations
+  }
+}
+
+# Mutation pour créer un projet
+mutation CreerProjet($input: ProjetInput!) {
+  creerProjet(input: $input) {
     _id
     titre
     description
+    equipe
     tuteur
+    competences
     dateDebut
     dateFin
     statut
+    urlDepot
     progression
     creeLe
     majLe
   }
 }
 
-# Variables:
+# Mutation pour mettre à jour un projet
+mutation MettreAJourProjet($id: ID!, $input: ProjetUpdateInput!) {
+  mettreAJourProjet(id: $id, input: $input) {
+    _id
+    titre
+    description
+    equipe
+    tuteur
+    competences
+    dateDebut
+    dateFin
+    statut
+    urlDepot
+    progression
+    majLe
+  }
+}
+
+# Mutation pour supprimer un projet
+mutation SupprimerProjet($id: ID!) {
+  supprimerProjet(id: $id) {
+    _id
+    titre
+    statut
+  }
+}
+
+# Variables d'exemple:
 # {
-#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
+#   "page": 1,
+#   "limit": 10,
+#   "statut": "EN_COURS",
+#   "recherche": "plateforme",
+#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f",
+#   "projetId": "5f8f8f8f8f8f8f8f8f8f8f8f",
+#   "input": {
+#     "titre": "Nouveau projet",
+#     "description": "Description du projet",
+#     "equipe": ["5f8f8f8f8f8f8f8f8f8f8f8f"],
+#     "tuteur": "5f8f8f8f8f8f8f8f8f8f8f8f",
+#     "competences": ["JavaScript", "React"],
+#     "dateDebut": "2025-06-01",
+#     "dateFin": "2025-12-31",
+#     "statut": "BROUILLON",
+#     "urlDepot": "https://github.com/progease/nouveau-projet"
+#   }
 # }
 

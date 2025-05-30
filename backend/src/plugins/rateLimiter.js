@@ -84,7 +84,7 @@ function GraphQLRateLimiterPlugin(options = {}) {
 
                 // Retourner une erreur formatee
                 throw new AppError(
-                    `Trop de requetes, veuillez reessayer apres un moment`,
+                    'Trop de requetes, veuillez reessayer apres un moment',
                     429,
                     'ERR_RATE_LIMIT'
                 );

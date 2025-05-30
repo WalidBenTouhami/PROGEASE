@@ -1,37 +1,16 @@
 {
   "info": {
     "_postman_id": "ce6e3176-800e-47f8-8cb5-20f7101145de",
-    "name": "PROGEASE API Tests (Auto-generes)",
+    "name": "PROGEASE API Tests",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Collection de tests auto-generes pour l'API PROGEASE - 2025-05-27 19:27:50"
+    "description": "Collection de tests pour l'API PROGEASE - 2025-05-28"
   },
   "item": [
     {
-      "name": "1. Tests de Sante",
+      "name": "1. Tests de Santé",
       "item": [
         {
-          "name": "Verifier l'etat du serveur",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/health"
-          }
-        },
-        {
-          "name": "Verifier l'API principale",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": "{{baseUrl}}/api"
-          }
-        }
-      ]
-    },
-    {
-      "name": "2. Tests de analyze",
-      "item": [
-        {
-          "name": "2.1 POST /analyze",
+          "name": "Vérifier l'état du serveur",
           "request": {
             "method": "POST",
             "header": [
@@ -40,7 +19,11 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{baseUrl}}/analyze"
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query { healthCheck { status timestamp version message } }\"\n}"
+            },
+            "url": "{{graphqlEndpoint}}"
           },
           "event": [
             {
@@ -48,16 +31,13 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Response contains created item\", function () {",
+                  "pm.test(\"Server is healthy\", function () {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "    ",
-                  "    // Stocker l'ID pour les tests suivants",
-                  "    pm.environment.set(\"analyzeId\", jsonData._id || jsonData.id);",
+                  "    pm.expect(jsonData.data.healthCheck.status).to.equal(\"OK\");",
                   "});"
                 ]
               }
@@ -67,10 +47,10 @@
       ]
     },
     {
-      "name": "3. Tests de generer-texte",
+      "name": "2. Tests des Projets",
       "item": [
         {
-          "name": "3.1 POST /generer-texte",
+          "name": "Lister les projets",
           "request": {
             "method": "POST",
             "header": [
@@ -79,7 +59,11 @@
                 "value": "application/json"
               }
             ],
-            "url": "{{baseUrl}}/generer-texte"
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query($page: Int, $limit: Int) { projets(page: $page, limit: $limit) { items { _id titre statut progression } pagination { total pages } } }\",\n  \"variables\": {\n    \"page\": 1,\n    \"limit\": 10\n  }\n}"
+            },
+            "url": "{{graphqlEndpoint}}"
           },
           "event": [
             {
@@ -87,16 +71,85 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Response contains created item\", function () {",
+                  "pm.test(\"Response has projects\", function () {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "    ",
-                  "    // Stocker l'ID pour les tests suivants",
-                  "    pm.environment.set(\"generer-texteId\", jsonData._id || jsonData.id);",
+                  "    pm.expect(jsonData.data.projets.items).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Créer un projet",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"mutation($input: ProjetInput!) { creerProjet(input: $input) { _id titre statut } }\",\n  \"variables\": {\n    \"input\": {\n      \"titre\": \"Nouveau Projet Test\",\n      \"description\": \"Description du projet de test\",\n      \"dateDebut\": \"2025-06-01\",\n      \"dateFin\": \"2025-12-31\",\n      \"competences\": [\"JavaScript\", \"React\"],\n      \"statut\": \"BROUILLON\"\n    }\n  }\n}"
+            },
+            "url": "{{graphqlEndpoint}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Project is created\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.creerProjet._id).to.exist;",
+                  "    pm.environment.set(\"projetId\", jsonData.data.creerProjet._id);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Analyser les risques",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"query\": \"query($projetId: ID!) { analyserRisquesProjet(projetId: $projetId) { retard progression livrables equipe niveauRisque recommandations } }\",\n  \"variables\": {\n    \"projetId\": \"{{projetId}}\"\n  }\n}"
+            },
+            "url": "{{graphqlEndpoint}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Risk analysis is complete\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.data.analyserRisquesProjet.niveauRisque).to.exist;",
+                  "    pm.expect(jsonData.data.analyserRisquesProjet.recommandations).to.be.an('array');",
                   "});"
                 ]
               }
@@ -106,544 +159,10 @@
       ]
     },
     {
-      "name": "4. Tests de generate-text",
+      "name": "3. Tests des Livrables",
       "item": [
         {
-          "name": "4.1 POST /generate-text",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/generate-text"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response contains created item\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "    ",
-                  "    // Stocker l'ID pour les tests suivants",
-                  "    pm.environment.set(\"generate-textId\", jsonData._id || jsonData.id);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "5. Tests de autres",
-      "item": [
-        {
-          "name": "5.1 GET /",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response format is correct\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    if (Array.isArray(jsonData)) {",
-                  "        pm.expect(jsonData).to.be.an('array');",
-                  "    } else if (jsonData.data || jsonData.items || jsonData.autres) {",
-                  "        pm.expect(jsonData.data || jsonData.items || jsonData.autres).to.be.an('array');",
-                  "    }",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "5.2 GET /",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response format is correct\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    if (Array.isArray(jsonData)) {",
-                  "        pm.expect(jsonData).to.be.an('array');",
-                  "    } else if (jsonData.data || jsonData.items || jsonData.autres) {",
-                  "        pm.expect(jsonData.data || jsonData.items || jsonData.autres).to.be.an('array');",
-                  "    }",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "5.3 POST /",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response contains created item\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "    ",
-                  "    // Stocker l'ID pour les tests suivants",
-                  "    pm.environment.set(\"autresId\", jsonData._id || jsonData.id);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "5.4 POST /",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response contains created item\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "    ",
-                  "    // Stocker l'ID pour les tests suivants",
-                  "    pm.environment.set(\"autresId\", jsonData._id || jsonData.id);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "6. Tests de projet",
-      "item": [
-        {
-          "name": "6.1 GET /projet/:projetId",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/projet/:projetId"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response format is correct\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an('object');",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "7. Tests de :livrableId",
-      "item": [
-        {
-          "name": "7.1 GET /:livrableId",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/:livrableId"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response format is correct\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    if (Array.isArray(jsonData)) {",
-                  "        pm.expect(jsonData).to.be.an('array');",
-                  "    } else if (jsonData.data || jsonData.items || jsonData.:livrableId) {",
-                  "        pm.expect(jsonData.data || jsonData.items || jsonData.:livrableId).to.be.an('array');",
-                  "    }",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "7.2 PUT /:livrableId",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/:livrableId"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Item updated successfully\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "7.3 DELETE /:livrableId",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/:livrableId"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Item deleted successfully\", function () {",
-                  "    if (pm.response.headers.get('Content-Type') && pm.response.headers.get('Content-Type').includes('application/json')) {",
-                  "        var jsonData = pm.response.json();",
-                  "        pm.expect(jsonData.success || jsonData.deleted || jsonData.message).to.exist;",
-                  "    }",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "8. Tests de :id",
-      "item": [
-        {
-          "name": "8.1 GET /:id",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/:id"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response format is correct\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an('object');",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "8.2 GET /:id/livrables",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/:id/livrables"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response format is correct\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData).to.be.an('object');",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "8.3 PUT /:id",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/:id"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Item updated successfully\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "8.4 DELETE /:id",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/:id"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Item deleted successfully\", function () {",
-                  "    if (pm.response.headers.get('Content-Type') && pm.response.headers.get('Content-Type').includes('application/json')) {",
-                  "        var jsonData = pm.response.json();",
-                  "        pm.expect(jsonData.success || jsonData.deleted || jsonData.message).to.exist;",
-                  "    }",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "9. Tests de analyse-risques",
-      "item": [
-        {
-          "name": "9.1 POST /analyse-risques",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/analyse-risques"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response contains created item\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "    ",
-                  "    // Stocker l'ID pour les tests suivants",
-                  "    pm.environment.set(\"analyse-risquesId\", jsonData._id || jsonData.id);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "10. Tests de suivi-taches",
-      "item": [
-        {
-          "name": "10.1 POST /suivi-taches",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": "{{baseUrl}}/suivi-taches"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is successful\", function () {",
-                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201, 202, 204]);",
-                  "});",
-                  "",
-                  "pm.test(\"Response contains created item\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData._id || jsonData.id).to.exist;",
-                  "    ",
-                  "    // Stocker l'ID pour les tests suivants",
-                  "    pm.environment.set(\"suivi-tachesId\", jsonData._id || jsonData.id);",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "name": "11. Tests GraphQL",
-      "item": [
-        {
-          "name": "11.1 Query projet",
+          "name": "Lister les livrables",
           "request": {
             "method": "POST",
             "header": [
@@ -654,9 +173,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"query { projet { _id } }\"\n}"
+              "raw": "{\n  \"query\": \"query($page: Int, $limit: Int) { livrables(page: $page, limit: $limit) { items { _id intitule statut } pagination { total pages } } }\",\n  \"variables\": {\n    \"page\": 1,\n    \"limit\": 10\n  }\n}"
             },
-            "url": "{{baseUrl}}/graphql"
+            "url": "{{graphqlEndpoint}}"
           },
           "event": [
             {
@@ -668,9 +187,9 @@
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
+                  "pm.test(\"Response has deliverables\", function () {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
+                  "    pm.expect(jsonData.data.livrables.items).to.be.an('array');",
                   "});"
                 ]
               }
@@ -678,7 +197,7 @@
           ]
         },
         {
-          "name": "11.2 Query projetId",
+          "name": "Créer un livrable",
           "request": {
             "method": "POST",
             "header": [
@@ -689,9 +208,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"query\": \"query { projetId { _id } }\"\n}"
+              "raw": "{\n  \"query\": \"mutation($input: LivrableInput!) { creerLivrable(input: $input) { _id intitule statut } }\",\n  \"variables\": {\n    \"input\": {\n      \"intitule\": \"Nouveau Livrable Test\",\n      \"description\": \"Description du livrable de test\",\n      \"dateLimite\": \"2025-08-31\",\n      \"projetId\": \"{{projetId}}\",\n      \"statut\": \"EN_ATTENTE\"\n    }\n  }\n}"
             },
-            "url": "{{baseUrl}}/graphql"
+            "url": "{{graphqlEndpoint}}"
           },
           "event": [
             {
@@ -703,604 +222,10 @@
                   "    pm.response.to.have.status(200);",
                   "});",
                   "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
+                  "pm.test(\"Deliverable is created\", function () {",
                   "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.3 Query livrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { livrable { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.4 Query health",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { health { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.5 Query projet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { projet { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.6 Query livrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { livrable { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.7 Query projetId",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { projetId { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.8 Mutation creerProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { creerProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.9 Mutation mettreAJourProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { mettreAJourProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.10 Mutation supprimerProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { supprimerProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.11 Mutation ajouterLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { ajouterLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.12 Mutation mettreAJourLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { mettreAJourLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.13 Mutation supprimerLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { supprimerLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.14 Mutation creerProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { creerProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.15 Mutation mettreAJourProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { mettreAJourProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.16 Mutation supprimerProjet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { supprimerProjet(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.17 Mutation creerLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { creerLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.18 Mutation mettreAJourLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { mettreAJourLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
-                  "});"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "11.19 Mutation supprimerLivrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation { supprimerLivrable(input: {}) { _id } }\"\n}"
-            },
-            "url": "{{baseUrl}}/graphql"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has valid GraphQL data\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data).to.exist;",
+                  "    pm.expect(jsonData.data.creerLivrable._id).to.exist;",
+                  "    pm.environment.set(\"livrableId\", jsonData.data.creerLivrable._id);",
                   "});"
                 ]
               }
@@ -1310,11 +235,18 @@
       ]
     }
   ],
-  "variable": [
+  "event": [
     {
-      "key": "baseUrl",
-      "value": "http://localhost:5000",
-      "type": "string"
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Code commun à exécuter avant chaque requête",
+          "if (!pm.environment.get(\"authToken\")) {",
+          "    console.log(\"Attention: Token d'authentification non défini\");",
+          "}"
+        ]
+      }
     }
   ]
 }

@@ -1,11 +1,11 @@
 const fs = require('fs');
 const path = require('path');
-const { STATUTS_PROJET, STATUTS_LIVRABLE } = require('../../../config/constants');
+const { Enum } = require('../../../config/constants');
 
 console.log('Verification des enumerations...');
 
 // Lire le schema GraphQL
-const schemaPath = path.resolve(__dirname, '../src/graphql/schema-template.graphql');
+const schemaPath = path.resolve(__dirname, '../my-apollo-graph/graphql/schema.graphql');
 const schemaContent = fs.readFileSync(schemaPath, 'utf8');
 
 // Extraire les enumerations du schema
@@ -21,8 +21,11 @@ function extractEnum(name, content) {
         .map(line => line.split('#')[0].trim());
 }
 
-const schemaStatutProjet = extractEnum('StatutProjet', schemaContent);
-const schemaStatutLivrable = extractEnum('StatutLivrable', schemaContent);
+// Extraire toutes les enumerations du schema
+const schemaEnums = {
+    StatutProjet: extractEnum('StatutProjet', schemaContent),
+    StatutLivrable: extractEnum('StatutLivrable', schemaContent)
+};
 
 // Verifier la correspondance
 function checkSync(schemaValues, constantValues, name) {
@@ -45,14 +48,54 @@ function checkSync(schemaValues, constantValues, name) {
         return false;
     }
 
+    // Verifier l'ordre des valeurs
+    const schemaOrder = schemaValues.join(',');
+    const constOrder = constKeys.join(',');
+    if (schemaOrder !== constOrder) {
+        console.warn(`⚠️ ${name}: L'ordre des enumerations differe entre le schema et les constantes`);
+        console.warn('   Schema  :', schemaOrder);
+        console.warn('   Constantes:', constOrder);
+    }
+
     console.log(`✅ ${name}: Les enumerations sont synchronisees`);
     return true;
 }
 
-const projetSync = checkSync(schemaStatutProjet, STATUTS_PROJET, 'StatutProjet');
-const livrableSync = checkSync(schemaStatutLivrable, STATUTS_LIVRABLE, 'StatutLivrable');
+// Verifier toutes les enumerations
+const enumResults = {
+    projet: checkSync(schemaEnums.StatutProjet, Enum.StatutProjet, 'StatutProjet'),
+    livrable: checkSync(schemaEnums.StatutLivrable, Enum.StatutLivrable, 'StatutLivrable')
+};
 
-if (projetSync && livrableSync) {
+// Verifier les references aux enumerations dans les types
+const typeFields = {
+    Projet: ['statut: StatutProjet!'],
+    Livrable: ['statut: StatutLivrable!'],
+    ProjetInput: ['statut: StatutProjet'],
+    LivrableInput: ['statut: StatutLivrable'],
+    ProjetUpdateInput: ['statut: StatutProjet'],
+    LivrableUpdateInput: ['statut: StatutLivrable']
+};
+
+Object.entries(typeFields).forEach(([type, fields]) => {
+    const typeRegex = new RegExp(`type ${type} {([^}]+)}`);
+    const typeMatch = typeRegex.exec(schemaContent);
+
+    if (!typeMatch) {
+        console.error(`❌ Type ${type} non trouve dans le schema`);
+        process.exit(1);
+    }
+
+    const typeContent = typeMatch[1];
+    fields.forEach(field => {
+        if (!typeContent.includes(field)) {
+            console.error(`❌ Champ ${field} manquant dans le type ${type}`);
+            process.exit(1);
+        }
+    });
+});
+
+if (Object.values(enumResults).every(result => result)) {
     console.log('✅ Toutes les enumerations sont synchronisees!');
     process.exit(0);
 } else {

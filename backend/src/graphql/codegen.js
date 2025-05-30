@@ -7,13 +7,13 @@ const { resolvers } = require('./index');
 let typeDefs;
 
 try {
-    console.log("[GraphQL] Tentative de chargement du schema...");
+    console.log('[GraphQL] Tentative de chargement du schema...');
 
     // Utiliser directement le fichier schema.graphql genere
     const schemaPath = path.join(__dirname, 'my-apollo-graph/graphql/schema.graphql');
 
     if (!fs.existsSync(schemaPath)) {
-        console.log("[GraphQL] Fichier de schema non trouve. Generation du schema...");
+        console.log('[GraphQL] Fichier de schema non trouve. Generation du schema...');
 
         // Executer le script de generation de schema
         const generateSchemaPath = path.join(__dirname, 'scripts/generate-schema.js');
@@ -27,15 +27,15 @@ try {
 
     // Charger le fichier schema.graphql
     typeDefs = fs.readFileSync(schemaPath, 'utf8');
-    console.log("[GraphQL] Schema charge avec succes depuis:", schemaPath);
+    console.log('[GraphQL] Schema charge avec succes depuis:', schemaPath);
 
 } catch (error) {
-    console.error("[GraphQL] Erreur lors du chargement du schema:", error);
-    throw new Error("Impossible de charger le schema GraphQL: " + error.message);
+    console.error('[GraphQL] Erreur lors du chargement du schema:', error);
+    throw new Error('Impossible de charger le schema GraphQL: ' + error.message);
 }
 
 // Creation du schema executable
 const schema = makeExecutableSchema({ typeDefs, resolvers });
 
-console.log("[GraphQL] Schema executable cree avec succes");
+console.log('[GraphQL] Schema executable cree avec succes');
 module.exports = { schema };

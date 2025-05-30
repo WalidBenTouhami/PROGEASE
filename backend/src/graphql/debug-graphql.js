@@ -34,9 +34,99 @@ const rl = readline.createInterface({
 
 // Requetes preconfigurees
 const presetQueries = {
-    health: `query { health { status timestamp user version uptime } }`,
-    projets: `query { projets { _id titre description } }`,
-    livrables: `query { livrables { _id titre description } }`
+    health: 'query { healthCheck { status timestamp version message } }',
+    projets: `query {
+        projets(page: 1, limit: 10) {
+            items {
+                _id
+                titre
+                description
+                statut
+                progression
+                estEnRetard
+            }
+            pagination {
+                total
+                pages
+                page
+                limit
+                hasNextPage
+                hasPreviousPage
+            }
+        }
+    }`,
+    livrables: `query {
+        livrables(page: 1, limit: 10) {
+            items {
+                _id
+                intitule
+                description
+                dateLimite
+                statut
+                estEnRetard
+            }
+            pagination {
+                total
+                pages
+                page
+                limit
+                hasNextPage
+                hasPreviousPage
+            }
+        }
+    }`,
+    projetDetails: `query($id: ID!) {
+        projet(id: $id) {
+            _id
+            titre
+            description
+            equipe
+            tuteur
+            competences
+            dateDebut
+            dateFin
+            statut
+            progression
+            urlDepot
+            estEnRetard
+            livrables {
+                _id
+                intitule
+                statut
+                dateLimite
+                estEnRetard
+            }
+        }
+    }`,
+    analyseRisques: `query($projetId: ID!) {
+        analyserRisquesProjet(projetId: $projetId) {
+            retard
+            progression
+            livrables
+            equipe
+            niveauRisque
+            recommandations
+        }
+    }`,
+    creerProjet: `mutation($input: ProjetInput!) {
+        creerProjet(input: $input) {
+            _id
+            titre
+            description
+            statut
+            progression
+        }
+    }`,
+    creerLivrable: `mutation($input: LivrableInput!) {
+        creerLivrable(input: $input) {
+            _id
+            intitule
+            description
+            dateLimite
+            statut
+            estEnRetard
+        }
+    }`
 };
 
 // Afficher la banniere
@@ -61,12 +151,15 @@ function showHelp() {
     console.log(colorize('  .clear  - Efface l\'ecran', 'gray'));
 
     console.log(colorize('\nExemples de requetes:', 'yellow'));
-    console.log(colorize(`  query { health { status } }`, 'gray'));
-    console.log(colorize(`  query { projets { _id titre } }`, 'gray'));
-    console.log(colorize(`  query { projet(id: "1") { titre } }`, 'gray'));
+    console.log(colorize('  query { healthCheck { status timestamp } }', 'gray'));
+    console.log(colorize('  query { projets(page: 1, limit: 10) { items { _id titre } } }', 'gray'));
+    console.log(colorize('  query { projet(id: "1") { titre livrables { intitule } } }', 'gray'));
 
     console.log(colorize('\nExemple avec variables:', 'yellow'));
-    console.log(colorize(`  { "query": "query GetProjet($id: ID!) { projet(id: $id) { _id titre } }", "variables": { "id": "1" } }`, 'gray'));
+    console.log(colorize(`  {
+    "query": "query GetProjet($id: ID!) { projet(id: $id) { _id titre livrables { intitule } } }",
+    "variables": { "id": "1" }
+  }`, 'gray'));
 
     console.log(colorize('\nNote: Pour envoyer une requete avec variables, utilisez un objet JSON complet', 'blue'));
     console.log();

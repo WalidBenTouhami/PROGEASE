@@ -6,6 +6,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
 
 interface Projet {
   id: string;
@@ -43,7 +45,9 @@ interface Template {
     MatCardModule,
     MatIconModule,
     MatListModule,
-    MatBadgeModule
+    MatBadgeModule,
+    MatProgressSpinnerModule,
+    MatButtonModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
@@ -65,6 +69,10 @@ export class FrontOfficeDashboardComponent implements OnInit {
   retoursRecus: number = 0;
   projetsRecents: Projet[] = [];
 
+  chargement = true;
+
+  constructor() {}
+
   ngOnInit() {
     // Initialize dashboard data
     this.projetsEnCours = 3;
@@ -74,6 +82,11 @@ export class FrontOfficeDashboardComponent implements OnInit {
       { id: '1', nom: 'Projet A' },
       { id: '2', nom: 'Projet B' }
     ];
+
+    // Simuler un chargement
+    setTimeout(() => {
+      this.chargement = false;
+    }, 1000);
   }
 
   // Ouvre le formulaire pour ajouter un utilisateur

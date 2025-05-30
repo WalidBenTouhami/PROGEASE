@@ -4,94 +4,77 @@ const router = express.Router();
 const logger = require('../utils/logger');
 const aiService = require('../services/ai.service');
 
-// Endpoint d'analyse IA
+/**
+ * @route POST /api/ai/analyze
+ * @desc Analyse un projet avec l'IA
+ */
 router.post('/analyze', async (req, res) => {
     try {
-        const { text, document } = req.body;
-        if (!text && !document) {
-            return res.status(400).json({
-                success: false,
-                message: "Aucun contenu à analyser",
-                error: "Aucun contenu à analyser"
-            });
-        }
-        // On passe tout le body pour permettre l'analyse flexible
-        const analyse = await aiService.analyserProjet({ text, document });
-        logger.monitoring('Analyse IA effectuee', { user: req.currentUser });
-        res.status(200).json({
-            success: true,
-            message: 'Analyse IA effectuee avec succes',
-            data: analyse
-        });
+        const resultat = await aiService.analyserProjet(req.body);
+        res.json(resultat);
     } catch (error) {
-        logger.error("Erreur lors de l'analyse AI:", error);
+        logger.error('Erreur lors de l\'analyse:', error);
         res.status(500).json({
             success: false,
-            message: "Erreur interne lors de l'analyse",
+            message: 'Erreur interne lors de l\'analyse',
             error: error.message
         });
     }
 });
 
-// Route pour generer du texte (français)
+/**
+ * @route POST /api/ai/generer-texte
+ * @desc Genere du texte en français
+ */
 router.post('/generer-texte', async (req, res) => {
     try {
         const { prompt } = req.body;
         if (!prompt) {
             return res.status(400).json({
                 success: false,
-                message: "Le prompt est requis",
-                error: "Le prompt est requis"
+                message: 'Le prompt est requis'
             });
         }
+
         const texte = await aiService.genererTexte(prompt);
-        logger.monitoring('Generation de texte IA (FR)', { user: req.currentUser });
-        res.status(200).json({
+        res.json({
             success: true,
-            message: 'Texte genere avec succes',
-            data: {
-                text: texte,
-                prompt: prompt.substring(0, 100),
-                timestamp: new Date().toISOString()
-            }
+            texte
         });
     } catch (error) {
-        logger.error("Erreur lors de la generation de texte:", error);
+        logger.error('Erreur lors de la generation de texte:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la generation de texte',
+            message: 'Erreur interne lors de la generation de texte',
             error: error.message
         });
     }
 });
 
-// Alias en anglais
+/**
+ * @route POST /api/ai/generate-text
+ * @desc Generates text in English
+ */
 router.post('/generate-text', async (req, res) => {
     try {
         const { prompt } = req.body;
         if (!prompt) {
             return res.status(400).json({
                 success: false,
-                message: "Prompt is required",
-                error: "Prompt is required"
+                message: 'Prompt is required'
             });
         }
-        const texte = await aiService.genererTexte(prompt);
-        logger.monitoring('Generation de texte IA (EN)', { user: req.currentUser });
-        res.status(200).json({
+
+        const text = await aiService.genererTexte(prompt);
+        res.json({
             success: true,
-            message: 'Text generated successfully',
-            data: {
-                text: texte,
-                prompt: prompt.substring(0, 100),
-                timestamp: new Date().toISOString()
-            }
+            text
         });
     } catch (error) {
-        logger.error("Error generating text:", error);
+        logger.error('Error generating text:', error);
         res.status(500).json({
             success: false,
-            message: 'Error generating text',
+            message: 'Internal error while generating text',
             error: error.message
         });
     }

@@ -116,7 +116,7 @@ async function checkServerAvailability() {
     try {
         // Faire une requete d'introspection simple
         await axios.post(config.baseUrl, {
-            query: `{ __schema { queryType { name } } }`
+            query: '{ __schema { queryType { name } } }'
         }, { timeout: 3000 });
 
         console.log(colorize('✅ Serveur GraphQL accessible', 'green'));
@@ -155,7 +155,7 @@ async function runPredefinedTests() {
             // Preparer les variables si necessaire
             let variables = {};
             if (name === 'projet' || name === 'livrable') {
-                variables = { id: "1" }; // ID fictif pour les tests
+                variables = { id: '1' }; // ID fictif pour les tests
             }
 
             // Executer la requete
@@ -177,7 +177,7 @@ async function runPredefinedTests() {
                 console.log(colorize('  Requete:', 'gray'));
                 console.log(colorize(`  ${query.trim().replace(/\n/g, '\n  ')}`, 'gray'));
             } else {
-                console.log(colorize(`  ✅ Succes`, 'green'));
+                console.log(colorize('  ✅ Succes', 'green'));
 
                 // Afficher un aperçu du resultat
                 let preview;
@@ -216,7 +216,7 @@ async function runPredefinedTests() {
     const successRate = Math.round((passedTests / totalTests) * 100) || 0;
 
     console.log('\n' + colorize('╔══════════════════════════════════════════════╗', 'bold'));
-    console.log(colorize(`║            ReSUMe DES TESTS GRAPHQL          ║`, 'bold'));
+    console.log(colorize('║            ReSUMe DES TESTS GRAPHQL          ║', 'bold'));
     console.log(colorize('╟──────────────────────────┬───────────────────╢', 'bold'));
     console.log(colorize(`║ Total des tests          │ ${String(totalTests).padStart(17)} ║`, 'bold'));
     console.log(colorize(`║ Tests reussis            │ ${String(passedTests).padStart(17)} ║`, 'bold'));

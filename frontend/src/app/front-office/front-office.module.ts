@@ -15,9 +15,6 @@ import { FrontOfficeTemplateComponent } from './front-office-template.component'
 import { BreadcrumbComponent } from '../shared/components/breadcrumb/breadcrumb.component';
 
 @NgModule({
-  declarations: [
-    FrontOfficeTemplateComponent
-  ],
   imports: [
     CommonModule,
     FormsModule,
@@ -31,7 +28,8 @@ import { BreadcrumbComponent } from '../shared/components/breadcrumb/breadcrumb.
     FrontOfficeRoutingModule,
     FrontOfficeDashboardComponent,
     ProjetListComponent,
-    LivrableListComponent
+    LivrableListComponent,
+    FrontOfficeTemplateComponent
   ]
 })
 export class FrontOfficeModule {}
