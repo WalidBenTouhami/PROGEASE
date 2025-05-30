@@ -79,7 +79,7 @@ export class ProjetFormComponent implements OnInit {
     const projet: Projet = {
       titre: formValue.titre,
       description: formValue.description,
-      equipe: formValue.equipe || [],
+      equipe: (formValue.equipe || '').split(',').map((id: string) => id.trim()).filter((id: string) => id),
       tuteur: formValue.tuteur,
       competences: (formValue.competences || '').split(',').map((c: string) => c.trim()).filter((c: string) => c),
       dateDebut: new Date(formValue.dateDebut),
