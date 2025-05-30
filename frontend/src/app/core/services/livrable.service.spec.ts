@@ -4,8 +4,8 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { LivrableService } from './livrable.service';
 import { environment } from '../../../environments/environment';
-import { RouterTestingModule} from '@angular/router/testing';
-import { CommonModule } from '@angular/common';
+import { Livrable, StatutLivrable } from '../models/livrable.model';
+import { provideRouter } from '@angular/router';
 
 describe('LivrableService', () => {
   let service: LivrableService;
@@ -13,24 +13,24 @@ describe('LivrableService', () => {
 
   const apiUrl = `${environment.apiUrl}/livrables`;
 
-  const mockLivrable = {
+  const mockLivrable: Livrable = {
     _id: '1',
-    titre: 'Livrable 1',
+    intitule: 'Livrable 1',
     description: 'Description du livrable',
+    dateLimite: new Date('2023-03-15'),
     projetId: '123',
-    dateRendu: new Date('2023-05-15'),
-    statut: 'SOUMIS',
-    commentaires: [],
-    fichiers: []
+    statut: StatutLivrable.EN_ATTENTE,
+    creeLe: new Date(),
+    majLe: new Date()
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule],
       providers: [
         LivrableService,
         provideHttpClient(),
-        provideHttpClientTesting()
+        provideHttpClientTesting(),
+        provideRouter([])
       ]
     });
 
@@ -42,14 +42,10 @@ describe('LivrableService', () => {
     httpMock.verify();
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-
   it('doit récupérer tous les livrables', () => {
-    service.recupererLivrables().subscribe(livrables => {
+    service.getAllLivrables().subscribe((livrables: Livrable[]) => {
       expect(livrables.length).toBe(1);
-      expect(livrables[0].titre).toBe('Livrable 1');
+      expect(livrables[0].intitule).toBe('Livrable 1');
     });
 
     const req = httpMock.expectOne(apiUrl);
@@ -58,9 +54,9 @@ describe('LivrableService', () => {
   });
 
   it('doit récupérer un livrable par ID', () => {
-    service.recupererLivrable('1').subscribe(livrable => {
+    service.recupererLivrable('1').subscribe((livrable: Livrable) => {
       expect(livrable._id).toBe('1');
-      expect(livrable.titre).toBe('Livrable 1');
+      expect(livrable.intitule).toBe('Livrable 1');
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);
@@ -69,8 +65,8 @@ describe('LivrableService', () => {
   });
 
   it('doit créer un livrable', () => {
-    service.creerLivrable(mockLivrable).subscribe(livrable => {
-      expect(livrable.titre).toBe('Livrable 1');
+    service.creerLivrable(mockLivrable).subscribe((livrable: Livrable) => {
+      expect(livrable.intitule).toBe('Livrable 1');
     });
 
     const req = httpMock.expectOne(apiUrl);
@@ -79,10 +75,9 @@ describe('LivrableService', () => {
   });
 
   it('doit mettre à jour un livrable', () => {
-    const updated = { ...mockLivrable, titre: 'Livrable Modifié' };
-
-    service.mettreAJourLivrable('1', updated).subscribe(livrable => {
-      expect(livrable.titre).toBe('Livrable Modifié');
+    const updated = { ...mockLivrable, intitule: 'Livrable Modifié' };
+    service.mettreAJourLivrable('1', updated).subscribe((livrable: Livrable) => {
+      expect(livrable.intitule).toBe('Livrable Modifié');
     });
 
     const req = httpMock.expectOne(`${apiUrl}/1`);
@@ -91,7 +86,7 @@ describe('LivrableService', () => {
   });
 
   it('doit supprimer un livrable', () => {
-    service.supprimerLivrable('1').subscribe(response => {
+    service.supprimerLivrable('1').subscribe((response: any) => {
       expect(response).toBeTruthy();
     });
 
@@ -101,9 +96,9 @@ describe('LivrableService', () => {
   });
 
   it('doit gérer une erreur serveur (500)', () => {
-    service.recupererLivrables().subscribe({
+    service.getAllLivrables().subscribe({
       next: () => fail('appel devait échouer'),
-      error: (err) => {
+      error: (err: any) => {
         expect(err.status).toBe(500);
         expect(err.statusText).toBe('Erreur interne');
       }
