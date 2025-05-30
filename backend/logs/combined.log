@@ -1963,3 +1963,35 @@ Use mongoose.model(name, schema) {"metadata":{"service":"progease-api","stack":"
 [undefined] INFO: Serveur Express demarre sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-30 01:34:11"}}
 [undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-30 01:34:11"}}
 [undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-30 01:34:11"}}
+[undefined] INFO: ✅ Cle API Deepseek chargee {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:13"}}
+[undefined] INFO: ✅ Cle API Deepseek chargee {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:19"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configures {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:19"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configures {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:19"}}
+[undefined] INFO: ✅ Connecte à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:30"}}
+[undefined] INFO: Connecte à MongoDB avec succes {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:30"}}
+[undefined] INFO: Donnees de test dejà presentes {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:35"}}
+[undefined] INFO: Donnees de test creees/verifiees avec succes {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:35"}}
+[undefined] INFO: Serveur Express demarre sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:35"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:35"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:21:35"}}
+[undefined] INFO: ✅ Cle API Deepseek chargee {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:16"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configures {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:16"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configures {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:16"}}
+[undefined] INFO: ✅ Connecte à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:23"}}
+[undefined] INFO: Connecte à MongoDB avec succes {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:23"}}
+[undefined] INFO: Donnees de test dejà presentes {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:26"}}
+[undefined] INFO: Donnees de test creees/verifiees avec succes {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:26"}}
+[undefined] INFO: Serveur Express demarre sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:26"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:26"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-30 02:24:26"}}
+[undefined] INFO: ✅ Cle API Deepseek chargee {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:04:59"}}
+[undefined] INFO: Gestionnaires d'erreurs du processus configures {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:04:59"}}
+[undefined] INFO: Gestionnaires d'erreurs HTTP configures {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:04:59"}}
+[undefined] INFO: ✅ Connecte à MongoDB {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:05:00"}}
+[undefined] INFO: Connecte à MongoDB avec succes {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:05:00"}}
+[undefined] ERROR: Erreur lors de la creation des donnees de test: Projet validation failed: statut: Le statut doit etre l'un des suivants: Brouillon, En_cours, Termine, Archive, En_retard, A_venir {"metadata":{"service":"progease-api","errors":{"statut":{"name":"ValidatorError","message":"Le statut doit etre l'un des suivants: Brouillon, En_cours, Termine, Archive, En_retard, A_venir","properties":{"message":"Le statut doit etre l'un des suivants: Brouillon, En_cours, Termine, Archive, En_retard, A_venir","type":"enum","enumValues":["Brouillon","En_cours","Termine","Archive","En_retard","A_venir"],"path":"statut","value":"En cours"},"kind":"enum","path":"statut","value":"En cours"}},"_message":"Projet validation failed","stack":"ValidationError: Projet validation failed: statut: Le statut doit etre l'un des suivants: Brouillon, En_cours, Termine, Archive, En_retard, A_venir\n    at Document.invalidate (D:\\pi\\PROGEASE\\backend\\node_modules\\mongoose\\lib\\document.js:3219:32)\n    at D:\\pi\\PROGEASE\\backend\\node_modules\\mongoose\\lib\\document.js:3012:17\n    at D:\\pi\\PROGEASE\\backend\\node_modules\\mongoose\\lib\\schematype.js:1368:9\n    at process.processTicksAndRejections (node:internal/process/task_queues:77:11)","timestamp":"2025-05-30 11:05:01"}}
+[undefined] WARN: Impossible de creer les donnees de test: {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:05:01"}}
+[undefined] INFO: Serveur Express demarre sur le port 5000 en mode development {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:05:01"}}
+[undefined] INFO: API REST disponible sur http://localhost:5000/api {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:05:01"}}
+[undefined] INFO: GraphQL v4 disponible sur http://localhost:5000/graphql {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:05:01"}}
+[undefined] INFO: Signal SIGINT reçu. Arret du serveur... {"metadata":{"service":"progease-api","timestamp":"2025-05-30 11:05:41"}}
