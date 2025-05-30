@@ -7,3 +7,80 @@
 p {
   color: #555;
 }
+
+.livrable-management {
+  padding: 1rem;
+}
+
+.filters-card {
+  margin-bottom: 1rem;
+}
+
+.filters {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filters mat-form-field {
+  flex: 1;
+  min-width: 200px;
+}
+
+table {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.mat-column-actions {
+  width: 100px;
+  text-align: center;
+}
+
+.mat-column-statut {
+  width: 120px;
+}
+
+.mat-column-id {
+  width: 80px;
+}
+
+.mat-mdc-row:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.mat-mdc-header-cell {
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.mat-mdc-cell {
+  color: var(--text-color);
+}
+
+mat-chip {
+  min-width: 80px;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .livrable-management {
+    padding: 0.5rem;
+  }
+
+  .filters {
+    flex-direction: column;
+  }
+
+  .filters mat-form-field {
+    width: 100%;
+  }
+
+  .mat-column-description {
+    display: none;
+  }
+
+  .mat-column-dateCreation {
+    display: none;
+  }
+}

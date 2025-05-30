@@ -29,51 +29,8 @@ const projetSchema = yup.object().shape({
         .min(yup.ref('dateDebut'), 'La date de fin doit etre posterieure à la date de debut.')
         .required('La date de fin est requise.'),
     statut: yup.string()
-        .oneOf(Object.values(Enum.StatutProjet), 'Statut de projet invalide.')
+        .oneOf(Object.values(Enum.StatutProjet), 'Statut de projet invalide.'),
+    progression: yup.number()
+        .min(0, 'La progression ne peut pas etre negative.')
+        .max(100, 'La progression ne peut pas depasser 100%.')
 });
-
-// Middleware de validation des donnees de projet
-const validateProjetData = async (req, res, next) => {
-    try {
-        // Adapter les dates au format si necessaire
-        const body = { ...req.body };
-        if (body.dateDebut && typeof body.dateDebut === 'string') {
-            body.dateDebut = new Date(body.dateDebut);
-        }
-        if (body.dateFin && typeof body.dateFin === 'string') {
-            body.dateFin = new Date(body.dateFin);
-        }
-
-        // Si mise à jour partielle, ne valider que les champs fournis
-        const schema = req.method === 'PUT' ? projetSchema.pick(Object.keys(body)) : projetSchema;
-
-        await schema.validate(body, { abortEarly: false });
-        next();
-    } catch (error) {
-        res.status(StatutHttp.MAUVAISE_REQUETE).json({
-            erreur: MessagesErreur.GENERAL.VALIDATION,
-            details: error.errors || error.message
-        });
-    }
-};
-
-// Middleware de validation des IDs
-const validateId = (paramName, source = 'params') => {
-    return (req, res, next) => {
-        const id = source === 'params' ? req.params[paramName] : req.body[paramName];
-
-        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(StatutHttp.MAUVAISE_REQUETE).json({
-                erreur: MessagesErreur.GENERAL.ID_INVALIDE,
-                details: `L'ID '${paramName}' est invalide ou manquant.`
-            });
-        }
-        next();
-    };
-};
-
-module.exports = {
-    validateProjetData,
-    validateId,
-    projetSchema // Export pour tests et reutilisation
-};

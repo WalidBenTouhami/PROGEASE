@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
 import { LivrableService } from '../../core/services/livrable.service';
@@ -7,11 +8,27 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-livrable-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, MatFormFieldModule, MatInputModule, MatTableModule, MatPaginatorModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatCardModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSelectModule,
+    MatButtonModule,
+    RouterModule
+  ],
   templateUrl: './livrable-list.component.html',
   styleUrl: './livrable-list.component.css'
 })

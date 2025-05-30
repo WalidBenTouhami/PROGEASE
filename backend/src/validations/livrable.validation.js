@@ -1,6 +1,6 @@
 const yup = require('yup');
 const mongoose = require('mongoose');
-const { MessagesErreur, StatutHttp } = require('../../config/constants');
+const { MessagesErreur, StatutHttp, Enum } = require('../../config/constants');
 
 // Schema de validation Yup pour les livrables
 const livrableSchema = yup.object().shape({
@@ -18,11 +18,11 @@ const livrableSchema = yup.object().shape({
         .test('is-mongo-id', 'L\'ID de projet est invalide.',
             val => val && mongoose.Types.ObjectId.isValid(val))
         .required('L\'ID du projet est requis.'),
-    dateEcheance: yup.date()
-        .min(new Date(), 'La date d\'echeance doit etre future.')
-        .required('La date d\'echeance est requise.'),
+    dateLimite: yup.date()
+        .min(new Date(), 'La date limite doit etre future.')
+        .required('La date limite est requise.'),
     statut: yup.string()
-        .oneOf(['en_attente', 'en_retard', 'termine'], 'Statut invalide.')
+        .oneOf(Object.values(Enum.StatutLivrable), 'Statut invalide.')
 });
 
 // Middleware de validation des donnees de livrable
@@ -33,9 +33,13 @@ const validateLivrableData = async (req, res, next) => {
         if (body.titre && !body.intitule) body.intitule = body.titre;
         if (body.intitule && !body.titre) body.titre = body.intitule;
 
-        // Adapter dateEcheance au format si besoin
-        if (body.dateEcheance && typeof body.dateEcheance === 'string') {
-            body.dateEcheance = new Date(body.dateEcheance);
+        // Gérer la compatibilité entre dateLimite et dateEcheance
+        if (body.dateEcheance && !body.dateLimite) body.dateLimite = body.dateEcheance;
+        if (body.dateLimite && !body.dateEcheance) body.dateEcheance = body.dateLimite;
+
+        // Adapter les dates au format
+        if (body.dateLimite && typeof body.dateLimite === 'string') {
+            body.dateLimite = new Date(body.dateLimite);
         }
 
         // Validation
@@ -49,7 +53,7 @@ const validateLivrableData = async (req, res, next) => {
     }
 };
 
-// Middleware de validation des IDs
+// Middleware de validation des IDs (inchangé)
 const validateId = (paramName, source = 'params') => {
     return (req, res, next) => {
         const id = source === 'params' ? req.params[paramName] : req.body[paramName];

@@ -1,51 +1,87 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 interface Livrable {
-  id: string;
-  intitule: string;
+  id: number;
+  titre: string;
+  description: string;
+  dateCreation: Date;
   statut: string;
-  dateLimite: string;
+  projet: string;
 }
 
 @Component({
   selector: 'app-livrable-management',
+  templateUrl: './livrable-management.component.html',
+  styleUrls: ['./livrable-management.component.css'],
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
-    MatBadgeModule,
+    ReactiveFormsModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDialogModule,
     MatCardModule,
+    MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatListModule,
-    MatIconModule,
-    MatButtonModule
-  ],
-  templateUrl: './livrable-management.component.html',
-  styleUrls: ['./livrable-management.component.css']
+    MatTooltipModule
+  ]
 })
-export class LivrableManagementComponent {
+export class LivrableManagementComponent implements OnInit {
   searchTerm = '';
   selectedStatus = '';
-  statuts = ['En attente', 'Terminé', 'En retard'];
-  livrables: Livrable[] = [
-    { id: '1', intitule: 'Livrable 1', statut: 'En attente', dateLimite: '2024-06-10' },
-    { id: '2', intitule: 'Livrable 2', statut: 'Terminé', dateLimite: '2024-06-01' },
-    { id: '3', intitule: 'Livrable 3', statut: 'En retard', dateLimite: '2024-05-20' }
-  ];
+  livrables: Livrable[] = [];
+  filteredLivrables: Livrable[] = [];
 
-  get livrablesFiltres() {
-    return this.livrables
-      .filter(l => !this.searchTerm || l.intitule.toLowerCase().includes(this.searchTerm.toLowerCase()))
+  constructor() {
+    // Données de test
+    this.livrables = [
+      {
+        id: 1,
+        titre: 'Documentation API',
+        description: 'Documentation complète de l\'API REST',
+        dateCreation: new Date(),
+        statut: 'En cours',
+        projet: 'PROGEASE'
+      },
+      {
+        id: 2,
+        titre: 'Schéma de base de données',
+        description: 'Modélisation de la base de données',
+        dateCreation: new Date(),
+        statut: 'Terminé',
+        projet: 'PROGEASE'
+      }
+    ];
+    this.filteredLivrables = [...this.livrables];
+  }
+
+  ngOnInit(): void {
+    this.filterLivrables();
+  }
+
+  filterLivrables(): void {
+    this.filteredLivrables = this.livrables
+      .filter(l => l.titre.toLowerCase().includes(this.searchTerm.toLowerCase()))
       .filter(l => !this.selectedStatus || l.statut === this.selectedStatus);
   }
 }

@@ -1,27 +1,31 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FrontOfficeDashboardComponent } from './dashboard.component';
+import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { BackOfficeDashboardComponent } from './dashboard.component';
-
-describe('BackOfficeDashboardComponent', () => {
-  let component: BackOfficeDashboardComponent;
+describe('FrontOfficeDashboardComponent', () => {
+  let component: FrontOfficeDashboardComponent;
   let fixture: ComponentFixture<FrontOfficeDashboardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule,
+        MatCardModule,
+        MatIconModule,
+        MatListModule,
         HttpClientTestingModule,
+        NoopAnimationsModule,
+        RouterTestingModule,
         FrontOfficeDashboardComponent
-      ],
-      providers: [
-        { provide: ActivatedRoute, useValue: { snapshot: {}, params: {} } }
       ]
-    })
-      .compileComponents();
+    }).compileComponents();
+  });
 
+  beforeEach(() => {
     fixture = TestBed.createComponent(FrontOfficeDashboardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

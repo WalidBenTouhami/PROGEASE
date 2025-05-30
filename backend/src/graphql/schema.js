@@ -26,17 +26,13 @@ const typeDefs = gql`
   type Livrable {
     _id: ID!
     intitule: String!
-    titre: String!
-    nom: String!
     description: String
-    dateEcheance: String
     dateLimite: String
-    urlDepot: String
-    statut: String
     projetId: ID!
+    statut: String
+    urlDepot: String
     creeLe: String
     majLe: String
-    projet: Projet
   }
 
   input LivrableInput {

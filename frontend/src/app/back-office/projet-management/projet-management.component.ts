@@ -1,13 +1,16 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatIconModule } from '@angular/material/icon';
+import { MatSortModule } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogModule } from '@angular/material/dialog';
 
 interface Projet {
   id: string;
@@ -23,14 +26,17 @@ interface Projet {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatCardModule,
+    MatIconModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatTableModule,
     MatPaginatorModule,
-    MatIconModule,
-    MatButtonModule
+    MatSortModule,
+    MatButtonModule,
+    MatDialogModule
   ],
   templateUrl: './projet-management.component.html',
   styleUrls: ['./projet-management.component.css']
