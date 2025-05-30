@@ -34,6 +34,16 @@ export interface Evaluation {
   updatedAt: string;
 }
 
+export interface UpdateEvaluationInput {
+  score: number;
+  comments: string;
+  criteria: EvaluationCriteria[];
+}
+
+interface UpdateEvaluationResponse {
+  updateEvaluation: Evaluation;
+}
+
 const GET_EVALUATIONS = gql`
   query GetEvaluations($projectId: ID!) {
     evaluations(projectId: $projectId) {
@@ -92,6 +102,41 @@ const GET_EVALUATION = gql`
   }
 `;
 
+const UPDATE_EVALUATION = gql`
+  mutation UpdateEvaluation($id: ID!, $input: UpdateEvaluationInput!) {
+    updateEvaluation(id: $id, input: $input) {
+      id
+      score
+      comments
+      criteria {
+        name
+        score
+        weight
+      }
+      project {
+        id
+        title
+      }
+      evaluator {
+        id
+        nom
+        prenom
+      }
+      aiRecommendations
+      createdAt
+      updatedAt
+    }
+  }
+`;
+
+const DELETE_EVALUATION = gql`
+  mutation DeleteEvaluation($id: ID!) {
+    deleteEvaluation(id: $id) {
+      id
+    }
+  }
+`;
+
 @Injectable({
   providedIn: 'root'
 })
@@ -135,6 +180,54 @@ export class EvaluationService {
         catchError((error) => {
           console.error('Erreur lors du chargement de l\'évaluation:', error);
           return throwError(() => new Error('Impossible de charger l\'évaluation.'));
+        })
+      );
+  }
+
+  updateEvaluation(id: string, input: UpdateEvaluationInput): Observable<Evaluation> {
+    return this.apollo.mutate<UpdateEvaluationResponse>({
+      mutation: UPDATE_EVALUATION,
+      variables: {
+        id,
+        input: {
+          score: input.score,
+          comments: input.comments,
+          criteria: input.criteria
+        }
+      }
+    }).pipe(
+      map(result => {
+        if (!result.data) {
+          throw new Error('No data returned from update mutation');
+        }
+        return result.data.updateEvaluation;
+      }),
+      catchError((error) => {
+        console.error('Error updating evaluation:', error);
+        return throwError(() => new Error('Failed to update evaluation'));
+      })
+    );
+  }
+
+  deleteEvaluation(id: string): Observable<string> {
+    return this.apollo
+      .mutate<{ deleteEvaluation: { id: string } }>({
+        mutation: DELETE_EVALUATION,
+        variables: { id },
+        refetchQueries: [
+          { query: GET_EVALUATIONS, variables: { projectId: 'ALL' } }
+        ]
+      })
+      .pipe(
+        map((result) => {
+          if (!result.data?.deleteEvaluation) {
+            throw new Error('Erreur lors de la suppression de l\'évaluation');
+          }
+          return result.data.deleteEvaluation.id;
+        }),
+        catchError((error) => {
+          console.error('Erreur lors de la suppression de l\'évaluation:', error);
+          return throwError(() => new Error('Impossible de supprimer l\'évaluation.'));
         })
       );
   }

@@ -1,11 +1,16 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { EvaluationsComponent } from './evaluations.component';
+import { EvaluationEditComponent } from './evaluation-edit/evaluation-edit.component';
 
 const routes: Routes = [
   {
     path: '',
     component: EvaluationsComponent
+  },
+  {
+    path: ':id/edit',
+    component: EvaluationEditComponent
   }
 ];
 

@@ -10,315 +10,125 @@ import { ProjectService, Project } from '../../core/services/project.service';
   standalone: true,
   imports: [CommonModule],
   template: `
-    <div class="projects-container">
-      <h2>Projets</h2>
-      <div class="projects-list">
-        @for (project of projects; track project.id) {
-          <div class="project-card">
-            <div class="project-header">
-              <h3>{{ project.title }}</h3>
-              <span class="status-badge" [class]="project.status.toLowerCase()">
-                {{ getStatusLabel(project.status) }}
-              </span>
-            </div>
-            
-            <p class="description">{{ project.description }}</p>
-            
-            <div class="project-stats">
-              <div class="stat">
-                <span class="label">Progression</span>
-                <div class="progress-bar">
-                  <div class="progress" [style.width.%]="project.progression"></div>
+    <div class="min-h-screen bg-gray-50/50">
+      <div class="max-w-[1400px] mx-auto px-4 py-8">
+        <div class="flex justify-between items-center mb-8">
+          <h1 class="text-2xl font-semibold text-gray-900">Projets</h1>
+          <button class="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors">
+            + Nouveau Projet
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          @for (project of projects; track project.id) {
+            <div class="group bg-white rounded-xl border border-gray-200 transition-all duration-300 hover:border-gray-400">
+              <div class="p-6 flex flex-col h-full">
+                <!-- Header -->
+                <div class="flex justify-between items-start gap-4 mb-4">
+                  <div class="min-w-0 flex-1">
+                    <h3 class="text-lg font-medium text-gray-900 truncate mb-1">
+                      {{ project.title }}
+                    </h3>
+                    <span [class]="getStatusClass(project.status)"
+                          class="inline-flex text-xs font-medium rounded-full px-2 py-0.5">
+                      {{ getStatusLabel(project.status) }}
+                    </span>
+                  </div>
+                  <button (click)="evaluateProject(project.id)" 
+                          class="shrink-0 text-xs font-medium text-gray-700 hover:text-gray-900 transition-colors">
+                    Évaluer
+                  </button>
                 </div>
-                <span class="value">{{ project.progression }}%</span>
-              </div>
-              
-              <div class="stat">
-                <span class="label">Score moyen</span>
-                <span class="value">{{ project.averageScore }}/20</span>
-              </div>
-              
-              <div class="stat">
-                <span class="label">Performance prédite</span>
-                <span class="value">{{ project.predictedPerformance }}/20</span>
-              </div>
-            </div>
 
-            <div class="project-team">
-              <div class="team-section">
-                <h4>Équipe</h4>
-                <div class="members">
-                  @for (member of project.team; track member.id) {
-                    <span class="member">{{ member.prenom }} {{ member.nom }}</span>
+                <!-- Description -->
+                <p class="text-sm text-gray-600 mb-6 line-clamp-2">{{ project.description }}</p>
+
+                <!-- Progress and Stats -->
+                <div class="mb-6 space-y-4">
+                  <!-- Progress Bar -->
+                  <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-sm">
+                      <span class="font-medium text-gray-900">Progression</span>
+                      <span class="font-medium text-gray-900">{{ project.progression }}%</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                      <div class="h-full bg-gray-900 rounded-full transition-all"
+                           [style.width.%]="project.progression"></div>
+                    </div>
+                  </div>
+
+                  <!-- Scores -->
+                  <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1">
+                      <span class="text-xs text-gray-500">Score actuel</span>
+                      <p class="text-sm font-semibold text-gray-900">{{ project.averageScore }}/20</p>
+                    </div>
+                    <div class="space-y-1">
+                      <span class="text-xs text-gray-500">Score prévu</span>
+                      <p class="text-sm font-semibold text-gray-900">{{ project.predictedPerformance }}/20</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Team Members -->
+                <div class="mb-6">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-medium text-gray-700">Équipe</span>
+                    @if (project.tutor) {
+                      <span class="text-xs text-gray-500">
+                        Tuteur: <span class="font-medium text-gray-700">{{ project.tutor.prenom }} {{ project.tutor.nom }}</span>
+                      </span>
+                    }
+                  </div>
+                  <div class="flex flex-wrap gap-1">
+                    @for (member of project.team; track member.id) {
+                      <span class="inline-flex text-xs font-medium px-2 py-1 bg-gray-100 text-gray-700 rounded-md">
+                        {{ member.prenom }} {{ member.nom }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Skills -->
+                <div class="flex flex-wrap gap-1 mb-6">
+                  @for (skill of project.skills; track skill) {
+                    <span class="inline-flex text-xs font-medium px-2 py-1 bg-gray-100 text-gray-600 rounded-md">
+                      {{ skill }}
+                    </span>
                   }
                 </div>
-              </div>
-              
-              @if (project.tutor) {
-                <div class="tutor-section">
-                  <h4>Tuteur</h4>
-                  <span class="tutor">{{ project.tutor.prenom }} {{ project.tutor.nom }}</span>
-                </div>
-              }
-            </div>
 
-            <div class="project-footer">
-              <div class="skills">
-                @for (skill of project.skills; track skill) {
-                  <span class="skill-tag">{{ skill }}</span>
-                }
-              </div>
-              <div class="dates">
-                <span>{{ project.startDate | date:'dd/MM/yyyy' }} - {{ project.endDate | date:'dd/MM/yyyy' }}</span>
-              </div>
-            </div>
-
-            <div class="project-actions">
-              <button class="btn-details" (click)="viewProject(project.id)">
-                Voir les détails
-              </button>
-              <button class="btn-evaluate" (click)="evaluateProject(project.id)">
-                Évaluer le projet
-              </button>
-            </div>
-
-            @if (project.evaluations.length > 0) {
-              <div class="latest-evaluation">
-                <h4>Dernière évaluation</h4>
-                <div class="evaluation-info">
-                  <span class="score">Score: {{ project.evaluations[project.evaluations.length - 1].score }}/20</span>
-                  <span class="date">{{ project.evaluations[project.evaluations.length - 1].createdAt | date:'dd/MM/yyyy' }}</span>
+                <!-- Footer -->
+                <div class="flex items-center justify-between pt-4 border-t border-gray-100 mt-auto">
+                  <span class="text-xs text-gray-500">
+                    {{ project.startDate | date:'dd/MM/yyyy' }} - {{ project.endDate | date:'dd/MM/yyyy' }}
+                  </span>
+                  <button (click)="viewProject(project.id)" 
+                          class="text-sm font-medium text-gray-900 hover:underline">
+                    Voir détails
+                  </button>
                 </div>
               </div>
-            }
-          </div>
-        } @empty {
-          <p>Aucun projet trouvé.</p>
-        }
+            </div>
+          } @empty {
+            <div class="col-span-full flex flex-col items-center justify-center py-12 bg-white rounded-xl border border-gray-200">
+              <p class="text-base text-gray-600 mb-1">Aucun projet trouvé</p>
+              <p class="text-sm text-gray-500">Commencez par créer un nouveau projet</p>
+            </div>
+          }
+        </div>
       </div>
     </div>
   `,
   styles: [`
-    .projects-container {
-      padding: 20px;
+    :host {
+      display: block;
     }
-
-    .projects-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
-    }
-
-    .project-card {
-      padding: 20px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      background: white;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-
-    .project-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .project-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-
-    h3 {
-      margin: 0;
-      color: #333;
-      font-size: 1.25rem;
-    }
-
-    .status-badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.875rem;
-      font-weight: 500;
-    }
-
-    .draft {
-      background-color: #e0e0e0;
-      color: #616161;
-    }
-
-    .in_progress {
-      background-color: #bbdefb;
-      color: #1976d2;
-    }
-
-    .completed {
-      background-color: #c8e6c9;
-      color: #388e3c;
-    }
-
-    .archived {
-      background-color: #ffecb3;
-      color: #ffa000;
-    }
-
-    .description {
-      color: #666;
-      margin-bottom: 15px;
+    .line-clamp-2 {
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-    }
-
-    .project-stats {
-      margin-bottom: 15px;
-    }
-
-    .stat {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-    }
-
-    .label {
-      width: 140px;
-      color: #666;
-      font-size: 0.875rem;
-    }
-
-    .value {
-      font-weight: 500;
-      color: #333;
-    }
-
-    .progress-bar {
-      flex: 1;
-      height: 6px;
-      background-color: #eee;
-      border-radius: 3px;
-      margin: 0 10px;
-    }
-
-    .progress {
-      height: 100%;
-      background-color: #2196f3;
-      border-radius: 3px;
-    }
-
-    .project-team {
-      margin-bottom: 15px;
-      padding: 10px;
-      background-color: #f5f5f5;
-      border-radius: 4px;
-    }
-
-    .team-section, .tutor-section {
-      margin-bottom: 10px;
-    }
-
-    h4 {
-      margin: 0 0 5px 0;
-      font-size: 0.875rem;
-      color: #666;
-    }
-
-    .members {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .member, .tutor {
-      font-size: 0.875rem;
-      color: #333;
-    }
-
-    .project-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-
-    .skills {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .skill-tag {
-      padding: 4px 8px;
-      background-color: #e3f2fd;
-      color: #1976d2;
-      border-radius: 4px;
-      font-size: 0.75rem;
-    }
-
-    .dates {
-      font-size: 0.875rem;
-      color: #666;
-    }
-
-    .project-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-
-    .btn-details, .btn-evaluate {
-      padding: 8px 16px;
-      border: none;
-      border-radius: 4px;
-      font-size: 0.875rem;
-      cursor: pointer;
-      transition: background-color 0.2s;
-    }
-
-    .btn-details {
-      background-color: #e3f2fd;
-      color: #1976d2;
-    }
-
-    .btn-details:hover {
-      background-color: #bbdefb;
-    }
-
-    .btn-evaluate {
-      background-color: #2196f3;
-      color: white;
-    }
-
-    .btn-evaluate:hover {
-      background-color: #1976d2;
-    }
-
-    .latest-evaluation {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-
-    .evaluation-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 5px;
-    }
-
-    .score {
-      font-weight: 500;
-      color: #2196f3;
-    }
-
-    .date {
-      font-size: 0.875rem;
-      color: #666;
     }
   `]
 })
@@ -361,5 +171,15 @@ export class ProjectListComponent implements OnInit {
       'ARCHIVED': 'Archivé'
     };
     return statusMap[status] || status;
+  }
+
+  getStatusClass(status: string): string {
+    const classMap: { [key: string]: string } = {
+      'DRAFT': 'bg-gray-100 text-gray-700',
+      'IN_PROGRESS': 'bg-blue-50 text-blue-700',
+      'COMPLETED': 'bg-green-50 text-green-700',
+      'ARCHIVED': 'bg-yellow-50 text-yellow-700'
+    };
+    return classMap[status] || 'bg-gray-100 text-gray-700';
   }
 }

@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } fr
 import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { gql } from 'apollo-angular';
+import { LoaderComponent } from '../../../shared/components/loader/loader.component';
 
 interface CreateEvaluationResponse {
   createEvaluation: {
@@ -54,29 +55,36 @@ const CREATE_EVALUATION = gql`
 @Component({
   selector: 'app-evaluation-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, LoaderComponent],
   template: `
-    <div class="container mx-auto p-4">
-      <div class="bg-gradient-to-br from-white to-blue-50 rounded-xl shadow-lg p-8 border border-blue-100">
-        <div class="mb-8">
-          <h1 class="text-3xl font-bold text-gray-800 mb-2">Nouvelle évaluation</h1>
-          <div *ngIf="project" class="space-y-2">
-            <h2 class="text-xl text-blue-600">{{ project.title }}</h2>
-            <p class="text-gray-600 text-sm">{{ project.description }}</p>
-          </div>
-          <div *ngIf="loading" class="flex items-center space-x-2 text-gray-500">
-            <div class="w-5 h-5 border-t-2 border-blue-500 rounded-full animate-spin"></div>
-            <span>Chargement du projet...</span>
+    <div class="container mx-auto p-6">
+      <app-loader *ngIf="loading"></app-loader>
+
+      <div *ngIf="!loading" class="max-w-3xl mx-auto bg-white rounded-lg shadow">
+        <!-- Header -->
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-800">Nouvelle évaluation</h1>
+              <div *ngIf="project" class="mt-2">
+                <h2 class="text-lg font-medium text-blue-600">{{ project.title }}</h2>
+                <p class="text-sm text-gray-600 mt-1">{{ project.description }}</p>
+              </div>
+            </div>
+            <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg px-6 py-4 text-center min-w-[160px]">
+              <span class="block text-sm font-medium mb-1">Score global</span>
+              <span class="text-3xl font-bold">{{ calculateGlobalScore() }}/20</span>
+            </div>
           </div>
         </div>
 
-        <form [formGroup]="evaluationForm" (ngSubmit)="onSubmit()" class="space-y-8">
-          <!-- Critères d'évaluation -->
-          <div class="space-y-4">
-            <div class="flex items-center justify-between">
+        <form [formGroup]="evaluationForm" (ngSubmit)="onSubmit()">
+          <!-- Critères section -->
+          <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between mb-4">
               <h2 class="text-xl font-semibold text-gray-800">Critères d'évaluation</h2>
               <button type="button" (click)="addCriterion()"
-                      class="inline-flex items-center px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md hover:bg-blue-100 transition-colors duration-200">
+                      class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors duration-200">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
                 </svg>
@@ -86,52 +94,46 @@ const CREATE_EVALUATION = gql`
             
             <div formArrayName="criteria" class="space-y-4">
               <div *ngFor="let criterion of criteriaControls; let i = index" [formGroupName]="i"
-                   class="p-6 bg-white rounded-lg shadow-sm border border-gray-100 hover:border-blue-200 transition-colors duration-200">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div class="col-span-1">
+                   class="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-all duration-200">
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+                  <div class="md:col-span-6">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Critère</label>
                     <input type="text" formControlName="name"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                           class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200">
                   </div>
                   
-                  <div>
+                  <div class="md:col-span-3">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Score (sur 20)</label>
                     <input type="number" formControlName="score" min="0" max="20" step="0.5"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                           class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200">
                   </div>
                   
-                  <div>
+                  <div class="md:col-span-3">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Pondération (%)</label>
                     <input type="number" formControlName="weight" min="0" max="100" step="5"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                           class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200">
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Score global calculé -->
-          <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-6 text-white">
-            <h3 class="text-lg font-medium opacity-90 mb-2">Score global</h3>
-            <p class="text-4xl font-bold">{{ calculateGlobalScore() }}/20</p>
-          </div>
-
-          <!-- Commentaires -->
-          <div class="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-            <label for="comments" class="block text-sm font-medium text-gray-700 mb-2">Commentaires</label>
+          <!-- Comments section -->
+          <div class="p-6 border-b border-gray-200">
+            <label for="comments" class="block text-xl font-semibold text-gray-800 mb-4">Commentaires</label>
             <textarea id="comments" formControlName="comments" rows="4"
-                     class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                     class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
                      placeholder="Ajoutez vos commentaires sur l'évaluation..."></textarea>
           </div>
 
-          <!-- Boutons -->
-          <div class="flex justify-end space-x-4 pt-4">
+          <!-- Actions -->
+          <div class="p-6 bg-gray-50 rounded-b-lg flex justify-end space-x-4">
             <button type="button" (click)="cancel()"
-                    class="px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors duration-200">
+                    class="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-all duration-200">
               Annuler
             </button>
             <button type="submit" [disabled]="!isFormValid()"
-                    class="px-6 py-3 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200">
+                    class="px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow">
               Enregistrer l'évaluation
             </button>
           </div>
@@ -142,9 +144,11 @@ const CREATE_EVALUATION = gql`
   styles: [`
     :host {
       display: block;
+      background-color: #f9fafb;
+      min-height: 100vh;
     }
     .container {
-      max-width: 1000px;
+      max-width: 1200px;
     }
     :host ::ng-deep input[type="number"] {
       -moz-appearance: textfield;
