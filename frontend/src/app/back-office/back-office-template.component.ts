@@ -11,6 +11,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { BreadcrumbComponent } from '../shared/components/breadcrumb/breadcrumb.component';
 
 interface BreadcrumbItem {
@@ -39,6 +40,7 @@ interface BreadcrumbItem {
     MatListModule,
     MatIconModule,
     MatButtonModule,
+    MatMenuModule,
     BreadcrumbComponent
   ]
 })

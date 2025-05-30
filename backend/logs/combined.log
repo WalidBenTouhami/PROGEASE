@@ -2194,3 +2194,42 @@ Use mongoose.model(name, schema) {"metadata":{"service":"progease-api","stack":"
 {"level":"info","message":"Serveur démarré sur le port 5000","service":"progease-api","timestamp":"2025-05-30 21:55:11"}
 {"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-30 22:22:50"}
 {"level":"info","message":"Connecté à MongoDB","service":"progease-api","timestamp":"2025-05-30 22:22:50"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-30 23:08:16"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-30 23:08:16"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-30 23:08:16"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-30 23:08:17"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-30 23:08:17"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-30 23:08:17"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-30 23:08:20"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-30 23:08:20"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-30 23:08:20"}
+{"level":"info","message":"Donnees de test creees/verifiees avec succes","service":"progease-api","timestamp":"2025-05-30 23:08:20"}
+{"level":"info","message":"Serveur Express demarre sur le port 5000 en mode development","service":"progease-api","timestamp":"2025-05-30 23:08:20"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-api","timestamp":"2025-05-30 23:08:20"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-api","timestamp":"2025-05-30 23:08:20"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-30 23:08:24"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-30 23:08:24"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-30 23:08:24"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-30 23:08:25"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-30 23:08:25"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-30 23:08:25"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-30 23:24:04"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-30 23:24:04"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-30 23:24:04"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-30 23:24:05"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-30 23:24:05"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-30 23:24:06"}
+{"level":"info","message":"Donnees de test creees/verifiees avec succes","service":"progease-api","timestamp":"2025-05-30 23:24:06"}
+{"level":"info","message":"Serveur Express demarre sur le port 5000 en mode development","service":"progease-api","timestamp":"2025-05-30 23:24:06"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-api","timestamp":"2025-05-30 23:24:06"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-api","timestamp":"2025-05-30 23:24:06"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-30 23:25:02"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-30 23:25:02"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-30 23:25:02"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-30 23:25:03"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-30 23:25:03"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-30 23:25:04"}
+{"level":"info","message":"Donnees de test creees/verifiees avec succes","service":"progease-api","timestamp":"2025-05-30 23:25:04"}
+{"level":"info","message":"Serveur Express demarre sur le port 5000 en mode development","service":"progease-api","timestamp":"2025-05-30 23:25:04"}
+{"level":"info","message":"API REST disponible sur http://localhost:5000/api","service":"progease-api","timestamp":"2025-05-30 23:25:04"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5000/graphql","service":"progease-api","timestamp":"2025-05-30 23:25:04"}

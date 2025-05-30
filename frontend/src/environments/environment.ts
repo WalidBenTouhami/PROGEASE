@@ -1,9 +1,9 @@
 export const environment = {
   production: false,
+  appName: 'PROGEASE',
+  version: '2.0.0',
   apiUrl: 'http://localhost:5003/api',
   graphqlUrl: 'http://localhost:5003/graphql',
-  version: '2.0.0',
-  appName: 'PROGEASE',
   defaultLanguage: 'fr',
   supportedLanguages: ['fr', 'en'],
   pagination: {
