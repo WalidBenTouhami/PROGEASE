@@ -47,7 +47,7 @@ export class ProjetFormComponent implements OnInit {
       description: ['', Validators.required],
       equipe: [[]],
       tuteur: [''],
-      competences: this.fb.array([]),
+      competences: ['', Validators.required],
       dateDebut: ['', Validators.required],
       dateFin: ['', Validators.required],
       statut: [StatutProjet.BROUILLON, Validators.required]
@@ -55,24 +55,12 @@ export class ProjetFormComponent implements OnInit {
   }
 
   private updateFormWithProjet(projet: Projet): void {
-    // Reset competences FormArray
-    while (this.competences.length) {
-      this.competences.removeAt(0);
-    }
-
-    // Add each competence to FormArray
-    if (projet.competences && projet.competences.length) {
-      projet.competences.forEach(comp => {
-        this.competences.push(this.fb.control(comp));
-      });
-    }
-
-    // Update form values
     this.projetForm.patchValue({
       titre: projet.titre,
       description: projet.description,
       equipe: projet.equipe,
       tuteur: projet.tuteur,
+      competences: projet.competences ? projet.competences.join(',') : '',
       dateDebut: this.formatDateForInput(projet.dateDebut),
       dateFin: this.formatDateForInput(projet.dateFin),
       statut: projet.statut
@@ -84,18 +72,6 @@ export class ProjetFormComponent implements OnInit {
     return d.toISOString().split('T')[0];
   }
 
-  get competences(): FormArray {
-    return this.projetForm.get('competences') as FormArray;
-  }
-
-  addCompetence(): void {
-    this.competences.push(this.fb.control(''));
-  }
-
-  removeCompetence(index: number): void {
-    this.competences.removeAt(index);
-  }
-
   onSubmit(): void {
     if (this.projetForm.invalid) return;
 
@@ -105,7 +81,7 @@ export class ProjetFormComponent implements OnInit {
       description: formValue.description,
       equipe: formValue.equipe || [],
       tuteur: formValue.tuteur,
-      competences: formValue.competences.filter((c: string) => c.trim() !== ''),
+      competences: (formValue.competences || '').split(',').map((c: string) => c.trim()).filter((c: string) => c),
       dateDebut: new Date(formValue.dateDebut),
       dateFin: new Date(formValue.dateFin),
       livrables: [], // Sera rempli séparément

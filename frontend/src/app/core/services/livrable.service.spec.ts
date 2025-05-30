@@ -24,8 +24,8 @@ describe('LivrableService', () => {
     majLe: new Date()
   };
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
       providers: [
         LivrableService,
         provideHttpClient(),
@@ -42,7 +42,7 @@ describe('LivrableService', () => {
     httpMock.verify();
   });
 
-  it('doit récupérer tous les livrables', () => {
+  it('doit récupérer tous les livrables', async () => {
     service.getAllLivrables().subscribe((livrables: Livrable[]) => {
       expect(livrables.length).toBe(1);
       expect(livrables[0].intitule).toBe('Livrable 1');
@@ -53,7 +53,7 @@ describe('LivrableService', () => {
     req.flush([mockLivrable]);
   });
 
-  it('doit récupérer un livrable par ID', () => {
+  it('doit récupérer un livrable par ID', async () => {
     service.recupererLivrable('1').subscribe((livrable: Livrable) => {
       expect(livrable._id).toBe('1');
       expect(livrable.intitule).toBe('Livrable 1');
@@ -64,7 +64,7 @@ describe('LivrableService', () => {
     req.flush(mockLivrable);
   });
 
-  it('doit créer un livrable', () => {
+  it('doit créer un livrable', async () => {
     service.creerLivrable(mockLivrable).subscribe((livrable: Livrable) => {
       expect(livrable.intitule).toBe('Livrable 1');
     });
@@ -74,7 +74,7 @@ describe('LivrableService', () => {
     req.flush(mockLivrable);
   });
 
-  it('doit mettre à jour un livrable', () => {
+  it('doit mettre à jour un livrable', async () => {
     const updated = { ...mockLivrable, intitule: 'Livrable Modifié' };
     service.mettreAJourLivrable('1', updated).subscribe((livrable: Livrable) => {
       expect(livrable.intitule).toBe('Livrable Modifié');
@@ -85,7 +85,7 @@ describe('LivrableService', () => {
     req.flush(updated);
   });
 
-  it('doit supprimer un livrable', () => {
+  it('doit supprimer un livrable', async () => {
     service.supprimerLivrable('1').subscribe((response: any) => {
       expect(response).toBeTruthy();
     });
@@ -95,7 +95,7 @@ describe('LivrableService', () => {
     req.flush({ success: true });
   });
 
-  it('doit gérer une erreur serveur (500)', () => {
+  it('doit gérer une erreur serveur (500)', async () => {
     service.getAllLivrables().subscribe({
       next: () => fail('appel devait échouer'),
       error: (err: any) => {
