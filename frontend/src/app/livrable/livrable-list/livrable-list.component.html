@@ -8,9 +8,9 @@
     <li *ngFor="let livrable of livrables">
       <span class="livrable-intitule">{{ livrable.intitule }}</span>
       <span class="status" [ngClass]="{
-        'termine': livrable.statut === 'termine',
-        'attente': livrable.statut === 'en_attente',
-        'retard': livrable.statut === 'en_retard'
+        'termine': livrable.statut === StatutLivrable.TERMINE,
+        'attente': livrable.statut === StatutLivrable.EN_ATTENTE,
+        'retard': livrable.statut === StatutLivrable.EN_RETARD
       }">{{ livrable.statut }}</span>
       <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant le <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
       <!-- <span *ngIf="livrable.urlDepot">

@@ -1,9 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ProjetService } from '../../core/services/projet.service';
-import { Projet } from '../../core/models/projet.model';
+import { Projet, StatutProjet } from '../../core/models/projet.model';
 import { Subscription } from 'rxjs';
+import { MatTableDataSource } from '@angular/material/table';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-projet-list',
@@ -12,19 +16,38 @@ import { Subscription } from 'rxjs';
   templateUrl: './projet-list.component.html',
   styleUrls: ['./projet-list.component.css']
 })
-export class ProjetListComponent implements OnInit, OnDestroy {
+export class ProjetListComponent implements OnInit, OnDestroy, AfterViewInit {
   projets: Projet[] = [];
   chargement = false;
   erreur = '';
   private subscription?: Subscription;
+  searchTerm = '';
+  selectedStatus = '';
+  statuts = Object.values(StatutProjet);
+  displayedColumns: string[] = ['titre', 'description', 'statut', 'dateDebut', 'dateFin', 'actions'];
+  dataSource = new MatTableDataSource<Projet>();
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+  get projetsFiltres() {
+    const filtered = this.projets
+      .filter(p => !this.searchTerm || p.titre.toLowerCase().includes(this.searchTerm.toLowerCase()))
+      .filter(p => !this.selectedStatus || p.statut === this.selectedStatus);
+    this.dataSource.data = filtered;
+    return filtered;
+  }
 
   constructor(
     private projetService: ProjetService,
-    private router: Router
+    private router: Router,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {
     this.chargerProjets();
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
   }
 
   chargerProjets() {
@@ -33,6 +56,7 @@ export class ProjetListComponent implements OnInit, OnDestroy {
       next: (projets) => {
         this.projets = projets;
         this.chargement = false;
+        this.dataSource.data = projets;
       },
       error: (err) => {
         this.erreur = "Erreur lors du chargement des projets.";
@@ -44,6 +68,7 @@ export class ProjetListComponent implements OnInit, OnDestroy {
 
   voirDetails(id: string) {
     this.router.navigate(['/projet', id]);
+    this.snackBar.open('Consultation du projet ' + id, 'Fermer', { duration: 2000 });
   }
 
   ngOnDestroy() {

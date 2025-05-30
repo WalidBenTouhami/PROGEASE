@@ -1,2 +1,28 @@
-<h2>Gestion des livrables</h2>
-<p>Section pour la gestion et le suivi des livrables.</p>
+<mat-card>
+  <h2>Gestion des livrables</h2>
+  <mat-form-field appearance="outline" style="width: 250px; margin-right: 1rem;">
+    <mat-label>Rechercher un livrable...</mat-label>
+    <input matInput [(ngModel)]="searchTerm" placeholder="Intitulé du livrable">
+  </mat-form-field>
+  <mat-form-field appearance="outline" style="width: 180px;">
+    <mat-label>Statut</mat-label>
+    <mat-select [(ngModel)]="selectedStatus">
+      <mat-option value="">Tous</mat-option>
+      <mat-option *ngFor="let status of statuts" [value]="status">{{ status }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-list *ngIf="livrablesFiltres.length">
+    <mat-list-item *ngFor="let livrable of livrablesFiltres">
+      <mat-icon matListIcon color="primary">description</mat-icon>
+      <span>{{ livrable.intitule }}</span>
+      <span matBadge="{{ livrable.statut }}" matBadgeColor="accent" matBadgeSize="medium" class="stat-badge"></span>
+      <span *ngIf="livrable.dateLimite">&nbsp;- À rendre avant <time [attr.datetime]="livrable.dateLimite">{{ livrable.dateLimite | date:'shortDate' }}</time></span>
+      <span class="actions">
+        <button mat-icon-button color="primary" aria-label="Éditer"><mat-icon>edit</mat-icon></button>
+        <button mat-icon-button color="warn" aria-label="Supprimer"><mat-icon>delete</mat-icon></button>
+      </span>
+    </mat-list-item>
+  </mat-list>
+  <p *ngIf="livrablesFiltres.length === 0">Aucun livrable trouvé.</p>
+</mat-card>

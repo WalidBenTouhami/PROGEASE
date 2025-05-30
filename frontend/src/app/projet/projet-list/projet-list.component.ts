@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Projet } from '../../core/models/projet.model';
+import { Projet, StatutProjet } from '../../core/models/projet.model';
 import { ProjetService } from '../../core/services/projet.service';
 
 @Component({
@@ -17,6 +17,7 @@ export class ProjetListComponent implements OnInit, OnDestroy {
   erreur = '';
   projets: (Projet & { _id: string })[] = [];
   private subscription?: Subscription;
+  StatutProjet = StatutProjet;
 
   constructor(
     private projetService: ProjetService,

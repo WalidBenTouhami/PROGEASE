@@ -5,6 +5,7 @@ import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { routes } from './app.routes';
 import { provideClientHydration } from '@angular/platform-browser';
 import { apolloProviders } from './core/apollo.config';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -14,6 +15,6 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(
       withInterceptors([authInterceptor])
     ),
-    ...apolloProviders
+    ...apolloProviders, provideAnimationsAsync()
   ]
 };

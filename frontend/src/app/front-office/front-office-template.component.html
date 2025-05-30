@@ -1,14 +1,14 @@
 <div class="frontoffice-layout">
-  <header class="fo-header">
+  <mat-toolbar color="primary" class="fo-header">
+    <button mat-icon-button class="hide-desktop" (click)="sidenav.toggle()"><mat-icon>menu</mat-icon></button>
     <img src="assets/PROGEASE.png" alt="PROGEASE Logo" class="fo-logo" />
     <span class="fo-title">PROGEASE</span>
-    <nav class="fo-nav">
-      <a routerLink="/front-office/dashboard" routerLinkActive="active">Dashboard</a>
-      <a routerLink="/front-office/projets" routerLinkActive="active">Projets</a>
-      <a routerLink="/front-office/livrables" routerLinkActive="active">Livrables</a>
-      <a routerLink="/front-office/profile" routerLinkActive="active">Profil</a>
-    </nav>
-  </header>
+    <span class="spacer"></span>
+    <a mat-button routerLink="/front-office/dashboard" routerLinkActive="active"><mat-icon>dashboard</mat-icon> Dashboard</a>
+    <a mat-button routerLink="/front-office/projets" routerLinkActive="active"><mat-icon>assignment</mat-icon> Projets</a>
+    <a mat-button routerLink="/front-office/livrables" routerLinkActive="active"><mat-icon>fact_check</mat-icon> Livrables</a>
+    <a mat-button routerLink="/front-office/profile" routerLinkActive="active"><mat-icon>account_circle</mat-icon> Profil</a>
+  </mat-toolbar>
   <main class="fo-main">
     <router-outlet></router-outlet>
   </main>

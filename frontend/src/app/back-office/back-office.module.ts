@@ -4,19 +4,21 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BackOfficeRoutingModule } from './back-office-routing.module';
 import { ProjetManagementComponent } from './projet-management/projet-management.component';
 import { LivrableManagementComponent } from './livrable-management/livrable-management.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { BackOfficeDashboardComponent } from './dashboard/dashboard.component';
+
 
 @NgModule({
   declarations: [
-    ProjetManagementComponent,
-    LivrableManagementComponent
+    
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     BackOfficeRoutingModule,
-    DashboardComponent // standalone component
+    BackOfficeDashboardComponent, // standalone component
+    ProjetManagementComponent, // standalone component
+    LivrableManagementComponent // standalone component
   ]
 })
 export class BackOfficeModule {}

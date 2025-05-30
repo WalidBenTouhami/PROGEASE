@@ -3,11 +3,15 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
 import { LivrableService } from '../../core/services/livrable.service';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-livrable-list',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatFormFieldModule, MatInputModule, MatTableModule, MatPaginatorModule],
   templateUrl: './livrable-list.component.html',
   styleUrl: './livrable-list.component.css'
 })
@@ -16,9 +20,18 @@ export class LivrableListComponent implements OnInit {
   livrables: Livrable[] = [];
   chargement = false;
   erreur = '';
+  searchTerm = '';
+  selectedStatus = '';
+  statuts = Object.values(StatutLivrable);
 
   // Exposer l'énumération pour le template
   StatutLivrable = StatutLivrable;
+
+  get livrablesFiltres() {
+    return this.livrables
+      .filter(l => !this.searchTerm || l.intitule.toLowerCase().includes(this.searchTerm.toLowerCase()))
+      .filter(l => !this.selectedStatus || l.statut === this.selectedStatus);
+  }
 
   constructor(private livrableService: LivrableService) {}
 
@@ -50,5 +63,10 @@ export class LivrableListComponent implements OnInit {
 
   isTermine(statut: StatutLivrable): boolean {
     return statut === StatutLivrable.TERMINE;
+  }
+
+  // Generic status checker for template
+  isStatus(statut: StatutLivrable, status: StatutLivrable): boolean {
+    return statut === status;
   }
 }

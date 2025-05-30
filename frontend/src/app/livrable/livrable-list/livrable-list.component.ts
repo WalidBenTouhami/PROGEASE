@@ -2,7 +2,7 @@ import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
-import { Livrable } from '../../core/models/livrable.model';
+import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
 import { LivrableService } from '../../core/services/livrable.service';
 
 @Component({
@@ -18,6 +18,7 @@ export class LivrableListComponent implements OnInit, OnDestroy {
   erreur = '';
   livrables: Livrable[] = [];
   private subscription?: Subscription;
+  StatutLivrable = StatutLivrable;
 
   constructor(
     private livrableService: LivrableService,

@@ -30,13 +30,13 @@ interface Template {
 }
 
 @Component({
-  selector: 'app-dashboard',
+  selector: 'app-frontoffice-dashboard',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
+export class FrontOfficeDashboardComponent implements OnInit {
   projets: Projet[] = [];
   notifications: Notification[] = [];
   livrables: Livrable[] = [];

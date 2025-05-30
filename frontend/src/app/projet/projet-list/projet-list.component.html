@@ -8,10 +8,10 @@
     <li *ngFor="let projet of projets">
       <a (click)="voirDetails(projet._id)" tabindex="0">{{ projet.titre }}</a>
       <span class="status" [ngClass]="{
-        'encours': projet.statut === 'en_cours',
-        'termine': projet.statut === 'termine',
-        'brouillon': projet.statut === 'brouillon',
-        'archive': projet.statut === 'archive'
+        'encours': projet.statut === StatutProjet.EN_COURS,
+        'termine': projet.statut === StatutProjet.TERMINE,
+        'brouillon': projet.statut === StatutProjet.BROUILLON,
+        'archive': projet.statut === StatutProjet.ARCHIVE
       }">{{ projet.statut }}</span>
     </li>
   </ul>

@@ -39,3 +39,17 @@ a:hover {
   color: #F44336;
   margin-bottom: 1rem;
 }
+
+.stat-badge {
+  margin-left: 1rem;
+  font-size: 1.1em;
+}
+
+mat-list-item {
+  align-items: center;
+  font-size: 1.1em;
+}
+
+mat-form-field {
+  margin-bottom: 1.2rem;
+}
