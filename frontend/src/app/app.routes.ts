@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { ApiTestComponent } from './core/api-test/api-test.component';
+import { ApiTesterComponent } from './core/components/api-tester/api-tester.component';
 
 export const routes: Routes = [
   { path: 'back-office', loadChildren: () => import('./back-office/back-office.module').then(m => m.BackOfficeModule) },
@@ -10,4 +11,8 @@ export const routes: Routes = [
   { path: '**', redirectTo: 'front-office' },
   // Route de test
   { path: 'test-api', component: ApiTestComponent },
+  {
+    path: 'api-test',
+    component: ApiTesterComponent
+  },
 ];

@@ -5,6 +5,7 @@ import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
 import { routes } from './app-routing.module';
 import { apolloProviders } from './core/apollo.config';
+import { ApiTesterComponent } from './core/components/api-tester/api-tester.component';
 
 bootstrapApplication(AppComponent, {
   providers: [
