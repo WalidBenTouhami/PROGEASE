@@ -92,6 +92,17 @@ const projetSchema = new Schema({
         default: Enum.StatutProjet.BROUILLON,
         index: true
     },
+    urlDepot: {
+        type: String,
+        trim: true,
+        validate: {
+            validator: function(v) {
+                return !v || /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/.test(v);
+            },
+            message: props => `${props.value} n'est pas une URL valide!`
+        }
+    }
+},
     progression: {
         type: Number,
         min: [0, 'La progression ne peut pas etre negative.'],
