@@ -3,18 +3,18 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 
-import { DashboardComponent } from './dashboard.component';
+import { BackOfficeDashboardComponent } from './dashboard.component';
 
-describe('DashboardComponent', () => {
-  let component: DashboardComponent;
-  let fixture: ComponentFixture<DashboardComponent>;
+describe('BackOfficeDashboardComponent', () => {
+  let component: BackOfficeDashboardComponent;
+  let fixture: ComponentFixture<FrontOfficeDashboardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        DashboardComponent
+        FrontOfficeDashboardComponent
       ],
       providers: [
         { provide: ActivatedRoute, useValue: { snapshot: {}, params: {} } }
@@ -22,7 +22,7 @@ describe('DashboardComponent', () => {
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(DashboardComponent);
+    fixture = TestBed.createComponent(FrontOfficeDashboardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

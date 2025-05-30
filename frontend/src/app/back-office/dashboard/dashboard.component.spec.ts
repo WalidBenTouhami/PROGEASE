@@ -1,26 +1,26 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { DashboardComponent } from './dashboard.component';
+import { BackOfficeDashboardComponent } from './dashboard.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ActivatedRoute } from '@angular/router';
 
-describe('DashboardComponent', () => {
-  let component: DashboardComponent;
-  let fixture: ComponentFixture<DashboardComponent>;
+describe('BackOfficeDashboardComponent', () => {
+  let component: BackOfficeDashboardComponent;
+  let fixture: ComponentFixture<BackOfficeDashboardComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        DashboardComponent
+        BackOfficeDashboardComponent
       ],
       providers: [
         { provide: ActivatedRoute, useValue: { snapshot: {}, params: {} } }
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(DashboardComponent);
+    fixture = TestBed.createComponent(BackOfficeDashboardComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
