@@ -1,38 +1,118 @@
-<mat-sidenav-container class="backoffice-layout">
-  <mat-sidenav #sidenav mode="side" opened class="bo-sidebar">
-    <mat-toolbar color="primary" class="bo-toolbar">PROGEASE</mat-toolbar>
+<mat-sidenav-container class="backoffice-layout" role="main">
+  <mat-sidenav #sidenav mode="side" opened class="bo-sidebar" role="navigation">
+    <div class="bo-sidebar-header">
+      <img src="assets/PROGEASE.png" 
+           alt="PROGEASE Logo" 
+           class="bo-logo-small"
+           loading="lazy" />
+      <span class="bo-sidebar-title">PROGEASE</span>
+    </div>
+
     <mat-nav-list>
-      <a mat-list-item routerLink="/back-office/dashboard" routerLinkActive="active">
-        <mat-icon>dashboard</mat-icon> Dashboard
+      <a mat-list-item 
+         routerLink="/back-office/dashboard" 
+         routerLinkActive="active"
+         matTooltip="Tableau de bord administrateur"
+         aria-label="Dashboard">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
       </a>
-      <a mat-list-item routerLink="/back-office/projet-management" routerLinkActive="active">
-        <mat-icon>assignment</mat-icon> Gestion Projets
+
+      <a mat-list-item 
+         routerLink="/back-office/projet-management" 
+         routerLinkActive="active"
+         matTooltip="Gérer les projets"
+         aria-label="Gestion des projets">
+        <mat-icon>assignment</mat-icon>
+        <span>Gestion Projets</span>
       </a>
-      <a mat-list-item routerLink="/back-office/livrable-management" routerLinkActive="active">
-        <mat-icon>fact_check</mat-icon> Gestion Livrables
+
+      <a mat-list-item 
+         routerLink="/back-office/livrable-management" 
+         routerLinkActive="active"
+         matTooltip="Gérer les livrables"
+         aria-label="Gestion des livrables">
+        <mat-icon>fact_check</mat-icon>
+        <span>Gestion Livrables</span>
       </a>
-      <a mat-list-item routerLink="/back-office/users" routerLinkActive="active">
-        <mat-icon>group</mat-icon> Utilisateurs
+
+      <a mat-list-item 
+         routerLink="/back-office/users" 
+         routerLinkActive="active"
+         matTooltip="Gérer les utilisateurs"
+         aria-label="Gestion des utilisateurs">
+        <mat-icon>group</mat-icon>
+        <span>Utilisateurs</span>
       </a>
-      <a mat-list-item routerLink="/back-office/settings" routerLinkActive="active">
-        <mat-icon>settings</mat-icon> Paramètres
+
+      <a mat-list-item 
+         routerLink="/back-office/settings" 
+         routerLinkActive="active"
+         matTooltip="Paramètres de l'application"
+         aria-label="Paramètres">
+        <mat-icon>settings</mat-icon>
+        <span>Paramètres</span>
       </a>
     </mat-nav-list>
   </mat-sidenav>
   <mat-sidenav-content>
-    <mat-toolbar color="primary" class="bo-header">
-      <button mat-icon-button (click)="sidenav.toggle()" class="hide-desktop"><mat-icon>menu</mat-icon></button>
-      <img src="assets/PROGEASE.png" alt="PROGEASE Logo" class="bo-logo" />
+    <mat-toolbar color="primary" class="bo-header" role="banner">
+      <button mat-icon-button 
+              (click)="sidenav.toggle()" 
+              class="hide-desktop"
+              matTooltip="Toggle menu"
+              aria-label="Toggle navigation menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <img src="assets/PROGEASE.png" 
+           alt="PROGEASE Logo" 
+           class="bo-logo" 
+           loading="lazy" />
+
       <span class="bo-title">PROGEASE Back-Office</span>
       <span class="spacer"></span>
-      <button mat-button><mat-icon>account_circle</mat-icon> Profil</button>
-      <button mat-button color="warn"><mat-icon>logout</mat-icon> Déconnexion</button>
+
+      <div class="bo-user-menu">
+        <button mat-button 
+                [matMenuTriggerFor]="userMenu"
+                aria-label="Menu utilisateur">
+          <mat-icon>account_circle</mat-icon>
+          <span>Admin</span>
+          <mat-icon>arrow_drop_down</mat-icon>
+        </button>
+        
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item routerLink="/back-office/profile">
+            <mat-icon>person</mat-icon>
+            <span>Profil</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Déconnexion</span>
+          </button>
+        </mat-menu>
+      </div>
     </mat-toolbar>
-    <main class="bo-main">
-      <router-outlet></router-outlet>
+    <main class="bo-main" [@fadeAnimation]="o.isActivated ? o.activatedRoute : ''">
+      <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+      
+      <router-outlet #o="outlet"></router-outlet>
+
+      <button mat-fab 
+              class="back-to-top" 
+              (click)="scrollToTop()" 
+              *ngIf="showBackToTop"
+              matTooltip="Retour en haut"
+              aria-label="Retourner en haut de la page">
+        <mat-icon>arrow_upward</mat-icon>
+      </button>
     </main>
-    <footer class="bo-footer">
-      &copy; {{ new Date().getFullYear() }} PROGEASE - Back-Office
+    <footer class="bo-footer" role="contentinfo">
+      <div class="footer-content">
+        &copy; {{ currentYear }} PROGEASE - Back-Office
+        <span class="version">v{{version}}</span>
+      </div>
     </footer>
   </mat-sidenav-content>
 </mat-sidenav-container>
