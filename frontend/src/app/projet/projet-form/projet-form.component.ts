@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { ProjetService } from '../../core/services/projet.service';
 import { Projet, StatutProjet } from '../../core/models/projet.model';
 import { Observable } from 'rxjs';
@@ -9,6 +10,7 @@ import { Observable } from 'rxjs';
   selector: 'app-projet-form',
   templateUrl: './projet-form.component.html',
   standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   styleUrls: ['./projet-form.component.css'],
 })
 export class ProjetFormComponent implements OnInit {
@@ -33,7 +35,7 @@ export class ProjetFormComponent implements OnInit {
     this.projetId = this.route.snapshot.paramMap.get('id');
     if (this.projetId) {
       this.isEditing = true;
-      this.projetService.getProjetById(this.projetId).subscribe(projet => {
+      this.projetService.recupererProjetParId(this.projetId).subscribe(projet => {
         this.updateFormWithProjet(projet);
       });
     }
@@ -101,26 +103,31 @@ export class ProjetFormComponent implements OnInit {
     const projet: Projet = {
       titre: formValue.titre,
       description: formValue.description,
-      equipe: formValue.equipe,
+      equipe: formValue.equipe || [],
       tuteur: formValue.tuteur,
       competences: formValue.competences.filter((c: string) => c.trim() !== ''),
       dateDebut: new Date(formValue.dateDebut),
       dateFin: new Date(formValue.dateFin),
-      livrables: [], // Will be filled by livrable form
+      livrables: [], // Sera rempli séparément
       statut: formValue.statut
     };
 
     let action$: Observable<Projet>;
 
     if (this.isEditing && this.projetId) {
-      action$ = this.projetService.updateProjet(this.projetId, projet);
+      action$ = this.projetService.mettreAJourProjet(this.projetId, projet);
     } else {
-      action$ = this.projetService.createProjet(projet);
+      action$ = this.projetService.creerProjet(projet);
     }
 
     action$.subscribe({
       next: () => this.router.navigate(['/projets']),
       error: (error) => console.error('Error saving project:', error)
     });
+  }
+
+  // Placeholder pour le chargement des utilisateurs (à implémenter selon vos besoins)
+  private loadUsers() {
+    this.availableUsers = [];
   }
 }

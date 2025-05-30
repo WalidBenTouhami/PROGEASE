@@ -12,7 +12,7 @@ export class ProjetService {
 
   constructor(private http: HttpClient) { }
 
-  getAllProjets(): Observable<Projet[]> {
+  recupererProjets(): Observable<Projet[]> {
     return this.http.get<Projet[]>(this.apiUrl).pipe(
       map(projets => projets.map(projet => ({
         ...projet,
@@ -24,7 +24,7 @@ export class ProjetService {
     );
   }
 
-  getProjetById(id: string): Observable<Projet> {
+  recupererProjetParId(id: string): Observable<Projet> {
     return this.http.get<Projet>(`${this.apiUrl}/${id}`).pipe(
       map(projet => ({
         ...projet,
@@ -36,19 +36,26 @@ export class ProjetService {
     );
   }
 
-  createProjet(projet: Projet): Observable<Projet> {
+  creerProjet(projet: Projet): Observable<Projet> {
     return this.http.post<Projet>(this.apiUrl, projet);
   }
 
-  updateProjet(id: string, projet: Projet): Observable<Projet> {
+  mettreAJourProjet(id: string, projet: Projet): Observable<Projet> {
     return this.http.put<Projet>(`${this.apiUrl}/${id}`, projet);
   }
 
-  deleteProjet(id: string): Observable<void> {
+  supprimerProjet(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   getStatutOptions(): string[] {
     return Object.values(StatutProjet);
   }
+
+  // Maintenir les alias pour la compatibilité
+  getAllProjets = this.recupererProjets;
+  getProjetById = this.recupererProjetParId;
+  createProjet = this.creerProjet;
+  updateProjet = this.mettreAJourProjet;
+  deleteProjet = this.supprimerProjet;
 }

@@ -17,6 +17,9 @@ export class LivrableListComponent implements OnInit {
   chargement = false;
   erreur = '';
 
+  // Exposer l'énumération pour le template
+  StatutLivrable = StatutLivrable;
+
   constructor(private livrableService: LivrableService) {}
 
   ngOnInit() {
@@ -27,7 +30,8 @@ export class LivrableListComponent implements OnInit {
           this.livrables = livrables;
           this.chargement = false;
         },
-        error: () => {
+        error: (err) => {
+          console.error('Erreur lors du chargement des livrables:', err);
           this.erreur = "Erreur lors du chargement des livrables.";
           this.chargement = false;
         }
@@ -35,8 +39,16 @@ export class LivrableListComponent implements OnInit {
     }
   }
 
-  // Helper method to check status
-  isStatus(status: StatutLivrable, expectedStatus: string): boolean {
-    return status.toLowerCase() === expectedStatus.toLowerCase();
+  // Fonctions utilitaires pour le template
+  isEnAttente(statut: StatutLivrable): boolean {
+    return statut === StatutLivrable.EN_ATTENTE;
+  }
+
+  isEnRetard(statut: StatutLivrable): boolean {
+    return statut === StatutLivrable.EN_RETARD;
+  }
+
+  isTermine(statut: StatutLivrable): boolean {
+    return statut === StatutLivrable.TERMINE;
   }
 }

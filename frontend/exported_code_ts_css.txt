@@ -137,12 +137,16 @@ export class AppRoutingModule {}
 // ======= Contenu de src/app/app.component.spec.ts =======
 
 import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AppComponent],
+      imports: [
+        RouterTestingModule,
+        AppComponent
+      ],
     }).compileComponents();
   });
 
@@ -273,6 +277,129 @@ const routes: Routes = [
 export class BackOfficeRoutingModule {}
 
 
+// ======= Contenu de src/app/back-office/back-office-template.component.css =======
+
+/* PROGEASE Back-Office Template Styles */
+.backoffice-layout {
+  display: grid;
+  grid-template-areas:
+    'header header'
+    'sidebar main'
+    'footer footer';
+  grid-template-columns: 220px 1fr;
+  grid-template-rows: 64px 1fr 40px;
+  min-height: 100vh;
+  background: #101624;
+  color: #e0e6ef;
+}
+.bo-header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  background: #18223a;
+  padding: 0 2rem;
+  height: 64px;
+  box-shadow: 0 2px 8px #0002;
+}
+.bo-logo {
+  height: 48px;
+  margin-right: 1rem;
+}
+.bo-title {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #2ed8c3;
+  letter-spacing: 2px;
+  flex: 1;
+}
+.bo-user-menu a {
+  color: #ffd700;
+  margin-left: 1rem;
+  text-decoration: none;
+  font-weight: 500;
+}
+.bo-sidebar {
+  grid-area: sidebar;
+  background: #16203a;
+  padding: 2rem 1rem 1rem 1rem;
+  min-width: 200px;
+  box-shadow: 2px 0 8px #0002;
+}
+.bo-sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+.bo-sidebar li {
+  margin-bottom: 1.2rem;
+}
+.bo-sidebar a {
+  color: #e0e6ef;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: color 0.2s;
+}
+.bo-sidebar a.active, .bo-sidebar a:hover {
+  color: #ffd700;
+  font-weight: bold;
+}
+.bo-main {
+  grid-area: main;
+  padding: 2rem;
+  background: #151b2b;
+  min-height: 400px;
+}
+.bo-footer {
+  grid-area: footer;
+  background: #18223a;
+  color: #ffd700;
+  text-align: center;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+}
+@media (max-width: 900px) {
+  .backoffice-layout {
+    grid-template-columns: 60px 1fr;
+  }
+  .bo-sidebar {
+    padding: 1rem 0.5rem;
+    min-width: 60px;
+  }
+  .bo-title {
+    font-size: 1.1rem;
+  }
+}
+@media (max-width: 600px) {
+  .backoffice-layout {
+    grid-template-areas:
+      'header'
+      'main'
+      'footer';
+    grid-template-columns: 1fr;
+    grid-template-rows: 56px 1fr 36px;
+  }
+  .bo-sidebar {
+    display: none;
+  }
+  .bo-header {
+    padding: 0 1rem;
+    height: 56px;
+  }
+  .bo-main {
+    padding: 1rem;
+  }
+} 
+
+// ======= Contenu de src/app/back-office/back-office-template.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-back-office-template',
+  templateUrl: './back-office-template.component.html',
+  styleUrls: ['./back-office-template.component.css']
+})
+export class BackOfficeTemplateComponent {} 
+
 // ======= Contenu de src/app/back-office/back-office.module.ts =======
 
 import { NgModule } from '@angular/core';
@@ -355,33 +482,35 @@ button:hover { background: #174bb3; }
 // ======= Contenu de src/app/back-office/dashboard/dashboard.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+      import { RouterTestingModule } from '@angular/router/testing';
+      import { DashboardComponent } from './dashboard.component';
 
-import { DashboardComponent } from './dashboard.component';
+      describe('DashboardComponent', () => {
+        let component: DashboardComponent;
+        let fixture: ComponentFixture<DashboardComponent>;
 
-describe('DashboardComponent', () => {
-  let component: DashboardComponent;
-  let fixture: ComponentFixture<DashboardComponent>;
+        beforeEach(async () => {
+          await TestBed.configureTestingModule({
+            imports: [
+              RouterTestingModule,
+              DashboardComponent
+            ]
+          }).compileComponents();
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [DashboardComponent]
-    })
-      .compileComponents();
+          fixture = TestBed.createComponent(DashboardComponent);
+          component = fixture.componentInstance;
+          fixture.detectChanges();
+        });
 
-    fixture = TestBed.createComponent(DashboardComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+        it('should create', () => {
+          expect(component).toBeTruthy();
+        });
+      });
 
 
 // ======= Contenu de src/app/back-office/dashboard/dashboard.component.ts =======
 
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
@@ -392,23 +521,25 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent {
-  users = [{ nom: 'Jean', role: 'Administrateur' }];
+export class DashboardComponent implements OnInit {
   roles = ['Administrateur', 'Tuteur', 'etudiant'];
-  projetTemplates = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
-  tutorPerformance: { nom?: string; score?: number }[] = [];
-  aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
+// Adding missing properties used in template
+  projetsAValider: number = 0;
+  livrablesACorriger: number = 0;
+  dernieresActions: Array<{ date: string; description: string }> = [];
 
-  openUserForm() {}
-  updateRole(user: any) {}
-  editUser(user: any) {}
-  deleteUser(user: any) {}
-  exportUsers() {}
-  importUsers() {}
+  ngOnInit() {
+    // Initialize dashboard data
+    this.projetsAValider = 5;
+    this.livrablesACorriger = 10;
+    this.dernieresActions = [
+      { date: '2024-03-20', description: 'Nouveau projet soumis' },
+      { date: '2024-03-19', description: 'Livrable corrige' }
+    ];
+  }
   createTemplate() {}
   editTemplate(template: any) {}
-  updateAICfg() {}
 }
 
 
@@ -428,28 +559,31 @@ p {
 // ======= Contenu de src/app/back-office/livrable-management/livrable-management.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+      import { RouterTestingModule } from '@angular/router/testing';
+      import { LivrableManagementComponent } from './livrable-management.component';
 
-import { LivrableManagementComponent } from './livrable-management.component';
+      describe('LivrableManagementComponent', () => {
+        let component: LivrableManagementComponent;
+        let fixture: ComponentFixture<LivrableManagementComponent>;
 
-describe('LivrableManagementComponent', () => {
-  let component: LivrableManagementComponent;
-  let fixture: ComponentFixture<LivrableManagementComponent>;
+        beforeEach(async () => {
+          await TestBed.configureTestingModule({
+            imports: [
+              RouterTestingModule,
+              LivrableManagementComponent
+            ]
+          })
+            .compileComponents();
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [LivrableManagementComponent]
-    })
-      .compileComponents();
+          fixture = TestBed.createComponent(LivrableManagementComponent);
+          component = fixture.componentInstance;
+          fixture.detectChanges();
+        });
 
-    fixture = TestBed.createComponent(LivrableManagementComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+        it('should create', () => {
+          expect(component).toBeTruthy();
+        });
+      });
 
 
 // ======= Contenu de src/app/back-office/livrable-management/livrable-management.component.ts =======
@@ -480,28 +614,31 @@ p {
 // ======= Contenu de src/app/back-office/projet-management/projet-management.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+  import { RouterTestingModule } from '@angular/router/testing';
+  import { ProjetManagementComponent } from './projet-management.component';
 
-import { ProjetManagementComponent } from './projet-management.component';
+  describe('ProjetManagementComponent', () => {
+    let component: ProjetManagementComponent;
+    let fixture: ComponentFixture<ProjetManagementComponent>;
 
-describe('ProjetManagementComponent', () => {
-  let component: ProjetManagementComponent;
-  let fixture: ComponentFixture<ProjetManagementComponent>;
+    beforeEach(async () => {
+      await TestBed.configureTestingModule({
+        imports: [
+          RouterTestingModule,
+          ProjetManagementComponent
+        ]
+      })
+        .compileComponents();
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ProjetManagementComponent]
-    })
-      .compileComponents();
+      fixture = TestBed.createComponent(ProjetManagementComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
 
-    fixture = TestBed.createComponent(ProjetManagementComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+    it('should create', () => {
+      expect(component).toBeTruthy();
+    });
   });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
 
 
 // ======= Contenu de src/app/back-office/projet-management/projet-management.component.ts =======
@@ -727,6 +864,312 @@ export const apolloProviders = [
 ];
 
 
+// ======= Contenu de src/app/core/generated/graphql.ts =======
+
+import { gql } from 'apollo-angular';
+import { Injectable } from '@angular/core';
+import * as Apollo from 'apollo-angular';
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+/** All built-in and custom scalars, mapped to their actual values */
+export type Scalars = {
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  /** Type Date personnalise */
+  Date: { input: any; output: any; }
+};
+
+export type AiRecommendationResult = {
+  recommendations?: Maybe<Array<Scalars['String']['output']>>;
+};
+
+export type AnalyseIa = {
+  entites?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  motsCles?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  resume?: Maybe<Scalars['String']['output']>;
+  score?: Maybe<Scalars['Float']['output']>;
+  sentiment?: Maybe<Scalars['String']['output']>;
+};
+
+export type AnalyzeTextOptions = {
+  language?: InputMaybe<Scalars['String']['input']>;
+  model?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AnalyzeTextResult = {
+  confidence?: Maybe<Scalars['Float']['output']>;
+  keywords?: Maybe<Array<Scalars['String']['output']>>;
+  language?: Maybe<Scalars['String']['output']>;
+  sentiment?: Maybe<Scalars['String']['output']>;
+  summary?: Maybe<Scalars['String']['output']>;
+};
+
+export type GenerateContentMetadata = {
+  generationTime?: Maybe<Scalars['String']['output']>;
+  modelUsed?: Maybe<Scalars['String']['output']>;
+  tokens?: Maybe<Scalars['Int']['output']>;
+};
+
+export type GenerateContentOptions = {
+  maxTokens?: InputMaybe<Scalars['Int']['input']>;
+  model?: InputMaybe<Scalars['String']['input']>;
+  temperature?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type GenerateContentResult = {
+  content?: Maybe<Scalars['String']['output']>;
+  metadata?: Maybe<GenerateContentMetadata>;
+};
+
+export type HealthCheckResult = {
+  message?: Maybe<Scalars['String']['output']>;
+  status?: Maybe<Scalars['String']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+  version?: Maybe<Scalars['String']['output']>;
+};
+
+export type Livrable = {
+  _id: Scalars['ID']['output'];
+  creeLe?: Maybe<Scalars['String']['output']>;
+  dateEcheance?: Maybe<Scalars['String']['output']>;
+  dateLimite?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  intitule: Scalars['String']['output'];
+  majLe?: Maybe<Scalars['String']['output']>;
+  nom: Scalars['String']['output'];
+  projet?: Maybe<Projet>;
+  projetId: Scalars['ID']['output'];
+  statut?: Maybe<Scalars['String']['output']>;
+  titre: Scalars['String']['output'];
+  urlDepot?: Maybe<Scalars['String']['output']>;
+};
+
+export type LivrableInput = {
+  dateEcheance?: InputMaybe<Scalars['String']['input']>;
+  dateLimite?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  intitule: Scalars['String']['input'];
+  nom?: InputMaybe<Scalars['String']['input']>;
+  projetId: Scalars['ID']['input'];
+  statut?: InputMaybe<Scalars['String']['input']>;
+  titre?: InputMaybe<Scalars['String']['input']>;
+  urlDepot?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type LivrableUpdateInput = {
+  dateEcheance?: InputMaybe<Scalars['String']['input']>;
+  dateLimite?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  intitule?: InputMaybe<Scalars['String']['input']>;
+  nom?: InputMaybe<Scalars['String']['input']>;
+  statut?: InputMaybe<Scalars['String']['input']>;
+  titre?: InputMaybe<Scalars['String']['input']>;
+  urlDepot?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Mutation = {
+  ajouterLivrable?: Maybe<Livrable>;
+  creerLivrable?: Maybe<Livrable>;
+  creerProjet?: Maybe<Projet>;
+  generateContent?: Maybe<GenerateContentResult>;
+  mettreAJourLivrable?: Maybe<Livrable>;
+  mettreAJourProjet?: Maybe<Projet>;
+  optimizeProjetDescription?: Maybe<OptimizeProjetDescriptionResult>;
+  ping?: Maybe<PingResult>;
+  supprimerLivrable?: Maybe<Livrable>;
+  supprimerProjet?: Maybe<Projet>;
+};
+
+
+export type MutationAjouterLivrableArgs = {
+  input: LivrableInput;
+  projetId: Scalars['ID']['input'];
+};
+
+
+export type MutationCreerLivrableArgs = {
+  input: LivrableInput;
+};
+
+
+export type MutationCreerProjetArgs = {
+  input: ProjetInput;
+};
+
+
+export type MutationGenerateContentArgs = {
+  contentType: Scalars['String']['input'];
+  options?: InputMaybe<GenerateContentOptions>;
+  prompt: Scalars['String']['input'];
+};
+
+
+export type MutationMettreAJourLivrableArgs = {
+  input: LivrableUpdateInput;
+  livrableId: Scalars['ID']['input'];
+};
+
+
+export type MutationMettreAJourProjetArgs = {
+  id: Scalars['ID']['input'];
+  input: ProjetInput;
+};
+
+
+export type MutationOptimizeProjetDescriptionArgs = {
+  options?: InputMaybe<OptimizeProjetDescriptionOptions>;
+  projetId: Scalars['ID']['input'];
+};
+
+
+export type MutationPingArgs = {
+  message?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationSupprimerLivrableArgs = {
+  livrableId: Scalars['ID']['input'];
+};
+
+
+export type MutationSupprimerProjetArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type OptimizeProjetDescriptionOptions = {
+  language?: InputMaybe<Scalars['String']['input']>;
+  style?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type OptimizeProjetDescriptionResult = {
+  improvements?: Maybe<Array<Scalars['String']['output']>>;
+  optimizedDescription?: Maybe<Scalars['String']['output']>;
+  originalDescription?: Maybe<Scalars['String']['output']>;
+};
+
+export type PingResult = {
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+  timestamp?: Maybe<Scalars['String']['output']>;
+};
+
+export type Projet = {
+  _id: Scalars['ID']['output'];
+  competences?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  creeLe?: Maybe<Scalars['String']['output']>;
+  dateDebut?: Maybe<Scalars['String']['output']>;
+  dateFin?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  equipe?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  livrables?: Maybe<Array<Maybe<Livrable>>>;
+  majLe?: Maybe<Scalars['String']['output']>;
+  progression?: Maybe<Scalars['Int']['output']>;
+  statut?: Maybe<Scalars['String']['output']>;
+  titre: Scalars['String']['output'];
+  tuteur?: Maybe<Scalars['String']['output']>;
+};
+
+export type ProjetInput = {
+  competences?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  dateDebut?: InputMaybe<Scalars['String']['input']>;
+  dateFin?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  equipe?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  statut?: InputMaybe<Scalars['String']['input']>;
+  titre: Scalars['String']['input'];
+  tuteur?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type Query = {
+  aiRecommendations?: Maybe<AiRecommendationResult>;
+  analyzeText?: Maybe<AnalyzeTextResult>;
+  healthCheck?: Maybe<HealthCheckResult>;
+  livrable?: Maybe<Livrable>;
+  livrables?: Maybe<Array<Maybe<Livrable>>>;
+  livrablesByProjet?: Maybe<Array<Maybe<Livrable>>>;
+  projet?: Maybe<Projet>;
+  projets?: Maybe<Array<Maybe<Projet>>>;
+};
+
+
+export type QueryAiRecommendationsArgs = {
+  projetId: Scalars['ID']['input'];
+};
+
+
+export type QueryAnalyzeTextArgs = {
+  options?: InputMaybe<AnalyzeTextOptions>;
+  text: Scalars['String']['input'];
+};
+
+
+export type QueryLivrableArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryLivrablesByProjetArgs = {
+  projetId: Scalars['ID']['input'];
+};
+
+
+export type QueryProjetArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export enum StatutLivrable {
+  EN_ATTENTE = 'En_attente',
+  EN_COURS = 'En_cours',
+  EN_RETARD = 'En_retard',
+  TERMINE = 'Termine',
+  VALIDE = 'Valide',
+  REJETE = 'Rejete'
+}
+
+export enum StatutProjet {
+  BROUILLON = 'Brouillon',
+  EN_COURS = 'En_cours',
+  TERMINE = 'Termine',
+  ARCHIVE = 'Archive',
+  EN_RETARD= 'En_retard',
+  A_VENIR= 'A_venir'
+}
+
+export type GetProjetsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetProjetsQuery = { projets?: Array<{ _id: string, titre: string, statut?: string | null } | null> | null };
+
+export const GetProjetsDocument = gql`
+    query GetProjets {
+  projets {
+    _id
+    titre
+    statut
+  }
+}
+    `;
+
+  @Injectable({
+    providedIn: 'root'
+  })
+  export class GetProjetsGQL extends Apollo.Query<GetProjetsQuery, GetProjetsQueryVariables> {
+    document = GetProjetsDocument;
+
+    constructor(apollo: Apollo.Apollo) {
+      super(apollo);
+    }
+  }
+
+
 // ======= Contenu de src/app/core/interceptors/auth.interceptor.ts =======
 
 import { HttpInterceptorFn } from '@angular/common/http';
@@ -746,60 +1189,65 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
 // ======= Contenu de src/app/core/models/livrable.model.ts =======
 
-export type StatutLivrable =  'En attente' | 'En_cours' | 'En retard' | 'Termine' | 'Valide' | 'Rejete' |;
-
+// Synced with backend/src/models/livrable.model.js
 export interface Livrable {
-  _id?: string;
-  nom: string;
-  description: string;
-  dateLimite: Date | string;
-  urlDepot: string;
-  statut: StatutLivrable;
-  projetId?: string;
-  creeLe?: Date | string;
-  majLe?: Date | string;
+    _id?: string;
+    intitule: string;
+    description: string;
+    dateLimite: Date;
+    projetId: string;
+    statut: StatutLivrable;
+    creeLe?: Date;
+    majLe?: Date;
+    // urlDepot?: string; // Uncomment if backend adds this field
 }
 
-export const StatutLivrable = {
-  StatutLivrable.EN_ATTENTE,
-  StatutLivrable.EN_COURS,
-  StatutLivrable.EN_RETARD,
-  StatutLivrable.TERMINE,
-  StatutLivrable.VALIDE,
-  StatutLivrable.REJETE
-} as const;
+export enum StatutLivrable {
+  EN_ATTENTE = 'En_attente',
+  EN_COURS = 'En_cours',
+  EN_RETARD = 'En_retard',
+  TERMINE = 'Termine',
+  VALIDE = 'Valide',
+  REJETE = 'Rejete'
+}
 
 
 // ======= Contenu de src/app/core/models/projet.model.ts =======
 
 import { Livrable } from './livrable.model';
 
-export type StatutProjet = 'Brouillon' | 'En_cours' | 'Termine' | 'Archive' | 'En_retard' | 'A_venir' |;
-
+// Synced with backend/src/models/projet.model.js
 export interface Projet {
-  _id: string;
-  titre: string;
-  description: string;
-  equipe: string[];
-  tuteur: string;
-  competences: string[];
-  dateDebut: Date | string;
-  dateFin: Date | string;
-  livrables?: Livrable[];
-  statut: StatutProjet;
-  progression?: number;
-  creeLe?: Date | string;
-  majLe?: Date | string;
+    _id?: string;
+    titre: string;
+    description: string;
+    equipe: string[];
+    tuteur?: string;
+    competences: string[];
+    dateDebut: Date;
+    dateFin: Date;
+    livrables: string[];
+    statut: StatutProjet;
+    progression?: number;
+    duree?: number; // Virtual
+    estEnRetard?: boolean; // Virtual
+    livrablesComplets?: Livrable[]; // Virtual, if used in UI
+    creeLe?: Date;
+    majLe?: Date;
 }
 
-export const Statutprojet = {
-  BROUILLON: 'Brouillon',
-  EN_COURS: 'En_cours',
-  TERMINE: 'Termine',
-  ARCHIVE: 'Archive'
-  EN_RETARD: 'En_retard',
-  A_VENIR: 'A_venir'
-} as const;
+export enum StatutProjet {
+    BROUILLON = 'Brouillon',
+    EN_COURS = 'En_cours',
+    TERMINE = 'Termine',
+    ARCHIVE = 'Archive',
+    EN_RETARD= 'En_retard',
+    A_VENIR= 'A_venir'
+}
+
+
+
+
 
 
 // ======= Contenu de src/app/core/services/api-tester.service.ts =======
@@ -902,59 +1350,6 @@ export class AlertService {
 }
 
 
-// ======= Contenu de src/app/core/services/livrable.service.spec.ts =======
-
-import { TestBed } from '@angular/core/testing';
-
-import { LivrableService } from './livrable.service';
-
-describe('LivrableService', () => {
-  let service: LivrableService;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(LivrableService);
-  });
-
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
-});
-
-
-// ======= Contenu de src/app/core/services/livrable.service.ts =======
-
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../../environments/environment';
-import { Livrable } from '../models/livrable.model';
-
-@Injectable({
-  providedIn: 'root'
-})
-export class LivrableService {
-  private baseUrl = `${environment.apiUrl}/livrables`;
-
-  constructor(private http: HttpClient) {}
-
-  recupererLivrablesParProjet(projetId: string) {
-    return this.http.get<Livrable[]>(`${this.baseUrl}/${projetId}`);
-  }
-
-  ajouterLivrable(data: Livrable) {
-    return this.http.post<Livrable>(this.baseUrl, data);
-  }
-
-  mettreAJourLivrable(livrableId: string, data: Livrable) {
-    return this.http.put<Livrable>(`${this.baseUrl}/${livrableId}`, data);
-  }
-
-  supprimerLivrable(livrableId: string) {
-    return this.http.delete(`${this.baseUrl}/${livrableId}`);
-  }
-}
-
-
 // ======= Contenu de src/app/core/services/graphql.service.ts =======
 
 import { Injectable } from '@angular/core';
@@ -979,12 +1374,11 @@ export class GraphqlService {
             dateDebut
             dateFin
             statut
-            livrables {
+            livrablesComplets {
               _id
-              nom
+              intitule
               description
               dateLimite
-              urlDepot
               statut
               projetId
             }
@@ -1039,39 +1433,45 @@ export class GraphqlService {
 }
 
 
-// ======= Contenu de src/app/core/services/projet.service.spec.ts =======
+// ======= Contenu de src/app/core/services/livrable.service.spec.ts =======
 
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
-import { ProjetService } from './projet.service';
+import { HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { LivrableService } from './livrable.service';
 import { environment } from '../../../environments/environment';
-import { Projet } from '../models/projet.model';
+import { RouterTestingModule} from '@angular/router/testing';
+import { CommonModule } from '@angular/common';
 
-describe('ProjetService', () => {
-  let service: ProjetService;
+describe('LivrableService', () => {
+  let service: LivrableService;
   let httpMock: HttpTestingController;
 
-  const API = `${environment.apiUrl}/projets`;
+  const apiUrl = `${environment.apiUrl}/livrables`;
 
-  const mockProjet: Projet = {
+  const mockLivrable = {
     _id: '1',
-    titre: 'Projet 1',
-    description: 'Description',
-    equipe: [],
-    tuteur: '123',
-    competences: ['Angular', 'Express'],
-    dateDebut: '2023-01-01',
-    dateFin: '2023-06-30',
-    statut: 'Brouillon'
+    titre: 'Livrable 1',
+    description: 'Description du livrable',
+    projetId: '123',
+    dateRendu: new Date('2023-05-15'),
+    statut: 'SOUMIS',
+    commentaires: [],
+    fichiers: []
   };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
-      providers: [ProjetService]
+      imports: [RouterTestingModule],
+      providers: [
+        LivrableService,
+        provideHttpClient(),
+        provideHttpClientTesting()
+      ]
     });
 
-    service = TestBed.inject(ProjetService);
+    service = TestBed.inject(LivrableService);
     httpMock = TestBed.inject(HttpTestingController);
   });
 
@@ -1079,139 +1479,839 @@ describe('ProjetService', () => {
     httpMock.verify();
   });
 
-  it('doit recuperer tous les projets', (done) => {
-    service.recupererProjets().subscribe(projets => {
-      expect(projets.length).toBe(1);
-      expect(projets[0].titre).toBe('Projet 1');
-      done();
-    });
-
-    const req = httpMock.expectOne(API);
-    expect(req.request.method).toBe('GET');
-    req.flush([mockProjet]);
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
-  it('doit recuperer un projet par ID', (done) => {
-    service.recupererProjet('1').subscribe(projet => {
-      expect(projet._id).toBe('1');
-      expect(projet.titre).toBe('Projet 1');
-      done();
+  it('doit récupérer tous les livrables', () => {
+    service.recupererLivrables().subscribe(livrables => {
+      expect(livrables.length).toBe(1);
+      expect(livrables[0].titre).toBe('Livrable 1');
     });
 
-    const req = httpMock.expectOne(`${API}/1`);
+    const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('GET');
-    req.flush(mockProjet);
+    req.flush([mockLivrable]);
   });
 
-  it('doit creer un projet', (done) => {
-    service.creerProjet(mockProjet).subscribe(projet => {
-      expect(projet.titre).toBe('Projet 1');
-      done();
+  it('doit récupérer un livrable par ID', () => {
+    service.recupererLivrable('1').subscribe(livrable => {
+      expect(livrable._id).toBe('1');
+      expect(livrable.titre).toBe('Livrable 1');
     });
 
-    const req = httpMock.expectOne(API);
+    const req = httpMock.expectOne(`${apiUrl}/1`);
+    expect(req.request.method).toBe('GET');
+    req.flush(mockLivrable);
+  });
+
+  it('doit créer un livrable', () => {
+    service.creerLivrable(mockLivrable).subscribe(livrable => {
+      expect(livrable.titre).toBe('Livrable 1');
+    });
+
+    const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('POST');
-    req.flush(mockProjet);
+    req.flush(mockLivrable);
   });
 
-  it('doit mettre à jour un projet', (done) => {
-    const updated = { ...mockProjet, titre: 'Projet Modifie' };
-    service.mettreAJourProjet('1', updated).subscribe(projet => {
-      expect(projet.titre).toBe('Projet Modifie');
-      done();
+  it('doit mettre à jour un livrable', () => {
+    const updated = { ...mockLivrable, titre: 'Livrable Modifié' };
+
+    service.mettreAJourLivrable('1', updated).subscribe(livrable => {
+      expect(livrable.titre).toBe('Livrable Modifié');
     });
 
-    const req = httpMock.expectOne(`${API}/1`);
+    const req = httpMock.expectOne(`${apiUrl}/1`);
     expect(req.request.method).toBe('PUT');
     req.flush(updated);
   });
 
-  it('doit supprimer un projet', (done) => {
-    service.supprimerProjet('1').subscribe(response => {
+  it('doit supprimer un livrable', () => {
+    service.supprimerLivrable('1').subscribe(response => {
       expect(response).toBeTruthy();
-      done();
     });
 
-    const req = httpMock.expectOne(`${API}/1`);
+    const req = httpMock.expectOne(`${apiUrl}/1`);
     expect(req.request.method).toBe('DELETE');
     req.flush({ success: true });
   });
 
-  it('doit gerer une erreur serveur (500)', (done) => {
-    service.recupererProjets().subscribe({
-      next: () => fail('appel devait echouer'),
+  it('doit gérer une erreur serveur (500)', () => {
+    service.recupererLivrables().subscribe({
+      next: () => fail('appel devait échouer'),
       error: (err) => {
         expect(err.status).toBe(500);
-        expect(err.message).toContain('Erreur serveur');
-        done();
+        expect(err.statusText).toBe('Erreur interne');
       }
     });
 
-    const req = httpMock.expectOne(API);
-    req.flush({}, { status: 500, statusText: 'Erreur interne' });
+    const req = httpMock.expectOne(apiUrl);
+    req.flush('Erreur serveur', { status: 500, statusText: 'Erreur interne' });
   });
 });
+
+
+// ======= Contenu de src/app/core/services/livrable.service.ts =======
+
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { Livrable, StatutLivrable } from '../models/livrable.model';
+import { environment } from '../../../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LivrableService {
+  private apiUrl = `${environment.apiUrl}/livrables`;
+
+  constructor(private http: HttpClient) { }
+
+  getAllLivrables(): Observable<Livrable[]> {
+    return this.http.get<Livrable[]>(this.apiUrl).pipe(
+      map(livrables => livrables.map(livrable => ({
+        ...livrable,
+        dateLimite: new Date(livrable.dateLimite),
+        creeLe: livrable.creeLe ? new Date(livrable.creeLe) : undefined,
+        majLe: livrable.majLe ? new Date(livrable.majLe) : undefined
+      })))
+    );
+  }
+
+  getLivrablesForProject(projetId: string): Observable<Livrable[]> {
+    return this.http.get<Livrable[]>(`${this.apiUrl}/projet/${projetId}`).pipe(
+      map(livrables => livrables.map(livrable => ({
+        ...livrable,
+        dateLimite: new Date(livrable.dateLimite),
+        creeLe: livrable.creeLe ? new Date(livrable.creeLe) : undefined,
+        majLe: livrable.majLe ? new Date(livrable.majLe) : undefined
+      })))
+    );
+  }
+
+  getLivrableById(id: string): Observable<Livrable> {
+    return this.http.get<Livrable>(`${this.apiUrl}/${id}`).pipe(
+      map(livrable => ({
+        ...livrable,
+        dateLimite: new Date(livrable.dateLimite),
+        creeLe: livrable.creeLe ? new Date(livrable.creeLe) : undefined,
+        majLe: livrable.majLe ? new Date(livrable.majLe) : undefined
+      }))
+    );
+  }
+
+  createLivrable(livrable: Livrable): Observable<Livrable> {
+    return this.http.post<Livrable>(this.apiUrl, livrable);
+  }
+
+  updateLivrable(id: string, livrable: Livrable): Observable<Livrable> {
+    return this.http.put<Livrable>(`${this.apiUrl}/${id}`, livrable);
+  }
+
+  deleteLivrable(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  }
+
+  getStatutOptions(): string[] {
+    return Object.values(StatutLivrable);
+  }
+}
+
+
+// ======= Contenu de src/app/core/services/projet.service.spec.ts =======
+
+import { TestBed } from '@angular/core/testing';
+    import { HttpTestingController } from '@angular/common/http/testing';
+    import { provideHttpClient } from '@angular/common/http';
+    import { provideHttpClientTesting } from '@angular/common/http/testing';
+    import { LivrableService } from './livrable.service';
+    import { environment } from '../../../environments/environment';
+    import { Livrable, StatutLivrable } from '../models/livrable.model';
+    import { RouterTestingModule } from '@angular/router/testing';
+
+    describe('LivrableService', () => {
+      let service: LivrableService;
+      let httpMock: HttpTestingController;
+
+      const apiUrl = `${environment.apiUrl}/livrables`;
+
+      const mockLivrable: Livrable = {
+        _id: '1',
+        intitule: 'Livrable 1',
+        description: 'Description du livrable',
+        dateLimite: new Date('2023-03-15'),
+        projetId: '123',
+        statut: StatutLivrable.EN_ATTENTE,
+        creeLe: new Date(),
+        majLe: new Date()
+      };
+
+      beforeEach(() => {
+        TestBed.configureTestingModule({
+          imports: [RouterTestingModule],
+          providers: [
+            LivrableService,
+            provideHttpClient(),
+            provideHttpClientTesting()
+          ]
+        });
+
+        service = TestBed.inject(LivrableService);
+        httpMock = TestBed.inject(HttpTestingController);
+      });
+
+      afterEach(() => {
+        httpMock.verify();
+      });
+
+      it('doit récupérer tous les livrables', () => {
+        service.getLivrables().subscribe((livrables: Livrable[]) => {
+          expect(livrables.length).toBe(1);
+          expect(livrables[0].intitule).toBe('Livrable 1');
+        });
+
+        const req = httpMock.expectOne(apiUrl);
+        expect(req.request.method).toBe('GET');
+        req.flush([mockLivrable]);
+      });
+
+      it('doit récupérer un livrable par ID', () => {
+        service.getLivrableById('1').subscribe((livrable: Livrable) => {
+          expect(livrable._id).toBe('1');
+          expect(livrable.intitule).toBe('Livrable 1');
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}/1`);
+        expect(req.request.method).toBe('GET');
+        req.flush(mockLivrable);
+      });
+
+      it('doit créer un livrable', () => {
+        service.createLivrable(mockLivrable).subscribe((livrable: Livrable) => {
+          expect(livrable.intitule).toBe('Livrable 1');
+        });
+
+        const req = httpMock.expectOne(apiUrl);
+        expect(req.request.method).toBe('POST');
+        req.flush(mockLivrable);
+      });
+
+      it('doit mettre à jour un livrable', () => {
+        const updated = { ...mockLivrable, intitule: 'Livrable Modifié' };
+        service.updateLivrable('1', updated).subscribe((livrable: Livrable) => {
+          expect(livrable.intitule).toBe('Livrable Modifié');
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}/1`);
+        expect(req.request.method).toBe('PUT');
+        req.flush(updated);
+      });
+
+      it('doit supprimer un livrable', () => {
+        service.deleteLivrable('1').subscribe((response: any) => {
+          expect(response).toBeTruthy();
+        });
+
+        const req = httpMock.expectOne(`${apiUrl}/1`);
+        expect(req.request.method).toBe('DELETE');
+        req.flush({ success: true });
+      });
+
+      it('doit gérer une erreur serveur (500)', () => {
+        service.getLivrables().subscribe({
+          next: () => fail('appel devait échouer'),
+          error: (err: any) => {
+            expect(err.status).toBe(500);
+            expect(err.statusText).toBe('Erreur interne');
+          }
+        });
+
+        const req = httpMock.expectOne(apiUrl);
+        req.flush('Erreur serveur', { status: 500, statusText: 'Erreur interne' });
+      });
+    });
 
 
 // ======= Contenu de src/app/core/services/projet.service.ts =======
 
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, catchError, retry, throwError } from 'rxjs';
+import { Observable, map, tap, catchError, throwError } from 'rxjs';
+import { Projet, StatutProjet } from '../models/projet.model';
 import { environment } from '../../../environments/environment';
-import { Projet } from '../models/projet.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ProjetService {
-  private baseUrl = `${environment.apiUrl}/projets`;
+  private apiUrl = `${environment.apiUrl}/projets`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
-  recupererProjets(): Observable<Projet[]> {
-    return this.http.get<Projet[]>(this.baseUrl).pipe(
-      retry(1),
-      catchError(this.handleError)
+  getAllProjets(): Observable<Projet[]> {
+    return this.http.get<Projet[]>(this.apiUrl).pipe(
+      map(projets => projets.map(projet => ({
+        ...projet,
+        dateDebut: new Date(projet.dateDebut),
+        dateFin: new Date(projet.dateFin),
+        creeLe: projet.creeLe ? new Date(projet.creeLe) : undefined,
+        majLe: projet.majLe ? new Date(projet.majLe) : undefined
+      })))
     );
   }
 
-  recupererProjet(id: string): Observable<Projet> {
-    return this.http.get<Projet>(`${this.baseUrl}/${id}`).pipe(
-      catchError(this.handleError)
+  getProjetById(id: string): Observable<Projet> {
+    return this.http.get<Projet>(`${this.apiUrl}/${id}`).pipe(
+      map(projet => ({
+        ...projet,
+        dateDebut: new Date(projet.dateDebut),
+        dateFin: new Date(projet.dateFin),
+        creeLe: projet.creeLe ? new Date(projet.creeLe) : undefined,
+        majLe: projet.majLe ? new Date(projet.majLe) : undefined
+      }))
     );
   }
 
-  creerProjet(data: Projet): Observable<Projet> {
-    return this.http.post<Projet>(this.baseUrl, data).pipe(
-      catchError(this.handleError)
-    );
+  createProjet(projet: Projet): Observable<Projet> {
+    return this.http.post<Projet>(this.apiUrl, projet);
   }
 
-  mettreAJourProjet(id: string, data: Projet): Observable<Projet> {
-    return this.http.put<Projet>(`${this.baseUrl}/${id}`, data).pipe(
-      catchError(this.handleError)
-    );
+  updateProjet(id: string, projet: Projet): Observable<Projet> {
+    return this.http.put<Projet>(`${this.apiUrl}/${id}`, projet);
   }
 
-  supprimerProjet(id: string): Observable<any> {
-    return this.http.delete(`${this.baseUrl}/${id}`).pipe(
-      retry(1),
-      catchError(this.handleError)
-    );
+  deleteProjet(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  private handleError(error: any): Observable<never> {
-    let message = 'Une erreur est survenue';
+  getStatutOptions(): string[] {
+    return Object.values(StatutProjet);
+  }
+}
 
-    if (error.error instanceof ErrorEvent) {
-      message = `Erreur client : ${error.error.message}`;
-    } else {
-      message = `Erreur serveur - code : ${error.status}, message : ${error.message}`;
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.css =======
+
+h2 {
+  margin-bottom: 1.5rem;
+}
+section {
+  margin-bottom: 2rem;
+}
+ul {
+  padding-left: 1.2rem;
+}
+li {
+  margin: 0.5rem 0;
+}
+
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { DashboardComponent } from './dashboard.component';
+
+describe('DashboardComponent', () => {
+  let component: DashboardComponent;
+  let fixture: ComponentFixture<DashboardComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [DashboardComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(DashboardComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/front-office/dashboard/dashboard.component.ts =======
+
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
+
+interface Projet {
+  id: string;
+  nom: string;
+  progression?: number;
+}
+
+interface Notification {
+  message: string;
+  date: Date | string;
+}
+
+interface Livrable {
+  nom: string;
+  statut: string;
+  dateLimite: Date | string;
+}
+
+interface User {
+  nom: string;
+  role: string;
+}
+
+interface Template {
+  nom: string;
+}
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterModule],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css']
+})
+export class DashboardComponent implements OnInit {
+  projets: Projet[] = [];
+  notifications: Notification[] = [];
+  livrables: Livrable[] = [];
+  users: User[] = [{ nom: 'Jean', role: 'Administrateur' }];
+  roles: string[] = ['Administrateur', 'Tuteur', 'etudiant'];
+  projetTemplates: Template[] = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
+  stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
+  tutorPerformance: { nom?: string; score?: number }[] = [];
+  aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
+
+  // Adding missing properties used in template
+  projetsEnCours: number = 0;
+  livrablesSoumis: number = 0;
+  retoursRecus: number = 0;
+  projetsRecents: Projet[] = [];
+
+  ngOnInit() {
+    // Initialize dashboard data
+    this.projetsEnCours = 3;
+    this.livrablesSoumis = 7;
+    this.retoursRecus = 4;
+    this.projetsRecents = [
+      { id: '1', nom: 'Projet A' },
+      { id: '2', nom: 'Projet B' }
+    ];
+  }
+
+  // Ouvre le formulaire pour ajouter un utilisateur
+  openUserForm(): void {}
+
+  // Met à jour le rôle d'un utilisateur
+  updateRole(user: User): void {}
+
+  // Modifie les informations d'un utilisateur
+  editUser(user: User): void {}
+
+  // Supprime un utilisateur
+  deleteUser(user: User): void {}
+
+  // Exporte la liste des utilisateurs
+  exportUsers(): void {}
+
+  // Importe une liste d'utilisateurs
+  importUsers(): void {}
+
+  // Cree un nouveau modele de projet
+  createTemplate(): void {}
+
+  // Modifie un modele de projet existant
+  editTemplate(template: Template): void {}
+
+  // Met à jour la configuration de l'IA
+  updateAICfg(): void {}
+}
+
+
+// ======= Contenu de src/app/front-office/front-office-routing.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjetListComponent } from './projet-list/projet-list.component';
+import { LivrableListComponent } from './livrable-list/livrable-list.component';
+
+const routes: Routes = [
+  { path: '', component: DashboardComponent },
+  { path: 'projets', component: ProjetListComponent },
+  { path: 'livrables', component: LivrableListComponent },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class FrontOfficeRoutingModule {}
+
+
+// ======= Contenu de src/app/front-office/front-office-template.component.css =======
+
+/* PROGEASE Front-Office Template Styles */
+.frontoffice-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #101624;
+  color: #e0e6ef;
+}
+.fo-header {
+  display: flex;
+  align-items: center;
+  background: #18223a;
+  padding: 0 2rem;
+  height: 64px;
+  box-shadow: 0 2px 8px #0002;
+}
+.fo-logo {
+  height: 44px;
+  margin-right: 1rem;
+}
+.fo-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #2ed8c3;
+  letter-spacing: 2px;
+  flex: 1;
+}
+.fo-nav {
+  display: flex;
+  gap: 1.5rem;
+}
+.fo-nav a {
+  color: #e0e6ef;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.fo-nav a.active, .fo-nav a:hover {
+  color: #ffd700;
+  font-weight: bold;
+}
+.fo-main {
+  flex: 1;
+  padding: 2rem;
+  background: #151b2b;
+  min-height: 400px;
+}
+.fo-footer {
+  background: #18223a;
+  color: #ffd700;
+  text-align: center;
+  padding: 0.5rem 0;
+  font-size: 1rem;
+}
+@media (max-width: 900px) {
+  .fo-header {
+    padding: 0 1rem;
+    height: 56px;
+  }
+  .fo-title {
+    font-size: 1.1rem;
+  }
+  .fo-main {
+    padding: 1rem;
+  }
+}
+@media (max-width: 600px) {
+  .fo-header {
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    padding: 0.5rem 0.5rem;
+  }
+  .fo-nav {
+    gap: 0.7rem;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+  }
+  .fo-main {
+    padding: 0.5rem;
+  }
+} 
+
+// ======= Contenu de src/app/front-office/front-office-template.component.ts =======
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-front-office-template',
+  templateUrl: './front-office-template.component.html',
+  styleUrls: ['./front-office-template.component.css']
+})
+export class FrontOfficeTemplateComponent {} 
+
+// ======= Contenu de src/app/front-office/front-office.module.ts =======
+
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FrontOfficeRoutingModule } from './front-office-routing.module';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { ProjetListComponent } from './projet-list/projet-list.component';
+import { LivrableListComponent } from './livrable-list/livrable-list.component';
+
+@NgModule({
+  imports: [
+    CommonModule,
+    FormsModule,
+    ReactiveFormsModule,
+    FrontOfficeRoutingModule,
+    DashboardComponent, // standalone components
+    ProjetListComponent,
+    LivrableListComponent
+  ]
+})
+export class FrontOfficeModule {}
+
+
+// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.css =======
+
+h3 {
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+
+a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+a:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+
+a:hover {
+  color: #174bb3;
+}
+
+.erreur {
+  color: #F44336;
+  margin-bottom: 1rem;
+}
+
+
+// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { LivrableListComponent } from './livrable-list.component';
+
+describe('LivrableListComponent', () => {
+  let component: LivrableListComponent;
+  let fixture: ComponentFixture<LivrableListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [LivrableListComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(LivrableListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.ts =======
+
+import { Component, Input, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
+import { LivrableService } from '../../core/services/livrable.service';
+
+@Component({
+  selector: 'app-livrable-list',
+  standalone: true,
+  imports: [CommonModule, RouterModule],
+  templateUrl: './livrable-list.component.html',
+  styleUrl: './livrable-list.component.css'
+})
+export class LivrableListComponent implements OnInit {
+  @Input() projetId!: string;
+  livrables: Livrable[] = [];
+  chargement = false;
+  erreur = '';
+
+  constructor(private livrableService: LivrableService) {}
+
+  ngOnInit() {
+    if (this.projetId) {
+      this.chargement = true;
+      this.livrableService.recupererLivrablesParProjet(this.projetId).subscribe({
+        next: (livrables) => {
+          this.livrables = livrables;
+          this.chargement = false;
+        },
+        error: () => {
+          this.erreur = "Erreur lors du chargement des livrables.";
+          this.chargement = false;
+        }
+      });
     }
+  }
 
-    console.error(`[ProjetService] ${message}`);
-    return throwError(() => new Error(message));
+  // Helper method to check status
+  isStatus(status: StatutLivrable, expectedStatus: string): boolean {
+    return status.toLowerCase() === expectedStatus.toLowerCase();
+  }
+}
+
+
+// ======= Contenu de src/app/front-office/projet-list/projet-list.component.css =======
+
+h2 {
+  margin-bottom: 1.5rem;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+  background: #fff;
+  box-shadow: 0 2px 10px #0001;
+}
+th, td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+th {
+  background: #f1f5f9;
+  text-align: left;
+  font-weight: bold;
+}
+button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  padding: .5rem 1rem;
+  border-radius: .4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+button:focus {
+  outline: 2px solid var(--accent-color, #17B5B5);
+}
+button:hover { background: #174bb3; }
+.erreur {
+  color: #F44336;
+  margin-bottom: 1rem;
+}
+
+
+// ======= Contenu de src/app/front-office/projet-list/projet-list.component.spec.ts =======
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ProjetListComponent } from './projet-list.component';
+
+describe('ProjetListComponent', () => {
+  let component: ProjetListComponent;
+  let fixture: ComponentFixture<ProjetListComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [ProjetListComponent]
+    })
+      .compileComponents();
+
+    fixture = TestBed.createComponent(ProjetListComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+
+// ======= Contenu de src/app/front-office/projet-list/projet-list.component.ts =======
+
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { ProjetService } from '../../core/services/projet.service';
+import { Projet } from '../../core/models/projet.model';
+import { Subscription } from 'rxjs';
+
+@Component({
+  selector: 'app-projet-list',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './projet-list.component.html',
+  styleUrls: ['./projet-list.component.css']
+})
+export class ProjetListComponent implements OnInit, OnDestroy {
+  projets: Projet[] = [];
+  chargement = false;
+  erreur = '';
+  private subscription?: Subscription;
+
+  constructor(
+    private projetService: ProjetService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.chargerProjets();
+  }
+
+  chargerProjets() {
+    this.chargement = true;
+    this.subscription = this.projetService.recupererProjets().subscribe({
+      next: (projets) => {
+        this.projets = projets;
+        this.chargement = false;
+      },
+      error: (err) => {
+        this.erreur = "Erreur lors du chargement des projets.";
+        this.chargement = false;
+        console.error('Erreur:', err);
+      }
+    });
+  }
+
+  voirDetails(id: string) {
+    this.router.navigate(['/projet', id]);
+  }
+
+  ngOnDestroy() {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 }
 
@@ -1339,7 +2439,7 @@ button[type="submit"]:hover {
 // ======= Contenu de src/app/livrable/livrable-form/livrable-form.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing';
 import { LivrableFormComponent } from './livrable-form.component';
 
 describe('LivrableFormComponent', () => {
@@ -1348,7 +2448,10 @@ describe('LivrableFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LivrableFormComponent]
+      imports: [
+        RouterTestingModule,
+        LivrableFormComponent
+      ]
     })
       .compileComponents();
 
@@ -1396,10 +2499,10 @@ export class LivrableFormComponent implements OnInit {
 
   ngOnInit() {
     this.livrableForm = this.fb.group({
-      nom: [this.livrable?.nom || '', Validators.required],
+      intitule: [this.livrable?.intitule || '', Validators.required],
       description: [this.livrable?.description || '', Validators.required],
       dateLimite: [this.livrable?.dateLimite ? this.livrable.dateLimite.toString().substring(0, 10) : '', Validators.required],
-      urlDepot: [this.livrable?.urlDepot || '', [Validators.required]],
+      // urlDepot: [this.livrable?.urlDepot || '', [Validators.required]],
       statut: [this.livrable?.statut || StatutLivrable.EN_ATTENTE, Validators.required]
     });
   }
@@ -1459,36 +2562,39 @@ a:hover {
 
 // ======= Contenu de src/app/livrable/livrable-list/livrable-list.component.spec.ts =======
 
-//src/app/livrable/livrable-list/livrable-list.component.spec.ts
-
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+    import { RouterTestingModule } from '@angular/router/testing';
+    import { LivrableListComponent } from './livrable-list.component';
 
-import { LivrableListComponent } from './livrable-list.component';
+    describe('LivrableListComponent', () => {
+      let component: LivrableListComponent;
+      let fixture: ComponentFixture<LivrableListComponent>;
 
-describe('LivrableListComponent', () => {
-  let component: LivrableListComponent;
-  let fixture: ComponentFixture<LivrableListComponent>;
+      beforeEach(async () => {
+        await TestBed.configureTestingModule({
+          imports: [
+            RouterTestingModule,
+            LivrableListComponent
+          ]
+        })
+        .compileComponents();
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [LivrableListComponent]
-    })
-    .compileComponents();
+        fixture = TestBed.createComponent(LivrableListComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+      });
 
-    fixture = TestBed.createComponent(LivrableListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+      it('should create', () => {
+        expect(component).toBeTruthy();
+      });
+    });
 
 
 // ======= Contenu de src/app/livrable/livrable-list/livrable-list.component.ts =======
 
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
+import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { Livrable } from '../../core/models/livrable.model';
 import { LivrableService } from '../../core/services/livrable.service';
@@ -1500,27 +2606,44 @@ import { LivrableService } from '../../core/services/livrable.service';
   templateUrl: './livrable-list.component.html',
   styleUrls: ['./livrable-list.component.css']
 })
-export class LivrableListComponent implements OnInit {
+export class LivrableListComponent implements OnInit, OnDestroy {
   @Input() projetId!: string;
-  livrables: Livrable[] = [];
-  chargement = false;
+  chargement = true;
   erreur = '';
+  livrables: Livrable[] = [];
+  private subscription?: Subscription;
 
-  constructor(private livrableService: LivrableService) {}
+  constructor(
+    private livrableService: LivrableService,
+    private router: Router
+  ) {}
 
-  ngOnInit() {
-    if (this.projetId) {
-      this.chargement = true;
-      this.livrableService.recupererLivrablesParProjet(this.projetId).subscribe({
-        next: (livrables: Livrable[]) => {
-          this.livrables = livrables;
-          this.chargement = false;
-        },
-        error: () => {
-          this.erreur = "Erreur lors du chargement des livrables.";
-          this.chargement = false;
-        }
-      });
+  ngOnInit(): void {
+    this.chargerLivrables();
+  }
+
+  chargerLivrables(): void {
+    this.chargement = true;
+    this.subscription = this.livrableService.recupererLivrablesParProjet(this.projetId).subscribe({
+      next: (livrables) => {
+        this.livrables = livrables;
+        this.chargement = false;
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des livrables:', error);
+        this.erreur = 'Impossible de charger les livrables.';
+        this.chargement = false;
+      }
+    });
+  }
+
+  voirDetails(id: string): void {
+    this.router.navigate(['/livrable', id]);
+  }
+
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
     }
   }
 }
@@ -1557,409 +2680,6 @@ import { LivrableRoutingModule } from './livrable-routing.module';
   ]
 })
 export class LivrableModule {}
-
-
-// ======= Contenu de src/app/front-office/dashboard/dashboard.component.css =======
-
-h2 {
-  margin-bottom: 1.5rem;
-}
-section {
-  margin-bottom: 2rem;
-}
-ul {
-  padding-left: 1.2rem;
-}
-li {
-  margin: 0.5rem 0;
-}
-
-
-// ======= Contenu de src/app/front-office/dashboard/dashboard.component.spec.ts =======
-
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { DashboardComponent } from './dashboard.component';
-
-describe('DashboardComponent', () => {
-  let component: DashboardComponent;
-  let fixture: ComponentFixture<DashboardComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [DashboardComponent]
-    })
-      .compileComponents();
-
-    fixture = TestBed.createComponent(DashboardComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
-
-
-// ======= Contenu de src/app/front-office/dashboard/dashboard.component.ts =======
-
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-
-interface Projet {
-  _id: string;
-  titre: string;
-  progression?: number;
-}
-
-interface Notification {
-  message: string;
-  date: Date | string;
-}
-
-interface Livrable {
-  nom: string;
-  statut: string;
-  dateLimite: Date | string;
-}
-
-interface User {
-  nom: string;
-  role: string;
-}
-
-interface Template {
-  nom: string;
-}
-
-@Component({
-  selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
-})
-export class DashboardComponent {
-  projets: Projet[] = [];
-  notifications: Notification[] = [];
-  livrables: Livrable[] = [];
-  users: User[] = [{ nom: 'Jean', role: 'Administrateur' }];
-  roles: string[] = ['Administrateur', 'Tuteur', 'etudiant'];
-  projetTemplates: Template[] = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
-  stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
-  tutorPerformance: { nom?: string; score?: number }[] = [];
-  aiConfig = { algoEquipe: '', seuilRisque: 50, activerRecommandations: true };
-
-  // Ouvre le formulaire pour ajouter un utilisateur
-  openUserForm(): void {}
-
-  // Met à jour le rôle d'un utilisateur
-  updateRole(user: User): void {}
-
-  // Modifie les informations d'un utilisateur
-  editUser(user: User): void {}
-
-  // Supprime un utilisateur
-  deleteUser(user: User): void {}
-
-  // Exporte la liste des utilisateurs
-  exportUsers(): void {}
-
-  // Importe une liste d'utilisateurs
-  importUsers(): void {}
-
-  // Cree un nouveau modele de projet
-  createTemplate(): void {}
-
-  // Modifie un modele de projet existant
-  editTemplate(template: Template): void {}
-
-  // Met à jour la configuration de l'IA
-  updateAICfg(): void {}
-}
-
-
-// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.css =======
-
-h3 {
-  margin-top: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-  background: #fff;
-  box-shadow: 0 2px 10px #0001;
-}
-
-th, td {
-  padding: 0.7rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-th {
-  background: #f1f5f9;
-  text-align: left;
-  font-weight: bold;
-}
-
-a {
-  color: #2563eb;
-  text-decoration: underline;
-}
-
-a:focus {
-  outline: 2px solid var(--accent-color, #17B5B5);
-}
-
-a:hover {
-  color: #174bb3;
-}
-
-.erreur {
-  color: #F44336;
-  margin-bottom: 1rem;
-}
-
-
-// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.spec.ts =======
-
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { LivrableListComponent } from './livrable-list.component';
-
-describe('LivrableListComponent', () => {
-  let component: LivrableListComponent;
-  let fixture: ComponentFixture<LivrableListComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [LivrableListComponent]
-    })
-      .compileComponents();
-
-    fixture = TestBed.createComponent(LivrableListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
-
-
-// ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.ts =======
-
-import { Component, Input, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Livrable } from '../../core/models/livrable.model';
-import { LivrableService } from '../../core/services/livrable.service';
-
-@Component({
-  selector: 'app-livrable-list',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './livrable-list.component.html',
-  styleUrl: './livrable-list.component.css'
-})
-export class LivrableListComponent implements OnInit {
-  @Input() projetId!: string;
-  livrables: Livrable[] = [];
-  chargement = false;
-  erreur = '';
-  constructor(private livrableService: LivrableService) {}
-  ngOnInit() {
-    if (this.projetId) {
-      this.chargement = true;
-      this.livrableService.recupererLivrablesParProjet(this.projetId).subscribe({
-        next: (livrables) => {
-          this.livrables = livrables;
-          this.chargement = false;
-        },
-        error: () => {
-          this.erreur = "Erreur lors du chargement des livrables.";
-          this.chargement = false;
-        }
-      });
-    }
-  }
-}
-
-
-// ======= Contenu de src/app/front-office/front-office-routing.module.ts =======
-
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjetListComponent } from './projet-list/projet-list.component';
-import { LivrableListComponent } from './livrable-list/livrable-list.component';
-
-const routes: Routes = [
-  { path: '', component: DashboardComponent },
-  { path: 'projets', component: ProjetListComponent },
-  { path: 'livrables', component: LivrableListComponent },
-];
-
-@NgModule({
-  imports: [RouterModule.forChild(routes)],
-  exports: [RouterModule]
-})
-export class FrontOfficeRoutingModule {}
-
-
-// ======= Contenu de src/app/front-office/front-office.module.ts =======
-
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { FrontOfficeRoutingModule } from './front-office-routing.module';
-import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProjetListComponent } from './projet-list/projet-list.component';
-import { LivrableListComponent } from './livrable-list/livrable-list.component';
-
-@NgModule({
-  imports: [
-    CommonModule,
-    FormsModule,
-    ReactiveFormsModule,
-    FrontOfficeRoutingModule,
-    DashboardComponent, // standalone components
-    ProjetListComponent,
-    LivrableListComponent
-  ]
-})
-export class FrontOfficeModule {}
-
-
-// ======= Contenu de src/app/front-office/projet-list/projet-list.component.css =======
-
-h2 {
-  margin-bottom: 1.5rem;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1rem;
-  background: #fff;
-  box-shadow: 0 2px 10px #0001;
-}
-th, td {
-  padding: 0.7rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-}
-th {
-  background: #f1f5f9;
-  text-align: left;
-  font-weight: bold;
-}
-button {
-  background: #2563eb;
-  color: #fff;
-  border: none;
-  padding: .5rem 1rem;
-  border-radius: .4rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background .2s;
-}
-button:focus {
-  outline: 2px solid var(--accent-color, #17B5B5);
-}
-button:hover { background: #174bb3; }
-.erreur {
-  color: #F44336;
-  margin-bottom: 1rem;
-}
-
-
-// ======= Contenu de src/app/front-office/projet-list/projet-list.component.spec.ts =======
-
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
-import { ProjetListComponent } from './projet-list.component';
-
-describe('ProjetListComponent', () => {
-  let component: ProjetListComponent;
-  let fixture: ComponentFixture<ProjetListComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ProjetListComponent]
-    })
-      .compileComponents();
-
-    fixture = TestBed.createComponent(ProjetListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
-
-
-// ======= Contenu de src/app/front-office/projet-list/projet-list.component.ts =======
-
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { ProjetService } from '../../core/services/projet.service';
-import { Projet } from '../../core/models/projet.model';
-import { Subscription } from 'rxjs';
-
-@Component({
-  selector: 'app-projet-list',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './projet-list.component.html',
-  styleUrls: ['./projet-list.component.css']
-})
-export class ProjetListComponent implements OnInit, OnDestroy {
-  projets: Projet[] = [];
-  chargement = false;
-  erreur = '';
-  private subscription?: Subscription;
-
-  constructor(
-    private projetService: ProjetService,
-    private router: Router
-  ) {}
-
-  ngOnInit() {
-    this.chargerProjets();
-  }
-
-  chargerProjets() {
-    this.chargement = true;
-    this.subscription = this.projetService.recupererProjets().subscribe({
-      next: (projets) => {
-        this.projets = projets;
-        this.chargement = false;
-      },
-      error: (err) => {
-        this.erreur = "Erreur lors du chargement des projets.";
-        this.chargement = false;
-        console.error('Erreur:', err);
-      }
-    });
-  }
-
-  voirDetails(id: string) {
-    this.router.navigate(['/projet', id]);
-  }
-
-  ngOnDestroy() {
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
-  }
-}
 
 
 // ======= Contenu de src/app/projet/projet-detail/projet-detail.component.css =======
@@ -2039,10 +2759,10 @@ export class ProjetDetailComponent implements OnInit {
 
   statutClass(statut: string): string {
     switch (statut) {
-      case 'Brouillon': return 'status brouillon';
-      case 'En cours': return 'status encours';
-      case 'Termine': return 'status termine';
-      case 'Archive': return 'status archive';
+      case 'brouillon': return 'status brouillon';
+      case 'en_cours': return 'status encours';
+      case 'termine': return 'status termine';
+      case 'archive': return 'status archive';
       default: return 'status';
     }
   }
@@ -2093,7 +2813,7 @@ button[type="submit"]:focus {
 // ======= Contenu de src/app/projet/projet-form/projet-form.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { RouterTestingModule } from '@angular/router/testing';
 import { ProjetFormComponent } from './projet-form.component';
 
 describe('ProjetFormComponent', () => {
@@ -2102,9 +2822,12 @@ describe('ProjetFormComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ProjetFormComponent]
+      imports: [
+        RouterTestingModule,
+        ProjetFormComponent
+      ]
     })
-      .compileComponents();
+    .compileComponents();
 
     fixture = TestBed.createComponent(ProjetFormComponent);
     component = fixture.componentInstance;
@@ -2119,64 +2842,130 @@ describe('ProjetFormComponent', () => {
 
 // ======= Contenu de src/app/projet/projet-form/projet-form.component.ts =======
 
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { Projet, Statutprojet } from '../../core/models/projet.model';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ProjetService } from '../../core/services/projet.service';
+import { Projet, StatutProjet } from '../../core/models/projet.model';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-projet-form',
-  standalone: true,
-  imports: [],
   templateUrl: './projet-form.component.html',
-  styleUrls: ['./projet-form.component.css']
+  standalone: true,
+  styleUrls: ['./projet-form.component.css'],
 })
 export class ProjetFormComponent implements OnInit {
-  @Input() projet?: Projet;
-  @Output() formSubmit = new EventEmitter<Projet>();
+  projetForm: FormGroup;
+  isEditing = false;
+  projetId: string | null = null;
+  statutOptions = Object.values(StatutProjet);
+  availableUsers: any[] = [];
 
-  projetForm!: FormGroup;
-  statutsProjet = [
-    Statutprojet.BROUILLON,
-    Statutprojet.EN_COURS,
-    Statutprojet.TERMINE,
-    Statutprojet.ARCHIVE,
-    Statutprojet.EN_RETARD,
-    Statutprojet.A_venir
-  ];
+  constructor(
+    private fb: FormBuilder,
+    private projetService: ProjetService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
+    this.projetForm = this.createForm();
+  }
 
-  constructor(private fb: FormBuilder) {}
+  ngOnInit(): void {
+    this.loadUsers();
 
-  ngOnInit() {
-    this.projetForm = this.fb.group({
-      titre: [this.projet?.titre || '', Validators.required],
-      description: [this.projet?.description || '', Validators.required],
-      equipe: [this.projet?.equipe ? this.projet.equipe.join(',') : '', Validators.required],
-      tuteur: [this.projet?.tuteur || '', Validators.required],
-      competences: [this.projet?.competences ? this.projet.competences.join(',') : '', Validators.required],
-      dateDebut: [this.projet?.dateDebut ? this.toDateInputValue(this.projet.dateDebut) : '', Validators.required],
-      dateFin: [this.projet?.dateFin ? this.toDateInputValue(this.projet.dateFin) : '', Validators.required],
-      statut: [this.projet?.statut || Statutprojet.BROUILLON, Validators.required]
+    this.projetId = this.route.snapshot.paramMap.get('id');
+    if (this.projetId) {
+      this.isEditing = true;
+      this.projetService.getProjetById(this.projetId).subscribe(projet => {
+        this.updateFormWithProjet(projet);
+      });
+    }
+  }
+
+  private createForm(): FormGroup {
+    return this.fb.group({
+      titre: ['', Validators.required],
+      description: ['', Validators.required],
+      equipe: [[]],
+      tuteur: [''],
+      competences: this.fb.array([]),
+      dateDebut: ['', Validators.required],
+      dateFin: ['', Validators.required],
+      statut: [StatutProjet.BROUILLON, Validators.required]
     });
   }
 
-  toDateInputValue(date: string | Date): string {
-    if (!date) return '';
-    const d = new Date(date);
-    return d.toISOString().substring(0, 10);
+  private updateFormWithProjet(projet: Projet): void {
+    // Reset competences FormArray
+    while (this.competences.length) {
+      this.competences.removeAt(0);
+    }
+
+    // Add each competence to FormArray
+    if (projet.competences && projet.competences.length) {
+      projet.competences.forEach(comp => {
+        this.competences.push(this.fb.control(comp));
+      });
+    }
+
+    // Update form values
+    this.projetForm.patchValue({
+      titre: projet.titre,
+      description: projet.description,
+      equipe: projet.equipe,
+      tuteur: projet.tuteur,
+      dateDebut: this.formatDateForInput(projet.dateDebut),
+      dateFin: this.formatDateForInput(projet.dateFin),
+      statut: projet.statut
+    });
   }
 
-  onSubmit() {
-    if (this.projetForm.valid) {
-      const formValue = this.projetForm.value;
-      const projet: Projet = {
-        ...formValue,
-        equipe: formValue.equipe.split(',').map((id: string) => id.trim()).filter((id: string) => id),
-        competences: formValue.competences.split(',').map((c: string) => c.trim()).filter((c: string) => c),
-        dateDebut: formValue.dateDebut,
-        dateFin: formValue.dateFin
-      };
-      this.formSubmit.emit(projet);
+  private formatDateForInput(date: Date): string {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0];
+  }
+
+  get competences(): FormArray {
+    return this.projetForm.get('competences') as FormArray;
+  }
+
+  addCompetence(): void {
+    this.competences.push(this.fb.control(''));
+  }
+
+  removeCompetence(index: number): void {
+    this.competences.removeAt(index);
+  }
+
+  onSubmit(): void {
+    if (this.projetForm.invalid) return;
+
+    const formValue = this.projetForm.value;
+    const projet: Projet = {
+      titre: formValue.titre,
+      description: formValue.description,
+      equipe: formValue.equipe,
+      tuteur: formValue.tuteur,
+      competences: formValue.competences.filter((c: string) => c.trim() !== ''),
+      dateDebut: new Date(formValue.dateDebut),
+      dateFin: new Date(formValue.dateFin),
+      livrables: [], // Will be filled by livrable form
+      statut: formValue.statut
+    };
+
+    let action$: Observable<Projet>;
+
+    if (this.isEditing && this.projetId) {
+      action$ = this.projetService.updateProjet(this.projetId, projet);
+    } else {
+      action$ = this.projetService.createProjet(projet);
     }
+
+    action$.subscribe({
+      next: () => this.router.navigate(['/projets']),
+      error: (error) => console.error('Error saving project:', error)
+    });
   }
 }
 
@@ -2206,50 +2995,53 @@ export class ProjetFormComponent implements OnInit {
 // ======= Contenu de src/app/projet/projet-list/projet-list.component.spec.ts =======
 
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+  import { RouterTestingModule } from '@angular/router/testing';
+  import { ProjetListComponent } from './projet-list.component';
 
-import { ProjetListComponent } from './projet-list.component';
+  describe('ProjetListComponent', () => {
+    let component: ProjetListComponent;
+    let fixture: ComponentFixture<ProjetListComponent>;
 
-describe('ProjetListComponent', () => {
-  let component: ProjetListComponent;
-  let fixture: ComponentFixture<ProjetListComponent>;
-
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [ProjetListComponent]
-    })
+    beforeEach(async () => {
+      await TestBed.configureTestingModule({
+        imports: [
+          RouterTestingModule,
+          ProjetListComponent
+        ]
+      })
       .compileComponents();
 
-    fixture = TestBed.createComponent(ProjetListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+      fixture = TestBed.createComponent(ProjetListComponent);
+      component = fixture.componentInstance;
+      fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
+    it('should create', () => {
+      expect(component).toBeTruthy();
+    });
   });
-});
 
 
 // ======= Contenu de src/app/projet/projet-list/projet-list.component.ts =======
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { ProjetService } from '../../core/services/projet.service';
-import { Projet } from '../../core/models/projet.model';
+import { RouterModule, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { Projet } from '../../core/models/projet.model';
+import { ProjetService } from '../../core/services/projet.service';
 
 @Component({
   selector: 'app-projet-list',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './projet-list.component.html',
-  styleUrls: ['./projet-list.component.css']
+  styleUrls: ['./projet-list.component.css'],
+  standalone: true,
+  imports: [CommonModule, RouterModule]
 })
 export class ProjetListComponent implements OnInit, OnDestroy {
-  projets: (Projet & { _id: string })[] = [];
-  chargement = false;
+  chargement = true;
   erreur = '';
+  projets: (Projet & { _id: string })[] = [];
   private subscription?: Subscription;
 
   constructor(
@@ -2257,30 +3049,38 @@ export class ProjetListComponent implements OnInit, OnDestroy {
     private router: Router
   ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.chargerProjets();
   }
 
-  chargerProjets() {
+  chargerProjets(): void {
     this.chargement = true;
     this.subscription = this.projetService.recupererProjets().subscribe({
-      next: (projets) => {
-        this.projets = projets.filter(p => !!p._id) as (Projet & { _id: string })[];
+      next: (projets: any[]) => {
+        this.projets = projets.filter((p: any) => !!p._id) as (Projet & { _id: string })[];
         this.chargement = false;
       },
-      error: (err) => {
-        this.erreur = "Erreur lors du chargement des projets.";
+      error: (error: any) => {
+        console.error('Erreur lors du chargement des projets:', error);
+        this.erreur = 'Impossible de charger les projets.';
         this.chargement = false;
-        console.error('Erreur:', err);
       }
     });
   }
 
-  voirDetails(id: string) {
-    this.router.navigate(['/projet', id]);
+  async voirDetails(id: string): Promise<void> {
+    try {
+      const success = await this.router.navigate(['/projet', id]);
+      if (!success) {
+        console.warn(`Navigation vers le projet ${id} impossible`);
+      }
+    } catch (error) {
+      console.error('Erreur de navigation:', error);
+      this.erreur = 'Impossible d\'acceder au projet demande.';
+    }
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }

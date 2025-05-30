@@ -12,7 +12,7 @@ export class LivrableService {
 
   constructor(private http: HttpClient) { }
 
-  getAllLivrables(): Observable<Livrable[]> {
+  recupererLivrables(): Observable<Livrable[]> {
     return this.http.get<Livrable[]>(this.apiUrl).pipe(
       map(livrables => livrables.map(livrable => ({
         ...livrable,
@@ -23,7 +23,7 @@ export class LivrableService {
     );
   }
 
-  getLivrablesForProject(projetId: string): Observable<Livrable[]> {
+  recupererLivrablesParProjet(projetId: string): Observable<Livrable[]> {
     return this.http.get<Livrable[]>(`${this.apiUrl}/projet/${projetId}`).pipe(
       map(livrables => livrables.map(livrable => ({
         ...livrable,
@@ -34,7 +34,7 @@ export class LivrableService {
     );
   }
 
-  getLivrableById(id: string): Observable<Livrable> {
+  recupererLivrable(id: string): Observable<Livrable> {
     return this.http.get<Livrable>(`${this.apiUrl}/${id}`).pipe(
       map(livrable => ({
         ...livrable,
@@ -45,19 +45,27 @@ export class LivrableService {
     );
   }
 
-  createLivrable(livrable: Livrable): Observable<Livrable> {
+  creerLivrable(livrable: Livrable): Observable<Livrable> {
     return this.http.post<Livrable>(this.apiUrl, livrable);
   }
 
-  updateLivrable(id: string, livrable: Livrable): Observable<Livrable> {
+  mettreAJourLivrable(id: string, livrable: Livrable): Observable<Livrable> {
     return this.http.put<Livrable>(`${this.apiUrl}/${id}`, livrable);
   }
 
-  deleteLivrable(id: string): Observable<void> {
+  supprimerLivrable(id: string): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
   getStatutOptions(): string[] {
     return Object.values(StatutLivrable);
   }
+
+  // Maintenir les alias pour la compatibilité
+  getAllLivrables = this.recupererLivrables;
+  getLivrableById = this.recupererLivrable;
+  getLivrablesForProject = this.recupererLivrablesParProjet;
+  createLivrable = this.creerLivrable;
+  updateLivrable = this.mettreAJourLivrable;
+  deleteLivrable = this.supprimerLivrable;
 }
