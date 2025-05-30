@@ -20,6 +20,8 @@ interface Livrable {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
+    MatBadgeModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
