@@ -40,14 +40,7 @@ describe('LivrableService', () => {
   };
 
   beforeEach(() => {
-    const spy = jasmine.createSpyObj<ApiService>('ApiService', {
-      get: of(mockListResponse),
-      post: of(mockResponse),
-      put: of(mockResponse),
-      delete: of({ success: true, message: 'Deleted' } as DeleteResponse),
-      checkHealth: of({ status: 'ok' })
-    });
-    
+    const spy = jasmine.createSpyObj<ApiService>('ApiService', ['get', 'post', 'put', 'delete', 'checkHealth']);
     TestBed.configureTestingModule({
       providers: [
         LivrableService,
@@ -67,7 +60,7 @@ describe('LivrableService', () => {
       apiServiceSpy.get.and.returnValue(of(mockListResponse));
 
       service.getLivrables().subscribe({
-        next: (response) => {
+        next: (response: ApiResponse<Livrable[]>) => {
           expect(response).toEqual(mockListResponse);
           expect(apiServiceSpy.get).toHaveBeenCalledWith('/api/livrables', {});
         }
@@ -80,7 +73,7 @@ describe('LivrableService', () => {
       apiServiceSpy.get.and.returnValue(of(mockPaginatedResponse));
 
       service.getLivrables(params).subscribe({
-        next: (response) => {
+        next: (response: ApiResponse<Livrable[]>) => {
           expect(response).toEqual(mockPaginatedResponse);
           expect(apiServiceSpy.get).toHaveBeenCalledWith('/api/livrables', params);
         }
@@ -94,7 +87,7 @@ describe('LivrableService', () => {
       apiServiceSpy.get.and.returnValue(of(mockResponse));
 
       service.getLivrableParId(id).subscribe({
-        next: (response) => {
+        next: (response: ApiResponse<Livrable>) => {
           expect(response).toEqual(mockResponse);
           expect(apiServiceSpy.get).toHaveBeenCalledWith(`/api/livrables/${id}`);
         }
@@ -120,7 +113,7 @@ describe('LivrableService', () => {
       apiServiceSpy.post.and.returnValue(of(createResponse));
 
       service.creerLivrable(newLivrable).subscribe({
-        next: (response) => {
+        next: (response: ApiResponse<Livrable>) => {
           expect(response).toEqual(createResponse);
           expect(apiServiceSpy.post).toHaveBeenCalledWith('/api/livrables', newLivrable);
         }
@@ -144,7 +137,7 @@ describe('LivrableService', () => {
       apiServiceSpy.put.and.returnValue(of(updateResponse));
 
       service.updateLivrable(id, updateLivrable).subscribe({
-        next: (response) => {
+        next: (response: ApiResponse<Livrable>) => {
           expect(response).toEqual(updateResponse);
           expect(apiServiceSpy.put).toHaveBeenCalledWith(`/api/livrables/${id}`, updateLivrable);
         }
@@ -159,7 +152,7 @@ describe('LivrableService', () => {
       apiServiceSpy.delete.and.returnValue(of(deleteResponse));
 
       service.deleteLivrable(id).subscribe({
-        next: (response) => {
+        next: (response: DeleteResponse) => {
           expect(response).toEqual(deleteResponse);
           expect(apiServiceSpy.delete).toHaveBeenCalledWith(`/api/livrables/${id}`);
         }
@@ -173,7 +166,7 @@ describe('LivrableService', () => {
       apiServiceSpy.get.and.returnValue(of(mockListResponse));
 
       service.getLivrablesByProjet(projetId).subscribe({
-        next: (response) => {
+        next: (response: ApiResponse<Livrable[]>) => {
           expect(response).toEqual(mockListResponse);
           expect(apiServiceSpy.get).toHaveBeenCalledWith(`/api/livrables/projet/${projetId}`);
         }
