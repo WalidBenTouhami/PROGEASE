@@ -4,22 +4,39 @@ const { resolvers } = require('./index');
 
 // Definition du schema GraphQL aligné avec les constantes et modèles
 const typeDefs = gql`
+  scalar Date
+
   type Query {
     health: Health!
     projets: [Projet!]!
     projet(id: ID!): Projet
-    livrables: [Livrable!]!
-    livrable(id: ID!): Livrable
+    deliverables(page: Int, limit: Int, projetId: ID, statut: StatutLivrable, recherche: String, dateLimiteMin: String, dateLimiteMax: String): LivrableConnection!
+    deliverable(id: ID!): Livrable
+    aiRecommendations(projetId: ID!): AIRecommendations!
+    analyserRisquesProjet(projetId: ID!): AnalyseRisques!
+    getProjectProgress(id: ID!): Float!
+    getPredictedPerformance(id: ID!): Float!
+    livrablesByProjet(projetId: ID!): [Livrable!]!
+    evaluations(projetId: ID): [Evaluation!]!
+    evaluation(id: ID!): Evaluation
+    getEvaluationStats(projectId: ID!): EvaluationStats!
   }
 
   type Mutation {
-    createProjet(input: ProjetInput!): Projet!
-    updateProjet(id: ID!, input: ProjetInput!): Projet!
-    deleteProjet(id: ID!): Boolean!
+    createProject(input: ProjetInput!): Projet!
+    updateProject(id: ID!, input: ProjetInput!): Projet!
+    deleteProject(id: ID!): Boolean!
     
-    createLivrable(input: LivrableInput!): Livrable!
-    updateLivrable(id: ID!, input: LivrableInput!): Livrable!
-    deleteLivrable(id: ID!): Boolean!
+    addDeliverable(projectId: ID!, input: DeliverableInput!): Livrable!
+    updateDeliverable(id: ID!, input: DeliverableInput!): Livrable!
+    deleteDeliverable(id: ID!): Boolean!
+
+    predictPerformance(projectId: ID!): Float!
+    generateLearningRecommendations(projectId: ID!): String!
+
+    createEvaluation(input: CreateEvaluationInput!): Evaluation!
+    updateEvaluation(id: ID!, input: UpdateEvaluationInput!): Evaluation!
+    deleteEvaluation(id: ID!): Boolean!
   }
 
   type Health {
@@ -31,56 +48,155 @@ const typeDefs = gql`
 
   type Projet {
     id: ID!
-    nom: String!
-    description: String
-    dateDebut: String!
-    dateFin: String
+    titre: String!
+    description: String!
     statut: StatutProjet!
+    equipe: [User!]!
+    tuteur: User
+    competences: [String!]!
+    dateDebut: Date!
+    dateFin: Date!
     livrables: [Livrable!]!
-    createdAt: String!
-    updatedAt: String!
+    evaluations: [Evaluation!]!
+    progression: Float!
+    moyenneEvaluations: Float!
+    performancePredite: Float!
+    creeLe: Date!
+    majLe: Date!
   }
 
   type Livrable {
     id: ID!
     intitule: String!
-    description: String
-    dateLimite: String!
+    description: String!
+    dateLimite: Date!
+    urlDepot: String
     statut: StatutLivrable!
+    projetId: ID!
     projet: Projet!
-    createdAt: String!
-    updatedAt: String!
+    estEnRetard: Boolean!
+    creeLe: Date!
+    majLe: Date!
   }
 
   input ProjetInput {
-    nom: String!
-    description: String
-    dateDebut: String!
-    dateFin: String
+    titre: String!
+    description: String!
+    equipe: [ID!]
+    tuteur: ID
+    competences: [String!]!
+    dateDebut: Date!
+    dateFin: Date!
     statut: StatutProjet
   }
 
-  input LivrableInput {
-    nom: String!
-    description: String
-    dateEcheance: String!
-    statut: StatutLivrable
-    projetId: ID!
+  input DeliverableInput {
+    name: String!
+    description: String!
+    deadline: Date!
+    repositoryUrl: String
+    status: StatutLivrable
   }
 
   enum StatutProjet {
+    BROUILLON
     EN_COURS
     TERMINE
-    EN_PAUSE
     ANNULE
   }
 
   enum StatutLivrable {
-    A_FAIRE
+    EN_ATTENTE
     EN_COURS
     TERMINE
-    EN_RETARD
-    ANNULE
+    RETARD
+  }
+
+  type AIRecommendations {
+    recommendations: String!
+    score: Float!
+    confidence: Float!
+    metadata: AIMetadata!
+  }
+
+  type AIMetadata {
+    modelUsed: String!
+    timestamp: Date!
+    processingTime: Float!
+  }
+
+  type AnalyseRisques {
+    retard: Boolean!
+    progression: Boolean!
+    livrables: Boolean!
+    equipe: Boolean!
+    niveauRisque: Int!
+    recommandations: [String!]!
+  }
+
+  type LivrableConnection {
+    items: [Livrable!]!
+    pagination: Pagination!
+  }
+
+  type Pagination {
+    page: Int!
+    limit: Int!
+    total: Int!
+    pages: Int!
+    hasNextPage: Boolean!
+    hasPreviousPage: Boolean!
+  }
+
+  type Evaluation {
+    id: ID!
+    note: Float!
+    commentaire: String
+    criteres: [EvaluationCritere!]!
+    projet: Projet!
+    evaluateur: User!
+    dateEvaluation: Date!
+    creeLe: Date!
+    majLe: Date!
+  }
+
+  type EvaluationCritere {
+    nom: String!
+    note: Float!
+    poids: Float!
+  }
+
+  type EvaluationStats {
+    moyenneScore: Float!
+    scoreMax: Float!
+    scoreMin: Float!
+    totalEvaluations: Int!
+  }
+
+  input CreateEvaluationInput {
+    projetId: ID!
+    note: Float!
+    commentaire: String
+    criteres: [EvaluationCritereInput!]!
+  }
+
+  input UpdateEvaluationInput {
+    note: Float
+    commentaire: String
+    criteres: [EvaluationCritereInput!]
+  }
+
+  input EvaluationCritereInput {
+    nom: String!
+    note: Float!
+    poids: Float!
+  }
+
+  type User {
+    id: ID!
+    nom: String!
+    prenom: String!
+    email: String!
   }
 `;
 

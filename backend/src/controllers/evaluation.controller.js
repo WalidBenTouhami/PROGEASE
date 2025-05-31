@@ -1,5 +1,5 @@
 const Evaluation = require('../models/evaluation.model');
-const Project = require('../models/project.model');
+const Project = require('../models/projet.model');
 const { generateAIAnalysis } = require('../services/ai.service');
 
 // Create a new evaluation

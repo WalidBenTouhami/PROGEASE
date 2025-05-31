@@ -46,7 +46,6 @@ const resolvers = {
             version: '2.0.0',
             environment: process.env.NODE_ENV
         }),
-        healthCheck: () => 'OK',
         ...aiResolver.Query,
         ...projetResolver.Query,
         ...livrableResolver.Query,
