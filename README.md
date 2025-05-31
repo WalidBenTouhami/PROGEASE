@@ -1,205 +1,221 @@
-# PROGEASE Project
+# PROGEASE
 
-<p align="center">
-  <img src="./assets/PROGEASE.png" alt="PROGEASE logo" width="400"/>
-</p>
+![PROGEASE Logo](./frontend/src/assets/PROGEASE.png)
 
-## 🚀 Introduction
-
-**PROGEASE** est une plateforme centralisée conçue pour améliorer la gestion des projets étudiants dans un cadre universitaire. Elle aide les étudiants, tuteurs et administrateurs à gérer efficacement les projets grâce à des fonctionnalités innovantes telles que l'automatisation, la collaboration en temps réel, et l'analyse des performances des projets.
-
----
-
-## 🧑‍💻 Équipe de Développement
-
-| **Développeur**         | **Modules**               |
-|--------------------------|---------------------------|
-| Ghofrane Toukebri        | Formation & Certification |
-| Yosr Ben Hammadi         | Système d'Évaluation      |
-| Imen Ferchichi           | Gestion des Utilisateurs  |
-| Karim Troudi             | Gestion du Forum          |
-| Walid Ben Touhami        | Gestion des Projets       |
+[![CI](https://github.com/WalidBenTouhami/PROGEASE/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/WalidBenTouhami/PROGEASE/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/WalidBenTouhami/PROGEASE/branch/main/graph/badge.svg)](https://codecov.io/gh/WalidBenTouhami/PROGEASE)
+[![Node.js Version](https://img.shields.io/badge/node-v16%2B-green.svg)](https://nodejs.org/)
+[![License: MIT](https://img.shields.io/badge/license-MIT-orange.svg)](LICENSE)
 
 ---
 
-## 🌟 Fonctionnalités Principales
-
-### **Gestion des Projets**
-- Ajouter, modifier et supprimer des projets.
-- Suivre l'avancement des projets en temps réel.
-- Prédire les performances grâce à des algorithmes d'IA.
-
-### **Gestion des Utilisateurs**
-- Gestion des rôles : étudiant, tuteur, administrateur.
-- Authentification et autorisation sécurisées.
-
-### **Système d'Évaluation**
-- Ajout et gestion des évaluations pour les projets.
-- Gestion des scores et des commentaires des évaluateurs.
-
-### **Formation et Certification**
-- Gestion des formations et certifications pour les étudiants.
-
-### **Gestion du Forum**
-- Création et gestion des discussions entre membres des équipes.
-
-### **Sécurité et Fiabilité**
-- Authentification sécurisée avec validation via **Yup**.
-- Protection des données sensibles côté backend.
-
-<p align="center">
-  <img src="./assets/Yup.png" alt="Validation Yup" width="400"/>
-</p>
+## 🚀 Projet Overview
+**PROGEASE** is a modern, full-stack platform for managing student projets in an academic environment. It streamlines projet and livrable tracking, team collaboration, evaluation, and reporting, with advanced features like AI-powered analysis and automated documentation/testing.
 
 ---
 
-## 🛠️ Technologies Utilisées
+## 🕵️ Comprehensive Code Audit (2025-05)
 
-- **Backend** : Node.js, Express.js
-- **Base de données** : MongoDB
-- **AI** : TensorFlow.js, scikit-learn
-- **Validation** : Yup
+This section presents a detailed audit of the PROGEASE codebase, covering architecture, code quality, security, testing, type safety, and best practices.
+
+### 1. Architecture & Structure
+- **Monorepo**: Clean separation between `backend/` (Node.js/Express/MongoDB/Apollo) and `frontend/` (Angular 18+/Apollo Angular).
+- **Backend**: Modular structure with `src/` containing `models`, `controllers`, `routes`, `middlewares`, `services`, `utils`, and `graphql`.
+- **Frontend**: Modern Angular structure with `app/` split into `core/` (services, models, GraphQL), `back-office/`, `front-office/`, and feature modules.
+
+### 2. Backend Audit
+#### a. Security
+- Uses `helmet` for HTTP headers, CORS with environment-based origins, and global rate limiting.
+- Environment variables are validated; sensitive data is never exposed in logs.
+- Password policy and JWT session config are present (verify user/auth endpoints).
+
+#### b. Error Handling & Logging
+- Centralized error handling for HTTP, process, and GraphQL errors, with custom `winston` logger.
+- Process-level handlers for `uncaughtException`, `unhandledRejection`, `SIGTERM`, `SIGINT`.
+- Standardized error responses and detailed logging.
+
+#### c. Validation
+- Input validation via `yup` and `express-validator`.
+- Mongoose validation mapped to user-friendly errors.
+
+#### d. API Design
+- REST and GraphQL supported, with aligned models and endpoints.
+- AI analysis route, `/health` endpoint, and auto-generated API docs.
+
+#### e. Testing & Automation
+- Jest for backend logic, Newman/Postman for API, CLI scripts for test/doc generation.
+- CI/CD with GitHub Actions for lint, build, test, codegen, and docs.
+
+#### f. Code Quality
+- ESLint and Prettier configured, consistent naming, modularization.
+
+### 3. Frontend Audit
+#### a. Type Safety & Codegen
+- Uses `@graphql-codegen` for TypeScript types and Angular services from backend schema.
+- Models match backend enums and fields.
+
+#### b. Authentication & Security
+- Auth interceptor adds JWT to HTTP requests.
+- Role handling in UI/models (verify login/registration flows).
+
+#### c. UI/UX
+- Responsive, branded layouts for back-office and front-office.
+- Angular best practices: standalone components, modular routing, service injection.
+
+#### d. Testing
+- Jasmine/Karma for components/services, API test component, CI integration.
+
+#### e. Code Quality
+- ESLint, Prettier, EditorConfig, consistent structure.
+
+### 4. DevOps & Automation
+- GitHub Actions for backend/frontend, including codegen, lint, test, and doc generation.
+- Badges for CI, coverage, Node version, license. Artifacts uploaded on every build.
+
+### 5. Documentation & Contributor Experience
+- Professional, up-to-date root and frontend READMEs.
+- Auto-generated API docs, easy onboarding for new contributors.
+
+### 6. Potential Gaps & Recommendations
+- **User Authentication**: JWT and password policy are configured, but explicit user registration/login endpoints and UI should be verified.
+- **Authorization Middleware**: Ensure all sensitive routes are protected in both REST and GraphQL.
+- **E2E Testing**: Consider adding Cypress or Playwright for full-stack E2E tests.
+- **Secrets Management**: Use environment variables or a secrets manager in production.
+- **Monitoring**: Add health checks to CI/CD and consider uptime monitoring tools.
+- **Accessibility**: Audit UI for accessibility (a11y) compliance.
+
+### 7. Summary Table
+
+| Area                | Status      | Notes                                                                 |
+|---------------------|-------------|-----------------------------------------------------------------------|
+| **Security**        | ✅ Good     | Helmet, CORS, rate limit, env validation, password policy, JWT config |
+| **Error Handling**  | ✅ Robust   | Centralized, process-level, custom logger                             |
+| **Validation**      | ✅ Strong   | Yup, express-validator, Mongoose, clear errors                        |
+| **Testing**         | ✅ Automated| Jest, Postman/Newman, codegen, CI/CD                                  |
+| **Type Safety**     | ✅ Excellent| GraphQL codegen, strict models, Angular types                         |
+| **Code Quality**    | ✅ High     | ESLint, Prettier, modular, naming conventions                         |
+| **Docs/Onboarding** | ✅ Excellent| Root/Frontend README, auto API docs, clear scripts                     |
+| **UI/UX**           | ✅ Modern   | Responsive, branded, modular templates                                |
+| **DevOps**          | ✅ Complete | CI/CD, badges, artifacts, codegen, test automation                    |
+| **Potential Gaps**  | ⚠️ Review  | Explicit user auth flows, E2E tests, a11y, production secrets          |
 
 ---
 
-## ⚙️ Installation et Configuration
-
-### **Prérequis**
-- Node.js (v16 ou supérieur)
-- npm (v7 ou supérieur)
-- MongoDB
-
-### **Étapes d'installation**
-
-1. **Cloner le dépôt :**
-   ```bash
-   git clone <URL_DU_DEPOT>
-   cd <NOM_DU_DEPOT>
-   ```
-
-2. **Installer les dépendances :**
-   ```bash
-   npm install
-   ```
-
-3. **Configurer les variables d'environnement :**
-   Créez un fichier `.env` à la racine du projet et ajoutez les variables suivantes :
-   ```env
-   PORT=3000
-   NODE_ENV=development
-   MONGO_URI=mongodb://localhost:27017/progease
-   CORS_ORIGINS=http://localhost:3000
-   ```
-
-4. **Lancer l'application :**
-   ```bash
-   npm start
-   ```
-
-5. **Accéder à l'application :**
-   - **API REST** : [http://localhost:4000/api/v1/](http://localhost:4000/api/v1/)
-   - **GraphQL Playground** : [http://localhost:4000/graphql](http://localhost:4000/graphql)
+## 🏗️ Architecture
+```
+[Frontend (Angular)] <-> [Backend (Node.js/Express/Apollo)] <-> [MongoDB]
+```
+- **Frontend**: Angular 18+, Apollo Angular, Material UI, responsive templates for back-office (admin/staff) and front-office (students/teams)
+- **Backend**: Node.js, Express, MongoDB, Apollo Server (GraphQL), REST, security best practices
+- **Database**: MongoDB (models: Projet, Livrable, etc.)
 
 ---
 
-## 🧪 Tests
+## 🌟 Key Features
+- Projet and livrable (livrable) management (CRUD, search, filter)
+- Role-based access (admin, tutor, student)
+- Dashboards for both back-office and front-office
+- AI-powered projet analysis (optional)
+- Automated API documentation and test generation (REST & GraphQL)
+- Type-safe GraphQL integration with codegen
+- Modern, branded UI with logo and color scheme
+- CI/CD with GitHub Actions, code quality, and test coverage
 
-Pour exécuter les tests, utilisez la commande suivante :
+---
+
+## ⚡ Quick Start
+### 1. **Clone the repository**
 ```bash
-npm test
+git clone https://github.com/WalidBenTouhami/PROGEASE.git
+cd PROGEASE
 ```
-
-### **Tests inclus :**
-- Tests unitaires pour les modules principaux.
-- Tests d'intégration pour les routes REST et GraphQL.
-
----
-
-## 📂 Structure Globale du Backend
-
-### **Structure des Dossiers**
-<details>
-  <summary>📂 Cliquez pour afficher la structure</summary>
-
+### 2. **Install dependencies**
+```bash
+cd backend && npm install
+cd ../frontend && npm install
 ```
-backend
-|-- config
-|   |-- constants.js
-|   `-- db.json
-|-- package-lock.json
-|-- package.json
-|-- server.js
-`-- src
-    |-- controllers
-    |   |-- evaluation.controller.js
-    |   |-- formation&certification.controller.js
-    |   |-- forum.controller.js
-    |   |-- project.controller.js
-    |   `-- user.controller.js
-    |-- middlewares
-    |   |-- evaluation.middleware.js
-    |   |-- formation&certification.middleware.js
-    |   |-- forum.middleware.js
-    |   |-- project.middleware.js
-    |   `-- user.middleware.js
-    |-- models
-    |   |-- evaluation.model.js
-    |   |-- formation&certification.model.js
-    |   |-- forum.model.js
-    |   |-- project.model.js
-    |   `-- user.model.js
-    |-- routers
-    |   |-- evaluation.router.js
-    |   |-- formation&certification.router.js
-    |   |-- forum.router.js
-    |   |-- project.router.js
-    |   `-- user.router.js
-    |-- schema.js
-    |-- services
-    |   |-- evaluation.service.js
-    |   |-- formation&certification.service.js
-    |   |-- forum.service.js
-    |   |-- project.service.js
-    |   `-- user.service.js
-    `-- utils
-        |-- date.util.js
-        `-- github.util.js
+### 3. **Seed the database**
+```bash
+cd ../backend
+node seed.js
 ```
-
-</details>
-
----
-
-## 📊 Modules et Arborescence
-
-<p align="center">
-  <img src="./assets/Tree%20map.png" alt="Arborescence des modules" width="1600"/>
-</p>
-
----
-
-## 🤝 Contributions
-
-Les contributions sont les bienvenues ! Veuillez suivre ces étapes pour proposer des modifications :
-1. **Forkez le dépôt.**
-2. **Créez une branche pour vos modifications.**
-   ```bash
-   git checkout -b feature/nom-feature
-   ```
-3. **Soumettez un pull request.**
-
-N'hésitez pas à ouvrir une issue pour discuter des améliorations.
+### 4. **Run the backend**
+```bash
+npm start
+# or
+node server.js
+```
+### 5. **Run the frontend**
+```bash
+cd ../frontend
+ng serve
+```
+Visit [http://localhost:4200/](http://localhost:4200/)
 
 ---
 
-## 📜 Licence
-
-Ce projet est sous licence **MIT**. Consultez le fichier `LICENSE` pour plus de détails.
+## 📚 API Documentation & Test Automation
+- **Generate API docs and tests:**
+  ```bash
+  cd backend
+  node tools/test-generator.js --docs
+  node tools/test-generator.js --graphql
+  node tools/test-generator.js --rest
+  ```
+- **Docs output:** `backend/docs/`
+- **Tests output:** `backend/tests/`
+- **Postman collections and GraphQL test files auto-generated**
 
 ---
 
-## 🔗 Liens Utiles
+## 🧬 Frontend GraphQL Codegen
+- **Generate types/services:**
+  ```bash
+  cd frontend
+  npm run codegen
+  ```
+- **Requires backend running at** `http://localhost:5000/graphql`
+- **Add .graphql files in** `src/app/core/graphql/` and re-run codegen as needed
 
-- **Documentation API** : [Lien vers la documentation](http://localhost:4000/api-docs)
-- **Documentation GraphQL** : [Lien vers GraphQL Playground](http://localhost:4000/graphql)
-- **Dépôt GitHub** : [Lien vers le dépôt](<URL_DU_DEPOT>)
+---
+
+## 🛡️ CI/CD & Quality Assurance
+- **GitHub Actions**: Automated install, lint, build, test, codegen, and docs for both backend and frontend
+- **Badges**: CI, code coverage, Node version, license
+- **Artifacts**: API docs and test reports uploaded on every build
+
+---
+
+## 🧩 Technologies Used
+- **Frontend**: Angular 18+, Apollo Angular, Material UI, SCSS
+- **Backend**: Node.js, Express, Apollo Server, MongoDB, Mongoose
+- **Testing**: Jest, Postman/Newman, GraphQL codegen
+- **CI/CD**: GitHub Actions
+- **Branding**: Custom logo, dark/teal/gold color scheme
+
+---
+
+## 🤝 Contributing
+- Use the CLI and templates for new features
+- Keep code and UI consistent with the PROGEASE branding
+- Run codegen and tests before submitting PRs
+- See `frontend/README.md` and `backend/README.md` for module-specific details
+
+---
+
+## 👥 Credits & Contact
+- Main author: [Walid Ben Touhami](https://github.com/WalidBenTouhami)
+- See contributors on GitHub
+- For questions, open an issue or contact the team
+
+---
+
+## 📝 Notes
+- **Logo**: `frontend/src/assets/PROGEASE.png`
+- **Environment**: Node.js 16+, MongoDB 5+, Angular 18+
+- **Deployment**: See CI/CD workflow and environment variable setup
+- **License**: MIT
+
+---
+
+For more details, see the sub-READMEs in `backend/` and `frontend/`.

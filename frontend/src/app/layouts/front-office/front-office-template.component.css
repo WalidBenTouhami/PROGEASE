@@ -1,0 +1,132 @@
+/* PROGEASE Front-Office Template Styles */
+.frontoffice-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--background-color);
+  color: var(--text-color);
+}
+.fo-header {
+  display: flex;
+  align-items: center;
+  background: var(--primary-color);
+  padding: 0 2rem;
+  height: var(--header-height);
+  box-shadow: 0 2px 8px var(--shadow-color);
+}
+.fo-logo {
+  height: 44px;
+  margin-right: 1rem;
+  transition: transform var(--transition-speed);
+}
+.fo-logo:hover {
+  transform: scale(1.05);
+}
+.fo-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--accent-color);
+  letter-spacing: 2px;
+  flex: 1;
+}
+.fo-nav {
+  display: flex;
+  gap: 1.5rem;
+  animation: slideIn 0.5s ease-out;
+}
+.fo-nav a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 500;
+  transition: color var(--transition-speed);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.fo-nav a.active, .fo-nav a:hover {
+  color: var(--highlight-color);
+}
+.fo-main {
+  flex: 1;
+  padding: 2rem;
+  background: var(--secondary-color);
+  min-height: 400px;
+  position: relative;
+}
+.breadcrumb {
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  border-radius: 4px;
+  animation: fadeIn 0.3s ease-out;
+}
+.back-to-top {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: var(--accent-color);
+  color: var(--text-color);
+  opacity: 0.7;
+  transition: opacity var(--transition-speed);
+  animation: fadeIn 0.3s ease-out;
+}
+.back-to-top:hover {
+  opacity: 1;
+}
+.fo-footer {
+  background: var(--primary-color);
+  color: var(--highlight-color);
+  text-align: center;
+  padding: 0.5rem 0;
+  height: var(--footer-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.footer-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.version {
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+@media (max-width: var(--breakpoint-tablet)) {
+  .fo-header {
+    padding: 0 1rem;
+  }
+  .fo-title {
+    font-size: 1.1rem;
+  }
+  .fo-main {
+    padding: 1rem;
+  }
+  .back-to-top {
+    bottom: 1rem;
+    right: 1rem;
+  }
+}
+@media (max-width: var(--breakpoint-mobile)) {
+  .fo-header {
+    flex-direction: column;
+    align-items: flex-start;
+    height: auto;
+    padding: 0.5rem;
+  }
+  .fo-nav {
+    width: 100%;
+    justify-content: space-around;
+    margin-top: 0.5rem;
+  }
+  .fo-nav a {
+    font-size: 0.9rem;
+  }
+  .fo-main {
+    padding: 0.5rem;
+  }
+  .breadcrumb {
+    margin-bottom: 0.5rem;
+  }
+} 

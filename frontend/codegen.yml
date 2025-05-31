@@ -1,0 +1,21 @@
+schema: http://localhost:5000/graphql
+# Path to your GraphQL endpoint. Change if your backend runs elsewhere.
+documents: src/app/**/*.graphql
+# All your frontend GraphQL queries/mutations/fragments
+
+generates:
+  src/app/core/generated/graphql.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-apollo-angular
+    config:
+      skipTypename: true
+      withHooks: false
+      withHOC: false
+      withComponent: false
+
+# Optional: generate a schema.json for IDE tooling
+  ./schema.json:
+    plugins:
+      - introspection 

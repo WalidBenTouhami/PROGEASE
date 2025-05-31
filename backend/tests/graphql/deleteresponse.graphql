@@ -1,0 +1,17 @@
+# Tests GraphQL pour DeleteResponse
+# Generes automatiquement le 2025-05-27 19:27:50
+# Auteur: WalidBenTouhami
+
+# Mutation pour supprimer un deleteresponse
+mutation DeleteDeleteResponse($id: ID!) {
+  deleteProjet(id: $id) {
+    success
+    message
+  }
+}
+
+# Variables:
+# {
+#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
+# }
+

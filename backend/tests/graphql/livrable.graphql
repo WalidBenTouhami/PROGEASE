@@ -1,0 +1,125 @@
+# Tests GraphQL pour Livrable
+# Generes automatiquement le 2025-05-27 19:27:50
+# Auteur: WalidBenTouhami
+
+# Requete pour recuperer tous les livrables avec pagination
+query GetAllLivrables($page: Int, $limit: Int, $statut: StatutLivrable, $projetId: ID) {
+  livrables(page: $page, limit: $limit, statut: $statut, projetId: $projetId) {
+    items {
+      _id
+      intitule
+      description
+      dateLimite
+      projetId
+      statut
+      urlDepot
+      estEnRetard
+      creeLe
+      majLe
+      projet {
+        _id
+        titre
+        statut
+      }
+    }
+    pagination {
+      total
+      pages
+      page
+      limit
+      hasNextPage
+      hasPreviousPage
+    }
+  }
+}
+
+# Requete pour recuperer un livrable specifique
+query GetLivrableById($id: ID!) {
+  livrable(id: $id) {
+    _id
+    intitule
+    description
+    dateLimite
+    projetId
+    statut
+    urlDepot
+    estEnRetard
+    creeLe
+    majLe
+    projet {
+      _id
+      titre
+      description
+      statut
+      progression
+    }
+  }
+}
+
+# Requete pour recuperer les livrables d'un projet
+query GetLivrablesByProjet($projetId: ID!) {
+  livrablesByProjet(projetId: $projetId) {
+    _id
+    intitule
+    description
+    dateLimite
+    statut
+    urlDepot
+    estEnRetard
+  }
+}
+
+# Mutation pour créer un livrable
+mutation CreerLivrable($input: LivrableInput!) {
+  creerLivrable(input: $input) {
+    _id
+    intitule
+    description
+    dateLimite
+    projetId
+    statut
+    urlDepot
+    creeLe
+    majLe
+  }
+}
+
+# Mutation pour mettre à jour un livrable
+mutation MettreAJourLivrable($id: ID!, $input: LivrableUpdateInput!) {
+  mettreAJourLivrable(id: $id, input: $input) {
+    _id
+    intitule
+    description
+    dateLimite
+    statut
+    urlDepot
+    majLe
+  }
+}
+
+# Mutation pour supprimer un livrable
+mutation SupprimerLivrable($id: ID!) {
+  supprimerLivrable(id: $id) {
+    _id
+    intitule
+    statut
+  }
+}
+
+# Variables d'exemple:
+# {
+#   "page": 1,
+#   "limit": 10,
+#   "statut": "EN_COURS",
+#   "projetId": "5f8f8f8f8f8f8f8f8f8f8f8f",
+#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f",
+#   "input": {
+#     "intitule": "Nouveau livrable",
+#     "description": "Description du livrable",
+#     "dateLimite": "2025-08-31",
+#     "projetId": "5f8f8f8f8f8f8f8f8f8f8f8f",
+#     "statut": "EN_ATTENTE",
+#     "urlDepot": "https://github.com/progease/nouveau-livrable"
+#   }
+# }
+

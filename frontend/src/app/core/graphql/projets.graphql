@@ -1,0 +1,7 @@
+query GetProjets {
+  projets {
+    _id
+    titre
+    statut
+  }
+} 

@@ -3,7 +3,7 @@ const Project = require('../models/project.model');
 const { generateAIAnalysis } = require('../services/ai.service');
 
 // Create a new evaluation
-exports.createEvaluation = async (req, res) => {
+const createEvaluation = async (req, res) => {
     try {
         const { projectId, evaluatorId, score, comments, criteria } = req.body;
 
@@ -51,7 +51,7 @@ exports.createEvaluation = async (req, res) => {
 };
 
 // Get all evaluations with filtering
-exports.getEvaluations = async (req, res) => {
+const getEvaluations = async (req, res) => {
     try {
         const {
             projectId,
@@ -109,7 +109,7 @@ exports.getEvaluations = async (req, res) => {
 };
 
 // Get evaluation by ID
-exports.getEvaluationById = async (req, res) => {
+const getEvaluationById = async (req, res) => {
     try {
         const evaluation = await Evaluation.findById(req.params.id)
             .populate('projectId', 'titre description')
@@ -126,7 +126,7 @@ exports.getEvaluationById = async (req, res) => {
 };
 
 // Update evaluation
-exports.updateEvaluation = async (req, res) => {
+const updateEvaluation = async (req, res) => {
     try {
         const { score, comments, criteria } = req.body;
 
@@ -170,7 +170,7 @@ exports.updateEvaluation = async (req, res) => {
 };
 
 // Delete evaluation
-exports.deleteEvaluation = async (req, res) => {
+const deleteEvaluation = async (req, res) => {
     try {
         const evaluation = await Evaluation.findById(req.params.id);
         if (!evaluation) {
@@ -193,31 +193,78 @@ exports.deleteEvaluation = async (req, res) => {
 };
 
 // Get evaluation statistics
-exports.getEvaluationStats = async (req, res) => {
+const getEvaluationStats = async (req, res) => {
     try {
-        const { projectId } = req.query;
-        const filter = projectId ? { projectId } : {};
-
         const stats = await Evaluation.aggregate([
-            { $match: filter },
             {
                 $group: {
                     _id: null,
-                    averageScore: { $avg: '$score' },
-                    highestScore: { $max: '$score' },
-                    lowestScore: { $min: '$score' },
-                    totalEvaluations: { $sum: 1 }
+                    averageScore: { $avg: "$score" },
+                    minScore: { $min: "$score" },
+                    maxScore: { $max: "$score" },
+                    totalEvaluations: { $sum: 1 },
+                    scoreDistribution: {
+                        $push: "$score"
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    averageScore: { $round: ["$averageScore", 2] },
+                    minScore: 1,
+                    maxScore: 1,
+                    totalEvaluations: 1,
+                    scoreDistribution: 1
                 }
             }
         ]);
 
-        res.json(stats[0] || {
+        // Calculate score distribution in ranges
+        const distribution = stats[0]?.scoreDistribution || [];
+        const ranges = {
+            '0-5': 0,
+            '6-10': 0,
+            '11-15': 0,
+            '16-20': 0
+        };
+
+        distribution.forEach(score => {
+            if (score <= 5) ranges['0-5']++;
+            else if (score <= 10) ranges['6-10']++;
+            else if (score <= 15) ranges['11-15']++;
+            else ranges['16-20']++;
+        });
+
+        const response = stats[0] ? {
+            ...stats[0],
+            scoreDistribution: ranges
+        } : {
             averageScore: 0,
-            highestScore: 0,
-            lowestScore: 0,
-            totalEvaluations: 0
+            minScore: 0,
+            maxScore: 0,
+            totalEvaluations: 0,
+            scoreDistribution: ranges
+        };
+
+        res.status(200).json({
+            status: 'success',
+            data: response
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({
+            status: 'error',
+            message: 'Error fetching evaluation statistics',
+            error: error.message
+        });
     }
+};
+
+module.exports = {
+    createEvaluation,
+    getEvaluations,
+    getEvaluationById,
+    updateEvaluation,
+    deleteEvaluation,
+    getEvaluationStats
 }; 

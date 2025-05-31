@@ -1,0 +1,39 @@
+<section class="dashboard-container" aria-labelledby="tableau-bord-titre">
+  <h2 id="tableau-bord-titre" class="title">Tableau de bord étudiant</h2>
+  <div *ngIf="chargement" class="dashboard-loader">
+    <mat-progress-spinner mode="indeterminate" color="primary"></mat-progress-spinner>
+    Chargement des statistiques...
+  </div>
+  <div class="stats-grid" role="list" aria-label="Statistiques principales" *ngIf="!chargement">
+    <mat-card class="stat-card" role="listitem">
+      <mat-icon color="primary">work</mat-icon>
+      <h3>Projets en cours</h3>
+      <span matBadge="{{ projetsEnCours }}" matBadgeColor="primary" matBadgeSize="large" class="stat-value"></span>
+    </mat-card>
+    <mat-card class="stat-card" role="listitem">
+      <mat-icon color="accent">assignment_turned_in</mat-icon>
+      <h3>Livrables soumis</h3>
+      <span matBadge="{{ livrablesSoumis }}" matBadgeColor="accent" matBadgeSize="large" class="stat-value"></span>
+    </mat-card>
+    <mat-card class="stat-card" role="listitem">
+      <mat-icon color="warn">feedback</mat-icon>
+      <h3>Retours reçus</h3>
+      <span matBadge="{{ retoursRecus }}" matBadgeColor="warn" matBadgeSize="large" class="stat-value"></span>
+    </mat-card>
+  </div>
+  <div class="stats-bar-chart" *ngIf="!chargement">
+    <div class="bar" [style.height]="projetsEnCours * 10 + 'px'" title="Projets en cours"></div>
+    <div class="bar" [style.height]="livrablesSoumis * 10 + 'px'" title="Livrables soumis"></div>
+    <div class="bar" [style.height]="retoursRecus * 10 + 'px'" title="Retours reçus"></div>
+  </div>
+  <section aria-labelledby="projets-recents-titre">
+    <h3 id="projets-recents-titre">Projets récents</h3>
+    <mat-list>
+      <mat-list-item *ngFor="let projet of projetsRecents">
+        <mat-icon matListIcon color="accent">star</mat-icon>
+        <a [routerLink]="['/projets', projet.id]">{{ projet.nom }}</a>
+        <span class="sr-only">, projet récent</span>
+      </mat-list-item>
+    </mat-list>
+  </section>
+</section>

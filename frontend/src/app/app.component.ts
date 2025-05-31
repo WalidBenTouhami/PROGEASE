@@ -1,61 +1,27 @@
-//src/app/app.component.ts
-
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterModule, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterModule, CommonModule],
-  template: `
-    <div class="min-h-screen flex flex-col">
-      <!-- Main Navigation -->
-      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-          <a class="navbar-brand" routerLink="/">PROGEASE</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav me-auto">
-              <li class="nav-item">
-                <a class="nav-link" routerLink="/projects" routerLinkActive="active">Projets</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" routerLink="/deliverables" routerLinkActive="active">Livrables</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" routerLink="/evaluations" routerLinkActive="active">Évaluations</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-
-      <!-- Main Content -->
-      <main class="container py-4">
-        <router-outlet></router-outlet>
-      </main>
-
-      <!-- Footer -->
-      <footer class="footer mt-auto py-3 bg-light">
-        <div class="container text-center">
-          <span class="text-muted">© 2024 PROGEASE. Tous droits réservés.</span>
-        </div>
-      </footer>
-    </div>
-  `,
-  styles: [`
-    :host {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    main {
-      flex: 1;
-    }
-  `]
+  imports: [
+    CommonModule,
+    RouterModule,
+    RouterOutlet,
+    MatToolbarModule,
+    MatButtonModule,
+    MatIconModule,
+    MatSidenavModule,
+    MatListModule
+  ],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   title = 'PROGEASE';

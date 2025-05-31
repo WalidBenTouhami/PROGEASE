@@ -1,0 +1,65 @@
+.livrable-card {
+  margin: 20px;
+  
+  .search-filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    
+    mat-form-field {
+      flex: 1;
+    }
+  }
+}
+
+.livrables-list {
+  mat-list-item {
+    margin-bottom: 8px;
+    
+    .livrable-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+      padding: 8px;
+      
+      .livrable-info {
+        flex: 1;
+        
+        h3 {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 500;
+        }
+        
+        p {
+          margin: 4px 0;
+          color: rgba(0, 0, 0, 0.6);
+          
+          &.date {
+            font-size: 12px;
+          }
+        }
+      }
+      
+      .livrable-status {
+        margin: 0 16px;
+      }
+      
+      .livrable-actions {
+        display: flex;
+        gap: 8px;
+      }
+    }
+  }
+}
+
+::ng-deep {
+  .mat-mdc-list-item {
+    height: auto !important;
+    margin-bottom: 8px !important;
+  }
+  
+  .mat-mdc-chip.mat-mdc-standard-chip {
+    min-height: 24px;
+  }
+} 

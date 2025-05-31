@@ -1,0 +1,60 @@
+<div class="livrable-management">
+  <mat-card class="livrable-card">
+    <mat-card-header>
+      <mat-card-title>Gestion des livrables</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="search-filters">
+        <mat-form-field appearance="outline">
+          <mat-label>Rechercher</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (ngModelChange)="filterLivrables()" placeholder="Rechercher un livrable...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Statut</mat-label>
+          <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="filterLivrables()">
+            <mat-option value="">Tous</mat-option>
+            <mat-option value="En attente">En attente</mat-option>
+            <mat-option value="En cours">En cours</mat-option>
+            <mat-option value="Terminé">Terminé</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="livrables-list">
+        <mat-list>
+          <mat-list-item *ngFor="let livrable of filteredLivrables">
+            <div class="livrable-item">
+              <div class="livrable-info">
+                <h3>{{ livrable.titre }}</h3>
+                <p>{{ livrable.description }}</p>
+                <p class="date">Créé le: {{ livrable.dateCreation | date }}</p>
+              </div>
+              <div class="livrable-status">
+                <mat-chip-set>
+                  <mat-chip [color]="livrable.statut === 'Terminé' ? 'accent' : 'primary'" selected>
+                    {{ livrable.statut }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+              <div class="livrable-actions">
+                <button mat-icon-button color="primary" matTooltip="Éditer">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button color="warn" matTooltip="Supprimer">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-list-item>
+        </mat-list>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-paginator [pageSize]="10"
+                 [pageSizeOptions]="[5, 10, 25, 100]"
+                 aria-label="Sélectionner la page">
+  </mat-paginator>
+</div>

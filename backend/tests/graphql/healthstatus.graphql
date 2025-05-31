@@ -1,0 +1,57 @@
+# Tests GraphQL pour HealthStatus
+# Generes automatiquement le 2025-05-27 19:27:50
+# Auteur: WalidBenTouhami
+
+# Requete pour verifier l'etat du serveur
+query HealthCheck {
+  healthCheck {
+    status
+    timestamp
+    version
+    message
+    uptime
+    database {
+      status
+      connections
+      collections
+    }
+    memory {
+      used
+      total
+      percentage
+    }
+  }
+}
+
+# Requete pour verifier l'etat de la base de donnees
+query DatabaseStatus {
+  databaseStatus {
+    status
+    collections {
+      name
+      count
+      size
+    }
+    indexes {
+      name
+      size
+    }
+    stats {
+      avgObjSize
+      totalSize
+      storageSize
+    }
+  }
+}
+
+# Requete pour verifier les performances
+query PerformanceMetrics {
+  performanceMetrics {
+    requestsPerMinute
+    averageResponseTime
+    errorRate
+    activeConnections
+    cacheHitRatio
+  }
+}
+

@@ -1,0 +1,84 @@
+<!-- Front Office Layout -->
+<div class="frontoffice-layout" role="main">
+  <!-- Header -->
+  <mat-toolbar color="primary" class="fo-header" role="navigation">
+    <button mat-icon-button 
+            class="hide-desktop" 
+            (click)="sidenav.toggle()" 
+            aria-label="Toggle navigation menu">
+      <mat-icon>menu</mat-icon>
+    </button>
+    
+    <img src="assets/PROGEASE.png" 
+         alt="PROGEASE Logo" 
+         class="fo-logo" 
+         loading="lazy" />
+         
+    <span class="fo-title">PROGEASE</span>
+    <span class="spacer"></span>
+    
+    <!-- Navigation Links -->
+    <nav class="fo-nav">
+      <a mat-button 
+         routerLink="/front-office/dashboard" 
+         routerLinkActive="active"
+         matTooltip="Accéder au tableau de bord"
+         aria-label="Dashboard">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      
+      <a mat-button 
+         routerLink="/front-office/projets" 
+         routerLinkActive="active"
+         matTooltip="Voir la liste des projets"
+         aria-label="Projets">
+        <mat-icon>assignment</mat-icon>
+        <span>Projets</span>
+      </a>
+      
+      <a mat-button 
+         routerLink="/front-office/livrables" 
+         routerLinkActive="active"
+         matTooltip="Voir la liste des livrables"
+         aria-label="Livrables">
+        <mat-icon>fact_check</mat-icon>
+        <span>Livrables</span>
+      </a>
+      
+      <a mat-button 
+         routerLink="/front-office/profile" 
+         routerLinkActive="active"
+         matTooltip="Gérer votre profil"
+         aria-label="Profil">
+        <mat-icon>account_circle</mat-icon>
+        <span>Profil</span>
+      </a>
+    </nav>
+  </mat-toolbar>
+
+  <!-- Main Content -->
+  <main class="fo-main" [@fadeAnimation]="o.isActivated ? o.activatedRoute : ''">
+    <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
+    
+    <router-outlet #o="outlet"></router-outlet>
+    
+    <!-- Back to top button -->
+    <button mat-fab 
+            class="back-to-top" 
+            (click)="scrollToTop()" 
+            *ngIf="showBackToTop"
+            matTooltip="Retour en haut"
+            aria-label="Retourner en haut de la page">
+      <mat-icon>arrow_upward</mat-icon>
+    </button>
+  </main>
+
+  <!-- Footer -->
+  <footer class="fo-footer" role="contentinfo">
+    <div class="footer-content">
+      &copy; {{ currentYear }} PROGEASE - Front-Office
+      <span class="version">v{{version}}</span>
+    </div>
+  </footer>
+</div> 

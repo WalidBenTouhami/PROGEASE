@@ -1,73 +1,114 @@
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
+    # Custom scalar for Date handling
+    scalar Date
+
+    # Types for risk analysis
+    type RiskAnalysis {
+        retard: Boolean!
+        progression: Boolean!
+        livrables: Boolean!
+        equipe: Boolean!
+        niveauRisque: Int!
+        recommandations: [String!]!
+    }
+
     type User {
         id: ID!
         nom: String!
         prenom: String!
         email: String!
         role: UserRole!
-        createdAt: String!
-        updatedAt: String!
+        createdAt: Date!
+        updatedAt: Date!
     }
 
-    type Project {
+    type Projet {
         id: ID!
-        title: String!
+        titre: String!
         description: String!
-        status: ProjectStatus!
-        team: [User!]!
-        tutor: User
-        skills: [String!]!
-        startDate: String!
-        endDate: String!
-        deliverables: [Deliverable!]!
+        statut: ProjetStatus!
+        equipe: [User!]!
+        tuteur: User
+        competences: [String!]!
+        dateDebut: Date!
+        dateFin: Date!
+        livrables: [Livrable!]!
         evaluations: [Evaluation!]!
         progression: Float!
-        averageScore: Float!
-        predictedPerformance: Float!
-        createdAt: String!
-        updatedAt: String!
+        moyenneEvaluations: Float!
+        performancePredite: Float!
+        creeLe: Date!
+        majLe: Date!
     }
 
-    type Deliverable {
+    type Livrable {
         id: ID!
-        name: String!
+        intitule: String!
         description: String!
-        deadline: String!
-        repositoryUrl: String!
-        status: DeliverableStatus!
-        projectId: ID!
-        project: Project!
-        createdAt: String!
-        updatedAt: String!
+        dateLimite: Date!
+        urlDepot: String!
+        statut: LivrableStatus!
+        projetId: ID!
+        projet: Projet
+        creeLe: Date!
+        majLe: Date!
+        estEnRetard: Boolean!
     }
 
     type Evaluation {
         id: ID!
-        projectId: ID!
-        project: Project!
-        evaluatorId: ID!
-        evaluator: User!
+        projetId: ID!
+        projet: Projet!
+        evaluateurId: ID!
+        evaluateur: User!
         score: Float!
-        comments: String
-        criteria: [EvaluationCriteria!]!
+        commentaires: String
+        criteres: [EvaluationCritere!]!
         aiRecommendations: String
-        createdAt: String!
-        updatedAt: String!
+        creeLe: Date!
+        majLe: Date!
     }
 
-    type EvaluationCriteria {
-        name: String!
+    type EvaluationCritere {
+        nom: String!
         score: Float!
-        weight: Float!
+        poids: Float!
     }
 
     type EvaluationStats {
-        averageScore: Float!
-        highestScore: Float!
-        lowestScore: Float!
+        moyenneScore: Float!
+        scoreMax: Float!
+        scoreMin: Float!
         totalEvaluations: Int!
+    }
+
+    type AiRecommendationResult {
+        recommendations: String!
+        score: Float
+        confidence: Float
+        metadata: AiMetadata
+    }
+
+    type AiMetadata {
+        modelUsed: String!
+        timestamp: Date!
+        processingTime: Float!
+    }
+
+    type PaginatedDeliverables {
+        items: [Livrable!]!
+        pagination: PaginationInfo!
+    }
+
+    type PaginationInfo {
+        page: Int!
+        limit: Int!
+        total: Int!
+        pages: Int!
+        hasNextPage: Boolean!
+        hasPreviousPage: Boolean!
     }
 
     enum UserRole {
@@ -76,30 +117,43 @@ const typeDefs = gql`
         ADMIN
     }
 
-    enum ProjectStatus {
-        DRAFT
-        IN_PROGRESS
-        COMPLETED
-        ARCHIVED
+    enum ProjetStatus {
+        BROUILLON
+        EN_COURS
+        TERMINE
+        EN_PAUSE
+        ANNULE
     }
 
-    enum DeliverableStatus {
-        PENDING
-        IN_PROGRESS
-        COMPLETED
-        LATE
+    enum LivrableStatus {
+        EN_ATTENTE
+        EN_COURS
+        TERMINE
+        VALIDE
+        EN_RETARD
+        ANNULE
     }
 
     type Query {
         # Project queries
-        projects: [Project!]!
-        project(id: ID!): Project
+        projets: [Projet!]!
+        projet(id: ID!): Projet
         getProjectProgress(id: ID!): Float!
         getPredictedPerformance(id: ID!): Float!
+        analyserRisquesProjet(projetId: ID!): RiskAnalysis!
 
         # Deliverable queries
-        deliverables(projectId: ID!): [Deliverable!]!
-        deliverable(id: ID!): Deliverable
+        deliverables(
+            page: Int
+            limit: Int
+            projetId: ID
+            statut: LivrableStatus
+            recherche: String
+            dateLimiteMin: Date
+            dateLimiteMax: Date
+        ): PaginatedDeliverables!
+        deliverable(id: ID!): Livrable
+        livrablesByProjet(projetId: ID!): [Livrable!]!
 
         # Evaluation queries
         evaluations(projectId: ID!): [Evaluation!]!
@@ -109,18 +163,32 @@ const typeDefs = gql`
         # User queries
         users: [User!]!
         user(id: ID!): User
+
+        # AI queries
+        aiRecommendations(projetId: ID!): AiRecommendationResult!
+
+        # Health check queries
+        health: Health!
+        healthCheck: String!
+    }
+
+    type Health {
+        status: String!
+        timestamp: String!
+        version: String!
+        environment: String!
     }
 
     type Mutation {
         # Project mutations
-        createProject(input: CreateProjectInput!): Project!
-        updateProject(id: ID!, input: UpdateProjectInput!): Project!
-        deleteProject(id: ID!): Project!
+        createProject(input: CreateProjectInput!): Projet!
+        updateProject(id: ID!, input: UpdateProjectInput!): Projet!
+        deleteProject(id: ID!): Projet!
 
         # Deliverable mutations
-        addDeliverable(projectId: ID!, input: CreateDeliverableInput!): Project!
-        updateDeliverable(id: ID!, input: UpdateDeliverableInput!): Deliverable!
-        deleteDeliverable(id: ID!): Deliverable!
+        addDeliverable(projectId: ID!, input: CreateDeliverableInput!): Livrable!
+        updateDeliverable(id: ID!, input: UpdateDeliverableInput!): Livrable!
+        deleteDeliverable(id: ID!): Livrable!
 
         # Evaluation mutations
         createEvaluation(input: CreateEvaluationInput!): Evaluation!
@@ -133,61 +201,61 @@ const typeDefs = gql`
     }
 
     input CreateProjectInput {
-        title: String!
+        titre: String!
         description: String!
-        status: ProjectStatus!
-        team: [ID!]!
-        tutor: ID
-        skills: [String!]!
-        startDate: String!
-        endDate: String!
+        statut: ProjetStatus!
+        equipe: [ID!]!
+        tuteur: ID
+        competences: [String!]!
+        dateDebut: Date!
+        dateFin: Date!
     }
 
     input UpdateProjectInput {
-        title: String
+        titre: String
         description: String
-        status: ProjectStatus
-        team: [ID!]
-        tutor: ID
-        skills: [String!]
-        startDate: String
-        endDate: String
+        statut: ProjetStatus
+        equipe: [ID!]
+        tuteur: ID
+        competences: [String!]
+        dateDebut: Date
+        dateFin: Date
     }
 
     input CreateDeliverableInput {
         name: String!
         description: String!
-        deadline: String!
+        deadline: Date!
         repositoryUrl: String!
-        status: DeliverableStatus!
+        status: LivrableStatus
     }
 
     input UpdateDeliverableInput {
         name: String
         description: String
-        deadline: String
+        deadline: Date
         repositoryUrl: String
-        status: DeliverableStatus
+        status: LivrableStatus
     }
 
     input CreateEvaluationInput {
-        projectId: ID!
-        evaluatorId: ID!
+        projetId: ID!
+        evaluateurId: ID!
         score: Float!
-        comments: String
-        criteria: [EvaluationCriteriaInput!]!
+        commentaires: String
+        criteres: [EvaluationCritereInput!]!
     }
 
     input UpdateEvaluationInput {
         score: Float
-        comments: String
-        criteria: [EvaluationCriteriaInput!]
+        commentaires: String
+        criteres: [EvaluationCritereInput!]
     }
 
-    input EvaluationCriteriaInput {
-        name: String!
+    input EvaluationCritereInput {
+        nom: String!
         score: Float!
-        weight: Float!
+        poids: Float!
     }
 `;
 

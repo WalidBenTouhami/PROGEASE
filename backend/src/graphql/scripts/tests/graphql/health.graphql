@@ -1,0 +1,40 @@
+# Tests GraphQL pour Health
+# Generes automatiquement le 2025-05-28 09:42:02
+# Auteur: WalidBenTouhami
+
+query GetHealth {
+  health {
+    status
+    timestamp
+    user
+    version
+    uptime
+  }
+}
+
+const resolvers = require('./resolvers');
+
+exports.resolvers = resolvers;
+exports.initLoaders = initLoaders;
+
+type Mutation {
+  ...
+  generateContent(prompt: String!, contentType: String!, options: GenerateContentOptions): GenerateContentResult
+}
+
+type GenerateContentResult {
+  content: String
+  metadata: GenerateContentMetadata
+}
+
+type GenerateContentMetadata {
+  generationTime: String
+  modelUsed: String
+  tokens: Int
+}
+
+input GenerateContentOptions {
+  model: String
+  temperature: Float
+  maxTokens: Int
+}

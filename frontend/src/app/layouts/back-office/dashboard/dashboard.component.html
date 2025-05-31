@@ -1,0 +1,39 @@
+<section class="dashboard-container" aria-labelledby="tableau-bord-admin-titre">
+  <h2 id="tableau-bord-admin-titre" class="title">Tableau de bord administration</h2>
+  <div *ngIf="chargement" class="dashboard-loader">
+    <mat-progress-spinner mode="indeterminate" color="primary"></mat-progress-spinner>
+    Chargement des statistiques...
+  </div>
+  <div class="stats-grid" role="list" aria-label="Statistiques de gestion" *ngIf="!chargement">
+    <mat-card class="stat-card" role="listitem">
+      <mat-icon color="primary">assignment</mat-icon>
+      <h3>Projets à valider</h3>
+      <span matBadge="{{ projetsAValider }}" matBadgeColor="warn" matBadgeSize="large" class="stat-value"></span>
+    </mat-card>
+    <mat-card class="stat-card" role="listitem">
+      <mat-icon color="warn">fact_check</mat-icon>
+      <h3>Livrables à corriger</h3>
+      <span matBadge="{{ livrablesACorriger }}" matBadgeColor="accent" matBadgeSize="large" class="stat-value"></span>
+    </mat-card>
+    <mat-card class="stat-card" role="listitem">
+      <mat-icon color="accent">group</mat-icon>
+      <h3>Étudiants inscrits</h3>
+      <span matBadge="{{ nbEtudiants }}" matBadgeColor="primary" matBadgeSize="large" class="stat-value"></span>
+    </mat-card>
+  </div>
+  <div class="stats-bar-chart" *ngIf="!chargement">
+    <div class="bar" [style.height]="projetsAValider * 10 + 'px'" title="Projets à valider"></div>
+    <div class="bar" [style.height]="livrablesACorriger * 10 + 'px'" title="Livrables à corriger"></div>
+    <div class="bar" [style.height]="nbEtudiants * 2 + 'px'" title="Étudiants inscrits"></div>
+  </div>
+  <section aria-labelledby="dernieres-actions-titre">
+    <h3 id="dernieres-actions-titre">Dernières actions</h3>
+    <mat-list>
+      <mat-list-item *ngFor="let action of dernieresActions">
+        <mat-icon matListIcon color="accent">history</mat-icon>
+        <div matLine>{{ action.description }}</div>
+        <div matLine><time [attr.datetime]="action.date">{{ action.date | date:'shortDate' }}</time></div>
+      </mat-list-item>
+    </mat-list>
+  </section>
+</section>

@@ -1,0 +1,19 @@
+[
+    'src/app/app.component.html',
+    'src/app/back-office/back-office-template.component.html',
+    'src/app/back-office/dashboard/dashboard.component.html',
+    'src/app/back-office/livrable-management/livrable-management.component.html',
+    'src/app/back-office/projet-management/projet-management.component.html',
+    'src/app/core/api-test/api-test.component.html',
+    'src/app/front-office/dashboard/dashboard.component.html',
+    'src/app/front-office/front-office-template.component.html',
+    'src/app/front-office/livrable-list/livrable-list.component.html',
+    'src/app/front-office/projet-list/projet-list.component.html',
+    'src/app/livrable/livrable-detail/livrable-detail.component.html',
+    'src/app/livrable/livrable-form/livrable-form.component.html',
+    'src/app/livrable/livrable-list/livrable-list.component.html',
+    'src/app/projet/projet-detail/projet-detail.component.html',
+    'src/app/projet/projet-form/projet-form.component.html',
+    'src/app/projet/projet-list/projet-list.component.html',
+    'src/index.html'
+];

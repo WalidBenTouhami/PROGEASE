@@ -1,0 +1,35 @@
+# Tests GraphQL pour Livrable
+# Generes automatiquement le 2025-05-28 09:42:02
+# Auteur: WalidBenTouhami
+
+query GetAllLivrables {
+  livrables {
+    _id
+    titre
+    description
+    statut
+    dateEcheance
+    projetId
+  }
+}
+
+query GetLivrableById($id: ID!) {
+  livrable(id: $id) {
+    _id
+    titre
+    description
+    statut
+    dateEcheance
+    projetId
+    projet {
+      _id
+      titre
+    }
+  }
+}
+
+# Variables:
+# {
+#   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
+# }
+

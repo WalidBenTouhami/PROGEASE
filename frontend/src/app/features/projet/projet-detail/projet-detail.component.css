@@ -1,0 +1,25 @@
+.projet-detail {
+  max-width: 900px;
+  margin: 2rem auto;
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 18px #0001;
+  padding: 2rem;
+}
+.projet-detail h2 {
+  margin-top: 0;
+}
+.status {
+  display: inline-block;
+  font-size: 0.95em;
+  margin-left: 0.5em;
+  padding: 0.2em 0.6em;
+  border-radius: 1em;
+}
+.status.termine { background: #c8e6c9; color: #256029; }
+.status.encours { background: #ffe082; color: #996c00; }
+.status.brouillon { background: #e0e0e0; color: #666; }
+.status.archive { background: #d1c4e9; color: #4527a0; }
+ul {
+  padding-left: 1.5em;
+}

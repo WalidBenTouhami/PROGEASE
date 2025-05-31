@@ -1,4 +1,5 @@
-// ../backend/config/constants.js
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 require('dotenv').config();
 
@@ -28,60 +29,195 @@ const Enums = Object.freeze({
         PENDING: "PENDING",
         OVERDUE: "OVERDUE",
     },
+    StatutProjet: {
+        BROUILLON: 'BROUILLON',
+        EN_COURS: 'EN_COURS',
+        TERMINE: 'TERMINE',
+        ARCHIVE: 'ARCHIVE',
+        EN_RETARD: 'EN_RETARD',
+        A_VENIR: 'A_VENIR',
+    },
+    StatutLivrable: {
+        EN_ATTENTE: 'EN_ATTENTE',
+        EN_COURS: 'EN_COURS',
+        EN_RETARD: 'EN_RETARD',
+        TERMINE: 'TERMINE',
+        VALIDE: 'VALIDE',
+        REJETE: 'REJETE'
+    },
+    NiveauRisque: {
+        FAIBLE: 'FAIBLE',
+        MODERE: 'MODERE',
+        ELEVE: 'ELEVE',
+        CRITIQUE: 'CRITIQUE'
+    },
+    TypeValidation: {
+        REQUIS: 'REQUIS',
+        OPTIONNEL: 'OPTIONNEL',
+        CONDITIONNEL: 'CONDITIONNEL'
+    }
 });
 
-// ✅ Configuration de sécurité
-const SecurityConfig = Object.freeze({
+// Securite avec valeurs de production plus strictes
+const ConfigSecurite = Object.freeze({
     JWT: {
-        EXPIRES_IN: process.env.JWT_EXPIRES_IN || "7d",
-        COOKIE_NAME: process.env.JWT_COOKIE_NAME || "__progease_token",
+        // 1 jour en dev, 2h en production
+        EXPIRE_DANS: process.env.NODE_ENV === 'production'
+            ? process.env.JWT_EXPIRES_IN || '2h'
+            : process.env.JWT_EXPIRES_IN || '1d',
+        NOM_COOKIE: process.env.JWT_COOKIE_NAME || '__progease_token',
+        ALGORITHME: 'HS256',
+        REFRESH_TOKEN_EXPIRE: '7d'
     },
-    PASSWORD: {
-        MIN_LENGTH: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10,
-        SALT_ROUNDS: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
-        MAX_ATTEMPTS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5,
-        LOCKOUT_MINUTES: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30,
+    MOT_DE_PASSE: {
+        LONGUEUR_MIN: parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || 10,
+        NB_SALT: parseInt(process.env.PASSWORD_SALT_ROUNDS, 10) || 12,
+        NB_MAX_ESSAIS: parseInt(process.env.PASSWORD_MAX_ATTEMPTS, 10) || 5,
+        MINUTES_VERROUILLAGE: parseInt(process.env.PASSWORD_LOCKOUT_MINUTES, 10) || 30,
+        REGEX_VALIDATION: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{10,}$/
     },
+    RATE_LIMIT: {
+        WINDOW_MS: parseInt(process.env.RATE_LIMIT_WINDOW_MS, 10) || 15 * 60 * 1000, // 15 minutes
+        MAX_REQUESTS: parseInt(process.env.RATE_LIMIT_MAX, 10) || 100, // 100 requetes
+    },
+    CORS: {
+        ORIGINS: process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',') : ['http://localhost:3000'],
+        METHODS: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        ALLOWED_HEADERS: ['Content-Type', 'Authorization']
+    }
 });
 
-// ✅ Paramètres de pagination par défaut
-const PaginationDefaults = Object.freeze({
+const PaginationParDefaut = Object.freeze({
     PAGE: 1,
-    LIMIT: 20,
-    MAX_LIMIT: 100,
+    LIMITE: 20,
+    LIMITE_MAX: 100,
 });
 
-// ✅ Messages d'erreur globaux & modulaires
-const ErrorMessages = Object.freeze({
+const MessagesErreur = Object.freeze({
     GENERAL: {
-        NOT_FOUND: "Ressource non trouvée.",
-        SERVER_ERROR: "Erreur serveur interne.",
-        UNAUTHORIZED: "Accès non autorisé.",
-        FORBIDDEN: "Action interdite.",
-        INVALID_ID: "ID invalide.",
+        NON_TROUVE: 'Ressource non trouvee.',
+        ERREUR_SERVEUR: 'Erreur serveur interne.',
+        NON_AUTORISE: 'Acces non autorise.',
+        INTERDIT: 'Action interdite.',
+        ID_INVALIDE: 'ID invalide.',
+        VALIDATION: 'Erreur de validation des donnees.',
+        RATE_LIMIT: 'Trop de requetes, veuillez reessayer plus tard.'
     },
     PROJECT: {
         INVALID_TEAM_MEMBER: "Un membre de l'équipe est invalide.",
         NOT_FOUND: "Projet introuvable.",
+        MEMBRE_EQUIPE_INVALIDE: 'Un membre de l\'equipe est invalide.',
+        NON_TROUVE: 'Projet introuvable.',
+        DATE_INVALIDE: 'Les dates du projet sont invalides.',
+        STATUT_INVALIDE: 'Le statut du projet est invalide.',
+        COMPETENCES_INVALIDES: 'Les competences specifiees sont invalides.'
     },
-    USER: {
-        DUPLICATE_EMAIL: "Email déjà utilisé.",
-        INVALID_ROLE: "Rôle utilisateur invalide.",
+    LIVRABLE: {
+        NON_TROUVE: 'Livrable introuvable.',
+        INVALIDE: 'Livrable invalide.',
+        DATE_LIMITE_INVALIDE: 'La date limite est invalide.',
+        STATUT_INVALIDE: 'Le statut du livrable est invalide.',
+        PROJET_INVALIDE: 'Le projet associe est invalide ou introuvable.'
     },
+    AUTH: {
+        TOKEN_EXPIRE: 'Token d\'authentification expire.',
+        TOKEN_INVALIDE: 'Token d\'authentification invalide.',
+        COMPTE_VERROUILLE: 'Compte verrouille suite à trop de tentatives.',
+        MOT_DE_PASSE_INVALIDE: 'Le mot de passe ne respecte pas les criteres de securite.',
+        INVALID_CREDENTIALS: 'Identifiants invalides',
+        TOKEN_EXPIRED: 'Token expiré',
+        TOKEN_INVALID: 'Token invalide',
+        UNAUTHORIZED: 'Non autorisé'
+    },
+    VALIDATION: {
+        REQUIRED_FIELD: 'Ce champ est requis',
+        INVALID_FORMAT: 'Format invalide'
+    }
 });
 
-// ✅ Codes de statut HTTP
-const HttpStatus = Object.freeze({
+const StatutHttp = Object.freeze({
+    OK: 200,
+    CREE: 201,
+    SANS_CONTENU: 204,
+    MAUVAISE_REQUETE: 400,
+    NON_AUTORISE: 401,
+    INTERDIT: 403,
+    NON_TROUVE: 404,
+    CONFLIT: 409,
+    TROP_DE_REQUETES: 429,
+    ERREUR_INTERNE: 500,
+});
+
+const NODE_ENV = process.env.NODE_ENV || 'development';
+
+// Configuration des variables d'environnement requises
+exports.VARIABLES_ENV_OBLIGATOIRES = {
+    MONGODB_URI: 'URI de connexion MongoDB',
+    JWT_SECRET: 'Clé secrète pour JWT',
+    PORT: 'Port du serveur',
+    NODE_ENV: 'Environnement (development/production)',
+    DEEPSEEK_API_KEY: 'Clé API Deepseek'
+};
+
+// Configuration de la base de données
+exports.DB_CONFIG = {
+    COLLECTIONS: {
+        USERS: 'users',
+        PROJECTS: 'projects',
+        EVALUATIONS: 'evaluations',
+        DELIVERABLES: 'deliverables'
+    },
+    CONNECTION_OPTIONS: {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }
+};
+
+// Configuration de l'API
+exports.API_CONFIG = {
+    PREFIX: '/api/v1',
+    RATE_LIMIT: {
+        WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+        MAX_REQUESTS: 100
+    }
+};
+
+// Configuration de la validation
+exports.VALIDATION = {
+    PASSWORD: {
+        MIN_LENGTH: 8,
+        MAX_LENGTH: 50
+    },
+    USERNAME: {
+        MIN_LENGTH: 3,
+        MAX_LENGTH: 30
+    }
+};
+
+// Configuration des messages d'erreur
+exports.ERROR_MESSAGES = {
+    AUTH: {
+        INVALID_CREDENTIALS: 'Identifiants invalides',
+        TOKEN_EXPIRED: 'Token expiré',
+        TOKEN_INVALID: 'Token invalide',
+        UNAUTHORIZED: 'Non autorisé'
+    },
+    VALIDATION: {
+        REQUIRED_FIELD: 'Ce champ est requis',
+        INVALID_FORMAT: 'Format invalide'
+    }
+};
+
+// Configuration des statuts HTTP
+exports.HTTP_STATUS = {
     OK: 200,
     CREATED: 201,
-    NO_CONTENT: 204,
     BAD_REQUEST: 400,
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,
-    CONFLICT: 409,
-    INTERNAL_ERROR: 500,
-});
+    INTERNAL_ERROR: 500
+};
 
 module.exports = {
     MONGO_URI: process.env.MONGO_URI,
@@ -89,8 +225,15 @@ module.exports = {
     JWT_SECRET: process.env.JWT_SECRET,
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
     Enums,
-    SecurityConfig,
-    PaginationDefaults,
-    ErrorMessages,
-    HttpStatus,
+    SecurityConfig: ConfigSecurite,
+    PaginationDefaults: PaginationParDefaut,
+    ErrorMessages: MessagesErreur,
+    HttpStatus: StatutHttp,
+    NODE_ENV,
+    ENVIRONMENTS: {
+        DEVELOPMENT: 'development',
+        PRODUCTION: 'production',
+        TEST: 'test'
+    }
 };
+

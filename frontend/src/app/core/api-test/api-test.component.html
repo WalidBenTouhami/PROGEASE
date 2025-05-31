@@ -1,0 +1,27 @@
+<section class="api-test-section" aria-labelledby="api-test-title">
+  <h2 id="api-test-title">Testeur d'API</h2>
+  <form (ngSubmit)="onSubmit()" #apiForm="ngForm" aria-label="Formulaire de test API">
+    <div class="form-group">
+      <label for="endpoint">Endpoint</label>
+      <input id="endpoint" name="endpoint" type="text" [(ngModel)]="endpoint" required aria-required="true" #endpointInput="ngModel">
+    </div>
+    <div class="form-group">
+      <label for="method">Methode</label>
+      <select id="method" name="method" [(ngModel)]="method" required aria-required="true">
+        <option value="GET">GET</option>
+        <option value="POST">POST</option>
+        <option value="PUT">PUT</option>
+        <option value="DELETE">DELETE</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="body">Corps (JSON)</label>
+      <textarea id="body" name="body" [(ngModel)]="body" rows="4" placeholder='{"key": "value"}' aria-label="Corps de la requete"></textarea>
+    </div>
+    <button type="submit" [disabled]="apiForm.invalid">Envoyer</button>
+  </form>
+  <section *ngIf="response" aria-labelledby="response-title">
+    <h3 id="response-title">Reponse</h3>
+    <pre>{{ response | json }}</pre>
+  </section>
+</section>

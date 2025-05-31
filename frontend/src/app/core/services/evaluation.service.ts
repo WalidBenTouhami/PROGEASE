@@ -2,73 +2,32 @@ import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { gql } from 'apollo-angular';
 import { map, Observable, catchError, throwError } from 'rxjs';
-
-export interface EvaluationCriteria {
-  name: string;
-  score: number;
-  weight: number;
-}
-
-export interface Project {
-  id: string;
-  title: string;
-}
-
-export interface User {
-  id: string;
-  nom: string;
-  prenom: string;
-}
-
-export interface Evaluation {
-  id: string;
-  projectId: string;
-  project: Project;
-  evaluatorId: string;
-  evaluator: User;
-  score: number;
-  comments: string;
-  criteria: EvaluationCriteria[];
-  aiRecommendations: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface UpdateEvaluationInput {
-  score: number;
-  comments: string;
-  criteria: EvaluationCriteria[];
-}
-
-interface UpdateEvaluationResponse {
-  updateEvaluation: Evaluation;
-}
+import { Evaluation, EvaluationStats, UpdateEvaluationInput, EvaluationCritere, Projet, User, CreateEvaluationInput } from '../models/evaluation.model';
 
 const GET_EVALUATIONS = gql`
-  query GetEvaluations($projectId: ID!) {
+  query GetEvaluations($projectId: ID) {
     evaluations(projectId: $projectId) {
       id
-      projectId
-      project {
+      projet {
         id
-        title
+        titre
+        description
       }
-      evaluatorId
-      evaluator {
+      evaluateur {
         id
         nom
         prenom
       }
       score
-      comments
-      criteria {
-        name
+      commentaires
+      criteres {
+        nom
         score
-        weight
+        poids
       }
       aiRecommendations
-      createdAt
-      updatedAt
+      creeLe
+      majLe
     }
   }
 `;
@@ -77,27 +36,26 @@ const GET_EVALUATION = gql`
   query GetEvaluation($id: ID!) {
     evaluation(id: $id) {
       id
-      projectId
-      project {
+      projet {
         id
-        title
+        titre
+        description
       }
-      evaluatorId
-      evaluator {
+      evaluateur {
         id
         nom
         prenom
       }
       score
-      comments
-      criteria {
-        name
+      commentaires
+      criteres {
+        nom
         score
-        weight
+        poids
       }
       aiRecommendations
-      createdAt
-      updatedAt
+      creeLe
+      majLe
     }
   }
 `;
@@ -107,24 +65,24 @@ const UPDATE_EVALUATION = gql`
     updateEvaluation(id: $id, input: $input) {
       id
       score
-      comments
-      criteria {
-        name
+      commentaires
+      criteres {
+        nom
         score
-        weight
+        poids
       }
-      project {
+      projet {
         id
-        title
+        titre
       }
-      evaluator {
+      evaluateur {
         id
         nom
         prenom
       }
       aiRecommendations
-      createdAt
-      updatedAt
+      creeLe
+      majLe
     }
   }
 `;
@@ -137,18 +95,45 @@ const DELETE_EVALUATION = gql`
   }
 `;
 
+const CREATE_EVALUATION = gql`
+  mutation CreateEvaluation($input: CreateEvaluationInput!) {
+    createEvaluation(input: $input) {
+      id
+      projet {
+        id
+        titre
+        description
+      }
+      evaluateur {
+        id
+        nom
+        prenom
+      }
+      score
+      commentaires
+      criteres {
+        nom
+        score
+        poids
+      }
+      aiRecommendations
+      creeLe
+      majLe
+    }
+  }
+`;
+
 @Injectable({
   providedIn: 'root'
 })
 export class EvaluationService {
   constructor(private apollo: Apollo) {}
 
-  getEvaluations(projectId: string): Observable<Evaluation[]> {
+  getEvaluations(projectId?: string): Observable<Evaluation[]> {
     return this.apollo
       .watchQuery<{ evaluations: Evaluation[] }>({
         query: GET_EVALUATIONS,
-        variables: { projectId },
-        fetchPolicy: 'network-only' // Always fetch fresh data
+        variables: projectId && projectId !== 'ALL' ? { projectId } : {},
       })
       .valueChanges.pipe(
         map((result) => result.data.evaluations),
@@ -160,15 +145,10 @@ export class EvaluationService {
   }
 
   getEvaluation(id: string): Observable<Evaluation> {
-    if (id === 'new') {
-      return throwError(() => new Error('Invalid evaluation ID'));
-    }
-    
     return this.apollo
       .watchQuery<{ evaluation: Evaluation }>({
         query: GET_EVALUATION,
-        variables: { id },
-        fetchPolicy: 'network-only' // Always fetch fresh data
+        variables: { id }
       })
       .valueChanges.pipe(
         map((result) => {
@@ -185,26 +165,19 @@ export class EvaluationService {
   }
 
   updateEvaluation(id: string, input: UpdateEvaluationInput): Observable<Evaluation> {
-    return this.apollo.mutate<UpdateEvaluationResponse>({
+    return this.apollo.mutate<{ updateEvaluation: Evaluation }>({
       mutation: UPDATE_EVALUATION,
-      variables: {
-        id,
-        input: {
-          score: input.score,
-          comments: input.comments,
-          criteria: input.criteria
-        }
-      }
+      variables: { id, input }
     }).pipe(
       map(result => {
         if (!result.data) {
-          throw new Error('No data returned from update mutation');
+          throw new Error('Aucune donnée retournée par la mutation');
         }
         return result.data.updateEvaluation;
       }),
       catchError((error) => {
-        console.error('Error updating evaluation:', error);
-        return throwError(() => new Error('Failed to update evaluation'));
+        console.error('Erreur lors de la mise à jour de l\'évaluation:', error);
+        return throwError(() => new Error('Impossible de mettre à jour l\'évaluation'));
       })
     );
   }
@@ -215,20 +188,57 @@ export class EvaluationService {
         mutation: DELETE_EVALUATION,
         variables: { id },
         refetchQueries: [
-          { query: GET_EVALUATIONS, variables: { projectId: 'ALL' } }
+          { query: GET_EVALUATIONS }
         ]
       })
       .pipe(
-        map((result) => {
-          if (!result.data?.deleteEvaluation) {
-            throw new Error('Erreur lors de la suppression de l\'évaluation');
+        map(result => {
+          if (!result.data) {
+            throw new Error('Aucune donnée retournée par la mutation');
           }
           return result.data.deleteEvaluation.id;
         }),
         catchError((error) => {
           console.error('Erreur lors de la suppression de l\'évaluation:', error);
-          return throwError(() => new Error('Impossible de supprimer l\'évaluation.'));
+          return throwError(() => new Error('Impossible de supprimer l\'évaluation'));
         })
       );
+  }
+
+  getEvaluationStats(projetId: string): Observable<EvaluationStats> {
+    return this.apollo.query<{ evaluationStats: EvaluationStats }>({
+      query: gql`
+        query GetEvaluationStats($projetId: ID!) {
+          evaluationStats(projetId: $projetId) {
+            moyenneGenerale
+            nombreEvaluations
+            meilleureNote
+            pireNote
+            distribution
+          }
+        }
+      `,
+      variables: { projetId }
+    }).pipe(
+      map(result => result.data.evaluationStats)
+    );
+  }
+
+  createEvaluation(input: CreateEvaluationInput): Observable<Evaluation> {
+    return this.apollo.mutate<{ createEvaluation: Evaluation }>({
+      mutation: CREATE_EVALUATION,
+      variables: { input }
+    }).pipe(
+      map(result => {
+        if (!result.data) {
+          throw new Error('Aucune donnée retournée par la mutation');
+        }
+        return result.data.createEvaluation;
+      }),
+      catchError((error) => {
+        console.error('Erreur lors de la création de l\'évaluation:', error);
+        return throwError(() => new Error('Impossible de créer l\'évaluation'));
+      })
+    );
   }
 } 

@@ -1,36 +1,38 @@
 import { Routes } from '@angular/router';
-import { WelcomeComponent } from './front-office/welcome/welcome.component';
-import { EvaluationsComponent } from './front-office/evaluations/evaluations.component';
-import { EvaluationDetailComponent } from './features/evaluations/evaluation-detail/evaluation-detail.component';
-import { EvaluationFormComponent } from './features/evaluations/evaluation-form/evaluation-form.component';
+import { ApiTestComponent } from './core/api-test/api-test.component';
 
 export const routes: Routes = [
   {
-    path: '',
-    component: WelcomeComponent
+    path: 'back-office',
+    loadChildren: () => import('./layouts/back-office/back-office.module').then(m => m.BackOfficeModule)
   },
   {
-    path: 'projects',
-    loadChildren: () => import('./project/project.module').then(m => m.ProjectModule)
+    path: 'front-office',
+    loadChildren: () => import('./layouts/front-office/front-office.module').then(m => m.FrontOfficeModule)
   },
   {
-    path: 'deliverables',
-    loadChildren: () => import('./deliverable/deliverable.module').then(m => m.DeliverableModule)
+    path: 'livrables',
+    loadChildren: () => import('./features/livrable/livrable.module').then(m => m.LivrableModule)
+  },
+  {
+    path: 'projets',
+    loadChildren: () => import('./features/projet/projet.module').then(m => m.ProjetModule)
   },
   {
     path: 'evaluations',
-    component: EvaluationsComponent
+    loadChildren: () => import('./features/evaluations/evaluations.module').then(m => m.EvaluationsModule)
   },
   {
-    path: 'evaluations/new',
-    component: EvaluationFormComponent
+    path: 'test-api',
+    component: ApiTestComponent
   },
   {
-    path: 'evaluations/:id',
-    component: EvaluationDetailComponent
+    path: '',
+    redirectTo: 'front-office',
+    pathMatch: 'full'
   },
   {
     path: '**',
-    redirectTo: ''
+    redirectTo: 'front-office'
   }
 ];

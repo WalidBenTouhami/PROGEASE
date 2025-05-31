@@ -5,6 +5,7 @@ const path = require('path');
 const filesToExport = [
   'server.ts',
   'src/app/app-routing.module.ts',
+  'src/app/app.component.css',
   'src/app/app.component.spec.ts',
   'src/app/app.component.ts',
   'src/app/app.config.server.ts',
@@ -12,37 +13,76 @@ const filesToExport = [
   'src/app/app.module.ts',
   'src/app/app.routes.ts',
   'src/app/back-office/back-office-routing.module.ts',
+  'src/app/back-office/back-office-template.component.css',
+  'src/app/back-office/back-office-template.component.ts',
   'src/app/back-office/back-office.module.ts',
-  'src/app/core/services/deliverable.service.spec.ts',
-  'src/app/core/services/deliverable.service.ts',
-  'src/app/core/services/project.service.spec.ts',
-  'src/app/core/services/project.service.ts',
-  'src/app/deliverable/deliverable-detail/deliverable-detail.component.spec.ts',
-  'src/app/deliverable/deliverable-detail/deliverable-detail.component.ts',
-  'src/app/deliverable/deliverable-form/deliverable-form.component.spec.ts',
-  'src/app/deliverable/deliverable-form/deliverable-form.component.ts',
-  'src/app/deliverable/deliverable-list/deliverable-list.component.spec.ts',
-  'src/app/deliverable/deliverable-list/deliverable-list.component.ts',
-  'src/app/deliverable/deliverable-routing.module.ts',
-  'src/app/deliverable/deliverable.module.ts',
+  'src/app/back-office/dashboard/dashboard.component.css',
+  'src/app/back-office/dashboard/dashboard.component.spec.ts',
+  'src/app/back-office/dashboard/dashboard.component.ts',
+  'src/app/back-office/livrable-management/livrable-management.component.css',
+  'src/app/back-office/livrable-management/livrable-management.component.spec.ts',
+  'src/app/back-office/livrable-management/livrable-management.component.ts',
+  'src/app/back-office/projet-management/projet-management.component.css',
+  'src/app/back-office/projet-management/projet-management.component.spec.ts',
+  'src/app/back-office/projet-management/projet-management.component.ts',
+  'src/app/core/api-test/api-test.component.ts',
+  'src/app/core/apollo.config.ts',
+  'src/app/core/generated/graphql.ts',
+  'src/app/core/interceptors/auth.interceptor.ts',
+  'src/app/core/models/livrable.model.ts',
+  'src/app/core/models/projet.model.ts',
+  'src/app/core/services/api-tester.service.ts',
+  'src/app/core/services/atert.service.ts',
+  'src/app/core/services/graphql.service.ts',
+  'src/app/core/services/livrable.service.spec.ts',
+  'src/app/core/services/livrable.service.ts',
+  'src/app/core/services/projet.service.spec.ts',
+  'src/app/core/services/projet.service.ts',
+  'src/app/front-office/dashboard/dashboard.component.css',
+  'src/app/front-office/dashboard/dashboard.component.spec.ts',
+  'src/app/front-office/dashboard/dashboard.component.ts',
   'src/app/front-office/front-office-routing.module.ts',
+  'src/app/front-office/front-office-template.component.css',
+  'src/app/front-office/front-office-template.component.ts',
   'src/app/front-office/front-office.module.ts',
-  'src/app/project/project-detail/project-detail.component.spec.ts',
-  'src/app/project/project-detail/project-detail.component.ts',
-  'src/app/project/project-form/project-form.component.spec.ts',
-  'src/app/project/project-form/project-form.component.ts',
-  'src/app/project/project-list/project-list.component.spec.ts',
-  'src/app/project/project-list/project-list.component.ts',
-  'src/app/project/project-routing.module.ts',
-  'src/app/project/project.module.ts',
+  'src/app/front-office/livrable-list/livrable-list.component.css',
+  'src/app/front-office/livrable-list/livrable-list.component.spec.ts',
+  'src/app/front-office/livrable-list/livrable-list.component.ts',
+  'src/app/front-office/projet-list/projet-list.component.css',
+  'src/app/front-office/projet-list/projet-list.component.spec.ts',
+  'src/app/front-office/projet-list/projet-list.component.ts',
+  'src/app/livrable/livrable-detail/livrable-detail.component.css',
+  'src/app/livrable/livrable-detail/livrable-detail.component.spec.ts',
+  'src/app/livrable/livrable-detail/livrable-detail.component.ts',
+  'src/app/livrable/livrable-form/livrable-form.component.css',
+  'src/app/livrable/livrable-form/livrable-form.component.spec.ts',
+  'src/app/livrable/livrable-form/livrable-form.component.ts',
+  'src/app/livrable/livrable-list/livrable-list.component.css',
+  'src/app/livrable/livrable-list/livrable-list.component.spec.ts',
+  'src/app/livrable/livrable-list/livrable-list.component.ts',
+  'src/app/livrable/livrable-routing.module.ts',
+  'src/app/livrable/livrable.module.ts',
+  'src/app/projet/projet-detail/projet-detail.component.css',
+  'src/app/projet/projet-detail/projet-detail.component.spec.ts',
+  'src/app/projet/projet-detail/projet-detail.component.ts',
+  'src/app/projet/projet-form/projet-form.component.css',
+  'src/app/projet/projet-form/projet-form.component.spec.ts',
+  'src/app/projet/projet-form/projet-form.component.ts',
+  'src/app/projet/projet-list/projet-list.component.css',
+  'src/app/projet/projet-list/projet-list.component.spec.ts',
+  'src/app/projet/projet-list/projet-list.component.ts',
+  'src/app/projet/projet-routing.module.ts',
+  'src/app/projet/projet.module.ts',
   'src/environments/environment.prod.ts',
   'src/environments/environment.ts',
   'src/main.server.ts',
-  'src/main.ts'
+  'src/main.ts',
+  'src/polyfills.ts',
+  'src/styles.css'
 ];
 
 // Chemin du fichier de sortie
-const outputFile = './exported_code.txt';
+const outputFile = './exported_code_ts_css.txt';
 
 /**
  * Fonction pour exporter le contenu des fichiers.
@@ -51,7 +91,7 @@ async function exportCode() {
   try {
     let outputContent = '';
 
-    console.log('🚀 Début de l\'export des fichiers...\n');
+    console.log('🚀 Debut de l\'export des fichiers...\n');
 
     for (const file of filesToExport) {
       const filePath = path.resolve(file);
@@ -67,7 +107,7 @@ async function exportCode() {
     }
 
     fs.writeFileSync(outputFile, outputContent, 'utf-8');
-    console.log(`\n✅ Code exporté avec succès dans : ${outputFile}`);
+    console.log(`\n✅ Code exporte avec succes dans : ${outputFile}`);
   } catch (error) {
     console.error('❌ Erreur lors de l\'exportation :', error.message);
   }

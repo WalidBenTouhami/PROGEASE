@@ -1,0 +1,53 @@
+:host {
+  display: block;
+}
+
+.project-card {
+  transition: transform 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.status-chip {
+  &.en-cours {
+    background-color: #4CAF50;
+    color: white;
+  }
+  
+  &.termine {
+    background-color: #2196F3;
+    color: white;
+  }
+  
+  &.en-attente {
+    background-color: #FFC107;
+    color: black;
+  }
+  
+  &.annule {
+    background-color: #F44336;
+    color: white;
+  }
+}
+
+.mat-mdc-card {
+  margin-bottom: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.mat-mdc-card-header {
+  padding: 16px;
+}
+
+.mat-mdc-card-content {
+  padding: 0 16px;
+}
+
+.mat-mdc-card-actions {
+  padding: 8px 16px;
+  display: flex;
+  justify-content: flex-end;
+} 
