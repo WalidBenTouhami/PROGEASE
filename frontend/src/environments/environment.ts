@@ -2,8 +2,13 @@ export const environment = {
   production: false,
   appName: 'PROGEASE',
   version: '2.0.0',
+
   apiUrl: 'http://localhost:3000',
   graphqlUri: 'http://localhost:3000/graphql',
+=======
+  apiUrl: 'http://localhost:5003',
+  graphqlUrl: 'http://localhost:5003/graphql',
+
   defaultLanguage: 'fr',
   supportedLanguages: ['fr', 'en'],
   pagination: {
