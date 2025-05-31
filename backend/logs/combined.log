@@ -2822,3 +2822,151 @@ Use mongoose.model(name, schema) {"metadata":{"service":"progease-api","stack":"
 {"level":"info","message":"GraphQL v4 disponible sur http://localhost:5003/graphql","service":"progease-api","timestamp":"2025-05-31 16:44:23"}
 {"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-31 16:44:23"}
 {"level":"info","message":"Données de test créées/vérifiées avec succès","service":"progease-api","timestamp":"2025-05-31 16:44:23"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:39"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:40"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:47:41"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:47:41"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:47:41"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:41"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:41"}
+{"level":"info","message":"Serveur Express démarré sur le port 5003 en mode development","service":"progease-api","timestamp":"2025-05-31 16:47:42"}
+{"level":"info","message":"API REST disponible sur http://localhost:5003/api","service":"progease-api","timestamp":"2025-05-31 16:47:42"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5003/graphql","service":"progease-api","timestamp":"2025-05-31 16:47:42"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-31 16:47:42"}
+{"level":"info","message":"Données de test créées/vérifiées avec succès","service":"progease-api","timestamp":"2025-05-31 16:47:42"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:29"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connecté à MongoDB avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Serveur Express démarré sur le port 5003 en mode development","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"API REST disponible sur http://localhost:5003/api","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5003/graphql","service":"progease-api","timestamp":"2025-05-31 16:48:30"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:31"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-31 16:48:31"}
+{"level":"info","message":"Données de test créées/vérifiées avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:31"}
+{"level":"info","message":"✅ Mode test forcé pour les tests","service":"progease-api","timestamp":"2025-05-31 16:48:31"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 16:48:31"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 16:48:31"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 16:48:32"}
