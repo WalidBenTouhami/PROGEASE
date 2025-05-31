@@ -1,9 +1,15 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatSortModule } from '@angular/material/sort';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { Subscription } from 'rxjs';
 import { Projet, StatutProjet } from '../../core/models/projet.model';
 import { ProjetService } from '../../core/services/projet.service';
@@ -18,15 +24,27 @@ import { ProjetService } from '../../core/services/projet.service';
     FormsModule,
     MatPaginatorModule,
     MatTableModule,
+    MatSortModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIconModule,
     RouterModule
   ]
-}) export class ProjetListComponent implements OnInit, OnDestroy {
+})
+export class ProjetListComponent implements OnInit, OnDestroy {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
   chargement = true;
   erreur = '';
   projets: (Projet & { _id: string })[] = [];
-  projetsFiltres: (Projet & { _id: string })[] = []; // Ajout de cette propriété
+  projetsFiltres: (Projet & { _id: string })[] = [];
+  dataSource = new MatTableDataSource<Projet & { _id: string }>();
   private subscription?: Subscription;
   StatutProjet = StatutProjet;
+  searchTerm = '';
+  selectedStatus = '';
+  statuts = Object.values(StatutProjet);
 
   constructor(
     private projetService: ProjetService,
@@ -39,29 +57,27 @@ import { ProjetService } from '../../core/services/projet.service';
 
   chargerProjets(): void {
     this.chargement = true;
-    this.subscription = this.projetService.recupererProjets().subscribe({
-      next: (projets: any[]) => {
-        this.projets = projets.filter((p: any) => !!p._id) as (Projet & { _id: string })[];
-        this.projetsFiltres = [...this.projets]; // Initialiser projetsFiltres
+    this.projetService.recupererProjets().subscribe({
+      next: (projets) => {
+        this.projets = projets.filter(p => p._id !== undefined) as (Projet & { _id: string })[];
+        this.projetsFiltres = [...this.projets];
+        this.dataSource.data = this.projets;
         this.chargement = false;
       },
-      error: (error: any) => {
+      error: (error) => {
         console.error('Erreur lors du chargement des projets:', error);
-        this.erreur = 'Impossible de charger les projets.';
+        this.erreur = 'Une erreur est survenue lors du chargement des projets.';
         this.chargement = false;
       }
     });
   }
 
-  filtrerProjets(critere: string): void {
-    if (!critere) {
-      this.projetsFiltres = [...this.projets];
-      return;
-    }
-
-    this.projetsFiltres = this.projets.filter(projet =>
-      projet.titre.toLowerCase().includes(critere.toLowerCase())
-    );
+  filtrerProjets(terme: string): void {
+    this.projetsFiltres = this.projets.filter(projet => {
+      const matchTitre = projet.titre.toLowerCase().includes(terme.toLowerCase());
+      const matchStatus = !this.selectedStatus || projet.statut === this.selectedStatus;
+      return matchTitre && matchStatus;
+    });
   }
 
   async voirDetails(id: string): Promise<void> {

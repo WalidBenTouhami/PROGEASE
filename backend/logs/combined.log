@@ -2267,3 +2267,54 @@ Use mongoose.model(name, schema) {"metadata":{"service":"progease-api","stack":"
 {"level":"info","message":"GraphQL v4 disponible sur http://localhost:5003/graphql","service":"progease-api","timestamp":"2025-05-31 00:22:36"}
 {"body":"{\\","expose":true,"level":"error","message":"Erreur: Expected property name or '}' in JSON at position 1","service":"progease-api","stack":"SyntaxError: Expected property name or '}' in JSON at position 1\n    at JSON.parse (<anonymous>)\n    at parse (D:\\pi\\PROGEASE\\backend\\node_modules\\body-parser\\lib\\types\\json.js:92:19)\n    at D:\\pi\\PROGEASE\\backend\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (D:\\pi\\PROGEASE\\backend\\node_modules\\raw-body\\index.js:238:16)\n    at done (D:\\pi\\PROGEASE\\backend\\node_modules\\raw-body\\index.js:227:7)\n    at IncomingMessage.onEnd (D:\\pi\\PROGEASE\\backend\\node_modules\\raw-body\\index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","status":400,"statusCode":400,"timestamp":"2025-05-31 00:27:25","type":"entity.parse.failed"}
 {"body":"{\\","expose":true,"level":"error","message":"Erreur: Expected property name or '}' in JSON at position 1","service":"progease-api","stack":"SyntaxError: Expected property name or '}' in JSON at position 1\n    at JSON.parse (<anonymous>)\n    at parse (D:\\pi\\PROGEASE\\backend\\node_modules\\body-parser\\lib\\types\\json.js:92:19)\n    at D:\\pi\\PROGEASE\\backend\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (D:\\pi\\PROGEASE\\backend\\node_modules\\raw-body\\index.js:238:16)\n    at done (D:\\pi\\PROGEASE\\backend\\node_modules\\raw-body\\index.js:227:7)\n    at IncomingMessage.onEnd (D:\\pi\\PROGEASE\\backend\\node_modules\\raw-body\\index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","status":400,"statusCode":400,"timestamp":"2025-05-31 00:27:42","type":"entity.parse.failed"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 00:33:29"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 00:33:29"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-31 00:33:29"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 00:33:30"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-31 00:33:30"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-31 00:33:31"}
+{"code":"ERR_HTTP_REQUEST_TIMEOUT","level":"warn","message":"Erreur client HTTP: Request timeout","service":"progease-api","stack":"Error [ERR_HTTP_REQUEST_TIMEOUT]: Request timeout\n    at onRequestTimeout (node:_http_server:829:30)\n    at Server.checkConnections (node:_http_server:642:7)\n    at listOnTimeout (node:internal/timers:581:17)\n    at process.processTimers (node:internal/timers:519:7)","timestamp":"2025-05-31 00:33:37"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 00:34:15"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 00:34:15"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-31 00:34:15"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 00:34:16"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-31 00:34:16"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-31 00:34:16"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 00:34:55"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 00:34:55"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-31 00:34:55"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 00:34:56"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-31 00:34:56"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-31 00:34:56"}
+{"level":"info","message":"Donnees de test creees/verifiees avec succes","service":"progease-api","timestamp":"2025-05-31 00:34:56"}
+{"level":"info","message":"Serveur Express demarre sur le port 5003 en mode development","service":"progease-api","timestamp":"2025-05-31 00:34:56"}
+{"level":"info","message":"API REST disponible sur http://localhost:5003/api","service":"progease-api","timestamp":"2025-05-31 00:34:56"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5003/graphql","service":"progease-api","timestamp":"2025-05-31 00:34:56"}
+{"code":"ERR_HTTP_REQUEST_TIMEOUT","level":"warn","message":"Erreur client HTTP: Request timeout","service":"progease-api","stack":"Error [ERR_HTTP_REQUEST_TIMEOUT]: Request timeout\n    at onRequestTimeout (node:_http_server:829:30)\n    at Server.checkConnections (node:_http_server:642:7)\n    at listOnTimeout (node:internal/timers:581:17)\n    at process.processTimers (node:internal/timers:519:7)","timestamp":"2025-05-31 00:36:56"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 00:43:31"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 00:43:31"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-31 00:43:31"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 00:43:32"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-31 00:43:32"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-31 00:43:32"}
+{"body":"{\\","expose":true,"level":"error","message":"Erreur: Expected property name or '}' in JSON at position 1","service":"progease-api","stack":"SyntaxError: Expected property name or '}' in JSON at position 1\n    at JSON.parse (<anonymous>)\n    at parse (D:\\pi\\PROGEASE\\backend\\node_modules\\body-parser\\lib\\types\\json.js:92:19)\n    at D:\\pi\\PROGEASE\\backend\\node_modules\\body-parser\\lib\\read.js:128:18\n    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)\n    at invokeCallback (D:\\pi\\PROGEASE\\backend\\node_modules\\raw-body\\index.js:238:16)\n    at done (D:\\pi\\PROGEASE\\backend\\node_modules\\raw-body\\index.js:227:7)\n    at IncomingMessage.onEnd (D:\\pi\\PROGEASE\\backend\\node_modules\\raw-body\\index.js:287:7)\n    at IncomingMessage.emit (node:events:524:28)\n    at endReadableNT (node:internal/streams/readable:1698:12)\n    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)","status":400,"statusCode":400,"timestamp":"2025-05-31 00:45:55","type":"entity.parse.failed"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 00:59:14"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 00:59:14"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-31 00:59:14"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 00:59:15"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-31 00:59:15"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-31 00:59:16"}
+{"level":"info","message":"Donnees de test creees/verifiees avec succes","service":"progease-api","timestamp":"2025-05-31 00:59:16"}
+{"level":"info","message":"Serveur Express demarre sur le port 5003 en mode development","service":"progease-api","timestamp":"2025-05-31 00:59:16"}
+{"level":"info","message":"API REST disponible sur http://localhost:5003/api","service":"progease-api","timestamp":"2025-05-31 00:59:16"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5003/graphql","service":"progease-api","timestamp":"2025-05-31 00:59:16"}
+{"level":"info","message":"Gestionnaires d'erreurs du processus configures","service":"progease-api","timestamp":"2025-05-31 01:04:28"}
+{"level":"info","message":"Gestionnaires d'erreurs HTTP configures","service":"progease-api","timestamp":"2025-05-31 01:04:28"}
+{"level":"info","message":"✅ Cle API Deepseek chargee","service":"progease-api","timestamp":"2025-05-31 01:04:28"}
+{"level":"info","message":"Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-05-31 01:04:29"}
+{"level":"info","message":"Connecte à MongoDB avec succes","service":"progease-api","timestamp":"2025-05-31 01:04:29"}
+{"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-05-31 01:04:30"}
+{"level":"info","message":"Donnees de test creees/verifiees avec succes","service":"progease-api","timestamp":"2025-05-31 01:04:30"}
+{"level":"info","message":"Serveur Express demarre sur le port 5003 en mode development","service":"progease-api","timestamp":"2025-05-31 01:04:30"}
+{"level":"info","message":"API REST disponible sur http://localhost:5003/api","service":"progease-api","timestamp":"2025-05-31 01:04:30"}
+{"level":"info","message":"GraphQL v4 disponible sur http://localhost:5003/graphql","service":"progease-api","timestamp":"2025-05-31 01:04:30"}

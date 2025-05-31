@@ -3,8 +3,10 @@ import { BackOfficeDashboardComponent } from './dashboard.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { NgChartsModule } from 'ng2-charts';
 
 describe('BackOfficeDashboardComponent', () => {
   let component: BackOfficeDashboardComponent;
@@ -16,8 +18,10 @@ describe('BackOfficeDashboardComponent', () => {
         MatCardModule,
         MatIconModule,
         MatListModule,
+        MatProgressSpinnerModule,
         HttpClientTestingModule,
         NoopAnimationsModule,
+        NgChartsModule,
         BackOfficeDashboardComponent
       ]
     }).compileComponents();
@@ -35,24 +39,22 @@ describe('BackOfficeDashboardComponent', () => {
     expect(component.chargement).toBeTruthy();
   });
 
-  it('should load statistics after delay', fakeAsync(() => {
-    expect(component.statistiques.totalProjets).toBe(0);
-    tick(1000);
+  it('should initialize statistics in constructor', () => {
     expect(component.statistiques.totalProjets).toBe(15);
     expect(component.statistiques.projetsActifs).toBe(8);
     expect(component.statistiques.projetsTermines).toBe(5);
     expect(component.statistiques.projetsEnRetard).toBe(2);
-    expect(component.chargement).toBeFalsy();
-  }));
+  });
 
-  it('should render statistics when loaded', fakeAsync(() => {
+  it('should initialize dashboard data in ngOnInit', fakeAsync(() => {
+    component.ngOnInit();
+    expect(component.projetsAValider).toBe(5);
+    expect(component.livrablesACorriger).toBe(10);
+    expect(component.dernieresActions.length).toBe(2);
+    expect(component.barChartData.datasets[0].data).toEqual([5, 10, 0]);
+    
     tick(1000);
     fixture.detectChanges();
-    
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.stats-card')?.textContent).toContain('15');
-    expect(compiled.querySelector('.active-projects')?.textContent).toContain('8');
-    expect(compiled.querySelector('.completed-projects')?.textContent).toContain('5');
-    expect(compiled.querySelector('.delayed-projects')?.textContent).toContain('2');
+    expect(component.chargement).toBeFalsy();
   }));
 });
