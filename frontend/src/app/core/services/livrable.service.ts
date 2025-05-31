@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Apollo } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
-import { Livrable } from '../models/livrable.model';
-import { CreateLivrableInput, UpdateLivrableInput } from '../models/livrable.input';
+import { Livrable, CreateLivrableInput, UpdateLivrableInput, StatutLivrable } from '../models/livrable.model';
 import { GET_LIVRABLES, GET_LIVRABLES_BY_PROJET, CREATE_LIVRABLE, UPDATE_LIVRABLE, DELETE_LIVRABLE } from '../graphql/livrable.queries';
 
 @Injectable({

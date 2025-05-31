@@ -15,7 +15,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
+import { MatMenuModule } from '@angular/material/menu';
 import { AlertService } from '../../../core/services/atert.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ThemePalette } from '@angular/material/core';
 
 @Component({
   selector: 'app-livrable-list',
@@ -34,7 +38,9 @@ import { AlertService } from '../../../core/services/atert.service';
     RouterModule,
     MatListModule,
     MatBadgeModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatChipsModule,
+    MatMenuModule
   ],
   templateUrl: './livrable-list.component.html',
   styles: [`
@@ -90,6 +96,32 @@ import { AlertService } from '../../../core/services/atert.service';
         text-decoration: underline;
       }
     }
+
+    .filters {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    mat-form-field {
+      flex: 1;
+    }
+
+    mat-chip-set {
+      display: inline-flex;
+    }
+
+    .ms-3 {
+      margin-left: 12px;
+    }
+
+    .mb-4 {
+      margin-bottom: 16px;
+    }
+
+    .mb-3 {
+      margin-bottom: 12px;
+    }
   `]
 })
 export class LivrableListComponent implements OnInit {
@@ -99,26 +131,48 @@ export class LivrableListComponent implements OnInit {
   chargement = false;
   erreur = '';
   searchTerm = '';
-  selectedStatus = '';
-  statuts = Object.values(StatutLivrable);
-
-  // Exposer l'énumération pour le template
-  StatutLivrable = StatutLivrable;
+  selectedStatus: StatutLivrable | null = null;
+  statutOptions = [
+    StatutLivrable.EN_COURS,
+    StatutLivrable.TERMINE,
+    StatutLivrable.EN_ATTENTE,
+    StatutLivrable.SOUMIS
+  ];
 
   constructor(
     private livrableService: LivrableService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
     if (this.projetId) {
-      this.chargement = true;
+      this.loadLivrablesForProject();
+    } else {
       this.loadLivrables();
     }
   }
 
   loadLivrables() {
-    this.livrableService.getLivrables(this.projetId).subscribe({
+    this.chargement = true;
+    this.livrableService.getLivrables().subscribe({
+      next: (livrables) => {
+        this.livrables = livrables;
+        this.filterLivrables();
+        this.chargement = false;
+      },
+      error: (error) => {
+        this.alertService.error('Erreur lors du chargement des livrables');
+        console.error('Error loading livrables:', error);
+        this.erreur = "Erreur lors du chargement des livrables.";
+        this.chargement = false;
+      }
+    });
+  }
+
+  loadLivrablesForProject() {
+    this.chargement = true;
+    this.livrableService.getLivrablesByProjet(this.projetId).subscribe({
       next: (livrables) => {
         this.livrables = livrables;
         this.filterLivrables();
@@ -139,18 +193,16 @@ export class LivrableListComponent implements OnInit {
       .filter(l => !this.selectedStatus || l.statut === this.selectedStatus);
   }
 
-  getStatusClass(status: StatutLivrable): string {
+  getStatusColor(status: StatutLivrable): ThemePalette {
     switch (status) {
       case StatutLivrable.EN_COURS:
-        return 'bg-primary';
+        return 'primary';
       case StatutLivrable.TERMINE:
-        return 'bg-success';
-      case StatutLivrable.EN_ATTENTE:
-        return 'bg-warning';
+        return 'accent';
       case StatutLivrable.SOUMIS:
-        return 'bg-info';
+        return 'warn';
       default:
-        return 'bg-secondary';
+        return undefined;
     }
   }
 
@@ -169,7 +221,11 @@ export class LivrableListComponent implements OnInit {
       this.livrableService.deleteLivrable(livrable.id).subscribe({
         next: () => {
           this.alertService.success('Livrable supprimé avec succès');
-          this.loadLivrables();
+          if (this.projetId) {
+            this.loadLivrablesForProject();
+          } else {
+            this.loadLivrables();
+          }
         },
         error: (error) => {
           this.alertService.error('Erreur lors de la suppression du livrable');
@@ -177,31 +233,5 @@ export class LivrableListComponent implements OnInit {
         }
       });
     }
-  }
-
-  // Fonctions utilitaires pour le template
-  isEnAttente(statut: StatutLivrable): boolean {
-    return statut === StatutLivrable.EN_ATTENTE;
-  }
-
-  isSoumis(statut: StatutLivrable): boolean {
-    return statut === StatutLivrable.SOUMIS;
-  }
-
-  isEnRevision(statut: StatutLivrable): boolean {
-    return statut === StatutLivrable.EN_REVISION;
-  }
-
-  isValide(statut: StatutLivrable): boolean {
-    return statut === StatutLivrable.VALIDE;
-  }
-
-  isRejete(statut: StatutLivrable): boolean {
-    return statut === StatutLivrable.REJETE;
-  }
-
-  // Generic status checker for template
-  isStatus(statut: StatutLivrable, status: StatutLivrable): boolean {
-    return statut === status;
   }
 }
