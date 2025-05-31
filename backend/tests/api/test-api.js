@@ -10,9 +10,10 @@ const testAPI = async () => {
 
         // Test de création d'utilisateur
         console.log('Test de création d\'utilisateur...');
+        const timestamp = new Date().getTime();
         const utilisateurData = {
             nom: 'John Doe',
-            email: 'john.doe@example.com',
+            email: `john.doe.${timestamp}@example.com`,
             role: 'TUTEUR'
         };
 
