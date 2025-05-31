@@ -1,14 +1,37 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Apollo } from 'apollo-angular';
 import { Observable, map } from 'rxjs';
+
+import { Livrable, CreateLivrableInput, UpdateLivrableInput, StatutLivrable } from '../models/livrable.model';
+import { GET_LIVRABLES, GET_LIVRABLES_BY_PROJET, CREATE_LIVRABLE, UPDATE_LIVRABLE, DELETE_LIVRABLE } from '../graphql/livrable.queries';
+=======
 import { Livrable, StatutLivrable } from '../models/livrable.model';
 import { environment } from '../../../environments/environment';
 import { ApiService } from './api.service';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class LivrableService {
+
+  constructor(private apollo: Apollo) {}
+
+  getLivrables(): Observable<Livrable[]> {
+    return this.apollo.query<{ livrables: Livrable[] }>({
+      query: GET_LIVRABLES
+    }).pipe(
+      map(result => result.data.livrables)
+    );
+  }
+
+  getLivrablesByProjet(projetId: string): Observable<Livrable[]> {
+    return this.apollo.query<{ livrablesByProjet: Livrable[] }>({
+      query: GET_LIVRABLES_BY_PROJET,
+      variables: { projetId }
+    }).pipe(
+      map(result => result.data.livrablesByProjet)
+=======
   private readonly path = '/api/livrables';
 
   constructor(private http: HttpClient, private api: ApiService) { }
@@ -68,41 +91,34 @@ export class LivrableService {
         creeLe: livrable.creeLe ? new Date(livrable.creeLe) : undefined,
         majLe: livrable.majLe ? new Date(livrable.majLe) : undefined
       })))
+
     );
   }
 
-  recupererLivrable(id: string): Observable<Livrable> {
-    return this.http.get<Livrable>(`${this.apiUrl}/${id}`).pipe(
-      map(livrable => ({
-        ...livrable,
-        dateLimite: new Date(livrable.dateLimite),
-        creeLe: livrable.creeLe ? new Date(livrable.creeLe) : undefined,
-        majLe: livrable.majLe ? new Date(livrable.majLe) : undefined
-      }))
+  createLivrable(livrable: CreateLivrableInput): Observable<Livrable> {
+    return this.apollo.mutate<{ createLivrable: Livrable }>({
+      mutation: CREATE_LIVRABLE,
+      variables: { input: livrable }
+    }).pipe(
+      map(result => result.data!.createLivrable)
     );
   }
 
-  creerLivrable(livrable: Livrable): Observable<Livrable> {
-    return this.http.post<Livrable>(this.apiUrl, livrable);
+  updateLivrable(id: string, livrable: UpdateLivrableInput): Observable<Livrable> {
+    return this.apollo.mutate<{ updateLivrable: Livrable }>({
+      mutation: UPDATE_LIVRABLE,
+      variables: { id, input: livrable }
+    }).pipe(
+      map(result => result.data!.updateLivrable)
+    );
   }
 
-  mettreAJourLivrable(id: string, livrable: Livrable): Observable<Livrable> {
-    return this.http.put<Livrable>(`${this.apiUrl}/${id}`, livrable);
+  deleteLivrable(id: string): Observable<boolean> {
+    return this.apollo.mutate<{ deleteLivrable: boolean }>({
+      mutation: DELETE_LIVRABLE,
+      variables: { id }
+    }).pipe(
+      map(result => result.data!.deleteLivrable)
+    );
   }
-
-  supprimerLivrable(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
-  }
-
-  getStatutOptions(): string[] {
-    return Object.values(StatutLivrable);
-  }
-
-  // Maintenir les alias pour la compatibilité
-  getAllLivrables = this.recupererLivrables;
-  getLivrableById = this.recupererLivrable;
-  getLivrablesForProject = this.recupererLivrablesParProjet;
-  createLivrable = this.creerLivrable;
-  updateLivrable = this.mettreAJourLivrable;
-  deleteLivrable = this.supprimerLivrable;
 }

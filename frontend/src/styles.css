@@ -1,4 +1,8 @@
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
 :root {
   --primary-color: #18223a;
   --secondary-color: #151b2b;
@@ -81,24 +85,17 @@ a:focus, a:hover {
 }
 .skip-link {
   position: absolute;
-  left: -999px;
-  top: auto;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  background: #fff;
-  color: var(--primary-color);
-  padding: 0.5em;
-  border-radius: 0 0 0.5em 0.5em;
-  z-index: 100;
+  left: -9999px;
+  z-index: 999;
+  padding: 1em;
+  background-color: white;
+  color: black;
+  opacity: 0;
 }
 .skip-link:focus {
-  left: 0;
-  top: 0;
-  width: auto;
-  height: auto;
-  font-size: 1rem;
-  outline: 2px solid var(--primary-color);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 1;
 }
 button, input, select, textarea {
   font-family: inherit;
@@ -149,4 +146,61 @@ button:focus, button:hover {
 }
 
 html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+body { 
+  margin: 0; 
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  background-color: #f5f5f5;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Material Design Overrides */
+.mat-mdc-card {
+  margin-bottom: 1rem;
+  border-radius: 8px !important;
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+/* Loading States */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+}
+
+/* Error States */
+.error-message {
+  color: #f44336;
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: #ffebee;
+}
+
+/* Success States */
+.success-message {
+  color: #4caf50;
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 4px;
+  background-color: #e8f5e9;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+  
+  .mat-mdc-card {
+    margin-bottom: 0.5rem;
+  }
+}

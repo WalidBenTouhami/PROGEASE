@@ -14,7 +14,7 @@ const logger = require('../../utils/logger');
 const { AppError, ERROR_CODES } = require('../../middleware/errorHandlers');
 const { validateInput } = require('../../utils/validators');
 const { handleMongooseError } = require('../../utils/errorUtils');
-const { Enum } = require('../../../config/constants');
+const { Enums } = require('../../../config/constants');
 const { mapProjetMongoVersGraphQL } = require('./projet.resolver');
 const { checkAuthorization } = require('../../utils/auth.utils');
 
@@ -27,20 +27,19 @@ function mapLivrableMongoVersGraphQL(doc) {
     if (!doc) return null;
     try {
         return {
-            _id: doc._id.toString(),
+            id: doc._id.toString(),
             intitule: doc.intitule || '',
             description: doc.description || '',
             dateLimite: doc.dateLimite || null,
-            projetId: doc.projetId?.toString() || '',
-            statut: doc.statut || Enum.StatutLivrable.EN_ATTENTE,
             urlDepot: doc.urlDepot || '',
+            statut: doc.statut || Enums.StatutLivrable.EN_ATTENTE,
+            projetId: doc.projetId?.toString() || '',
             creeLe: doc.creeLe || new Date(),
             majLe: doc.majLe || new Date(),
-            estEnRetard: doc.estEnRetard || false,
-            __typename: 'Livrable'
+            estEnRetard: doc.estEnRetard || false
         };
     } catch (error) {
-        logger.error('Erreur lors du mapping Livrable:', {
+        logger.error('Error mapping deliverable:', {
             error: error.message,
             docId: doc?._id
         });
@@ -53,7 +52,7 @@ const Query = {
     /**
      * Liste des livrables avec pagination et filtres
      */
-    livrables: async (_, {
+    deliverables: async (_, {
         page = 1,
         limit = 10,
         projetId = null,
@@ -72,7 +71,7 @@ const Query = {
                 filter.projetId = projetId;
             }
 
-            if (statut && Object.values(Enum.StatutLivrable).includes(statut)) {
+            if (statut && Object.values(Enums.StatutLivrable).includes(statut)) {
                 filter.statut = statut;
             }
 
@@ -118,7 +117,7 @@ const Query = {
                 }
             };
         } catch (error) {
-            logger.error('Erreur lors de la recuperation des livrables:', {
+            logger.error('Error fetching deliverables:', {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId,
@@ -126,7 +125,7 @@ const Query = {
             });
 
             throw new AppError(
-                'Impossible de recuperer les livrables',
+                'Failed to fetch deliverables',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -135,28 +134,28 @@ const Query = {
     },
 
     /**
-     * Recuperer un livrable par son ID
+     * Get a deliverable by ID
      */
-    livrable: async (_, { id }, context) => {
+    deliverable: async (_, { id }, context) => {
         checkAuthorization(context, 'read', 'livrables');
 
         try {
-            // Valider l'ID
+            // Validate ID
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 throw new AppError(
-                    'ID de livrable invalide',
+                    'Invalid deliverable ID',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
                 );
             }
 
-            // Utiliser le dataloader
+            // Use dataloader
             const livrable = await context.loaders.livrableLoader.load(id);
 
             if (!livrable) {
                 throw new AppError(
-                    'Livrable non trouve',
+                    'Deliverable not found',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
@@ -167,14 +166,14 @@ const Query = {
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            logger.error(`Erreur lors de la recuperation du livrable ${id}:`, {
+            logger.error(`Error fetching deliverable ${id}:`, {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId
             });
 
             throw new AppError(
-                'Erreur lors de la recuperation du livrable',
+                'Failed to fetch deliverable',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -183,37 +182,37 @@ const Query = {
     },
 
     /**
-     * Recuperer les livrables d'un projet
+     * Get deliverables by project ID
      */
     livrablesByProjet: async (_, { projetId }, context) => {
         checkAuthorization(context, 'read', 'livrables');
 
         try {
-            // Valider l'ID du projet
+            // Validate project ID
             if (!mongoose.Types.ObjectId.isValid(projetId)) {
                 throw new AppError(
-                    'ID de projet invalide',
+                    'Invalid project ID',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
                 );
             }
 
-            // Utiliser le dataloader
+            // Use dataloader
             const livrables = await context.loaders.livrablesByProjetLoader.load(projetId);
 
             return livrables.map(mapLivrableMongoVersGraphQL);
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            logger.error(`Erreur lors de la recuperation des livrables du projet ${projetId}:`, {
+            logger.error(`Error fetching deliverables for project ${projetId}:`, {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId
             });
 
             throw new AppError(
-                'Erreur lors de la recuperation des livrables',
+                'Failed to fetch project deliverables',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -224,39 +223,39 @@ const Query = {
 
 const Mutation = {
     /**
-     * Creer un nouveau livrable
+     * Create a new deliverable
      */
-    creerLivrable: async (_, { input }, context) => {
+    addDeliverable: async (_, { projectId, input }, context) => {
         checkAuthorization(context, 'create', 'livrables');
 
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
 
-            // Valider les donnees d'entree
+            // Validate input
             validateInput(input, {
-                intitule: { required: true, type: 'string', minLength: 3 },
+                name: { required: true, type: 'string', minLength: 3 },
                 description: { required: true, type: 'string', minLength: 10 },
-                dateLimite: { required: true, type: 'date' },
-                projetId: { required: true, type: 'string' },
-                urlDepot: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ }
+                deadline: { required: true, type: 'date' },
+                repositoryUrl: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ },
+                status: { type: 'string', enum: Object.values(Enums.StatutLivrable) }
             });
 
-            // Verifier si le projet existe
-            const projet = await Projet.findById(input.projetId).session(session);
+            // Check if project exists
+            const projet = await Projet.findById(projectId).session(session);
             if (!projet) {
                 throw new AppError(
-                    'Projet non trouve',
+                    'Project not found',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
                 );
             }
 
-            // Creer le livrable
+            // Create deliverable
             const livrable = new Livrable({
                 ...input,
-                statut: input.statut || Enum.StatutLivrable.EN_ATTENTE,
+                statut: input.statut || Enums.StatutLivrable.EN_ATTENTE,
                 createur: context.utilisateur?._id,
                 creeLe: new Date(),
                 majLe: new Date()
@@ -264,16 +263,16 @@ const Mutation = {
 
             const saved = await livrable.save({ session });
 
-            // Mettre à jour le projet
+            // Update project
             projet.livrables.push(saved._id);
             await projet.save({ session });
 
             await session.commitTransaction();
 
-            // Invalider les caches DataLoader
+            // Invalidate DataLoader caches
             context.loaders.livrableLoader.clear(saved._id);
-            context.loaders.livrablesByProjetLoader.clear(input.projetId);
-            context.loaders.projetLoader.clear(input.projetId);
+            context.loaders.livrablesByProjetLoader.clear(projectId);
+            context.loaders.projetLoader.clear(projectId);
 
             logger.info(`Livrable cree: ${saved._id}`, {
                 utilisateurId: context.utilisateur?._id,
@@ -289,11 +288,11 @@ const Mutation = {
 
             const appError = handleMongooseError(
                 error,
-                'Impossible de creer le livrable',
+                'Failed to create deliverable',
                 context.requestId
             );
 
-            logger.error('Erreur lors de la creation du livrable:', {
+            logger.error('Error creating deliverable:', {
                 error: error.message,
                 stack: error.stack,
                 input,
@@ -307,39 +306,39 @@ const Mutation = {
     },
 
     /**
-     * Mettre à jour un livrable existant
+     * Update a deliverable
      */
-    mettreAJourLivrable: async (_, { id, input }, context) => {
+    updateDeliverable: async (_, { id, input }, context) => {
         checkAuthorization(context, 'update', 'livrables');
 
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
 
-            // Valider l'ID
+            // Validate ID
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 throw new AppError(
-                    'ID de livrable invalide',
+                    'Invalid deliverable ID',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
                 );
             }
 
-            // Valider les donnees d'entree
-            if (input.intitule) validateInput({ intitule: input.intitule }, { intitule: { type: 'string', minLength: 3 } });
+            // Validate input
+            if (input.name) validateInput({ name: input.name }, { name: { type: 'string', minLength: 3 } });
             if (input.description) validateInput({ description: input.description }, { description: { type: 'string', minLength: 10 } });
-            if (input.urlDepot) validateInput({ urlDepot: input.urlDepot }, { urlDepot: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ } });
+            if (input.repositoryUrl) validateInput({ repositoryUrl: input.repositoryUrl }, { repositoryUrl: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ } });
 
             const updateData = {
-                ...input,
+                intitule: input.name,
+                description: input.description,
+                dateLimite: input.deadline,
+                urlDepot: input.repositoryUrl,
+                statut: input.status,
                 majLe: new Date(),
                 majPar: context.utilisateur?._id
             };
-
-            if (updateData.dateLimite) {
-                updateData.dateLimite = new Date(updateData.dateLimite);
-            }
 
             const livrable = await Livrable.findByIdAndUpdate(
                 id,
@@ -353,25 +352,16 @@ const Mutation = {
 
             if (!livrable) {
                 throw new AppError(
-                    'Livrable non trouve',
+                    'Deliverable not found',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
                 );
             }
 
-            // Mettre à jour la progression du projet si le statut a changé
-            if (input.statut) {
-                const projet = await Projet.findById(livrable.projetId).session(session);
-                if (projet) {
-                    await projet.calculerProgression();
-                    await projet.save({ session });
-                }
-            }
-
             await session.commitTransaction();
 
-            // Invalider les caches DataLoader
+            // Invalidate DataLoader caches
             context.loaders.livrableLoader.clear(id);
             context.loaders.livrablesByProjetLoader.clear(livrable.projetId);
             context.loaders.projetLoader.clear(livrable.projetId);
@@ -390,11 +380,11 @@ const Mutation = {
 
             const appError = handleMongooseError(
                 error,
-                'Impossible de mettre à jour le livrable',
+                'Failed to update deliverable',
                 context.requestId
             );
 
-            logger.error(`Erreur lors de la mise à jour du livrable ${id}:`, {
+            logger.error(`Error updating deliverable ${id}:`, {
                 error: error.message,
                 stack: error.stack,
                 input,
@@ -408,19 +398,19 @@ const Mutation = {
     },
 
     /**
-     * Supprimer un livrable
+     * Delete a deliverable
      */
-    supprimerLivrable: async (_, { id }, context) => {
+    deleteDeliverable: async (_, { id }, context) => {
         checkAuthorization(context, 'delete', 'livrables');
 
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
 
-            // Valider l'ID
+            // Validate ID
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 throw new AppError(
-                    'ID de livrable invalide',
+                    'Invalid deliverable ID',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
@@ -431,14 +421,14 @@ const Mutation = {
 
             if (!livrable) {
                 throw new AppError(
-                    'Livrable non trouve',
+                    'Deliverable not found',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
                 );
             }
 
-            // Mettre à jour le projet parent
+            // Update parent project
             const projet = await Projet.findById(livrable.projetId).session(session);
             if (projet) {
                 projet.livrables = projet.livrables.filter(lId => lId.toString() !== id);
@@ -448,7 +438,7 @@ const Mutation = {
 
             await session.commitTransaction();
 
-            // Invalider les caches DataLoader
+            // Invalidate DataLoader caches
             context.loaders.livrableLoader.clear(id);
             context.loaders.livrablesByProjetLoader.clear(livrable.projetId);
             context.loaders.projetLoader.clear(livrable.projetId);
@@ -465,14 +455,14 @@ const Mutation = {
 
             if (error instanceof AppError) throw error;
 
-            logger.error(`Erreur lors de la suppression du livrable ${id}:`, {
+            logger.error(`Error deleting deliverable ${id}:`, {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId
             });
 
             throw new AppError(
-                'Impossible de supprimer le livrable',
+                'Failed to delete deliverable',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -483,22 +473,23 @@ const Mutation = {
     }
 };
 
-// Resolvers pour les champs calculés
+// Resolvers pour les champs complexes du type Livrable
 const LivrableResolver = {
+    id: (parent) => parent._id.toString(),
     projet: async (parent, _, context) => {
         if (!parent.projetId) return null;
         try {
-            const projet = await context.loaders.projetLoader.load(parent.projetId);
+            const projet = await context.loaders.projetLoader.load(parent.projetId.toString());
             return mapProjetMongoVersGraphQL(projet);
         } catch (error) {
-            logger.error(`Erreur lors du chargement du projet ${parent.projetId}:`, error);
+            logger.error(`Error loading project for deliverable ${parent.id}:`, error);
             return null;
         }
     },
     estEnRetard: (parent) => {
         if (!parent.dateLimite) return false;
-        if (parent.statut === Enum.StatutLivrable.TERMINE ||
-            parent.statut === Enum.StatutLivrable.VALIDE) return false;
+        if (parent.statut === Enums.StatutLivrable.TERMINE ||
+            parent.statut === Enums.StatutLivrable.VALIDE) return false;
         return new Date() > new Date(parent.dateLimite);
     }
 };
@@ -506,6 +497,6 @@ const LivrableResolver = {
 module.exports = {
     Query,
     Mutation,
-    Livrable: LivrableResolver,
+    LivrableResolver,
     mapLivrableMongoVersGraphQL
 };

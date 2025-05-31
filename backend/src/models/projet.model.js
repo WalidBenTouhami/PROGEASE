@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
-const { Enum } = require('../../config/constants');
+const { Enums } = require('../../config/constants');
 
 const projetSchema = new Schema({
     titre: {
@@ -85,12 +85,12 @@ const projetSchema = new Schema({
     }],
     statut: {
         type: String,
+        required: true,
         enum: {
-            values: Object.values(Enum.StatutProjet),
-            message: `Le statut doit etre l'un des suivants: ${Object.values(Enum.StatutProjet).join(', ')}`
+            values: Object.values(Enums.StatutProjet),
+            message: 'Statut de projet invalide'
         },
-        default: Enum.StatutProjet.BROUILLON,
-        index: true
+        default: Enums.StatutProjet.BROUILLON
     },
     urlDepot: {
         type: String,
@@ -129,8 +129,8 @@ projetSchema.virtual('duree').get(function() {
 });
 
 projetSchema.virtual('estEnRetard').get(function() {
-    return this.statut !== Enum.StatutProjet.TERMINE &&
-        this.statut !== Enum.StatutProjet.ARCHIVE &&
+    return this.statut !== Enums.StatutProjet.TERMINE &&
+        this.statut !== Enums.StatutProjet.ARCHIVE &&
         new Date() > this.dateFin;
 });
 
@@ -155,18 +155,18 @@ projetSchema.pre('save', async function(next) {
     this.majLe = new Date();
 
     // Mise à jour automatique du statut en fonction des dates
-    if (this.statut !== Enum.StatutProjet.ARCHIVE) {
+    if (this.statut !== Enums.StatutProjet.ARCHIVE) {
         const maintenant = new Date();
-        if (this.progression >= 100 && this.statut !== Enum.StatutProjet.TERMINE) {
-            this.statut = Enum.StatutProjet.TERMINE;
-        } else if (maintenant > this.dateFin && this.statut !== Enum.StatutProjet.TERMINE) {
-            this.statut = Enum.StatutProjet.EN_RETARD;
+        if (this.progression >= 100 && this.statut !== Enums.StatutProjet.TERMINE) {
+            this.statut = Enums.StatutProjet.TERMINE;
+        } else if (maintenant > this.dateFin && this.statut !== Enums.StatutProjet.TERMINE) {
+            this.statut = Enums.StatutProjet.EN_RETARD;
         } else if (maintenant >= this.dateDebut && maintenant <= this.dateFin) {
-            if (this.statut === Enum.StatutProjet.BROUILLON || this.statut === Enum.StatutProjet.A_VENIR) {
-                this.statut = Enum.StatutProjet.EN_COURS;
+            if (this.statut === Enums.StatutProjet.BROUILLON || this.statut === Enums.StatutProjet.A_VENIR) {
+                this.statut = Enums.StatutProjet.EN_COURS;
             }
-        } else if (maintenant < this.dateDebut && this.statut === Enum.StatutProjet.BROUILLON) {
-            this.statut = Enum.StatutProjet.A_VENIR;
+        } else if (maintenant < this.dateDebut && this.statut === Enums.StatutProjet.BROUILLON) {
+            this.statut = Enums.StatutProjet.A_VENIR;
         }
     }
 
@@ -194,7 +194,7 @@ projetSchema.methods.calculerProgression = async function() {
         return;
     }
 
-    const termines = livrables.filter(l => l.statut === Enum.StatutLivrable.TERMINE).length;
+    const termines = livrables.filter(l => l.statut === Enums.StatutLivrable.TERMINE).length;
     this.progression = Math.round((termines / livrables.length) * 100);
 };
 

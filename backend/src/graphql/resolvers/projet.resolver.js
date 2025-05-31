@@ -15,6 +15,8 @@ const { validateInput } = require('../../utils/validators');
 const { handleMongooseError } = require('../../utils/errorUtils');
 const { Enum } = require('../../../config/constants');
 const { checkAuthorization } = require('../../utils/auth.utils');
+const Livrable = require('../../models/livrable.model');
+const Evaluation = require('../../models/evaluation.model');
 
 /**
  * Transforme un document MongoDB Projet en type GraphQL
@@ -23,37 +25,24 @@ const { checkAuthorization } = require('../../utils/auth.utils');
  */
 function mapProjetMongoVersGraphQL(doc) {
     if (!doc) return null;
-    try {
-        return {
-            _id: doc._id.toString(),
-            titre: doc.titre || '',
-            description: doc.description || '',
-            equipe: Array.isArray(doc.equipe)
-                ? doc.equipe.map(id => id?.toString() || '')
-                : [],
-            tuteur: doc.tuteur?.toString() || null,
-            competences: Array.isArray(doc.competences) ? doc.competences : [],
-            dateDebut: doc.dateDebut || null,
-            dateFin: doc.dateFin || null,
-            livrables: Array.isArray(doc.livrables)
-                ? doc.livrables.map(id => id?.toString() || '')
-                : [],
-            statut: doc.statut || Enum.StatutProjet.EN_COURS,
-            urlDepot: doc.urlDepot || '',
-            progression: doc.progression || 0,
-            creeLe: doc.creeLe || new Date(),
-            majLe: doc.majLe || new Date(),
-            duree: doc.duree || 0,
-            estEnRetard: doc.estEnRetard || false,
-            __typename: 'Projet'
-        };
-    } catch (error) {
-        logger.error('Erreur lors du mapping Projet:', {
-            error: error.message,
-            docId: doc?._id
-        });
-        return null;
-    }
+    return {
+        id: doc._id.toString(),
+        titre: doc.titre || '',
+        description: doc.description || '',
+        statut: doc.statut || Enum.StatutProjet.BROUILLON,
+        equipe: doc.equipe || [],
+        tuteur: doc.tuteur,
+        competences: doc.competences || [],
+        dateDebut: doc.dateDebut,
+        dateFin: doc.dateFin,
+        livrables: doc.livrables || [],
+        evaluations: doc.evaluations || [],
+        progression: doc.progression || 0,
+        moyenneEvaluations: doc.moyenneEvaluations || 0,
+        performancePredite: doc.performancePredite || 0,
+        creeLe: doc.creeLe,
+        majLe: doc.majLe
+    };
 }
 
 // Definition des resolvers pour les projets
@@ -138,7 +127,7 @@ const Query = {
                 }
             };
         } catch (error) {
-            logger.error('Erreur lors de la recuperation des projets:', {
+            logger.error('Error fetching projects:', {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId,
@@ -146,7 +135,7 @@ const Query = {
             });
 
             throw new AppError(
-                'Impossible de recuperer les projets',
+                'Failed to fetch projects',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -155,28 +144,28 @@ const Query = {
     },
 
     /**
-     * Recuperer un projet par son ID
+     * Get a project by ID
      */
     projet: async (_, { id }, context) => {
         checkAuthorization(context, 'read', 'projets');
 
         try {
-            // Valider l'ID
+            // Validate ID
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 throw new AppError(
-                    'ID de projet invalide',
+                    'Invalid project ID',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
                 );
             }
 
-            // Utiliser le dataloader pour eviter les requetes en double
+            // Use dataloader to avoid duplicate requests
             const projet = await context.loaders.projetLoader.load(id);
 
             if (!projet) {
                 throw new AppError(
-                    'Projet non trouve',
+                    'Project not found',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
@@ -187,14 +176,14 @@ const Query = {
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            logger.error(`Erreur lors de la recuperation du projet ${id}:`, {
+            logger.error(`Error fetching project ${id}:`, {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId
             });
 
             throw new AppError(
-                'Erreur lors de la recuperation du projet',
+                'Failed to fetch project',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -203,7 +192,7 @@ const Query = {
     },
 
     /**
-     * Analyser les risques d'un projet
+     * Analyze project risks
      */
     analyserRisquesProjet: async (_, { projetId }, context) => {
         checkAuthorization(context, 'read', 'projets');
@@ -215,14 +204,14 @@ const Query = {
 
             if (!projet) {
                 throw new AppError(
-                    'Projet non trouve',
+                    'Project not found',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
                 );
             }
 
-            // Analyse des risques basée sur plusieurs facteurs
+            // Risk analysis based on multiple factors
             const risques = {
                 retard: projet.estEnRetard,
                 progression: projet.progression < 50 && projet.dateFin < new Date(),
@@ -234,16 +223,16 @@ const Query = {
 
             const recommandations = [];
             if (risques.retard) {
-                recommandations.push('Revoir le planning du projet et ajuster les échéances');
+                recommandations.push('Review project schedule and adjust deadlines');
             }
             if (risques.progression) {
-                recommandations.push('Augmenter les ressources allouées au projet');
+                recommandations.push('Increase resources allocated to the project');
             }
             if (risques.livrables) {
-                recommandations.push('Organiser une réunion de suivi des livrables en retard');
+                recommandations.push('Schedule a follow-up meeting for late deliverables');
             }
             if (risques.equipe) {
-                recommandations.push('Renforcer l\'équipe projet');
+                recommandations.push('Strengthen the project team');
             }
 
             return {
@@ -254,7 +243,7 @@ const Query = {
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            logger.error('Erreur lors de l\'analyse des risques:', {
+            logger.error('Error analyzing project risks:', {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId,
@@ -262,27 +251,49 @@ const Query = {
             });
 
             throw new AppError(
-                'Erreur lors de l\'analyse des risques',
+                'Failed to analyze project risks',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
             );
+        }
+    },
+
+    getProjectProgress: async (_, { id }, context) => {
+        try {
+            const projet = await Projet.findById(id);
+            if (!projet) throw new Error('Project not found');
+            return projet.progression || 0;
+        } catch (error) {
+            logger.error(`Error getting project progress ${id}:`, error);
+            throw new Error('Failed to get project progress');
+        }
+    },
+
+    getPredictedPerformance: async (_, { id }, context) => {
+        try {
+            const projet = await Projet.findById(id);
+            if (!projet) throw new Error('Project not found');
+            return projet.performancePredite || 0;
+        } catch (error) {
+            logger.error(`Error getting predicted performance ${id}:`, error);
+            throw new Error('Failed to get predicted performance');
         }
     }
 };
 
 const Mutation = {
     /**
-     * Creer un nouveau projet
+     * Create a new project
      */
-    creerProjet: async (_, { input }, context) => {
+    createProject: async (_, { input }, context) => {
         checkAuthorization(context, 'create', 'projets');
 
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
 
-            // Valider les donnees d'entree
+            // Validate input
             validateInput(input, {
                 titre: { required: true, type: 'string', minLength: 5 },
                 description: { required: true, type: 'string', minLength: 10 },
@@ -294,7 +305,7 @@ const Mutation = {
                 urlDepot: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ }
             });
 
-            // Creer le projet
+            // Create project
             const projet = new Projet({
                 ...input,
                 statut: input.statut || Enum.StatutProjet.BROUILLON,
@@ -314,7 +325,7 @@ const Mutation = {
 
             await session.commitTransaction();
 
-            // Invalider le cache DataLoader
+            // Invalidate DataLoader cache
             context.loaders.projetLoader.clear(saved._id);
 
             return mapProjetMongoVersGraphQL(saved);
@@ -323,11 +334,11 @@ const Mutation = {
 
             const appError = handleMongooseError(
                 error,
-                'Impossible de creer le projet',
+                'Failed to create project',
                 context.requestId
             );
 
-            logger.error('Erreur lors de la creation du projet:', {
+            logger.error('Error creating project:', {
                 error: error.message,
                 stack: error.stack,
                 input,
@@ -341,26 +352,26 @@ const Mutation = {
     },
 
     /**
-     * Mettre à jour un projet existant
+     * Update an existing project
      */
-    mettreAJourProjet: async (_, { id, input }, context) => {
+    updateProject: async (_, { id, input }, context) => {
         checkAuthorization(context, 'update', 'projets');
 
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
 
-            // Valider l'ID
+            // Validate ID
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 throw new AppError(
-                    'ID de projet invalide',
+                    'Invalid project ID',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
                 );
             }
 
-            // Valider les donnees d'entree
+            // Validate input
             if (input.titre) validateInput({ titre: input.titre }, { titre: { type: 'string', minLength: 5 } });
             if (input.description) validateInput({ description: input.description }, { description: { type: 'string', minLength: 10 } });
             if (input.competences) validateInput({ competences: input.competences }, { competences: { type: 'array', itemType: 'string', minLength: 1 } });
@@ -372,7 +383,7 @@ const Mutation = {
                 majPar: context.utilisateur?._id
             };
 
-            // Conversion des dates si présentes
+            // Convert dates if present
             if (updateData.dateDebut) updateData.dateDebut = new Date(updateData.dateDebut);
             if (updateData.dateFin) updateData.dateFin = new Date(updateData.dateFin);
 
@@ -390,14 +401,14 @@ const Mutation = {
 
             if (!projetMisAJour) {
                 throw new AppError(
-                    'Projet non trouve',
+                    'Project not found',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
                 );
             }
 
-            // Recalculer la progression si nécessaire
+            // Recalculate progress if necessary
             if (input.livrables || input.statut) {
                 await projetMisAJour.calculerProgression();
                 await projetMisAJour.save({ session });
@@ -405,7 +416,7 @@ const Mutation = {
 
             await session.commitTransaction();
 
-            // Invalider le cache DataLoader
+            // Invalidate DataLoader cache
             context.loaders.projetLoader.clear(id);
 
             logger.info(`Projet mis à jour: ${id}`, {
@@ -421,11 +432,11 @@ const Mutation = {
 
             const appError = handleMongooseError(
                 error,
-                'Impossible de mettre à jour le projet',
+                'Failed to update project',
                 context.requestId
             );
 
-            logger.error(`Erreur lors de la mise à jour du projet ${id}:`, {
+            logger.error(`Error updating project ${id}:`, {
                 error: error.message,
                 stack: error.stack,
                 input,
@@ -439,34 +450,34 @@ const Mutation = {
     },
 
     /**
-     * Supprimer un projet
+     * Delete a project
      */
-    supprimerProjet: async (_, { id }, context) => {
+    deleteProject: async (_, { id }, context) => {
         checkAuthorization(context, 'delete', 'projets');
 
         const session = await mongoose.startSession();
         try {
             session.startTransaction();
 
-            // Valider l'ID
+            // Validate ID
             if (!mongoose.Types.ObjectId.isValid(id)) {
                 throw new AppError(
-                    'ID de projet invalide',
+                    'Invalid project ID',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
                 );
             }
 
-            // Supprimer d'abord les livrables associés
-            const Livrable = require('../../models/livrable.model');
+            // Delete associated deliverables first
             await Livrable.deleteMany({ projetId: id }).session(session);
+            await Evaluation.deleteMany({ projetId: id }).session(session);
 
             const projetSupprime = await Projet.findByIdAndDelete(id).session(session);
 
             if (!projetSupprime) {
                 throw new AppError(
-                    'Projet non trouve',
+                    'Project not found',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
@@ -475,7 +486,7 @@ const Mutation = {
 
             await session.commitTransaction();
 
-            // Invalider le cache DataLoader
+            // Invalidate DataLoader cache
             context.loaders.projetLoader.clear(id);
 
             logger.info(`Projet supprime: ${id}`, {
@@ -489,14 +500,14 @@ const Mutation = {
 
             if (error instanceof AppError) throw error;
 
-            logger.error(`Erreur lors de la suppression du projet ${id}:`, {
+            logger.error(`Error deleting project ${id}:`, {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId
             });
 
             throw new AppError(
-                'Impossible de supprimer le projet',
+                'Failed to delete project',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -508,56 +519,50 @@ const Mutation = {
 };
 
 // Resolvers pour les champs complexes du type Projet
-const Types = {
-    Projet: {
-        /**
-         * Calcule la progression du projet
-         */
-        progression: (projet) => {
-            try {
-                if (!projet.dateDebut || !projet.dateFin) return null;
-
-                const maintenant = new Date();
-                const debut = new Date(projet.dateDebut);
-                const fin = new Date(projet.dateFin);
-
-                if (isNaN(debut.getTime()) || isNaN(fin.getTime())) return null;
-
-                if (maintenant < debut) return 0;
-                if (maintenant > fin) return 100;
-
-                const total = fin.getTime() - debut.getTime();
-                const ecoule = maintenant.getTime() - debut.getTime();
-
-                return Math.round((ecoule / total) * 100);
-            } catch (error) {
-                logger.error('Erreur lors du calcul de la progression:', {
-                    error: error.message,
-                    projetId: projet?._id
-                });
-                return null;
-            }
-        },
-
-        /**
-         * Resolution des livrables associes au projet
-         */
-        livrables: async (projet, _, context) => {
-            try {
-                // Si les livrables sont dejà charges et references par ID
-                if (projet.livrables && projet.livrables.length > 0) {
-                    // Utiliser le DataLoader pour charger les livrables en batch
-                    const livrablesRefs = await context.loaders.livrablesByProjetLoader.load(projet._id);
-                    return livrablesRefs.map(require('./livrable.resolver').mapLivrableMongoVersGraphQL);
-                }
-                return [];
-            } catch (error) {
-                logger.error('Erreur lors de la resolution des livrables:', {
-                    error: error.message,
-                    projetId: projet?._id
-                });
-                return [];
-            }
+const ProjetResolver = {
+    equipe: async (parent, _, context) => {
+        if (!parent.equipe || parent.equipe.length === 0) return [];
+        try {
+            const users = await context.loaders.userLoader.loadMany(
+                parent.equipe.map(id => id.toString())
+            );
+            return users.filter(Boolean);
+        } catch (error) {
+            logger.error(`Error loading team members for project ${parent.id}:`, error);
+            return [];
+        }
+    },
+    tuteur: async (parent, _, context) => {
+        if (!parent.tuteur) return null;
+        try {
+            return await context.loaders.userLoader.load(parent.tuteur.toString());
+        } catch (error) {
+            logger.error(`Error loading tutor for project ${parent.id}:`, error);
+            return null;
+        }
+    },
+    livrables: async (parent, _, context) => {
+        if (!parent.livrables || parent.livrables.length === 0) return [];
+        try {
+            const livrables = await context.loaders.livrableLoader.loadMany(
+                parent.livrables.map(id => id.toString())
+            );
+            return livrables.filter(Boolean);
+        } catch (error) {
+            logger.error(`Error loading deliverables for project ${parent.id}:`, error);
+            return [];
+        }
+    },
+    evaluations: async (parent, _, context) => {
+        if (!parent.evaluations || parent.evaluations.length === 0) return [];
+        try {
+            const evaluations = await context.loaders.evaluationLoader.loadMany(
+                parent.evaluations.map(id => id.toString())
+            );
+            return evaluations.filter(Boolean);
+        } catch (error) {
+            logger.error(`Error loading evaluations for project ${parent.id}:`, error);
+            return [];
         }
     }
 };
@@ -565,6 +570,6 @@ const Types = {
 module.exports = {
     Query,
     Mutation,
-    Types,
+    Projet: ProjetResolver,
     mapProjetMongoVersGraphQL
 };

@@ -1,41 +1,34 @@
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
-// Tableau des variables necessaires et fonction pour verifier/logger sans crash
-const VARIABLES_ENV_OBLIGATOIRES = {
-    CRITIQUES: ['MONGO_URI', 'JWT_SECRET', 'NODE_ENV'],
-    RECOMMANDEES: ['DEEPSEEK_API_KEY'] // On retire CORS_ORIGINS et LOG_LEVEL car ils ont des valeurs par défaut
-};
+require('dotenv').config();
 
-// Verification sans crash immediat pour les variables recommandees
-const variablesManquantes = {
-    critiques: [],
-    recommandees: []
-};
-
-VARIABLES_ENV_OBLIGATOIRES.CRITIQUES.forEach((varEnv) => {
-    if (!process.env[varEnv]) {
-        variablesManquantes.critiques.push(varEnv);
+// ✅ Validation des variables d'environnement critiques
+const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
+REQUIRED_ENV_VARS.forEach((envVar) => {
+    if (!process.env[envVar]) {
+        throw new Error(`La variable d'environnement ${envVar} est manquante.`);
     }
 });
 
-VARIABLES_ENV_OBLIGATOIRES.RECOMMANDEES.forEach((varEnv) => {
-    if (!process.env[varEnv]) {
-        variablesManquantes.recommandees.push(varEnv);
-    }
-});
-
-// Ne crash que si des variables critiques manquent
-if (variablesManquantes.critiques.length) {
-    throw new Error(`Variables d'environnement critiques manquantes: ${variablesManquantes.critiques.join(', ')}`);
-}
-
-if (variablesManquantes.recommandees.length) {
-    console.warn(`⚠️ Variables d'environnement recommandees manquantes: ${variablesManquantes.recommandees.join(', ')}`);
-}
-
-// Enum utilises dans le systeme
-const Enum = Object.freeze({
+// ✅ Énumérations globales
+const Enums = Object.freeze({
+    ProjectStatus: {
+        DRAFT: "DRAFT",
+        IN_PROGRESS: "IN_PROGRESS",
+        COMPLETED: "COMPLETED",
+        ARCHIVED: "ARCHIVED",
+    },
+    UserRole: {
+        ETUDIANT: "ETUDIANT",
+        TUTEUR: "TUTEUR",
+        ADMIN: "ADMIN",
+    },
+    DeliverableStatus: {
+        COMPLETED: "COMPLETED",
+        PENDING: "PENDING",
+        OVERDUE: "OVERDUE",
+    },
     StatutProjet: {
         BROUILLON: 'BROUILLON',
         EN_COURS: 'EN_COURS',
@@ -110,7 +103,9 @@ const MessagesErreur = Object.freeze({
         VALIDATION: 'Erreur de validation des donnees.',
         RATE_LIMIT: 'Trop de requetes, veuillez reessayer plus tard.'
     },
-    PROJET: {
+    PROJECT: {
+        INVALID_TEAM_MEMBER: "Un membre de l'équipe est invalide.",
+        NOT_FOUND: "Projet introuvable.",
         MEMBRE_EQUIPE_INVALIDE: 'Un membre de l\'equipe est invalide.',
         NON_TROUVE: 'Projet introuvable.',
         DATE_INVALIDE: 'Les dates du projet sont invalides.',
@@ -128,7 +123,15 @@ const MessagesErreur = Object.freeze({
         TOKEN_EXPIRE: 'Token d\'authentification expire.',
         TOKEN_INVALIDE: 'Token d\'authentification invalide.',
         COMPTE_VERROUILLE: 'Compte verrouille suite à trop de tentatives.',
-        MOT_DE_PASSE_INVALIDE: 'Le mot de passe ne respecte pas les criteres de securite.'
+        MOT_DE_PASSE_INVALIDE: 'Le mot de passe ne respecte pas les criteres de securite.',
+        INVALID_CREDENTIALS: 'Identifiants invalides',
+        TOKEN_EXPIRED: 'Token expiré',
+        TOKEN_INVALID: 'Token invalide',
+        UNAUTHORIZED: 'Non autorisé'
+    },
+    VALIDATION: {
+        REQUIRED_FIELD: 'Ce champ est requis',
+        INVALID_FORMAT: 'Format invalide'
     }
 });
 
@@ -147,17 +150,85 @@ const StatutHttp = Object.freeze({
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+// Configuration des variables d'environnement requises
+exports.VARIABLES_ENV_OBLIGATOIRES = {
+    MONGODB_URI: 'URI de connexion MongoDB',
+    JWT_SECRET: 'Clé secrète pour JWT',
+    PORT: 'Port du serveur',
+    NODE_ENV: 'Environnement (development/production)',
+    DEEPSEEK_API_KEY: 'Clé API Deepseek'
+};
+
+// Configuration de la base de données
+exports.DB_CONFIG = {
+    COLLECTIONS: {
+        USERS: 'users',
+        PROJECTS: 'projects',
+        EVALUATIONS: 'evaluations',
+        DELIVERABLES: 'deliverables'
+    },
+    CONNECTION_OPTIONS: {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    }
+};
+
+// Configuration de l'API
+exports.API_CONFIG = {
+    PREFIX: '/api/v1',
+    RATE_LIMIT: {
+        WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+        MAX_REQUESTS: 100
+    }
+};
+
+// Configuration de la validation
+exports.VALIDATION = {
+    PASSWORD: {
+        MIN_LENGTH: 8,
+        MAX_LENGTH: 50
+    },
+    USERNAME: {
+        MIN_LENGTH: 3,
+        MAX_LENGTH: 30
+    }
+};
+
+// Configuration des messages d'erreur
+exports.ERROR_MESSAGES = {
+    AUTH: {
+        INVALID_CREDENTIALS: 'Identifiants invalides',
+        TOKEN_EXPIRED: 'Token expiré',
+        TOKEN_INVALID: 'Token invalide',
+        UNAUTHORIZED: 'Non autorisé'
+    },
+    VALIDATION: {
+        REQUIRED_FIELD: 'Ce champ est requis',
+        INVALID_FORMAT: 'Format invalide'
+    }
+};
+
+// Configuration des statuts HTTP
+exports.HTTP_STATUS = {
+    OK: 200,
+    CREATED: 201,
+    BAD_REQUEST: 400,
+    UNAUTHORIZED: 401,
+    FORBIDDEN: 403,
+    NOT_FOUND: 404,
+    INTERNAL_ERROR: 500
+};
+
 module.exports = {
     MONGO_URI: process.env.MONGO_URI,
     PORT: process.env.PORT || 3000,
     JWT_SECRET: process.env.JWT_SECRET,
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
-    LOG_LEVEL: process.env.LOG_LEVEL || 'info',
-    Enum,
-    ConfigSecurite,
-    PaginationParDefaut,
-    MessagesErreur,
-    StatutHttp,
+    Enums,
+    SecurityConfig: ConfigSecurite,
+    PaginationDefaults: PaginationParDefaut,
+    ErrorMessages: MessagesErreur,
+    HttpStatus: StatutHttp,
     NODE_ENV,
     ENVIRONMENTS: {
         DEVELOPMENT: 'development',

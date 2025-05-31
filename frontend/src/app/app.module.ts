@@ -1,5 +1,9 @@
-// main.ts
-import { bootstrapApplication } from '@angular/platform-browser';
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientModule } from '@angular/common/http';
+import { ApolloModule } from 'apollo-angular';
+import { HttpLink } from 'apollo-angular/http';
 import { AppComponent } from './app.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
@@ -27,8 +31,8 @@ export class AppModule { }
 
 bootstrapApplication(AppComponent, {
   providers: [
-    provideHttpClient(),
-    provideRouter(routes),
-    ...apolloProviders,
+    ...appConfig.providers
   ],
-}).catch(err => console.error(err));
+  bootstrap: [AppComponent]
+})
+export class AppModule { } 

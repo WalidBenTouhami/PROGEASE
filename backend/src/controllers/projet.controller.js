@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Projet = require('../models/projet.model');
 const Livrable = require('../models/livrable.model');
 const logger = require('../utils/logger');
-const { Enum } = require('../../config/constants');
+const { Enums } = require('../../config/constants');
 
 /**
  * Recuperer tous les projets avec filtrage optionnel
@@ -25,7 +25,7 @@ exports.recupererProjets = async (req, res) => {
         const filter = {};
 
         // Application des filtres
-        if (statut && Object.values(Enum.StatutProjet).includes(statut)) {
+        if (statut && Object.values(Enums.StatutProjet).includes(statut)) {
             filter.statut = statut;
         }
         if (recherche) {
@@ -114,7 +114,7 @@ exports.creerProjet = async (req, res) => {
             ...req.body,
             dateDebut: req.body.dateDebut ? new Date(req.body.dateDebut) : new Date(),
             dateFin: req.body.dateFin ? new Date(req.body.dateFin) : null,
-            statut: req.body.statut || Enum.StatutProjet.BROUILLON,
+            statut: Enums.StatutProjet.BROUILLON,
             progression: 0,
             creeLe: new Date(),
             majLe: new Date(),

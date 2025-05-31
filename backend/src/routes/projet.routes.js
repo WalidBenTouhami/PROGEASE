@@ -2,7 +2,9 @@
 const express = require('express');
 const router = express.Router();
 const projetController = require('../controllers/projet.controller');
-const { validateProjetData, validateId } = require('../validations/projet.validation');
+const { validateRequest } = require('../middleware/validation.middleware');
+const { projetSchema } = require('../validations/projet.validation');
+const { validateId } = require('../validations/projet.validation');
 const { asyncHandler } = require('../middleware/asyncHandler');
 const { rateLimiter } = require('../middleware/rateLimiter');
 
@@ -40,7 +42,7 @@ router.get('/',
  * @access Public
  */
 router.post('/',
-    validateProjetData,
+    validateRequest(projetSchema),
     asyncHandler(projetController.creerProjet)
 );
 
@@ -61,7 +63,7 @@ router.get('/:id',
  */
 router.put('/:id',
     validateId('id'),
-    validateProjetData,
+    validateRequest(projetSchema),
     asyncHandler(projetController.mettreAJourProjet)
 );
 
@@ -73,27 +75,6 @@ router.put('/:id',
 router.delete('/:id',
     validateId('id'),
     asyncHandler(projetController.supprimerProjet)
-);
-
-/**
- * @route POST /api/projets/analyse-risques
- * @description Analyser les risques d'un projet
- * @access Public
- */
-router.post('/analyse-risques',
-    rateLimiter({ windowMs: 300000, max: 10 }),  // max 10 requetes / 5min (plus lourd)
-    validateId('projetId', 'body'),
-    asyncHandler(projetController.analyserRisques)
-);
-
-/**
- * @route POST /api/projets/suivi-taches
- * @description Obtenir le suivi des tâches d'un projet
- * @access Public
- */
-router.post('/suivi-taches',
-    validateId('projetId', 'body'),
-    asyncHandler(projetController.suiviTaches)
 );
 
 /**

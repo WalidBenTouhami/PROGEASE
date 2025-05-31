@@ -1,52 +1,77 @@
 const mongoose = require('mongoose');
-const { Schema, model } = mongoose;
-const { Enum } = require('../../config/constants');
+const { Schema } = mongoose;
+const { Enums } = require('../../config/constants');
 
 const livrableSchema = new Schema({
     intitule: {
         type: String,
-        required: [true, 'Le titre du livrable est requis.'],
+        required: [true, 'L\'intitulé du livrable est requis.'],
         trim: true,
-        minlength: [3, 'Le titre doit contenir au moins 3 caracteres.'],
-        maxlength: [150, 'Le titre ne peut pas depasser 150 caracteres.']
+        minlength: [5, 'L\'intitulé doit contenir au moins 5 caractères.'],
+        maxlength: [100, 'L\'intitulé ne peut pas dépasser 100 caractères.']
     },
     description: {
         type: String,
         required: [true, 'La description du livrable est requise.'],
         trim: true,
-        minlength: [10, 'La description doit contenir au moins 10 caracteres.']
+        minlength: [10, 'La description doit contenir au moins 10 caractères.']
+    },
+    projetId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Projet',
+        required: [true, 'Le projet associé est requis.'],
+        validate: {
+            validator: function(v) {
+                return mongoose.Types.ObjectId.isValid(v);
+            },
+            message: props => `${props.value} n'est pas un ID projet valide!`
+        }
     },
     dateLimite: {
         type: Date,
         required: [true, 'La date limite est requise.'],
         validate: {
-            validator: function(date) {
-                return date >= new Date();
-            },
-            message: 'La date limite doit etre ulterieure à aujourd\'hui.'
-        }
-    },
-    projetId: {
-        type: Schema.Types.ObjectId,
-        ref: 'Projet',
-        required: [true, 'L\'ID du projet est requis.'],
-        validate: {
             validator: function(v) {
-                return mongoose.Types.ObjectId.isValid(v);
+                return v instanceof Date && !isNaN(v);
             },
-            message: props => `${props.value} n'est pas un ID de projet valide!`
-        },
-        index: true
+            message: 'Format de date limite invalide.'
+        }
     },
     statut: {
         type: String,
+        required: true,
         enum: {
-            values: Object.values(Enum.StatutLivrable),
-            message: `Le statut doit etre l'un des suivants: ${Object.values(Enum.StatutLivrable).join(', ')}`
+            values: Object.values(Enums.StatutLivrable),
+            message: 'Statut de livrable invalide'
         },
-        default: Enum.StatutLivrable.EN_ATTENTE,
-        index: true
+        default: Enums.StatutLivrable.EN_ATTENTE
     },
+    urlDepot: {
+        type: String,
+        trim: true,
+        validate: {
+            validator: function(v) {
+                return !v || /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/.test(v);
+            },
+            message: props => `${props.value} n'est pas une URL valide!`
+        }
+    },
+    commentaires: [{
+        auteur: {
+            type: Schema.Types.ObjectId,
+            ref: 'Utilisateur',
+            required: true
+        },
+        contenu: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        dateCreation: {
+            type: Date,
+            default: Date.now
+        }
+    }],
     creeLe: {
         type: Date,
         default: Date.now
@@ -56,44 +81,33 @@ const livrableSchema = new Schema({
         default: Date.now
     }
 }, {
-    timestamps: {
-        createdAt: 'creeLe',
-        updatedAt: 'majLe'
-    },
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true }
+    timestamps: { createdAt: 'creeLe', updatedAt: 'majLe' }
 });
 
-// Ajout d'un index compose pour les requetes frequentes
-livrableSchema.index({ projetId: 1, statut: 1 });
+// Indexes
+livrableSchema.index({ projetId: 1 });
+livrableSchema.index({ statut: 1 });
+livrableSchema.index({ dateLimite: 1 });
+livrableSchema.index({ 'commentaires.auteur': 1 });
 
-// Methode pour verifier si un livrable est en retard
-livrableSchema.methods.estEnRetard = function() {
-    return this.statut !== Enum.StatutLivrable.TERMINE && new Date() > this.dateLimite;
-};
-
-// Virtual pour acceder au projet
-livrableSchema.virtual('projet', {
-    ref: 'Projet',
-    localField: 'projetId',
-    foreignField: '_id',
-    justOne: true
+// Virtual for checking if deliverable is late
+livrableSchema.virtual('estEnRetard').get(function() {
+    if (!this.dateLimite) return false;
+    if (this.statut === Enums.StatutLivrable.TERMINE ||
+        this.statut === Enums.StatutLivrable.VALIDE) return false;
+    return new Date() > this.dateLimite;
 });
 
-// Middleware "pre_save" pour mettre à jour le statut si necessaire
+// Pre-save middleware
 livrableSchema.pre('save', function(next) {
-    if (this.isModified('dateLimite') || this.isModified('statut')) {
-        if (this.statut !== Enum.StatutLivrable.TERMINE && new Date() > this.dateLimite) {
-            this.statut = Enum.StatutLivrable.EN_RETARD;
-        }
-    }
+    this.majLe = new Date();
     next();
 });
 
-// Middleware pour mettre à jour la date de modification
+// Pre-update middleware
 livrableSchema.pre(['updateOne', 'findOneAndUpdate'], function(next) {
     this.set({ majLe: new Date() });
     next();
 });
 
-module.exports = model('Livrable', livrableSchema);
+module.exports = mongoose.model('Livrable', livrableSchema);

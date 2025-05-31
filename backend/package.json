@@ -10,7 +10,8 @@
     "test:newman": "node newman-tests.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "publish-schema": "node src/graphql/scripts/publish-schema.js"
+    "publish-schema": "node src/graphql/scripts/publish-schema.js",
+    "seed": "node src/seeders/seeder.js"
   },
   "keywords": [
     "api",
@@ -36,10 +37,9 @@
     "dataloader": "^2.2.3",
     "dotenv": "^16.5.0",
     "express": "^4.21.2",
-    "express-graphql": "^0.12.0",
     "express-rate-limit": "^6.11.2",
     "express-validator": "^7.2.1",
-    "graphql": "^16.11.0",
+    "graphql": "^16.8.1",
     "graphql-http": "^1.22.4",
     "graphql-tag": "^2.12.6",
     "helmet": "^7.2.0",

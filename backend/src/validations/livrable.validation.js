@@ -1,28 +1,33 @@
 const yup = require('yup');
 const mongoose = require('mongoose');
-const { MessagesErreur, StatutHttp, Enum } = require('../../config/constants');
+const { MessagesErreur, StatutHttp, Enums } = require('../../config/constants');
 
 // Schema de validation Yup pour les livrables
 const livrableSchema = yup.object().shape({
-    intitule: yup.string()
-        .min(3, 'L\'intitule doit contenir au moins 3 caracteres.')
-        .max(150, 'L\'intitule ne peut pas depasser 150 caracteres.')
-        .required('L\'intitule est requis.'),
+    titre: yup.string()
+        .required('Le titre est requis.')
+        .min(3, 'Le titre doit contenir au moins 3 caractères.')
+        .max(150, 'Le titre ne peut pas dépasser 150 caractères.'),
+    
     description: yup.string()
-        .min(10, 'La description doit contenir au moins 10 caracteres.')
-        .required('La description est requise.'),
+        .required('La description est requise.')
+        .min(10, 'La description doit contenir au moins 10 caractères.'),
+    
     projetId: yup.string()
-        .test('is-mongo-id', 'L\'ID de projet est invalide.',
-            val => val && mongoose.Types.ObjectId.isValid(val))
-        .required('L\'ID du projet est requis.'),
+        .required('L\'ID du projet est requis.')
+        .matches(/^[0-9a-fA-F]{24}$/, 'ID de projet invalide.'),
+    
     dateLimite: yup.date()
-        .min(new Date(), 'La date limite doit etre future.')
         .required('La date limite est requise.')
-        .test('date-valide', 'La date limite doit être valide.',
-            val => val instanceof Date && !isNaN(val)),
+        .min(new Date(), 'La date limite doit être ultérieure à aujourd\'hui.'),
+    
     statut: yup.string()
-        .oneOf(Object.values(Enum.StatutLivrable), 'Statut invalide.')
-        .default(Enum.StatutLivrable.EN_ATTENTE)
+        .required('Le statut est requis.')
+        .oneOf(Object.values(Enums.StatutLivrable), 'Statut invalide.'),
+    
+    urlLivrable: yup.string()
+        .nullable()
+        .url('L\'URL du livrable doit être valide.')
 });
 
 // Middleware de validation des donnees de livrable

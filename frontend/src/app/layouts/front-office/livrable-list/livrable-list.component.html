@@ -1,0 +1,81 @@
+<section aria-labelledby="liste-livrables-titre">
+  <h2 id="liste-livrables-titre">Liste des livrables</h2>
+  <div class="container">
+    <!-- Loading State -->
+    <div *ngIf="chargement" class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p class="loading-message">Chargement des livrables...</p>
+    </div>
+
+    <!-- Error State -->
+    <mat-card *ngIf="erreur" class="error-card">
+      <mat-card-content>
+        <p class="error-message">{{ erreur }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Content -->
+    <div *ngIf="!chargement && !erreur">
+      <!-- Filters -->
+      <div class="filters mb-4">
+        <mat-form-field appearance="outline">
+          <mat-label>Rechercher un livrable</mat-label>
+          <input matInput [(ngModel)]="searchTerm" (ngModelChange)="filterLivrables()" placeholder="Titre du livrable...">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Filtrer par statut</mat-label>
+          <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="filterLivrables()">
+            <mat-option [value]="null">Tous</mat-option>
+            <mat-option *ngFor="let status of statutOptions" [value]="status">
+              {{ status }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Empty State -->
+      <mat-card *ngIf="filteredLivrables.length === 0" class="empty-card">
+        <mat-card-content>
+          <p class="empty-message">Aucun livrable trouvé.</p>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Livrables List -->
+      <mat-list *ngIf="filteredLivrables.length > 0">
+        <mat-list-item *ngFor="let livrable of filteredLivrables" class="mb-3">
+          <div matListItemTitle>
+            <a [routerLink]="['/livrables', livrable.id]">{{ livrable.titre }}</a>
+            <mat-chip-set class="ms-3">
+              <mat-chip [color]="getStatusColor(livrable.statut)" [highlighted]="true">
+                {{ livrable.statut }}
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+          <div matListItemLine>{{ livrable.description }}</div>
+          
+          <!-- Actions Menu -->
+          <button mat-icon-button [matMenuTriggerFor]="menu" matListItemMeta>
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="openEditDialog(livrable)">
+              <mat-icon>edit</mat-icon>
+              <span>Modifier</span>
+            </button>
+            <button mat-menu-item (click)="deleteLivrable(livrable)">
+              <mat-icon>delete</mat-icon>
+              <span>Supprimer</span>
+            </button>
+          </mat-menu>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <!-- Add Button -->
+    <button mat-fab color="primary" (click)="openCreateDialog()" style="position: fixed; bottom: 24px; right: 24px;">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+</section>
