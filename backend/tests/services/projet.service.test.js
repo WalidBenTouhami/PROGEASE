@@ -1,65 +1,137 @@
-const { creerProjet, recupererTousProjets } = require('../../src/services/projet.service');
-const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const { Enum } = require('../../config/constants');
-
-let mongoServer;
-
-jest.setTimeout(120000); // Augmenter le délai global à 2 minutes
-
-beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri);
-}, 60000); // Augmenter le délai à 1 minute
-
-afterAll(async () => {
-    if (mongoose.connection.readyState !== 0) {
-        await mongoose.disconnect();
-    }
-    if (mongoServer) {
-        await mongoServer.stop();
-    }
-}, 60000);
+const { expect } = require('chai');
+const { ProjetService } = require('../../src/services/projet.service');
+const { DatabaseService } = require('../../src/services/database.service');
+const { mockProjet, mockLivrable, mockEvaluation } = require('../mocks/data');
 
 describe('ProjetService', () => {
-    describe('creerProjet', () => {
-        it('devrait créer un nouveau projet avec des données valides', async () => {
-            const projetData = {
-                titre: 'Test Projet',
-                description: 'Description détaillée du projet de test pour validation',
-                dateDebut: new Date(),
-                dateFin: new Date(Date.now() + 86400000), // +1 jour
-                statut: Enum.StatutProjet.EN_COURS,
-                competences: ['JavaScript', 'Node.js'],
-                equipe: [],
-                progression: 0,
-                urlDepot: 'https://github.com/test/projet'
-            };
+  let projetService;
+  let dbService;
 
-            const projetCree = await creerProjet(projetData);
-            expect(projetCree).toBeDefined();
-            expect(projetCree.titre).toBe(projetData.titre);
-            expect(projetCree.description).toBe(projetData.description);
-            expect(projetCree.statut).toBe(projetData.statut);
-            expect(projetCree.competences).toEqual(projetData.competences);
-        }, 30000); // Augmenter le délai à 30 secondes
+  beforeEach(() => {
+    dbService = new DatabaseService();
+    projetService = new ProjetService(dbService);
+  });
+
+  describe('createProjet', () => {
+    it('should create a new projet', async () => {
+      const projetData = {
+        titre: 'Nouveau Projet',
+        description: 'Description du projet',
+        dateDebut: '2024-01-01',
+        dateFin: '2024-12-31',
+        statut: 'EN_COURS'
+      };
+
+      const result = await projetService.createProjet(projetData);
+      expect(result).to.have.property('id');
+      expect(result.titre).to.equal(projetData.titre);
+      expect(result.description).to.equal(projetData.description);
+      expect(result.statut).to.equal(projetData.statut);
     });
 
-    describe('recupererTousProjets', () => {
-        it('devrait récupérer tous les projets avec pagination', async () => {
-            const options = {
-                page: 1,
-                limit: 10
-            };
+    it('should throw an error if required fields are missing', async () => {
+      const projetData = {
+        description: 'Description du projet'
+      };
 
-            const resultat = await recupererTousProjets(options);
-            expect(resultat).toBeDefined();
-            expect(resultat.projets).toBeDefined();
-            expect(Array.isArray(resultat.projets)).toBe(true);
-            expect(resultat.pagination).toBeDefined();
-            expect(resultat.pagination.page).toBe(options.page);
-            expect(resultat.pagination.limite).toBe(options.limit);
-        }, 30000); // Augmenter le délai à 30 secondes
+      try {
+        await projetService.createProjet(projetData);
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.message).to.include('titre');
+      }
     });
+  });
+
+  describe('getProjets', () => {
+    it('should return all projets', async () => {
+      const projets = await projetService.getProjets();
+      expect(projets).to.be.an('array');
+      projets.forEach(projet => {
+        expect(projet).to.have.property('id');
+        expect(projet).to.have.property('titre');
+      });
+    });
+
+    it('should filter projets by statut', async () => {
+      const statut = 'EN_COURS';
+      const projets = await projetService.getProjets({ statut });
+      expect(projets).to.be.an('array');
+      projets.forEach(projet => {
+        expect(projet.statut).to.equal(statut);
+      });
+    });
+  });
+
+  describe('getProjetById', () => {
+    it('should return a projet by id', async () => {
+      const projet = await projetService.getProjetById(mockProjet.id);
+      expect(projet).to.have.property('id', mockProjet.id);
+      expect(projet).to.have.property('titre', mockProjet.titre);
+    });
+
+    it('should return null for non-existent projet', async () => {
+      const projet = await projetService.getProjetById('non-existent-id');
+      expect(projet).to.be.null;
+    });
+  });
+
+  describe('updateProjet', () => {
+    it('should update a projet', async () => {
+      const updateData = {
+        titre: 'Titre mis à jour',
+        description: 'Description mise à jour'
+      };
+
+      const result = await projetService.updateProjet(mockProjet.id, updateData);
+      expect(result).to.have.property('id', mockProjet.id);
+      expect(result.titre).to.equal(updateData.titre);
+      expect(result.description).to.equal(updateData.description);
+    });
+
+    it('should throw an error for non-existent projet', async () => {
+      try {
+        await projetService.updateProjet('non-existent-id', { titre: 'Test' });
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.message).to.include('not found');
+      }
+    });
+  });
+
+  describe('deleteProjet', () => {
+    it('should delete a projet', async () => {
+      const result = await projetService.deleteProjet(mockProjet.id);
+      expect(result).to.have.property('id', mockProjet.id);
+    });
+
+    it('should throw an error for non-existent projet', async () => {
+      try {
+        await projetService.deleteProjet('non-existent-id');
+        expect.fail('Should have thrown an error');
+      } catch (error) {
+        expect(error.message).to.include('not found');
+      }
+    });
+  });
+
+  describe('getProjetLivrables', () => {
+    it('should return livrables for a projet', async () => {
+      const livrables = await projetService.getProjetLivrables(mockProjet.id);
+      expect(livrables).to.be.an('array');
+      livrables.forEach(livrable => {
+        expect(livrable).to.have.property('projetId', mockProjet.id);
+      });
+    });
+  });
+
+  describe('getProjetEvaluations', () => {
+    it('should return evaluations for a projet', async () => {
+      const evaluations = await projetService.getProjetEvaluations(mockProjet.id);
+      expect(evaluations).to.be.an('array');
+      evaluations.forEach(evaluation => {
+        expect(evaluation).to.have.property('projetId', mockProjet.id);
+      });
+    });
+  });
 }); 

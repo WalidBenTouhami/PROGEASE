@@ -19,20 +19,17 @@ export interface Projet {
     id?: string;
     titre: string;
     description: string;
+    equipe?: string[];
+    tuteur?: string;
+    competences?: string[];
     dateDebut: string;
     dateFin: string;
-    statut: StatutProjet;
-    responsableId?: string;
-    responsable?: {
-        id: string;
-        nom: string;
-        prenom: string;
-    };
-    membres?: Membre[];
-    competences?: string[];
     livrables?: string[];
-    dateCreation?: string;
-    dateModification?: string;
+    statut: StatutProjet;
+    progression?: number;
+    creeLe?: string;
+    majLe?: string;
+    livrablesComplets?: Livrable[];
 }
 
 export interface User {

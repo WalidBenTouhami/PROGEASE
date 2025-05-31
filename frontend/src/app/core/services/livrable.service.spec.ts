@@ -1,110 +1,277 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpTestingController } from '@angular/common/http/testing';
-import { provideHttpClient } from '@angular/common/http';
-import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { Apollo } from 'apollo-angular';
+import { of } from 'rxjs';
 import { LivrableService } from './livrable.service';
-import { environment } from '../../../environments/environment';
-import { Livrable, StatutLivrable } from '../models/livrable.model';
-import { provideRouter } from '@angular/router';
+import { Livrable } from '../models/livrable.model';
 
 describe('LivrableService', () => {
   let service: LivrableService;
-  let httpMock: HttpTestingController;
-
-  const apiUrl = `${environment.apiUrl}/livrables`;
+  let apolloSpy: jasmine.SpyObj<Apollo>;
 
   const mockLivrable: Livrable = {
-    _id: '1',
-    intitule: 'Livrable 1',
-    description: 'Description du livrable',
-    dateLimite: new Date('2023-03-15'),
-    projetId: '123',
-    statut: StatutLivrable.EN_ATTENTE,
-    creeLe: new Date(),
-    majLe: new Date()
+    id: '1',
+    titre: 'Livrable Test',
+    description: 'Description du livrable test',
+    dateRendu: '2024-06-30',
+    type: 'DOCUMENTATION',
+    statut: 'EN_COURS',
+    projetId: '1',
+    rendus: []
   };
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
+  beforeEach(() => {
+    const spy = jasmine.createSpyObj('Apollo', ['watchQuery', 'mutate']);
+    TestBed.configureTestingModule({
       providers: [
         LivrableService,
-        provideHttpClient(),
-        provideHttpClientTesting(),
-        provideRouter([])
+        { provide: Apollo, useValue: spy }
       ]
     });
-
     service = TestBed.inject(LivrableService);
-    httpMock = TestBed.inject(HttpTestingController);
+    apolloSpy = TestBed.inject(Apollo) as jasmine.SpyObj<Apollo>;
   });
 
-  afterEach(() => {
-    httpMock.verify();
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
-  it('doit récupérer tous les livrables', async () => {
-    service.getAllLivrables().subscribe((livrables: Livrable[]) => {
-      expect(livrables.length).toBe(1);
-      expect(livrables[0].intitule).toBe('Livrable 1');
+  describe('getLivrables', () => {
+    it('should return an array of livrables', (done) => {
+      const response = {
+        data: {
+          livrables: [mockLivrable]
+        }
+      };
+
+      apolloSpy.watchQuery.and.returnValue({
+        valueChanges: of(response)
+      } as any);
+
+      service.getLivrables().subscribe(result => {
+        expect(result.data).toEqual([mockLivrable]);
+        expect(result.success).toBeTrue();
+        done();
+      });
     });
 
-    const req = httpMock.expectOne(apiUrl);
-    expect(req.request.method).toBe('GET');
-    req.flush([mockLivrable]);
-  });
+    it('should handle errors', (done) => {
+      apolloSpy.watchQuery.and.returnValue({
+        valueChanges: of({
+          data: null,
+          errors: [{ message: 'Error fetching livrables' }]
+        })
+      } as any);
 
-  it('doit récupérer un livrable par ID', async () => {
-    service.recupererLivrable('1').subscribe((livrable: Livrable) => {
-      expect(livrable._id).toBe('1');
-      expect(livrable.intitule).toBe('Livrable 1');
+      service.getLivrables().subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/1`);
-    expect(req.request.method).toBe('GET');
-    req.flush(mockLivrable);
+    it('should filter by projetId', (done) => {
+      const projetId = '1';
+      const response = {
+        data: {
+          livrables: [mockLivrable]
+        }
+      };
+
+      apolloSpy.watchQuery.and.returnValue({
+        valueChanges: of(response)
+      } as any);
+
+      service.getLivrables({ projetId }).subscribe(result => {
+        expect(result.data[0].projetId).toEqual(projetId);
+        expect(result.success).toBeTrue();
+        done();
+      });
+    });
   });
 
-  it('doit créer un livrable', async () => {
-    service.creerLivrable(mockLivrable).subscribe((livrable: Livrable) => {
-      expect(livrable.intitule).toBe('Livrable 1');
+  describe('getLivrableById', () => {
+    it('should return a livrable by id', (done) => {
+      const response = {
+        data: {
+          livrable: mockLivrable
+        }
+      };
+
+      apolloSpy.watchQuery.and.returnValue({
+        valueChanges: of(response)
+      } as any);
+
+      service.getLivrableById('1').subscribe(result => {
+        expect(result.data).toEqual(mockLivrable);
+        expect(result.success).toBeTrue();
+        done();
+      });
     });
 
-    const req = httpMock.expectOne(apiUrl);
-    expect(req.request.method).toBe('POST');
-    req.flush(mockLivrable);
+    it('should handle non-existent livrable', (done) => {
+      apolloSpy.watchQuery.and.returnValue({
+        valueChanges: of({
+          data: {
+            livrable: null
+          }
+        })
+      } as any);
+
+      service.getLivrableById('999').subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
+    });
   });
 
-  it('doit mettre à jour un livrable', async () => {
-    const updated = { ...mockLivrable, intitule: 'Livrable Modifié' };
-    service.mettreAJourLivrable('1', updated).subscribe((livrable: Livrable) => {
-      expect(livrable.intitule).toBe('Livrable Modifié');
+  describe('createLivrable', () => {
+    it('should create a new livrable', (done) => {
+      const newLivrable = {
+        titre: 'Nouveau Livrable',
+        description: 'Description',
+        dateRendu: '2024-06-30',
+        type: 'DOCUMENTATION',
+        statut: 'EN_COURS',
+        projetId: '1'
+      };
+
+      const response = {
+        data: {
+          createLivrable: { ...newLivrable, id: '2' }
+        }
+      };
+
+      apolloSpy.mutate.and.returnValue(of(response));
+
+      service.createLivrable(newLivrable).subscribe(result => {
+        expect(result.success).toBeTrue();
+        expect(result.data.id).toBeTruthy();
+        expect(result.data.titre).toEqual(newLivrable.titre);
+        done();
+      });
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/1`);
-    expect(req.request.method).toBe('PUT');
-    req.flush(updated);
+    it('should handle creation errors', (done) => {
+      apolloSpy.mutate.and.returnValue(of({
+        data: null,
+        errors: [{ message: 'Error creating livrable' }]
+      }));
+
+      service.createLivrable({} as any).subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
+    });
   });
 
-  it('doit supprimer un livrable', async () => {
-    service.supprimerLivrable('1').subscribe((response: any) => {
-      expect(response).toBeTruthy();
+  describe('updateLivrable', () => {
+    it('should update an existing livrable', (done) => {
+      const updateData = {
+        titre: 'Titre mis à jour',
+        description: 'Description mise à jour',
+        statut: 'TERMINE'
+      };
+
+      const response = {
+        data: {
+          updateLivrable: { ...mockLivrable, ...updateData }
+        }
+      };
+
+      apolloSpy.mutate.and.returnValue(of(response));
+
+      service.updateLivrable('1', updateData).subscribe(result => {
+        expect(result.success).toBeTrue();
+        expect(result.data.titre).toEqual(updateData.titre);
+        expect(result.data.description).toEqual(updateData.description);
+        expect(result.data.statut).toEqual(updateData.statut);
+        done();
+      });
     });
 
-    const req = httpMock.expectOne(`${apiUrl}/1`);
-    expect(req.request.method).toBe('DELETE');
-    req.flush({ success: true });
+    it('should handle update errors', (done) => {
+      apolloSpy.mutate.and.returnValue(of({
+        data: null,
+        errors: [{ message: 'Error updating livrable' }]
+      }));
+
+      service.updateLivrable('1', {}).subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
+    });
   });
 
-  it('doit gérer une erreur serveur (500)', async () => {
-    service.getAllLivrables().subscribe({
-      next: () => fail('appel devait échouer'),
-      error: (err: any) => {
-        expect(err.status).toBe(500);
-        expect(err.statusText).toBe('Erreur interne');
-      }
+  describe('deleteLivrable', () => {
+    it('should delete a livrable', (done) => {
+      const response = {
+        data: {
+          deleteLivrable: { id: '1' }
+        }
+      };
+
+      apolloSpy.mutate.and.returnValue(of(response));
+
+      service.deleteLivrable('1').subscribe(result => {
+        expect(result.success).toBeTrue();
+        expect(result.data.id).toEqual('1');
+        done();
+      });
     });
 
-    const req = httpMock.expectOne(apiUrl);
-    req.flush('Erreur serveur', { status: 500, statusText: 'Erreur interne' });
+    it('should handle deletion errors', (done) => {
+      apolloSpy.mutate.and.returnValue(of({
+        data: null,
+        errors: [{ message: 'Error deleting livrable' }]
+      }));
+
+      service.deleteLivrable('999').subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
+    });
+  });
+
+  describe('soumettreRendu', () => {
+    it('should submit a rendu for a livrable', (done) => {
+      const renduData = {
+        url: 'https://example.com/rendu',
+        commentaire: 'Voici mon rendu'
+      };
+
+      const response = {
+        data: {
+          soumettreRendu: {
+            ...mockLivrable,
+            rendus: [...mockLivrable.rendus, renduData]
+          }
+        }
+      };
+
+      apolloSpy.mutate.and.returnValue(of(response));
+
+      service.soumettreRendu('1', renduData).subscribe(result => {
+        expect(result.success).toBeTrue();
+        expect(result.data.rendus).toContainEqual(renduData);
+        done();
+      });
+    });
+
+    it('should handle submission errors', (done) => {
+      apolloSpy.mutate.and.returnValue(of({
+        data: null,
+        errors: [{ message: 'Error submitting rendu' }]
+      }));
+
+      service.soumettreRendu('1', {}).subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
+    });
   });
 });

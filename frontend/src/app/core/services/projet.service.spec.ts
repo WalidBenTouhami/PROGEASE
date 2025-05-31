@@ -6,11 +6,14 @@ import { environment } from '../../../environments/environment';
 import { Projet, StatutProjet } from '../models/projet.model';
 import { Livrable, StatutLivrable } from '../models/livrable.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Apollo } from 'apollo-angular';
+import { of } from 'rxjs';
 
 describe('ProjetService Integration Tests', () => {
   let projetService: ProjetService;
   let livrableService: LivrableService;
   let httpMock: HttpTestingController;
+  let apolloSpy: jasmine.SpyObj<Apollo>;
 
   const apiUrl = `${environment.apiUrl}/projets`;
 
@@ -56,12 +59,13 @@ describe('ProjetService Integration Tests', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ProjetService, LivrableService]
+      providers: [ProjetService, LivrableService, { provide: Apollo, useValue: jasmine.createSpyObj('Apollo', ['watchQuery', 'mutate'])}]
     });
 
     projetService = TestBed.inject(ProjetService);
     livrableService = TestBed.inject(LivrableService);
     httpMock = TestBed.inject(HttpTestingController);
+    apolloSpy = TestBed.inject(Apollo) as jasmine.SpyObj<Apollo>;
   });
 
   afterEach(() => {
@@ -344,6 +348,216 @@ describe('ProjetService Error Handling', () => {
 
       const req = httpMock.expectOne(`${apiUrl}/invalid-id`);
       req.flush('Format d\'ID invalide', { status: 400, statusText: 'Bad Request' });
+    });
+  });
+});
+
+describe('ProjetService', () => {
+  let service: ProjetService;
+  let apolloSpy: jasmine.SpyObj<Apollo>;
+
+  const mockProjet: Projet = {
+    id: '1',
+    titre: 'Projet Test',
+    description: 'Description du projet test',
+    dateDebut: '2024-01-01',
+    dateFin: '2024-12-31',
+    statut: 'EN_COURS',
+    equipe: []
+  };
+
+  beforeEach(() => {
+    const spy = jasmine.createSpyObj('Apollo', ['watchQuery', 'mutate']);
+    TestBed.configureTestingModule({
+      providers: [
+        ProjetService,
+        { provide: Apollo, useValue: spy }
+      ]
+    });
+    service = TestBed.inject(ProjetService);
+    apolloSpy = TestBed.inject(Apollo) as jasmine.SpyObj<Apollo>;
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  describe('getProjets', () => {
+    it('should return an array of projets', (done) => {
+      const response = {
+        data: {
+          projets: [mockProjet]
+        }
+      };
+
+      apolloSpy.watchQuery.and.returnValue({
+        valueChanges: of(response)
+      } as any);
+
+      service.getProjets().subscribe(result => {
+        expect(result.data).toEqual([mockProjet]);
+        expect(result.success).toBeTrue();
+        done();
+      });
+    });
+
+    it('should handle errors', (done) => {
+      apolloSpy.watchQuery.and.returnValue({
+        valueChanges: of({
+          data: null,
+          errors: [{ message: 'Error fetching projets' }]
+        })
+      } as any);
+
+      service.getProjets().subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
+    });
+  });
+
+  describe('getProjetById', () => {
+    it('should return a projet by id', (done) => {
+      const response = {
+        data: {
+          projet: mockProjet
+        }
+      };
+
+      apolloSpy.watchQuery.and.returnValue({
+        valueChanges: of(response)
+      } as any);
+
+      service.getProjetById('1').subscribe(result => {
+        expect(result.data).toEqual(mockProjet);
+        expect(result.success).toBeTrue();
+        done();
+      });
+    });
+
+    it('should handle non-existent projet', (done) => {
+      apolloSpy.watchQuery.and.returnValue({
+        valueChanges: of({
+          data: {
+            projet: null
+          }
+        })
+      } as any);
+
+      service.getProjetById('999').subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
+    });
+  });
+
+  describe('createProjet', () => {
+    it('should create a new projet', (done) => {
+      const newProjet = {
+        titre: 'Nouveau Projet',
+        description: 'Description',
+        dateDebut: '2024-01-01',
+        dateFin: '2024-12-31',
+        statut: 'EN_COURS'
+      };
+
+      const response = {
+        data: {
+          createProjet: { ...newProjet, id: '2' }
+        }
+      };
+
+      apolloSpy.mutate.and.returnValue(of(response));
+
+      service.createProjet(newProjet).subscribe(result => {
+        expect(result.success).toBeTrue();
+        expect(result.data.id).toBeTruthy();
+        expect(result.data.titre).toEqual(newProjet.titre);
+        done();
+      });
+    });
+
+    it('should handle creation errors', (done) => {
+      apolloSpy.mutate.and.returnValue(of({
+        data: null,
+        errors: [{ message: 'Error creating projet' }]
+      }));
+
+      service.createProjet({} as any).subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
+    });
+  });
+
+  describe('updateProjet', () => {
+    it('should update an existing projet', (done) => {
+      const updateData = {
+        titre: 'Titre mis à jour',
+        description: 'Description mise à jour'
+      };
+
+      const response = {
+        data: {
+          updateProjet: { ...mockProjet, ...updateData }
+        }
+      };
+
+      apolloSpy.mutate.and.returnValue(of(response));
+
+      service.updateProjet('1', updateData).subscribe(result => {
+        expect(result.success).toBeTrue();
+        expect(result.data.titre).toEqual(updateData.titre);
+        expect(result.data.description).toEqual(updateData.description);
+        done();
+      });
+    });
+
+    it('should handle update errors', (done) => {
+      apolloSpy.mutate.and.returnValue(of({
+        data: null,
+        errors: [{ message: 'Error updating projet' }]
+      }));
+
+      service.updateProjet('1', {}).subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
+    });
+  });
+
+  describe('deleteProjet', () => {
+    it('should delete a projet', (done) => {
+      const response = {
+        data: {
+          deleteProjet: { id: '1' }
+        }
+      };
+
+      apolloSpy.mutate.and.returnValue(of(response));
+
+      service.deleteProjet('1').subscribe(result => {
+        expect(result.success).toBeTrue();
+        expect(result.data.id).toEqual('1');
+        done();
+      });
+    });
+
+    it('should handle deletion errors', (done) => {
+      apolloSpy.mutate.and.returnValue(of({
+        data: null,
+        errors: [{ message: 'Error deleting projet' }]
+      }));
+
+      service.deleteProjet('999').subscribe(result => {
+        expect(result.success).toBeFalse();
+        expect(result.error).toBeTruthy();
+        done();
+      });
     });
   });
 });

@@ -1,9 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Evaluation } from '../../../core/models/evaluation.model';
 import { EvaluationService } from '../../../core/services/evaluation.service';
+
+type ApiResponse<T> = {
+  success: boolean;
+  data: T;
+};
 
 @Component({
   selector: 'app-evaluation-detail',
@@ -18,14 +23,14 @@ import { EvaluationService } from '../../../core/services/evaluation.service';
           <div class="mb-6">
             <h2 class="text-xl font-semibold mb-2">Projet: {{ evaluation.projet?.titre }}</h2>
             <p class="text-gray-600">
-              Évaluateur: {{ evaluation.evaluateur.nom }} {{ evaluation.evaluateur.prenom }}
+              Évaluateur: {{ evaluation.evaluateur?.nom }} {{ evaluation.evaluateur?.prenom }}
             </p>
           </div>
 
           <div class="mb-6">
-            <h3 class="text-lg font-semibold mb-2">Score Global</h3>
+            <h3 class="text-lg font-semibold mb-2">Note Globale</h3>
             <div class="text-3xl font-bold text-blue-600">
-              {{ evaluation.score }}/20
+              {{ evaluation.note }}/20
             </div>
           </div>
 
@@ -35,10 +40,10 @@ import { EvaluationService } from '../../../core/services/evaluation.service';
               <div *ngFor="let critere of evaluation.criteres" class="border-b pb-4">
                 <div class="flex justify-between items-center">
                   <span class="font-medium">{{ critere.nom }}</span>
-                  <span class="text-lg font-semibold">{{ critere.score }}/20</span>
+                  <span class="text-lg font-semibold">{{ critere.note }}/20</span>
                 </div>
                 <div class="text-sm text-gray-600">
-                  Pondération: {{ critere.poids * 100 }}%
+                  Pondération: {{ critere.poids }}%
                 </div>
               </div>
             </div>
@@ -46,16 +51,11 @@ import { EvaluationService } from '../../../core/services/evaluation.service';
 
           <div class="mb-6">
             <h3 class="text-lg font-semibold mb-2">Commentaires</h3>
-            <p class="text-gray-700 whitespace-pre-line">{{ evaluation.commentaires }}</p>
-          </div>
-
-          <div *ngIf="evaluation.aiRecommendations" class="mb-6">
-            <h3 class="text-lg font-semibold mb-2">Recommandations IA</h3>
-            <p class="text-gray-700 whitespace-pre-line">{{ evaluation.aiRecommendations }}</p>
+            <p class="text-gray-700 whitespace-pre-line">{{ evaluation.commentaire }}</p>
           </div>
 
           <div class="text-sm text-gray-500">
-            Date d'évaluation: {{ evaluation.creeLe | date:'longDate':'':'fr' }}
+            Date d'évaluation: {{ evaluation.dateEvaluation | date:'longDate':'':'fr' }}
           </div>
         </div>
       </ng-container>
@@ -106,7 +106,16 @@ export class EvaluationDetailComponent implements OnInit {
     if (id) {
       this.loading = true;
       this.error = null;
-      this.evaluation$ = this.evaluationService.getEvaluation(id);
+      this.evaluation$ = this.evaluationService.getEvaluation(id).pipe(
+        map((response: ApiResponse<Evaluation>) => {
+          this.loading = false;
+          if (!response.success) {
+            this.error = 'Impossible de charger l\'évaluation';
+            throw new Error(this.error);
+          }
+          return response.data;
+        })
+      );
     }
   }
 } 

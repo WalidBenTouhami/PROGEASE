@@ -4,10 +4,27 @@ import { gql } from 'apollo-angular';
 import { map, Observable, catchError, throwError } from 'rxjs';
 import { Evaluation, EvaluationStats, UpdateEvaluationInput, EvaluationCritere, Projet, User, CreateEvaluationInput } from '../models/evaluation.model';
 
+type ApiResponse<T> = {
+  success: boolean;
+  data: T;
+};
+
 const GET_EVALUATIONS = gql`
-  query GetEvaluations($projectId: ID) {
-    evaluations(projectId: $projectId) {
+  query GetEvaluations($projetId: ID) {
+    evaluations(projetId: $projetId) {
       id
+      projetId
+      evaluateurId
+      note
+      commentaire
+      criteres {
+        nom
+        note
+        poids
+      }
+      dateEvaluation
+      creeLe
+      majLe
       projet {
         id
         titre
@@ -18,16 +35,6 @@ const GET_EVALUATIONS = gql`
         nom
         prenom
       }
-      score
-      commentaires
-      criteres {
-        nom
-        score
-        poids
-      }
-      aiRecommendations
-      creeLe
-      majLe
     }
   }
 `;
@@ -36,6 +43,18 @@ const GET_EVALUATION = gql`
   query GetEvaluation($id: ID!) {
     evaluation(id: $id) {
       id
+      projetId
+      evaluateurId
+      note
+      commentaire
+      criteres {
+        nom
+        note
+        poids
+      }
+      dateEvaluation
+      creeLe
+      majLe
       projet {
         id
         titre
@@ -46,16 +65,6 @@ const GET_EVALUATION = gql`
         nom
         prenom
       }
-      score
-      commentaires
-      criteres {
-        nom
-        score
-        poids
-      }
-      aiRecommendations
-      creeLe
-      majLe
     }
   }
 `;
@@ -64,13 +73,18 @@ const UPDATE_EVALUATION = gql`
   mutation UpdateEvaluation($id: ID!, $input: UpdateEvaluationInput!) {
     updateEvaluation(id: $id, input: $input) {
       id
-      score
-      commentaires
+      projetId
+      evaluateurId
+      note
+      commentaire
       criteres {
         nom
-        score
+        note
         poids
       }
+      dateEvaluation
+      creeLe
+      majLe
       projet {
         id
         titre
@@ -80,9 +94,6 @@ const UPDATE_EVALUATION = gql`
         nom
         prenom
       }
-      aiRecommendations
-      creeLe
-      majLe
     }
   }
 `;
@@ -99,6 +110,18 @@ const CREATE_EVALUATION = gql`
   mutation CreateEvaluation($input: CreateEvaluationInput!) {
     createEvaluation(input: $input) {
       id
+      projetId
+      evaluateurId
+      note
+      commentaire
+      criteres {
+        nom
+        note
+        poids
+      }
+      dateEvaluation
+      creeLe
+      majLe
       projet {
         id
         titre
@@ -109,16 +132,6 @@ const CREATE_EVALUATION = gql`
         nom
         prenom
       }
-      score
-      commentaires
-      criteres {
-        nom
-        score
-        poids
-      }
-      aiRecommendations
-      creeLe
-      majLe
     }
   }
 `;
@@ -129,14 +142,17 @@ const CREATE_EVALUATION = gql`
 export class EvaluationService {
   constructor(private apollo: Apollo) {}
 
-  getEvaluations(projectId?: string): Observable<Evaluation[]> {
+  getEvaluations(projetId?: string): Observable<ApiResponse<Evaluation[]>> {
     return this.apollo
       .watchQuery<{ evaluations: Evaluation[] }>({
         query: GET_EVALUATIONS,
-        variables: projectId && projectId !== 'ALL' ? { projectId } : {},
+        variables: projetId && projetId !== 'ALL' ? { projetId } : {},
       })
       .valueChanges.pipe(
-        map((result) => result.data.evaluations),
+        map((result) => ({
+          success: true,
+          data: result.data.evaluations
+        })),
         catchError((error) => {
           console.error('Erreur lors du chargement des évaluations:', error);
           return throwError(() => new Error('Impossible de charger les évaluations.'));
@@ -144,7 +160,7 @@ export class EvaluationService {
       );
   }
 
-  getEvaluation(id: string): Observable<Evaluation> {
+  getEvaluation(id: string): Observable<ApiResponse<Evaluation>> {
     return this.apollo
       .watchQuery<{ evaluation: Evaluation }>({
         query: GET_EVALUATION,
@@ -155,7 +171,10 @@ export class EvaluationService {
           if (!result.data.evaluation) {
             throw new Error('Évaluation non trouvée');
           }
-          return result.data.evaluation;
+          return {
+            success: true,
+            data: result.data.evaluation
+          };
         }),
         catchError((error) => {
           console.error('Erreur lors du chargement de l\'évaluation:', error);
@@ -164,7 +183,7 @@ export class EvaluationService {
       );
   }
 
-  updateEvaluation(id: string, input: UpdateEvaluationInput): Observable<Evaluation> {
+  updateEvaluation(id: string, input: UpdateEvaluationInput): Observable<ApiResponse<Evaluation>> {
     return this.apollo.mutate<{ updateEvaluation: Evaluation }>({
       mutation: UPDATE_EVALUATION,
       variables: { id, input }
@@ -173,7 +192,10 @@ export class EvaluationService {
         if (!result.data) {
           throw new Error('Aucune donnée retournée par la mutation');
         }
-        return result.data.updateEvaluation;
+        return {
+          success: true,
+          data: result.data.updateEvaluation
+        };
       }),
       catchError((error) => {
         console.error('Erreur lors de la mise à jour de l\'évaluation:', error);
@@ -182,7 +204,7 @@ export class EvaluationService {
     );
   }
 
-  deleteEvaluation(id: string): Observable<string> {
+  deleteEvaluation(id: string): Observable<ApiResponse<string>> {
     return this.apollo
       .mutate<{ deleteEvaluation: { id: string } }>({
         mutation: DELETE_EVALUATION,
@@ -196,7 +218,10 @@ export class EvaluationService {
           if (!result.data) {
             throw new Error('Aucune donnée retournée par la mutation');
           }
-          return result.data.deleteEvaluation.id;
+          return {
+            success: true,
+            data: result.data.deleteEvaluation.id
+          };
         }),
         catchError((error) => {
           console.error('Erreur lors de la suppression de l\'évaluation:', error);
@@ -205,26 +230,28 @@ export class EvaluationService {
       );
   }
 
-  getEvaluationStats(projetId: string): Observable<EvaluationStats> {
+  getEvaluationStats(projetId: string): Observable<ApiResponse<EvaluationStats>> {
     return this.apollo.query<{ evaluationStats: EvaluationStats }>({
       query: gql`
         query GetEvaluationStats($projetId: ID!) {
           evaluationStats(projetId: $projetId) {
-            moyenneGenerale
-            nombreEvaluations
-            meilleureNote
-            pireNote
-            distribution
+            moyenneNote
+            noteMax
+            noteMin
+            totalEvaluations
           }
         }
       `,
       variables: { projetId }
     }).pipe(
-      map(result => result.data.evaluationStats)
+      map(result => ({
+        success: true,
+        data: result.data.evaluationStats
+      }))
     );
   }
 
-  createEvaluation(input: CreateEvaluationInput): Observable<Evaluation> {
+  createEvaluation(input: CreateEvaluationInput): Observable<ApiResponse<Evaluation>> {
     return this.apollo.mutate<{ createEvaluation: Evaluation }>({
       mutation: CREATE_EVALUATION,
       variables: { input }
@@ -233,7 +260,10 @@ export class EvaluationService {
         if (!result.data) {
           throw new Error('Aucune donnée retournée par la mutation');
         }
-        return result.data.createEvaluation;
+        return {
+          success: true,
+          data: result.data.createEvaluation
+        };
       }),
       catchError((error) => {
         console.error('Erreur lors de la création de l\'évaluation:', error);

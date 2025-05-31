@@ -5,24 +5,17 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Apollo } from 'apollo-angular';
 import { gql } from 'apollo-angular';
 import { LoaderComponent } from '../../../shared/components/loader/loader.component';
+import { Evaluation, EvaluationCritere } from '../../../core/models/evaluation.model';
 
-interface CreateEvaluationResponse {
-  createEvaluation: {
-    id: string;
-    score: number;
-    comments: string;
-    criteria: {
-      name: string;
-      score: number;
-      weight: number;
-    }[];
-  }
+interface ApiResponse<T> {
+  success: boolean;
+  data: T;
 }
 
 interface GetProjectResponse {
   project: {
     id: string;
-    title: string;
+    titre: string;
     description: string;
   }
 }
@@ -31,7 +24,7 @@ const GET_PROJECT = gql`
   query GetProject($id: ID!) {
     project(id: $id) {
       id
-      title
+      titre
       description
     }
   }
@@ -41,12 +34,25 @@ const CREATE_EVALUATION = gql`
   mutation CreateEvaluation($input: CreateEvaluationInput!) {
     createEvaluation(input: $input) {
       id
-      score
-      comments
-      criteria {
-        name
-        score
-        weight
+      note
+      commentaire
+      criteres {
+        nom
+        note
+        poids
+      }
+      dateEvaluation
+      creeLe
+      majLe
+      projet {
+        id
+        titre
+        description
+      }
+      evaluateur {
+        id
+        nom
+        prenom
       }
     }
   }
@@ -67,12 +73,12 @@ const CREATE_EVALUATION = gql`
             <div>
               <h1 class="text-2xl font-bold text-gray-800">Nouvelle évaluation</h1>
               <div *ngIf="project" class="mt-2">
-                <h2 class="text-lg font-medium text-blue-600">{{ project.title }}</h2>
+                <h2 class="text-lg font-medium text-blue-600">{{ project.titre }}</h2>
                 <p class="text-sm text-gray-600 mt-1">{{ project.description }}</p>
               </div>
             </div>
             <div class="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg px-6 py-4 text-center min-w-[160px]">
-              <span class="block text-sm font-medium mb-1">Score global</span>
+              <span class="block text-sm font-medium mb-1">Note globale</span>
               <span class="text-3xl font-bold">{{ calculateGlobalScore() }}/20</span>
             </div>
           </div>
@@ -92,25 +98,25 @@ const CREATE_EVALUATION = gql`
               </button>
             </div>
             
-            <div formArrayName="criteria" class="space-y-4">
+            <div formArrayName="criteres" class="space-y-4">
               <div *ngFor="let criterion of criteriaControls; let i = index" [formGroupName]="i"
                    class="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-all duration-200">
                 <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
                   <div class="md:col-span-6">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Critère</label>
-                    <input type="text" formControlName="name"
+                    <input type="text" formControlName="nom"
                            class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200">
                   </div>
                   
                   <div class="md:col-span-3">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Score (sur 20)</label>
-                    <input type="number" formControlName="score" min="0" max="20" step="0.5"
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Note (sur 20)</label>
+                    <input type="number" formControlName="note" min="0" max="20" step="0.5"
                            class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200">
                   </div>
                   
                   <div class="md:col-span-3">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Pondération (%)</label>
-                    <input type="number" formControlName="weight" min="0" max="100" step="5"
+                    <input type="number" formControlName="poids" min="0" max="100" step="5"
                            class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200">
                   </div>
                 </div>
@@ -120,8 +126,8 @@ const CREATE_EVALUATION = gql`
 
           <!-- Comments section -->
           <div class="p-6 border-b border-gray-200">
-            <label for="comments" class="block text-xl font-semibold text-gray-800 mb-4">Commentaires</label>
-            <textarea id="comments" formControlName="comments" rows="4"
+            <label for="commentaire" class="block text-xl font-semibold text-gray-800 mb-4">Commentaires</label>
+            <textarea id="commentaire" formControlName="commentaire" rows="4"
                      class="w-full px-4 py-2 bg-white border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors duration-200"
                      placeholder="Ajoutez vos commentaires sur l'évaluation..."></textarea>
           </div>
@@ -163,7 +169,7 @@ const CREATE_EVALUATION = gql`
 export class EvaluationFormComponent implements OnInit {
   evaluationForm: FormGroup;
   projectId: string | null = null;
-  project: { id: string; title: string; description: string } | null = null;
+  project: { id: string; titre: string; description: string } | null = null;
   loading = false;
 
   constructor(
@@ -173,8 +179,8 @@ export class EvaluationFormComponent implements OnInit {
     private router: Router
   ) {
     this.evaluationForm = this.fb.group({
-      criteria: this.fb.array([]),
-      comments: [''],
+      criteres: this.fb.array([]),
+      commentaire: [''],
     });
   }
 
@@ -207,49 +213,47 @@ export class EvaluationFormComponent implements OnInit {
       error: (error) => {
         console.error('Error loading project:', error);
         this.loading = false;
+        this.router.navigate(['/projects']);
       }
     });
   }
 
   get criteriaControls() {
-    return (this.evaluationForm.get('criteria') as FormArray).controls;
+    return (this.evaluationForm.get('criteres') as FormArray).controls;
   }
 
   addCriterion() {
-    const criteriaForm = this.fb.group({
-      name: ['', Validators.required],
-      score: [0, [Validators.required, Validators.min(0), Validators.max(20)]],
-      weight: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
-    });
-
-    (this.evaluationForm.get('criteria') as FormArray).push(criteriaForm);
+    const criteriaArray = this.evaluationForm.get('criteres') as FormArray;
+    criteriaArray.push(this.fb.group({
+      nom: ['', Validators.required],
+      note: [0, [Validators.required, Validators.min(0), Validators.max(20)]],
+      poids: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
+    }));
   }
 
   calculateGlobalScore(): number {
-    const criteria = this.evaluationForm.get('criteria')?.value || [];
-    if (criteria.length === 0) return 0;
+    const criteriaArray = this.evaluationForm.get('criteres') as FormArray;
+    if (criteriaArray.length === 0) return 0;
 
+    let totalScore = 0;
     let totalWeight = 0;
-    let weightedScore = 0;
 
-    criteria.forEach((criterion: any) => {
-      const weight = criterion.weight / 100;
-      totalWeight += weight;
-      weightedScore += criterion.score * weight;
+    criteriaArray.controls.forEach(control => {
+      const note = control.get('note')?.value || 0;
+      const poids = control.get('poids')?.value || 0;
+      totalScore += (note * poids);
+      totalWeight += poids;
     });
 
-    if (totalWeight === 0) return 0;
-    return Math.round((weightedScore / totalWeight) * 100) / 100;
+    return totalWeight > 0 ? Math.round((totalScore / totalWeight) * 100) / 100 : 0;
   }
 
   isFormValid(): boolean {
-    if (!this.evaluationForm.valid) return false;
+    const criteriaArray = this.evaluationForm.get('criteres') as FormArray;
+    const totalWeight = criteriaArray.controls.reduce((sum, control) => 
+      sum + (control.get('poids')?.value || 0), 0);
     
-    const criteria = this.evaluationForm.get('criteria')?.value || [];
-    if (criteria.length === 0) return false;
-
-    const totalWeight = criteria.reduce((sum: number, criterion: any) => sum + (criterion.weight / 100), 0);
-    return Math.abs(totalWeight - 1) < 0.01;
+    return this.evaluationForm.valid && criteriaArray.length > 0 && totalWeight === 100;
   }
 
   onSubmit() {
@@ -257,32 +261,32 @@ export class EvaluationFormComponent implements OnInit {
 
     const formValue = this.evaluationForm.value;
     const input = {
-      projectId: this.projectId,
-      evaluatorId: "1", // TODO: Get from auth service
-      score: this.calculateGlobalScore(),
-      comments: formValue.comments,
-      criteria: formValue.criteria.map((c: any) => ({
-        ...c,
-        weight: c.weight / 100
-      }))
+      projetId: this.projectId,
+      note: this.calculateGlobalScore(),
+      commentaire: formValue.commentaire,
+      criteres: formValue.criteres,
+      dateEvaluation: new Date().toISOString()
     };
 
-    this.apollo.mutate<CreateEvaluationResponse>({
+    this.loading = true;
+    this.apollo.mutate<{ createEvaluation: Evaluation }>({
       mutation: CREATE_EVALUATION,
       variables: { input }
     }).subscribe({
       next: (result) => {
-        if (result.data) {
+        this.loading = false;
+        if (result.data?.createEvaluation) {
           this.router.navigate(['/evaluations', result.data.createEvaluation.id]);
         }
       },
       error: (error) => {
         console.error('Error creating evaluation:', error);
+        this.loading = false;
       }
     });
   }
 
   cancel() {
-    this.router.navigate(['/projects']);
+    this.router.navigate(['/projects', this.projectId]);
   }
 } 

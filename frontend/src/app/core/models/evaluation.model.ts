@@ -17,39 +17,42 @@ export interface User {
 
 export interface EvaluationCritere {
   nom: string;
-  score: number;
+  note: number;
   poids: number;
 }
 
 export interface Evaluation {
-  id: string;
-  projet: Projet;
-  evaluateur: User;
-  score: number;
-  commentaires: string;
+  id?: string;
+  projetId: string;
+  evaluateurId: string;
+  note: number;
+  commentaire: string;
   criteres: EvaluationCritere[];
-  aiRecommendations?: string;
-  creeLe: string;
-  majLe: string;
+  dateEvaluation: string;
+  creeLe?: string;
+  majLe?: string;
+  
+  projet?: Projet;
+  evaluateur?: User;
 }
 
 export interface EvaluationStats {
-  moyenneScore: number;
-  scoreMax: number;
-  scoreMin: number;
+  moyenneNote: number;
+  noteMax: number;
+  noteMin: number;
   totalEvaluations: number;
 }
 
 export interface UpdateEvaluationInput {
-  score?: number;
-  commentaires?: string;
+  note?: number;
+  commentaire?: string;
   criteres?: EvaluationCritere[];
 }
 
 export interface CreateEvaluationInput {
   projetId: string;
   evaluateurId: string;
-  score: number;
-  commentaires: string;
+  note: number;
+  commentaire: string;
   criteres: EvaluationCritere[];
 } 

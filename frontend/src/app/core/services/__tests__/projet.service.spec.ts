@@ -6,6 +6,16 @@ import { Projet, StatutProjet } from '../../models/projet.model';
 import { Livrable, StatutLivrable } from '../../models/livrable.model';
 import { of } from 'rxjs';
 
+type ApiResponse<T> = {
+  success: boolean;
+  data: T;
+};
+
+type DeleteResponse = {
+  success: boolean;
+  message: string;
+};
+
 describe('ProjetService', () => {
   let service: ProjetService;
   let apiServiceSpy: jasmine.SpyObj<ApiService>;
@@ -16,27 +26,32 @@ describe('ProjetService', () => {
     description: 'Description du projet',
     equipe: ['user1', 'user2'],
     competences: ['Angular', 'Node.js'],
-    dateDebut: new Date(),
-    dateFin: new Date(),
+    dateDebut: '2024-01-01',
+    dateFin: '2024-12-31',
     livrables: ['livrable1'],
     statut: StatutProjet.EN_COURS
   };
 
   const mockLivrable: Livrable = {
-    intitule: 'Livrable 1',
+    titre: 'Livrable 1',
     description: 'Description du livrable',
-    dateLimite: new Date(),
+    dateLimite: '2024-12-31',
     projetId: 'projet1',
     statut: StatutLivrable.EN_COURS
   };
 
-  const mockResponse = {
+  const mockResponse: ApiResponse<Projet> = {
     success: true,
     data: mockProjet
   };
 
+  const mockListResponse: ApiResponse<Projet[]> = {
+    success: true,
+    data: [mockProjet]
+  };
+
   beforeEach(() => {
-    const apiSpy = jasmine.createSpyObj('ApiService', ['get', 'post', 'put', 'delete', 'checkHealth']);
+    const apiSpy = jasmine.createSpyObj<ApiService>('ApiService', ['get', 'post', 'put', 'delete', 'checkHealth']);
     const livrableSpy = jasmine.createSpyObj('LivrableService', ['getAllLivrables']);
     
     TestBed.configureTestingModule({
@@ -57,45 +72,70 @@ describe('ProjetService', () => {
   });
 
   describe('getProjets', () => {
-    it('should return a list of projects', () => {
-      const mockProjets = { success: true, data: [mockProjet] };
-      apiServiceSpy.get.and.returnValue(of(mockProjets));
+    it('should return all projects', () => {
+      apiServiceSpy.get.and.returnValue(of(mockListResponse));
 
-      service.getProjets().subscribe(response => {
-        expect(response).toEqual(mockProjets);
-        expect(apiServiceSpy.get).toHaveBeenCalledWith('/api/projets', {});
+      service.getProjets().subscribe({
+        next: (response: ApiResponse<Projet[]>) => {
+          expect(response).toEqual(mockListResponse);
+          expect(apiServiceSpy.get).toHaveBeenCalledWith('/api/projets', {});
+        }
       });
     });
 
     it('should handle pagination params', () => {
       const params = { page: 1, limit: 10 };
-      apiServiceSpy.get.and.returnValue(of({ success: true, data: [] }));
+      const mockPaginatedResponse: ApiResponse<Projet[]> = { success: true, data: [] };
+      apiServiceSpy.get.and.returnValue(of(mockPaginatedResponse));
 
-      service.getProjets(params).subscribe(() => {
-        expect(apiServiceSpy.get).toHaveBeenCalledWith('/api/projets', params);
+      service.getProjets(params).subscribe({
+        next: (response: ApiResponse<Projet[]>) => {
+          expect(response).toEqual(mockPaginatedResponse);
+          expect(apiServiceSpy.get).toHaveBeenCalledWith('/api/projets', params);
+        }
+      });
+    });
+  });
+
+  describe('getProjetById', () => {
+    it('should get project by id', () => {
+      const id = '123';
+      apiServiceSpy.get.and.returnValue(of(mockResponse));
+
+      service.getProjetById(id).subscribe({
+        next: (response: ApiResponse<Projet>) => {
+          expect(response).toEqual(mockResponse);
+          expect(apiServiceSpy.get).toHaveBeenCalledWith(`/api/projets/${id}`);
+        }
       });
     });
   });
 
   describe('creerProjet', () => {
     it('should create a new project', () => {
-      apiServiceSpy.post.and.returnValue(of(mockResponse));
+      const newProjet: Projet = {
+        titre: 'Nouveau Projet',
+        description: 'Description du nouveau projet',
+        equipe: ['user1'],
+        competences: ['Angular'],
+        dateDebut: '2024-01-01',
+        dateFin: '2024-12-31',
+        livrables: [],
+        statut: StatutProjet.EN_ATTENTE
+      };
 
-      service.creerProjet(mockProjet).subscribe(response => {
-        expect(response).toEqual(mockResponse);
-        expect(apiServiceSpy.post).toHaveBeenCalledWith('/api/projets', mockProjet);
-      });
-    });
-  });
+      const createResponse: ApiResponse<Projet> = {
+        success: true,
+        data: { ...newProjet, id: '456' }
+      };
 
-  describe('getProjetParId', () => {
-    it('should get project by id', () => {
-      const id = '123';
-      apiServiceSpy.get.and.returnValue(of(mockResponse));
+      apiServiceSpy.post.and.returnValue(of(createResponse));
 
-      service.getProjetParId(id).subscribe(response => {
-        expect(response).toEqual(mockResponse);
-        expect(apiServiceSpy.get).toHaveBeenCalledWith(`/api/projets/${id}`);
+      service.creerProjet(newProjet).subscribe({
+        next: (response: ApiResponse<Projet>) => {
+          expect(response).toEqual(createResponse);
+          expect(apiServiceSpy.post).toHaveBeenCalledWith('/api/projets', newProjet);
+        }
       });
     });
   });
@@ -103,11 +143,23 @@ describe('ProjetService', () => {
   describe('updateProjet', () => {
     it('should update project', () => {
       const id = '123';
-      apiServiceSpy.put.and.returnValue(of(mockResponse));
+      const updateProjet: Projet = {
+        ...mockProjet,
+        description: 'Description mise à jour'
+      };
 
-      service.updateProjet(id, mockProjet).subscribe(response => {
-        expect(response).toEqual(mockResponse);
-        expect(apiServiceSpy.put).toHaveBeenCalledWith(`/api/projets/${id}`, mockProjet);
+      const updateResponse: ApiResponse<Projet> = {
+        success: true,
+        data: updateProjet
+      };
+
+      apiServiceSpy.put.and.returnValue(of(updateResponse));
+
+      service.updateProjet(id, updateProjet).subscribe({
+        next: (response: ApiResponse<Projet>) => {
+          expect(response).toEqual(updateResponse);
+          expect(apiServiceSpy.put).toHaveBeenCalledWith(`/api/projets/${id}`, updateProjet);
+        }
       });
     });
   });
@@ -118,9 +170,11 @@ describe('ProjetService', () => {
       const deleteResponse = { success: true, message: 'Deleted' };
       apiServiceSpy.delete.and.returnValue(of(deleteResponse));
 
-      service.deleteProjet(id).subscribe(response => {
-        expect(response).toEqual(deleteResponse);
-        expect(apiServiceSpy.delete).toHaveBeenCalledWith(`/api/projets/${id}`);
+      service.deleteProjet(id).subscribe({
+        next: (response) => {
+          expect(response).toEqual(deleteResponse);
+          expect(apiServiceSpy.delete).toHaveBeenCalledWith(`/api/projets/${id}`);
+        }
       });
     });
   });
@@ -128,12 +182,17 @@ describe('ProjetService', () => {
   describe('getLivrables', () => {
     it('should get project deliverables', () => {
       const projetId = '123';
-      const mockLivrables = { success: true, data: [mockLivrable] };
-      apiServiceSpy.get.and.returnValue(of(mockLivrables));
+      const mockLivrableResponse: ApiResponse<Livrable[]> = {
+        success: true,
+        data: [mockLivrable]
+      };
+      apiServiceSpy.get.and.returnValue(of(mockLivrableResponse));
 
-      service.getLivrables(projetId).subscribe(response => {
-        expect(response).toEqual(mockLivrables);
-        expect(apiServiceSpy.get).toHaveBeenCalledWith(`/api/projets/${projetId}/livrables`);
+      service.getLivrables(projetId).subscribe({
+        next: (response: ApiResponse<Livrable[]>) => {
+          expect(response).toEqual(mockLivrableResponse);
+          expect(apiServiceSpy.get).toHaveBeenCalledWith(`/api/projets/${projetId}/livrables`);
+        }
       });
     });
   });
@@ -141,25 +200,21 @@ describe('ProjetService', () => {
   describe('analyserRisques', () => {
     it('should analyze project risks', () => {
       const projetId = '123';
-      const mockAnalyse = { success: true, data: { niveau: 'FAIBLE', details: [] } };
-      apiServiceSpy.post.and.returnValue(of(mockAnalyse));
+      const mockAnalyseResponse: ApiResponse<any> = {
+        success: true,
+        data: {
+          risques: ['Délais serrés'],
+          impact: 'MOYEN',
+          recommandations: ['Ajouter des ressources']
+        }
+      };
+      apiServiceSpy.post.and.returnValue(of(mockAnalyseResponse));
 
-      service.analyserRisques(projetId).subscribe(response => {
-        expect(response).toEqual(mockAnalyse);
-        expect(apiServiceSpy.post).toHaveBeenCalledWith('/api/projets/analyse-risques', { projetId });
-      });
-    });
-  });
-
-  describe('suiviTaches', () => {
-    it('should get task tracking', () => {
-      const projetId = '123';
-      const mockSuivi = { success: true, data: { progression: 75, taches: [] } };
-      apiServiceSpy.post.and.returnValue(of(mockSuivi));
-
-      service.suiviTaches(projetId).subscribe(response => {
-        expect(response).toEqual(mockSuivi);
-        expect(apiServiceSpy.post).toHaveBeenCalledWith('/api/projets/suivi-taches', { projetId });
+      service.analyserRisques(projetId).subscribe({
+        next: (response: ApiResponse<any>) => {
+          expect(response).toEqual(mockAnalyseResponse);
+          expect(apiServiceSpy.post).toHaveBeenCalledWith('/api/projets/analyse-risques', { projetId });
+        }
       });
     });
   });
@@ -169,17 +224,12 @@ describe('ProjetService', () => {
       const healthResponse = { status: 'ok' };
       apiServiceSpy.checkHealth.and.returnValue(of(healthResponse));
 
-      service.checkHealth().subscribe(response => {
-        expect(response).toEqual(healthResponse);
-        expect(apiServiceSpy.checkHealth).toHaveBeenCalledWith('/api/projets');
+      service.checkHealth().subscribe({
+        next: (response) => {
+          expect(response).toEqual(healthResponse);
+          expect(apiServiceSpy.checkHealth).toHaveBeenCalledWith('/api/projets');
+        }
       });
-    });
-  });
-
-  describe('getStatutOptions', () => {
-    it('should return all project status options', () => {
-      const statuts = service.getStatutOptions();
-      expect(statuts).toEqual(Object.values(StatutProjet));
     });
   });
 }); 
