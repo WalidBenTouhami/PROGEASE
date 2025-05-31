@@ -48,7 +48,7 @@
       "status": "draft"
     }
   ],
-  "users": [
+  "utilisateurs": [
     {
       "id": "645aef123456789012345678",
       "name": "John Doe",

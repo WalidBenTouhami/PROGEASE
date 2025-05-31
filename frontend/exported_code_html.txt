@@ -40,7 +40,7 @@
   <header class="bo-header">
     <img src="assets/PROGEASE.png" alt="PROGEASE Logo" class="bo-logo" />
     <span class="bo-title">PROGEASE Back-Office</span>
-    <nav class="bo-user-menu">
+    <nav class="bo-utilisateur-menu">
       <a href="#">Profil</a> |
       <a href="#">Deconnexion</a>
     </nav>
@@ -51,7 +51,7 @@
         <li><a routerLink="/back-office/dashboard" routerLinkActive="active">Dashboard</a></li>
         <li><a routerLink="/back-office/projet-management" routerLinkActive="active">Gestion Projets</a></li>
         <li><a routerLink="/back-office/livrable-management" routerLinkActive="active">Gestion Livrables</a></li>
-        <li><a routerLink="/back-office/users" routerLinkActive="active">Utilisateurs</a></li>
+        <li><a routerLink="/back-office/utilisateurs" routerLinkActive="active">Utilisateurs</a></li>
         <li><a routerLink="/back-office/settings" routerLinkActive="active">Parametres</a></li>
       </ul>
     </nav>
@@ -187,7 +187,7 @@
   <footer class="fo-footer">
     &copy; {{ new Date().getFullYear() }} PROGEASE - Front-Office
   </footer>
-</div> 
+</div>
 
 // ======= Contenu de src/app/front-office/livrable-list/livrable-list.component.html =======
 

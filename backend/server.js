@@ -73,7 +73,7 @@ if (NODE_ENV === 'development') {
 
 // Middleware pour ajouter des informations de contexte
 app.use((req, res, next) => {
-    req.currentUser = req.headers['x-user'] || 'WalidBenTouhami';
+    req.currentutilisateur = req.headers['x-utilisateur'] || 'WalidBenTouhami';
     req.timestamp = new Date().toISOString();
 
     // Ajouter des en-tetes de securite
@@ -93,11 +93,13 @@ app.get('/favicon.ico', (req, res) => {
 const projetRoutes = require('./src/routes/projet.routes');
 const livrableRoutes = require('./src/routes/livrable.routes');
 const aiRoutes = require('./src/routes/ai.routes');
+const utilisateurRoutes = require('./src/routes/utilisateur.routes');
 
 // Routes API
 app.use('/api/projets', projetRoutes);
 app.use('/api/livrables', livrableRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/utilisateurs', utilisateurRoutes);
 
 // Point d'entree API
 app.get('/api', (req, res) => {
@@ -105,7 +107,7 @@ app.get('/api', (req, res) => {
         status: 'ok',
         message: 'PROGEASE API v2',
         timestamp: req.timestamp,
-        user: req.currentUser,
+        utilisateur: req.currentutilisateur,
         endpoints: ['/api/projets', '/api/livrables', '/api/ai', '/graphql']
     });
 });
@@ -116,7 +118,7 @@ app.get('/health', (req, res) => {
     res.json({
         status: 'ok',
         timestamp: req.timestamp || '2025-05-28T09:19:39Z',
-        user: req.currentUser || 'WalidBenTouhami',
+        utilisateur: req.currentutilisateur || 'WalidBenTouhami',
         version: '2.0.0',
         graphqlVersion: '4.0',
         environment: NODE_ENV,
@@ -144,7 +146,7 @@ if (process.env.USE_APOLLO_SERVER === 'true') {
                     };
                 },
                 context: ({ req }) => ({
-                    currentUser: req.currentUser,
+                    currentutilisateur: req.currentutilisateur,
                     timestamp: req.timestamp
                 })
             }));
@@ -163,7 +165,7 @@ if (process.env.USE_APOLLO_SERVER === 'true') {
             };
         },
         context: ({ req }) => ({
-            currentUser: req.currentUser,
+            currentutilisateur: req.currentutilisateur,
             timestamp: req.timestamp
         })
     }));
@@ -205,7 +207,7 @@ async function startServer() {
 🚀 PROGEASE Server (GraphQL v4)
 =======================================================
 📅 Date: 2025-05-28 09:19:39
-👤 User: WalidBenTouhami
+👤 utilisateur: WalidBenTouhami
 🌐 Port: ${PORT}
 🔧 Mode: ${NODE_ENV}
 🔗 API: http://localhost:${PORT}/api

@@ -1,6 +1,6 @@
 const Formation = require("../models/Formation");  
 const Certificat = require("../models/Certification"); 
-const User = require("../models/User"); 
+const utilisateur = require("../models/utilisateur"); 
 const QuizResult = require("../models/QuizResult"); 
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
@@ -19,7 +19,7 @@ const checkQuizReussis = async (utilisateurId, formationsRequises) => {
 
       for (const quizId of quizIds) {
         const quizResult = await QuizResult.findOne({
-          userId: utilisateurId,
+          utilisateurId: utilisateurId,
           quizId: quizId
         });
 
@@ -94,15 +94,15 @@ const getAllFormations = async (req, res) => {
   }
 };
 /*
-const addUserToFormation = async (req, res) => {
+const addutilisateurToFormation = async (req, res) => {
   const { formationId } = req.params;
-  const { userId } = req.body;
+  const { utilisateurId } = req.body;
 
   try {
-    const user = await User.findById(userId);  
-    if (!user) return res.status(404).json({ error: "Utilisateur non trouve" });
+    const utilisateur = await utilisateur.findById(utilisateurId);  
+    if (!utilisateur) return res.status(404).json({ error: "Utilisateur non trouve" });
 
-    if (user.role !== "student") {
+    if (utilisateur.role !== "student") {
       return res.status(400).json({
         error: "Seuls les etudiants peuvent s'inscrire à une formation.",
       });
@@ -112,13 +112,13 @@ const addUserToFormation = async (req, res) => {
     if (!formation)
       return res.status(404).json({ error: "Formation non trouvee" });
 
-    if (formation.utilisateursInscrits.includes(userId)) {
+    if (formation.utilisateursInscrits.includes(utilisateurId)) {
       return res
         .status(400)
         .json({ error: "Utilisateur dejà inscrit à cette formation." });
     }
 
-    formation.utilisateursInscrits.push(userId);
+    formation.utilisateursInscrits.push(utilisateurId);
     await formation.save();
 
     res.status(200).json({ message: "Utilisateur inscrit avec succès", formation });
@@ -127,19 +127,19 @@ const addUserToFormation = async (req, res) => {
   }
 };*/
 
-const addUserToFormation = async (req, res) => {
+const addutilisateurToFormation = async (req, res) => {
   const { formationId } = req.params;
-  const { userId } = req.body;
+  const { utilisateurId } = req.body;
 
-  if (!userId) {
-    return res.status(400).json({ error: "userId est requis" });
+  if (!utilisateurId) {
+    return res.status(400).json({ error: "utilisateurId est requis" });
   }
 
   try {
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: "Utilisateur non trouvé" });
+    const utilisateur = await utilisateur.findById(utilisateurId);
+    if (!utilisateur) return res.status(404).json({ error: "Utilisateur non trouvé" });
 
-    if (user.role !== "student") {
+    if (utilisateur.role !== "student") {
       return res.status(400).json({
         error: "Seuls les étudiants peuvent s'inscrire à une formation.",
       });
@@ -149,17 +149,17 @@ const addUserToFormation = async (req, res) => {
     if (!formation)
       return res.status(404).json({ error: "Formation non trouvée" });
 
-    const isAlreadyEnrolled = formation.utilisateursInscrits.some(id => id.toString() === userId);
+    const isAlreadyEnrolled = formation.utilisateursInscrits.some(id => id.toString() === utilisateurId);
     if (isAlreadyEnrolled) {
       return res
         .status(400)
         .json({ error: "Utilisateur déjà inscrit à cette formation." });
     }
 
-    formation.utilisateursInscrits.push(userId);
+    formation.utilisateursInscrits.push(utilisateurId);
 await Formation.updateOne(
   { _id: formationId },
-  { $addToSet: { utilisateursInscrits: userId } }
+  { $addToSet: { utilisateursInscrits: utilisateurId } }
 );
     res.status(200).json({ message: "Utilisateur inscrit avec succès", formation });
   } catch (error) {
@@ -197,7 +197,7 @@ const addModuleToFormation = async (req, res) => {
 const path = require("path");
 
 const genererCertificat = async (req, res) => {
-  const utilisateurId = req.user.userId;
+  const utilisateurId = req.utilisateur.utilisateurId;
 
   if (!utilisateurId) {
     return res.status(400).json({ error: 'ID utilisateur manquant dans le token.' });
@@ -282,7 +282,7 @@ const getFormationById = async (req, res) => {
 module.exports = {
   createFormation,
   getAllFormations,
-  addUserToFormation,
+  addutilisateurToFormation,
   addModuleToFormation,
   genererCertificat,
   getFormationById

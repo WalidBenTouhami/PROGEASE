@@ -6,7 +6,7 @@ console.log('Demarrage des tests de logs...');
 // Generer des logs pour chaque niveau
 logger.error('Erreur de test critique', { code: 'E001', source: 'test-script' });
 logger.warn('Avertissement de test', { component: 'systeme de fichiers' });
-logger.info('Information de test standard', { user: 'admin' });
+logger.info('Information de test standard', { utilisateur: 'admin' });
 logger.debug('Message de debogage detaille', { data: { id: 123, value: 'test' } });
 
 // Test de la gestion des exceptions
@@ -20,7 +20,7 @@ try {
 logger.info('Test avec donnees complexes', {
     utilisateur: {
         id: 1,
-        nom: 'Test User',
+        nom: 'Test utilisateur',
         roles: ['admin', 'developpeur']
     },
     statistiques: {

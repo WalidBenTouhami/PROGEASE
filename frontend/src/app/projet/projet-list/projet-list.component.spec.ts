@@ -30,7 +30,7 @@ describe('ProjetListComponent', () => {
       dateDebut: new Date('2024-01-01'),
       dateFin: new Date('2024-12-31'),
       statut: StatutProjet.EN_COURS,
-      equipe: ['user1'],
+      equipe: ['utilisateur1'],
       competences: ['Angular'],
       livrables: []
     },
@@ -41,7 +41,7 @@ describe('ProjetListComponent', () => {
       dateDebut: new Date('2024-02-01'),
       dateFin: new Date('2024-11-30'),
       statut: StatutProjet.TERMINE,
-      equipe: ['user2'],
+      equipe: ['utilisateur2'],
       competences: ['Node.js'],
       livrables: []
     }
@@ -92,7 +92,7 @@ describe('ProjetListComponent', () => {
     projetService.recupererProjets.and.returnValue(
       throwError(() => new Error('Erreur test'))
     );
-    
+
     component.ngOnInit();
     tick();
 
@@ -135,7 +135,7 @@ describe('ProjetListComponent Performance', () => {
       dateDebut: new Date('2024-01-01'),
       dateFin: new Date('2024-12-31'),
       statut: StatutProjet.EN_COURS,
-      equipe: ['user1'],
+      equipe: ['utilisateur1'],
       competences: ['Angular'],
       livrables: []
     }));
@@ -178,25 +178,25 @@ describe('ProjetListComponent Performance', () => {
   it('should load 1000 projects within 1 second', fakeAsync(() => {
     const startTime = performance.now();
     projetService.recupererProjets.and.returnValue(of(generateMockProjets(1000)));
-    
+
     component.ngOnInit();
     tick();
-    
+
     const endTime = performance.now();
     const loadTime = endTime - startTime;
-    
+
     expect(loadTime).toBeLessThan(1000); // Moins d'une seconde
     expect(component.projets.length).toBe(1000);
   }));
 
   it('should filter 1000 projects efficiently', fakeAsync(() => {
     component.projets = generateMockProjets(1000);
-    
+
     const startTime = performance.now();
     component.filtrerProjets('Test 500');
     const endTime = performance.now();
     const filterTime = endTime - startTime;
-    
+
     expect(filterTime).toBeLessThan(100); // Moins de 100ms
     expect(component.projetsFiltres.length).toBe(1);
   }));
@@ -205,14 +205,14 @@ describe('ProjetListComponent Performance', () => {
     component.projets = generateMockProjets(1000);
     const filterTerms = ['Test', 'Projet', '500', ''];
     let totalTime = 0;
-    
+
     filterTerms.forEach(term => {
       const startTime = performance.now();
       component.filtrerProjets(term);
       const endTime = performance.now();
       totalTime += (endTime - startTime);
     });
-    
+
     const averageTime = totalTime / filterTerms.length;
     expect(averageTime).toBeLessThan(50); // Moyenne de moins de 50ms par filtre
   }));
@@ -220,10 +220,10 @@ describe('ProjetListComponent Performance', () => {
   it('should handle concurrent data loading and filtering', fakeAsync(() => {
     const mockProjets = generateMockProjets(500);
     projetService.recupererProjets.and.returnValue(of(mockProjets).pipe(delay(100)));
-    
+
     component.ngOnInit();
     component.filtrerProjets('Test');
-    
+
     tick(100);
     expect(component.projets.length).toBe(500);
     expect(component.projetsFiltres.length).toBeGreaterThan(0);
@@ -233,7 +233,7 @@ describe('ProjetListComponent Performance', () => {
     const updates = 5;
     let updateCount = 0;
     const mockProjets = generateMockProjets(100);
-    
+
     projetService.recupererProjets.and.returnValue(
       timer(0, 1000).pipe(
         take(updates),
@@ -247,10 +247,10 @@ describe('ProjetListComponent Performance', () => {
         })
       )
     );
-    
+
     component.ngOnInit();
     tick(updates * 1000);
-    
+
     expect(updateCount).toBe(updates);
     expect(component.projets.length).toBe(100);
     discardPeriodicTasks();
@@ -259,12 +259,12 @@ describe('ProjetListComponent Performance', () => {
   it('should optimize memory usage with large datasets', fakeAsync(() => {
     const largeMockProjets = generateMockProjets(5000);
     projetService.recupererProjets.and.returnValue(of(largeMockProjets));
-    
+
     const initialMemory = (performance as any).memory?.usedJSHeapSize;
     component.ngOnInit();
     tick();
     const finalMemory = (performance as any).memory?.usedJSHeapSize;
-    
+
     if (initialMemory && finalMemory) {
       const memoryIncrease = finalMemory - initialMemory;
       // L'augmentation de mémoire ne devrait pas dépasser 50MB pour 5000 projets
@@ -276,7 +276,7 @@ describe('ProjetListComponent Performance', () => {
     component.projets = generateMockProjets(1000);
     const pageChanges = 10;
     let totalTime = 0;
-    
+
     for (let i = 0; i < pageChanges; i++) {
       const startTime = performance.now();
       // Simuler un changement de page
@@ -292,7 +292,7 @@ describe('ProjetListComponent Performance', () => {
       totalTime += (endTime - startTime);
       tick();
     }
-    
+
     const averageTime = totalTime / pageChanges;
     expect(averageTime).toBeLessThan(20); // Moyenne de moins de 20ms par changement de page
   }));

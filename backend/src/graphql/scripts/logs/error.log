@@ -64,7 +64,7 @@ type Mutation {
 type Health {
     status: String!
     timestamp: String!
-    user: String!
+    utilisateur: String!
     version: String!
     uptime: Float!
 }
@@ -184,7 +184,7 @@ type Mutation {
 type Health {
     status: String!
     timestamp: String!
-    user: String!
+    utilisateur: String!
     version: String!
     uptime: Float!
 }

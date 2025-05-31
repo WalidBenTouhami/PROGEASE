@@ -63,7 +63,7 @@ const validateLivrable = (req, res, next) => {
 const checkLivrablePermissions = async (req, res, next) => {
     try {
         // Si l'utilisateur est admin, autoriser toutes les operations
-        if (req.user && req.user.role === 'ADMIN') {
+        if (req.utilisateur && req.utilisateur.role === 'ADMIN') {
             return next();
         }
 
@@ -82,10 +82,10 @@ const checkLivrablePermissions = async (req, res, next) => {
         const projet = await Projet.findById(livrable.projetId);
 
         // Verifier si l'utilisateur est le tuteur ou le createur du projet
-        const isTuteur = projet.tuteur.equals(req.user._id);
-        const isProjetCreateur = projet.createur.equals(req.user._id);
-        const isLivrableCreateur = livrable.createur && livrable.createur.equals(req.user._id);
-        const isTeamMember = projet.equipe.some(membre => membre.equals(req.user._id));
+        const isTuteur = projet.tuteur.equals(req.utilisateur._id);
+        const isProjetCreateur = projet.createur.equals(req.utilisateur._id);
+        const isLivrableCreateur = livrable.createur && livrable.createur.equals(req.utilisateur._id);
+        const isTeamMember = projet.equipe.some(membre => membre.equals(req.utilisateur._id));
 
         // Pour les lectures, autoriser l'equipe
         if (req.method === 'GET' && (isTeamMember || isTuteur || isProjetCreateur || isLivrableCreateur)) {
@@ -97,7 +97,7 @@ const checkLivrablePermissions = async (req, res, next) => {
             return next();
         }
 
-        // Sinon, refuser l'acces
+        // Sinon, refutilisateur l'acces
         throw new ValidationError(
             'Vous n\'avez pas les autorisations necessaires pour cette operation',
             403

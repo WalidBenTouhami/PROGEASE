@@ -108,7 +108,7 @@ const correctQueries = {
   health {
     status
     timestamp
-    user
+    utilisateur
     version
     uptime
   }

@@ -42,7 +42,7 @@ button:focus {
 }
 button:hover { background: #174bb3; }
 
-.user-actions {
+.utilisateur-actions {
   margin: 1rem 0;
   display: flex;
   gap: 1rem;

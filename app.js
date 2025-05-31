@@ -18,12 +18,12 @@ app.use(express.json());
 
 const certificatRoutes = require('./routes/certificationRoutes'); // Routes pour les certificats
 const formationRoutes = require('./routes/formationRoutes'); // Routes pour les formations
-const userRoutes = require('./routes/UserRoutes.js');  
+const utilisateurRoutes = require('./routes/utilisateurRoutes.js');  
 const quizRoute = require('./routes/quizRoutes'); // Routes pour les quiz
 
 
 // Routes
-app.use('/api', userRoutes);
+app.use('/api', utilisateurRoutes);
 app.use('/api/certificats', certificatRoutes);  // Route pour les certificats
 app.use('/api/formations', formationRoutes); 
 app.use('/api/quiz', quizRoute); 

@@ -8,12 +8,12 @@ const { ForbiddenError } = require('apollo-server-express');
  * @throws {ForbiddenError} - Lance une erreur si l'utilisateur n'est pas autorisé
  */
 function checkAuthorization(context, requiredRole = null) {
-    if (!context.currentUser) {
+    if (!context.currentutilisateur) {
         throw new ForbiddenError('Non autorisé: utilisateur non authentifié');
     }
 
     // Si un rôle spécifique est requis, vérifiez-le ici
-    if (requiredRole && context.currentUser.role !== requiredRole) {
+    if (requiredRole && context.currentutilisateur.role !== requiredRole) {
         throw new ForbiddenError(`Non autorisé: rôle ${requiredRole} requis`);
     }
 

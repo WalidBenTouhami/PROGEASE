@@ -90,7 +90,7 @@ async function main() {
         const metadataPath = path.join(CONFIG.outputDir, 'metadata.json');
         const metadata = {
             timestamp: getCurrentDateTime(), // Utiliser la fonction mise à jour
-            user: process.env.USER || 'defaultUser',
+            utilisateur: process.env.utilisateur || 'defaultutilisateur',
             version: '2.0.0',
             subgraph: CONFIG.subgraphName,
             routingUrl: CONFIG.routingUrl

@@ -83,11 +83,11 @@ exports.submitQuiz = async (req, res) => {
     let score = 0;
 
     quiz.questions.forEach((q, index) => {
-      const userAnswer = answers[index];
+      const utilisateurAnswer = answers[index];
       if (
-        typeof userAnswer === 'string' &&
+        typeof utilisateurAnswer === 'string' &&
         typeof q.answer === 'string' &&
-        userAnswer.toLowerCase().trim() === q.answer.toLowerCase().trim()
+        utilisateurAnswer.toLowerCase().trim() === q.answer.toLowerCase().trim()
       ) {
         score++;
       }

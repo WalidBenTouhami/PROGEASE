@@ -48,8 +48,8 @@ const aiResolvers = {
     Query: {
         // @GraphQLResolver - supprime l'avertissement "Unused property"
         // noinspection JSUnusedGlobalSymbols
-        aiRecommendations: async (_, { projetId }, { currentUser }) => {
-            logger.debug(`Demande de recommandations IA pour le projet ${projetId} par ${currentUser}`);
+        aiRecommendations: async (_, { projetId }, { currentutilisateur }) => {
+            logger.debug(`Demande de recommandations IA pour le projet ${projetId} par ${currentutilisateur}`);
 
             try {
                 return await aiService.getRecommendations(projetId);
@@ -61,8 +61,8 @@ const aiResolvers = {
 
         // @GraphQLResolver - supprime l'avertissement "Unused property"
         // noinspection JSUnusedGlobalSymbols
-        analyzeText: async (_, { text, options = {} }, { currentUser }) => {
-            logger.debug(`Analyse de texte par IA demandee par ${currentUser}`);
+        analyzeText: async (_, { text, options = {} }, { currentutilisateur }) => {
+            logger.debug(`Analyse de texte par IA demandee par ${currentutilisateur}`);
 
             try {
                 return await aiService.analyzeText(text, options);
@@ -76,8 +76,8 @@ const aiResolvers = {
     Mutation: {
         // @GraphQLResolver - supprime l'avertissement "Unused property"
         // noinspection JSUnusedGlobalSymbols
-        generateContent: async (_, { prompt, contentType, options = {} }, { currentUser }) => {
-            logger.debug(`Generation de contenu IA de type ${contentType} demandee par ${currentUser}`);
+        generateContent: async (_, { prompt, contentType, options = {} }, { currentutilisateur }) => {
+            logger.debug(`Generation de contenu IA de type ${contentType} demandee par ${currentutilisateur}`);
 
             try {
                 const generatedContent = await aiService.generateContent(prompt, contentType, options);
@@ -97,8 +97,8 @@ const aiResolvers = {
 
         // @GraphQLResolver - supprime l'avertissement "Unused property"
         // noinspection JSUnusedGlobalSymbols
-        optimizeProjetDescription: async (_, { projetId, options = {} }, { currentUser }) => {
-            logger.debug(`Optimisation de description pour le projet ${projetId} par ${currentUser}`);
+        optimizeProjetDescription: async (_, { projetId, options = {} }, { currentutilisateur }) => {
+            logger.debug(`Optimisation de description pour le projet ${projetId} par ${currentutilisateur}`);
 
             try {
                 return await aiService.optimizeProjetDescription(projetId, options);

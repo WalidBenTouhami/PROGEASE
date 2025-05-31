@@ -1,6 +1,6 @@
-// src/modules/user-management/services/user.service.js
+// src/modules/utilisateur-management/services/utilisateur.service.js
 
-const User = require('../models/User');  // Utilisation de require pour le modèle
+const utilisateur = require('../models/utilisateur');  // Utilisation de require pour le modèle
 const bcrypt = require('bcryptjs');  // Utilisation de require pour bcrypt
 const jwt = require('jsonwebtoken');  // Utilisation de require pour jsonwebtoken
 const nodemailer = require('nodemailer');  // Utilisation de require pour nodemailer
@@ -8,53 +8,53 @@ const nodemailer = require('nodemailer');  // Utilisation de require pour nodema
 const JWT_SECRET = process.env.JWT_SECRET;
 
 // Générer un token JWT
-const generateToken = (user) => {
+const generateToken = (utilisateur) => {
   return jwt.sign(
-    { userId: user._id, name: user.name, email: user.email, role: user.role },
+    { utilisateurId: utilisateur._id, name: utilisateur.name, email: utilisateur.email, role: utilisateur.role },
     JWT_SECRET,
     { expiresIn: '1h' }
   );
 };
 
 // Inscrire un nouvel utilisateur
-const registerUser = async ({ name, email, password, role }) => {
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new Error('User already exists');
+const registerutilisateur = async ({ name, email, password, role }) => {
+  const existingutilisateur = await utilisateur.findOne({ email });
+  if (existingutilisateur) {
+    throw new Error('utilisateur already exists');
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  const newUser = new User({
+  const newutilisateur = new utilisateur({
     name,
     email,
     password: hashedPassword,
     role,
   });
 
-  const verificationToken = newUser.generateVerificationToken();
-  await newUser.save();
-  await sendVerificationEmail(newUser.email, verificationToken);
+  const verificationToken = newutilisateur.generateVerificationToken();
+  await newutilisateur.save();
+  await sendVerificationEmail(newutilisateur.email, verificationToken);
 
-  const token = generateToken(newUser);
+  const token = generateToken(newutilisateur);
 
-  return { user: newUser, token };
+  return { utilisateur: newutilisateur, token };
 };
 
 // Connexion d'un utilisateur
-const loginUser = async (email, password) => {
-  const user = await User.findOne({ email });
-  if (!user) {
-    throw new Error('User not found');
+const loginutilisateur = async (email, password) => {
+  const utilisateur = await utilisateur.findOne({ email });
+  if (!utilisateur) {
+    throw new Error('utilisateur not found');
   }
 
-  const isMatch = await bcrypt.compare(password, user.password);
+  const isMatch = await bcrypt.compare(password, utilisateur.password);
   if (!isMatch) {
     throw new Error('Invalid credentials');
   }
 
-  const token = generateToken(user);
-  return { user, token };
+  const token = generateToken(utilisateur);
+  return { utilisateur, token };
 };
 
 // Fonction pour envoyer un email de vérification
@@ -62,7 +62,7 @@ const sendVerificationEmail = async (email, verificationToken) => {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'imenf902@gmail.com',  
+      utilisateur: 'imenf902@gmail.com',  
       pass: 'wpkk qkty mnoz gbyb',        
     },
   });
@@ -85,4 +85,4 @@ const sendVerificationEmail = async (email, verificationToken) => {
 };
 
 // Exporter le service avec module.exports
-module.exports = { registerUser, loginUser };
+module.exports = { registerutilisateur, loginutilisateur };

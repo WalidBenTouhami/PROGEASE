@@ -28,7 +28,7 @@ describe('ProjetFormComponent', () => {
     dateDebut: new Date('2024-01-01'),
     dateFin: new Date('2024-12-31'),
     statut: StatutProjet.EN_COURS,
-    equipe: ['user1'],
+    equipe: ['utilisateur1'],
     competences: ['Angular'],
     livrables: []
   };
@@ -103,7 +103,7 @@ describe('ProjetFormComponent', () => {
       const titreControl = component.projetForm.get('titre');
       titreControl?.setValue('Ab');
       expect(titreControl?.errors?.['minlength']).toBeTruthy();
-      
+
       titreControl?.setValue('Abcde');
       expect(titreControl?.errors?.['minlength']).toBeFalsy();
     });
@@ -112,7 +112,7 @@ describe('ProjetFormComponent', () => {
       const descriptionControl = component.projetForm.get('description');
       descriptionControl?.setValue('Court');
       expect(descriptionControl?.errors?.['minlength']).toBeTruthy();
-      
+
       descriptionControl?.setValue('Une description suffisamment longue');
       expect(descriptionControl?.errors?.['minlength']).toBeFalsy();
     });
@@ -120,15 +120,15 @@ describe('ProjetFormComponent', () => {
     it('should validate date range', () => {
       const dateDebutControl = component.projetForm.get('dateDebut');
       const dateFinControl = component.projetForm.get('dateFin');
-      
+
       dateDebutControl?.setValue(new Date('2024-12-31'));
       dateFinControl?.setValue(new Date('2024-01-01'));
-      
+
       expect(component.projetForm.errors?.['dateRange']).toBeTruthy();
-      
+
       dateDebutControl?.setValue(new Date('2024-01-01'));
       dateFinControl?.setValue(new Date('2024-12-31'));
-      
+
       expect(component.projetForm.errors?.['dateRange']).toBeFalsy();
     });
 
@@ -136,8 +136,8 @@ describe('ProjetFormComponent', () => {
       const equipeControl = component.projetForm.get('equipe');
       equipeControl?.setValue([]);
       expect(equipeControl?.errors?.['required']).toBeTruthy();
-      
-      equipeControl?.setValue(['user1']);
+
+      equipeControl?.setValue(['utilisateur1']);
       expect(equipeControl?.errors?.['required']).toBeFalsy();
     });
 
@@ -145,7 +145,7 @@ describe('ProjetFormComponent', () => {
       const competencesControl = component.projetForm.get('competences');
       competencesControl?.setValue([]);
       expect(competencesControl?.errors?.['required']).toBeTruthy();
-      
+
       competencesControl?.setValue(['Angular']);
       expect(competencesControl?.errors?.['required']).toBeFalsy();
     });
@@ -159,7 +159,7 @@ describe('ProjetFormComponent', () => {
         dateDebut: new Date('2024-01-01'),
         dateFin: new Date('2024-12-31'),
         statut: StatutProjet.EN_COURS,
-        equipe: ['user1'],
+        equipe: ['utilisateur1'],
         competences: ['Angular'],
         tuteur: 'tuteur1'
       });
@@ -169,7 +169,7 @@ describe('ProjetFormComponent', () => {
       expect(component.projetForm.valid).toBeTruthy();
       component.onSubmit();
       tick();
-      
+
       expect(projetService.creerProjet).toHaveBeenCalledWith(component.projetForm.value);
       expect(router.navigate).toHaveBeenCalledWith(['/projets']);
     }));
@@ -179,7 +179,7 @@ describe('ProjetFormComponent', () => {
       component.projetId = '1';
       component.onSubmit();
       tick();
-      
+
       expect(projetService.mettreAJourProjet).toHaveBeenCalledWith('1', component.projetForm.value);
       expect(router.navigate).toHaveBeenCalledWith(['/projets']);
     }));
@@ -188,7 +188,7 @@ describe('ProjetFormComponent', () => {
       projetService.creerProjet.and.returnValue(throwError(() => new Error('Erreur test')));
       component.onSubmit();
       tick();
-      
+
       expect(component.erreur).toBe('Erreur lors de la sauvegarde du projet.');
     }));
   });
@@ -199,9 +199,9 @@ describe('ProjetFormComponent', () => {
         titre: 'Test',
         description: 'Description'
       });
-      
+
       component.resetForm();
-      
+
       expect(component.projetForm.get('titre')?.value).toBe('');
       expect(component.projetForm.get('description')?.value).toBe('');
     });

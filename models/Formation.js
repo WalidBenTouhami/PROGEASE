@@ -17,7 +17,7 @@ const formationSchema = new mongoose.Schema({
     quiz: [{ type: mongoose.Schema.Types.ObjectId, ref: "Quiz" }]  // Reference au modèle Quiz
   },
   modules: [String],
-  utilisateursInscrits: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+  utilisateursInscrits: [{ type: mongoose.Schema.Types.ObjectId, ref: "utilisateur" }],
   dateCreation: { type: Date, default: Date.now }
 });
 

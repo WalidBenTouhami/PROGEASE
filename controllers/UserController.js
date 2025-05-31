@@ -1,99 +1,99 @@
-// src/modules/user-management/controllers/UserController.js
+// src/modules/utilisateur-management/controllers/utilisateurController.js
 
-const User = require('../models/User.js');  // Remplacer import par require
-const userService = require('../services/user.service.js');  // Remplacer import par require
+const utilisateur = require('../models/utilisateur.js');  // Remplacer import par require
+const utilisateurService = require('../services/utilisateur.service.js');  // Remplacer import par require
 
 // Créer un nouvel utilisateur
-const createUser = async (req, res) => {
+const createutilisateur = async (req, res) => {
   try {
-    const { userId, name, email, role } = req.body;
-    const newUser = new User({ userId, name, email, role });
-    await newUser.save();
-    res.status(201).json(newUser);
+    const { utilisateurId, name, email, role } = req.body;
+    const newutilisateur = new utilisateur({ utilisateurId, name, email, role });
+    await newutilisateur.save();
+    res.status(201).json(newutilisateur);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
 // Obtenir tous les utilisateurs
-const getAllUsers = async (req, res) => {
+const getAllutilisateurs = async (req, res) => {
   try {
-    const users = await User.find();
-    res.status(200).json(users);
+    const utilisateurs = await utilisateur.find();
+    res.status(200).json(utilisateurs);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 // Obtenir un utilisateur par son ID
-const getUserById = async (req, res) => {
+const getutilisateurById = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const utilisateur = await utilisateur.findById(req.params.id);
+    if (!utilisateur) {
+      return res.status(404).json({ message: 'utilisateur not found' });
     }
-    res.status(200).json(user);
+    res.status(200).json(utilisateur);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 // Mettre à jour un utilisateur par son ID
-const updateUser = async (req, res) => {
+const updateutilisateur = async (req, res) => {
   try {
-    const { userId, name, email, role } = req.body;
-    const updatedUser = await User.findByIdAndUpdate(
+    const { utilisateurId, name, email, role } = req.body;
+    const updatedutilisateur = await utilisateur.findByIdAndUpdate(
       req.params.id,
-      { userId, name, email, role },
+      { utilisateurId, name, email, role },
       { new: true }
     );
-    if (!updatedUser) {
-      return res.status(404).json({ message: 'User not found' });
+    if (!updatedutilisateur) {
+      return res.status(404).json({ message: 'utilisateur not found' });
     }
-    res.status(200).json(updatedUser);
+    res.status(200).json(updatedutilisateur);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
 };
 
 // Supprimer un utilisateur par son ID
-const deleteUser = async (req, res) => {
+const deleteutilisateur = async (req, res) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
-    if (!deletedUser) {
-      return res.status(404).json({ message: 'User not found' });
+    const deletedutilisateur = await utilisateur.findByIdAndDelete(req.params.id);
+    if (!deletedutilisateur) {
+      return res.status(404).json({ message: 'utilisateur not found' });
     }
-    res.status(200).json({ message: 'User deleted successfully' });
+    res.status(200).json({ message: 'utilisateur deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
 // Inscrire un nouvel utilisateur
-const registerUser = async (req, res) => {
+const registerutilisateur = async (req, res) => {
   try {
-    const { name, email, password, role, userId } = req.body;
+    const { name, email, password, role, utilisateurId } = req.body;
 
     // Vérification que tous les champs requis sont envoyés
     if (!name || !email || !password || !role) {
       return res.status(400).json({ message: 'Tous les champs sont requis' });
     }
 
-    const { user, token } = await userService.registerUser({
+    const { utilisateur, token } = await utilisateurService.registerutilisateur({
       name,
       email,
       password,
       role,
-      userId, // Ceci sera généré automatiquement si laissé vide
+      utilisateurId, // Ceci sera généré automatiquement si laissé vide
     });
 
     res.status(201).json({
-      message: 'User registered successfully',
-      user: {
-        userId: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+      message: 'utilisateur registered successfully',
+      utilisateur: {
+        utilisateurId: utilisateur._id,
+        name: utilisateur.name,
+        email: utilisateur.email,
+        role: utilisateur.role,
       },
       token,
     });
@@ -103,17 +103,17 @@ const registerUser = async (req, res) => {
 };
 
 // Connexion d'un utilisateur
-const loginUser = async (req, res) => {
+const loginutilisateur = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const { user, token } = await userService.loginUser(email, password);
+    const { utilisateur, token } = await utilisateurService.loginutilisateur(email, password);
     res.status(200).json({
       message: 'Login successful',
-      user: {
-        userId: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
+      utilisateur: {
+        utilisateurId: utilisateur._id,
+        name: utilisateur.name,
+        email: utilisateur.email,
+        role: utilisateur.role,
       },
       token,
     });
@@ -128,20 +128,20 @@ const verifyEmail = async (req, res) => {
     const { token } = req.query;
 
     // Vérifier le token
-    const user = await User.findOne({
+    const utilisateur = await utilisateur.findOne({
       verificationToken: token,
       verificationTokenExpiration: { $gt: Date.now() },
     });
 
-    if (!user) {
+    if (!utilisateur) {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
     // Activer l'utilisateur
-    user.isVerified = true;
-    user.verificationToken = undefined;
-    user.verificationTokenExpiration = undefined;
-    await user.save();
+    utilisateur.isVerified = true;
+    utilisateur.verificationToken = undefined;
+    utilisateur.verificationTokenExpiration = undefined;
+    await utilisateur.save();
 
     res.status(200).json({ message: 'Email successfully verified' });
   } catch (error) {
@@ -151,12 +151,12 @@ const verifyEmail = async (req, res) => {
 
 // Exporter les contrôleurs avec module.exports
 module.exports = {
-  createUser,
-  getAllUsers,
-  getUserById,
-  updateUser,
-  deleteUser,
-  registerUser,
-  loginUser,
+  createutilisateur,
+  getAllutilisateurs,
+  getutilisateurById,
+  updateutilisateur,
+  deleteutilisateur,
+  registerutilisateur,
+  loginutilisateur,
   verifyEmail
 };

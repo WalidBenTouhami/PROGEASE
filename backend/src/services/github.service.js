@@ -10,7 +10,7 @@ dotenv.config();
 const client = axios.create({
     timeout: 10000, // 10s timeout
     headers: {
-        'User-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0'
     }
 });
 
@@ -48,7 +48,7 @@ async function checkGithubRepoExists(url) {
 
     // Preparer les headers avec token si disponible
     const headers = {
-        'User-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0'
     };
 
     if (CONFIG.GITHUB_TOKEN) {
@@ -124,7 +124,7 @@ async function getGithubRepoBranches(url) {
 
     // Preparer les headers
     const headers = {
-        'User-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0'
     };
 
     if (CONFIG.GITHUB_TOKEN) {
@@ -165,7 +165,7 @@ async function getGithubRepoCommits(url, limit = 5) {
 
     // Preparer les headers
     const headers = {
-        'User-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0'
     };
 
     if (CONFIG.GITHUB_TOKEN) {

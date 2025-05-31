@@ -19,7 +19,7 @@ router.get('/health', (req, res) => {
             status: 'ok',
             service: 'projets-api',
             timestamp: new Date().toISOString(),
-            user: req.currentUser || 'anonymous'
+            utilisateur: req.currentutilisateur || 'anonymous'
         }
     });
 });

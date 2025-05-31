@@ -4,7 +4,7 @@
 # Auteur: WalidBenTouhami
 
 # Variables d'environnement pour Apollo
-export APOLLO_KEY="user:gh.b4827a19-4fc2-45d6-b053-e935ff4a406f:--tXDlUNdpITbByFqmAnvw"
+export APOLLO_KEY="utilisateur:gh.b4827a19-4fc2-45d6-b053-e935ff4a406f:--tXDlUNdpITbByFqmAnvw"
 export APOLLO_GRAPH_REF="progease-app@main"
 export APOLLO_SUBGRAPH_NAME="progease-projets"
 

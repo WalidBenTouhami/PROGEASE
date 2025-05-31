@@ -34,7 +34,7 @@ export class ProjetFormComponent implements OnInit {
   projetId?: string;
   erreur = '';
   statutOptions = Object.values(StatutProjet);
-  availableUsers: any[] = [];
+  availableutilisateurs: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -55,7 +55,7 @@ export class ProjetFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadUsers();
+    this.loadutilisateurs();
 
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
@@ -68,7 +68,7 @@ export class ProjetFormComponent implements OnInit {
   onSubmit(): void {
     if (this.projetForm.valid) {
       const projet: Projet = this.projetForm.value;
-      
+
       if (this.isEditing && this.projetId) {
         this.projetService.mettreAJourProjet(this.projetId, projet).subscribe({
           next: () => this.router.navigate(['/projets']),
@@ -129,7 +129,7 @@ export class ProjetFormComponent implements OnInit {
   }
 
   // Placeholder pour le chargement des utilisateurs (à implémenter selon vos besoins)
-  private loadUsers() {
-    this.availableUsers = [];
+  private loadutilisateurs() {
+    this.availableutilisateurs = [];
   }
 }

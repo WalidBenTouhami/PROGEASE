@@ -59,7 +59,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/progease'
     console.log('🚀 PROGEASE Server (GraphQL v4)');
     console.log('=======================================================');
     console.log(`📅 Date: ${new Date().toLocaleString()}`);
-    console.log(`👤 User: ${process.env.USER || 'WalidBenTouhami'}`);
+    console.log(`👤 utilisateur: ${process.env.utilisateur || 'WalidBenTouhami'}`);
     console.log(`🌐 Port: ${port}`);
     console.log(`🔧 Mode: ${env}`);
     console.log(`🔗 API: http://localhost:${port}/api`);

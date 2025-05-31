@@ -1,6 +1,6 @@
 const Formation = require("../models/Formation");
 const Certificat = require("../models/Certification"); // Assurez-vous que le modèle Certificat est bien importe
-const User = require("../models/User"); // Assurez-vous que le modèle User est bien importe
+const utilisateur = require("../models/utilisateur"); // Assurez-vous que le modèle utilisateur est bien importe
 const QuizResult = require("../models/QuizResult"); // Modèle pour les resultats des quiz
 
 // Fonction pour verifier si l'utilisateur a reussi tous les quiz associes aux formations requises
@@ -15,7 +15,7 @@ const checkQuizReussis = async (utilisateurId, formationsRequises) => {
 
       for (const quizId of quizIds) {
         const quizResult = await QuizResult.findOne({
-          userId: utilisateurId,
+          utilisateurId: utilisateurId,
           quizId: quizId
         });
 
@@ -69,7 +69,7 @@ const createCertificat = async (req, res) => {
 
 // Fonction pour generer un certificat en verifiant l'eligibilite
 const genererCertificat = async (req, res) => {
-  const utilisateurId = req.user._id; // Assumes JWT middleware sets req.user
+  const utilisateurId = req.utilisateur._id; // Assumes JWT middleware sets req.utilisateur
   const { formationsRequises, titre, description, dureeValidite } = req.body;
 
   try {
@@ -124,15 +124,15 @@ const getAllFormations = async (req, res) => {
 };
 
 // Ajouter un utilisateur à une formation (s'il est etudiant)
-const addUserToFormation = async (req, res) => {
+const addutilisateurToFormation = async (req, res) => {
   const { formationId } = req.params;
-  const { userId } = req.body;
+  const { utilisateurId } = req.body;
 
   try {
-    const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ error: "Utilisateur non trouve" });
+    const utilisateur = await utilisateur.findById(utilisateurId);
+    if (!utilisateur) return res.status(404).json({ error: "Utilisateur non trouve" });
 
-    if (user.role !== "student") {
+    if (utilisateur.role !== "student") {
       return res.status(400).json({
         error: "Seuls les etudiants peuvent s'inscrire à une formation.",
       });
@@ -142,13 +142,13 @@ const addUserToFormation = async (req, res) => {
     if (!formation)
       return res.status(404).json({ error: "Formation non trouvee" });
 
-    if (formation.utilisateursInscrits.includes(userId)) {
+    if (formation.utilisateursInscrits.includes(utilisateurId)) {
       return res
         .status(400)
         .json({ error: "Utilisateur dejà inscrit à cette formation." });
     }
 
-    formation.utilisateursInscrits.push(userId);
+    formation.utilisateursInscrits.push(utilisateurId);
     await formation.save();
 
     res.status(200).json({ message: "Utilisateur inscrit avec succès", formation });
@@ -211,7 +211,7 @@ const verifierValiditeCertificat = async (req, res) => {
 module.exports = {
   createFormation,
   getAllFormations,
-  addUserToFormation,
+  addutilisateurToFormation,
   addModuleToFormation,
   genererCertificat,
   verifierValiditeCertificat,

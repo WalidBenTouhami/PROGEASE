@@ -100,7 +100,7 @@ async function genererTexte(prompt) {
                         content: 'Vous êtes un assistant IA expert en analyse de projets et en génération de texte.'
                     },
                     {
-                        role: 'user',
+                        role: 'utilisateur',
                         content: prompt
                     }
                 ],

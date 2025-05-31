@@ -299,7 +299,7 @@ const Mutation = {
                 ...input,
                 statut: input.statut || Enum.StatutProjet.BROUILLON,
                 progression: 0,
-                createur: context.user?._id,
+                createur: context.utilisateur?._id,
                 creeLe: new Date(),
                 majLe: new Date()
             });
@@ -308,7 +308,7 @@ const Mutation = {
 
             // Ajouter l'activite d'audit
             logger.info(`Projet cree: ${saved._id}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -369,7 +369,7 @@ const Mutation = {
             const updateData = {
                 ...input,
                 majLe: new Date(),
-                majPar: context.user?._id
+                majPar: context.utilisateur?._id
             };
 
             // Conversion des dates si présentes
@@ -409,7 +409,7 @@ const Mutation = {
             context.loaders.projetLoader.clear(id);
 
             logger.info(`Projet mis à jour: ${id}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -479,7 +479,7 @@ const Mutation = {
             context.loaders.projetLoader.clear(id);
 
             logger.info(`Projet supprime: ${id}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 

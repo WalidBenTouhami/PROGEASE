@@ -312,7 +312,7 @@ export class BackOfficeRoutingModule {}
   letter-spacing: 2px;
   flex: 1;
 }
-.bo-user-menu a {
+.bo-utilisateur-menu a {
   color: #ffd700;
   margin-left: 1rem;
   text-decoration: none;
@@ -387,7 +387,7 @@ export class BackOfficeRoutingModule {}
   .bo-main {
     padding: 1rem;
   }
-} 
+}
 
 // ======= Contenu de src/app/back-office/back-office-template.component.ts =======
 
@@ -398,7 +398,7 @@ import { Component } from '@angular/core';
   templateUrl: './back-office-template.component.html',
   styleUrls: ['./back-office-template.component.css']
 })
-export class BackOfficeTemplateComponent {} 
+export class BackOfficeTemplateComponent {}
 
 // ======= Contenu de src/app/back-office/back-office.module.ts =======
 
@@ -472,7 +472,7 @@ button:focus {
 }
 button:hover { background: #174bb3; }
 
-.user-actions {
+.utilisateur-actions {
   margin: 1rem 0;
   display: flex;
   gap: 1rem;
@@ -1858,7 +1858,7 @@ interface Livrable {
   dateLimite: Date | string;
 }
 
-interface User {
+interface utilisateur {
   nom: string;
   role: string;
 }
@@ -1878,7 +1878,7 @@ export class DashboardComponent implements OnInit {
   projets: Projet[] = [];
   notifications: Notification[] = [];
   livrables: Livrable[] = [];
-  users: User[] = [{ nom: 'Jean', role: 'Administrateur' }];
+  utilisateurs: utilisateur[] = [{ nom: 'Jean', role: 'Administrateur' }];
   roles: string[] = ['Administrateur', 'Tuteur', 'etudiant'];
   projetTemplates: Template[] = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
@@ -1903,22 +1903,22 @@ export class DashboardComponent implements OnInit {
   }
 
   // Ouvre le formulaire pour ajouter un utilisateur
-  openUserForm(): void {}
+  openutilisateurForm(): void {}
 
   // Met à jour le rôle d'un utilisateur
-  updateRole(user: User): void {}
+  updateRole(utilisateur: utilisateur): void {}
 
   // Modifie les informations d'un utilisateur
-  editUser(user: User): void {}
+  editutilisateur(utilisateur: utilisateur): void {}
 
   // Supprime un utilisateur
-  deleteUser(user: User): void {}
+  deleteutilisateur(utilisateur: utilisateur): void {}
 
   // Exporte la liste des utilisateurs
-  exportUsers(): void {}
+  exportutilisateurs(): void {}
 
   // Importe une liste d'utilisateurs
-  importUsers(): void {}
+  importutilisateurs(): void {}
 
   // Cree un nouveau modele de projet
   createTemplate(): void {}
@@ -2036,7 +2036,7 @@ export class FrontOfficeRoutingModule {}
   .fo-main {
     padding: 0.5rem;
   }
-} 
+}
 
 // ======= Contenu de src/app/front-office/front-office-template.component.ts =======
 
@@ -2047,7 +2047,7 @@ import { Component } from '@angular/core';
   templateUrl: './front-office-template.component.html',
   styleUrls: ['./front-office-template.component.css']
 })
-export class FrontOfficeTemplateComponent {} 
+export class FrontOfficeTemplateComponent {}
 
 // ======= Contenu de src/app/front-office/front-office.module.ts =======
 
@@ -2860,7 +2860,7 @@ export class ProjetFormComponent implements OnInit {
   isEditing = false;
   projetId: string | null = null;
   statutOptions = Object.values(StatutProjet);
-  availableUsers: any[] = [];
+  availableutilisateurs: any[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -2872,7 +2872,7 @@ export class ProjetFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadUsers();
+    this.loadutilisateurs();
 
     this.projetId = this.route.snapshot.paramMap.get('id');
     if (this.projetId) {

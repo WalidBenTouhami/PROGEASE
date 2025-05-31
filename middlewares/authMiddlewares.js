@@ -20,11 +20,11 @@ const authMiddleware = (req, res, next) => {
     console.log("Decoded token:", decoded);  // Log du token decode pour verifier son contenu
 
     // Verification de la presence de l'ID utilisateur dans le token
-    if (!decoded || !decoded.userId) {
+    if (!decoded || !decoded.utilisateurId) {
       return res.status(400).json({ error: 'ID utilisateur manquant dans le token' });
     }
 
-    req.user = decoded;  // Ajouter l'utilisateur decode à la requête
+    req.utilisateur = decoded;  // Ajouter l'utilisateur decode à la requête
     next();
   });
 };

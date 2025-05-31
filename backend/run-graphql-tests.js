@@ -24,7 +24,7 @@ const colors = {
 const config = {
     baseUrl: 'http://localhost:5000/graphql',
     testsDir: path.join(__dirname, 'tests', 'graphql'),
-    currentUser: 'WalidBenTouhami',
+    currentutilisateur: 'WalidBenTouhami',
     currentDate: '2025-05-28 09:48:25'
 };
 
@@ -38,7 +38,7 @@ function showBanner() {
     console.log('╔══════════════════════════════════════════════════════════════╗');
     console.log('║                  PROGEASE - Tests GraphQL                    ║');
     console.log('╟──────────────────────────────────────────────────────────────╢');
-    console.log(`║ Utilisateur: ${config.currentUser.padEnd(46, ' ')}  ║`);
+    console.log(`║ Utilisateur: ${config.currentutilisateur.padEnd(46, ' ')}  ║`);
     console.log(`║ Date: ${config.currentDate.padEnd(52, ' ')}   ║`);
     console.log('╚══════════════════════════════════════════════════════════════╝');
 }
@@ -50,7 +50,7 @@ query GetHealth {
   health {
     status
     timestamp
-    user
+    utilisateur
     version
     uptime
   }
@@ -165,7 +165,7 @@ async function runPredefinedTests() {
             }, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-User': config.currentUser
+                    'X-utilisateur': config.currentutilisateur
                 },
                 timeout: 5000
             });
@@ -251,7 +251,7 @@ async function generateCorrectTestFiles() {
             path.join(config.testsDir, 'health.graphql'),
             `# Tests GraphQL pour Health
 # Generes par PROGEASE le ${config.currentDate}
-# Utilisateur: ${config.currentUser}
+# Utilisateur: ${config.currentutilisateur}
 
 ${predefinedQueries.health}
 `
@@ -262,7 +262,7 @@ ${predefinedQueries.health}
             path.join(config.testsDir, 'projet.graphql'),
             `# Tests GraphQL pour Projet
 # Generes par PROGEASE le ${config.currentDate}
-# Utilisateur: ${config.currentUser}
+# Utilisateur: ${config.currentutilisateur}
 
 ${predefinedQueries.projets}
 
@@ -280,7 +280,7 @@ ${predefinedQueries.projet}
             path.join(config.testsDir, 'livrable.graphql'),
             `# Tests GraphQL pour Livrable
 # Generes par PROGEASE le ${config.currentDate}
-# Utilisateur: ${config.currentUser}
+# Utilisateur: ${config.currentutilisateur}
 
 ${predefinedQueries.livrables}
 

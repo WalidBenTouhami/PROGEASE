@@ -118,12 +118,12 @@ exports.creerProjet = async (req, res) => {
             progression: 0,
             creeLe: new Date(),
             majLe: new Date(),
-            createur: req.user ? req.user.id : undefined
+            createur: req.utilisateur ? req.utilisateur.id : undefined
         });
 
         await nouveauProjet.save();
 
-        logger.monitoring('Projet cree', { projetId: nouveauProjet._id, user: req.user?.id });
+        logger.monitoring('Projet cree', { projetId: nouveauProjet._id, utilisateur: req.utilisateur?.id });
 
         res.status(201).json({
             success: true,
@@ -177,7 +177,7 @@ exports.mettreAJourProjet = async (req, res) => {
             await projetMisAJour.save();
         }
 
-        logger.monitoring('Projet mis à jour', { projetId: id, user: req.user?.id });
+        logger.monitoring('Projet mis à jour', { projetId: id, utilisateur: req.utilisateur?.id });
 
         res.status(200).json({
             success: true,
@@ -214,7 +214,7 @@ exports.supprimerProjet = async (req, res) => {
             });
         }
 
-        logger.monitoring('Projet supprime', { projetId: id, user: req.user?.id });
+        logger.monitoring('Projet supprime', { projetId: id, utilisateur: req.utilisateur?.id });
 
         res.status(200).json({
             success: true,

@@ -257,7 +257,7 @@ const Mutation = {
             const livrable = new Livrable({
                 ...input,
                 statut: input.statut || Enum.StatutLivrable.EN_ATTENTE,
-                createur: context.user?._id,
+                createur: context.utilisateur?._id,
                 creeLe: new Date(),
                 majLe: new Date()
             });
@@ -276,7 +276,7 @@ const Mutation = {
             context.loaders.projetLoader.clear(input.projetId);
 
             logger.info(`Livrable cree: ${saved._id}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 projetId: input.projetId,
                 requestId: context.requestId
             });
@@ -334,7 +334,7 @@ const Mutation = {
             const updateData = {
                 ...input,
                 majLe: new Date(),
-                majPar: context.user?._id
+                majPar: context.utilisateur?._id
             };
 
             if (updateData.dateLimite) {
@@ -377,7 +377,7 @@ const Mutation = {
             context.loaders.projetLoader.clear(livrable.projetId);
 
             logger.info(`Livrable mis à jour: ${id}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 projetId: livrable.projetId,
                 requestId: context.requestId
             });
@@ -454,7 +454,7 @@ const Mutation = {
             context.loaders.projetLoader.clear(livrable.projetId);
 
             logger.info(`Livrable supprime: ${id}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 projetId: livrable.projetId,
                 requestId: context.requestId
             });

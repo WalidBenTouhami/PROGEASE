@@ -26,7 +26,7 @@ interface Livrable {
   dateLimite: Date | string;
 }
 
-interface User {
+interface utilisateur {
   nom: string;
   role: string;
 }
@@ -56,7 +56,7 @@ export class FrontOfficeDashboardComponent implements OnInit {
   projets: Projet[] = [];
   notifications: Notification[] = [];
   livrables: Livrable[] = [];
-  users: User[] = [{ nom: 'Jean', role: 'Administrateur' }];
+  utilisateurs: utilisateur[] = [{ nom: 'Jean', role: 'Administrateur' }];
   roles: string[] = ['Administrateur', 'Tuteur', 'etudiant'];
   projetTemplates: Template[] = [{ nom: 'Modele 1' }, { nom: 'Modele 2' }];
   stats = { projetsActifs: 5, groupesRisque: 2, performanceMoyTuteur: 8.5 };
@@ -90,22 +90,22 @@ export class FrontOfficeDashboardComponent implements OnInit {
   }
 
   // Ouvre le formulaire pour ajouter un utilisateur
-  openUserForm(): void {}
+  openutilisateurForm(): void {}
 
   // Met à jour le rôle d'un utilisateur
-  updateRole(user: User): void {}
+  updateRole(utilisateur: utilisateur): void {}
 
   // Modifie les informations d'un utilisateur
-  editUser(user: User): void {}
+  editutilisateur(utilisateur: utilisateur): void {}
 
   // Supprime un utilisateur
-  deleteUser(user: User): void {}
+  deleteutilisateur(utilisateur: utilisateur): void {}
 
   // Exporte la liste des utilisateurs
-  exportUsers(): void {}
+  exportutilisateurs(): void {}
 
   // Importe une liste d'utilisateurs
-  importUsers(): void {}
+  importutilisateurs(): void {}
 
   // Cree un nouveau modele de projet
   createTemplate(): void {}

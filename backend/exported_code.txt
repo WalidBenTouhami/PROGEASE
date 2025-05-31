@@ -90,7 +90,7 @@ function createApolloMiddleware(server, options = {}) {
             const context = {
                 // Metadonnees de requete pour le traçage et le debogage
                 ip: req.ip || req.connection?.remoteAddress,
-                userAgent: req.headers['user-agent'],
+                utilisateurAgent: req.headers['utilisateur-agent'],
 
                 // Ajout de l'objet requete pour acceder aux headers
                 req,
@@ -724,7 +724,7 @@ const correctQueries = {
   health {
     status
     timestamp
-    user
+    utilisateur
     version
     uptime
   }
@@ -865,7 +865,7 @@ const colors = {
 const config = {
     baseUrl: 'http://localhost:5000/graphql',
     testsDir: path.join(__dirname, 'tests', 'graphql'),
-    currentUser: 'WalidBenTouhami',
+    currentutilisateur: 'WalidBenTouhami',
     currentDate: '2025-05-28 09:25:45'
 };
 
@@ -879,7 +879,7 @@ function showBanner() {
     console.log('╔══════════════════════════════════════════════════════════════╗');
     console.log('║                  PROGEASE - Tests GraphQL                    ║');
     console.log('╟──────────────────────────────────────────────────────────────╢');
-    console.log(`║ Utilisateur: ${config.currentUser.padEnd(46, ' ')}  ║`);
+    console.log(`║ Utilisateur: ${config.currentutilisateur.padEnd(46, ' ')}  ║`);
     console.log(`║ Date: ${config.currentDate.padEnd(52, ' ')}   ║`);
     console.log('╚══════════════════════════════════════════════════════════════╝');
 }
@@ -965,7 +965,7 @@ async function processGraphQLTests() {
                     }, {
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-User': config.currentUser
+                            'X-utilisateur': config.currentutilisateur
                         },
                         // Diminuer le timeout pour ne pas attendre trop longtemps en cas d'erreur
                         timeout: 3000
@@ -1098,7 +1098,7 @@ type Query {
 type Health {
   status: String!
   timestamp: String!
-  user: String!
+  utilisateur: String!
   version: String!
   uptime: Float!
 }
@@ -1263,7 +1263,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Configuration utilisateur
-const currentUser = 'WalidBenTouhami';
+const currentutilisateur = 'WalidBenTouhami';
 const baseUrl = 'http://localhost:5000';
 
 // Verifier que le serveur est accessible avant d'executer les tests
@@ -1344,7 +1344,7 @@ async function runNewmanTests() {
   // Nom du rapport avec timestamp actuel
   const reportName = `rapport-${dateFormat}`;
 
-  console.log(`Execution des tests Newman par ${currentUser} à ${formattedDate}`);
+  console.log(`Execution des tests Newman par ${currentutilisateur} à ${formattedDate}`);
 
   // Options de Newman
   newman.run({
@@ -1364,7 +1364,7 @@ async function runNewmanTests() {
       }
     },
     globalVar: [
-      { key: "currentUser", value: currentUser },
+      { key: "currentutilisateur", value: currentutilisateur },
       { key: "timestamp", value: "2025-05-27T19:36:32Z" },
       { key: "baseUrl", value: baseUrl },
       { key: "testDate", value: "2025-05-27 19:36:32" }
@@ -1438,7 +1438,7 @@ const colors = {
 const config = {
     baseUrl: 'http://localhost:5000/graphql',
     testsDir: path.join(__dirname, 'tests', 'graphql'),
-    currentUser: 'WalidBenTouhami',
+    currentutilisateur: 'WalidBenTouhami',
     currentDate: '2025-05-28 09:48:25'
 };
 
@@ -1452,7 +1452,7 @@ function showBanner() {
     console.log('╔══════════════════════════════════════════════════════════════╗');
     console.log('║                  PROGEASE - Tests GraphQL                    ║');
     console.log('╟──────────────────────────────────────────────────────────────╢');
-    console.log(`║ Utilisateur: ${config.currentUser.padEnd(46, ' ')}  ║`);
+    console.log(`║ Utilisateur: ${config.currentutilisateur.padEnd(46, ' ')}  ║`);
     console.log(`║ Date: ${config.currentDate.padEnd(52, ' ')}   ║`);
     console.log('╚══════════════════════════════════════════════════════════════╝');
 }
@@ -1464,7 +1464,7 @@ query GetHealth {
   health {
     status
     timestamp
-    user
+    utilisateur
     version
     uptime
   }
@@ -1579,7 +1579,7 @@ async function runPredefinedTests() {
             }, {
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-User': config.currentUser
+                    'X-utilisateur': config.currentutilisateur
                 },
                 timeout: 5000
             });
@@ -1665,7 +1665,7 @@ async function generateCorrectTestFiles() {
             path.join(config.testsDir, 'health.graphql'),
             `# Tests GraphQL pour Health
 # Generes par PROGEASE le ${config.currentDate}
-# Utilisateur: ${config.currentUser}
+# Utilisateur: ${config.currentutilisateur}
 
 ${predefinedQueries.health}
 `
@@ -1676,7 +1676,7 @@ ${predefinedQueries.health}
             path.join(config.testsDir, 'projet.graphql'),
             `# Tests GraphQL pour Projet
 # Generes par PROGEASE le ${config.currentDate}
-# Utilisateur: ${config.currentUser}
+# Utilisateur: ${config.currentutilisateur}
 
 ${predefinedQueries.projets}
 
@@ -1694,7 +1694,7 @@ ${predefinedQueries.projet}
             path.join(config.testsDir, 'livrable.graphql'),
             `# Tests GraphQL pour Livrable
 # Generes par PROGEASE le ${config.currentDate}
-# Utilisateur: ${config.currentUser}
+# Utilisateur: ${config.currentutilisateur}
 
 ${predefinedQueries.livrables}
 
@@ -2074,7 +2074,7 @@ async function main() {
     const metadataPath = path.join(CONFIG.outputDir, 'metadata.json');
     const metadata = {
       timestamp: getCurrentDateTime(), // Utiliser la fonction mise à jour
-      user: process.env.USER || 'defaultUser',
+      utilisateur: process.env.utilisateur || 'defaultutilisateur',
       version: '2.0.0',
       subgraph: CONFIG.subgraphName,
       routingUrl: CONFIG.routingUrl
@@ -2276,7 +2276,7 @@ if (NODE_ENV === 'development') {
 
 // Middleware pour ajouter des informations de contexte
 app.use((req, res, next) => {
-    req.currentUser = req.headers['x-user'] || 'WalidBenTouhami';
+    req.currentutilisateur = req.headers['x-utilisateur'] || 'WalidBenTouhami';
     req.timestamp = new Date().toISOString();
 
     // Ajouter des en-tetes de securite
@@ -2308,7 +2308,7 @@ app.get('/api', (req, res) => {
         status: 'ok',
         message: 'PROGEASE API v2',
         timestamp: req.timestamp,
-        user: req.currentUser,
+        utilisateur: req.currentutilisateur,
         endpoints: ['/api/projets', '/api/livrables', '/api/ai', '/graphql']
     });
 });
@@ -2319,7 +2319,7 @@ app.get('/health', (req, res) => {
     res.json({
         status: 'ok',
         timestamp: req.timestamp || '2025-05-28T09:19:39Z',
-        user: req.currentUser || 'WalidBenTouhami',
+        utilisateur: req.currentutilisateur || 'WalidBenTouhami',
         version: '2.0.0',
         graphqlVersion: '4.0',
         environment: NODE_ENV,
@@ -2340,7 +2340,7 @@ app.use('/graphql', graphqlHTTP({
         };
     },
     context: ({ req }) => ({
-        currentUser: req.currentUser,
+        currentutilisateur: req.currentutilisateur,
         timestamp: req.timestamp
     })
 }));
@@ -2391,7 +2391,7 @@ async function startServer() {
 🚀 PROGEASE Server (GraphQL v4)
 =======================================================
 📅 Date: 2025-05-28 09:19:39
-👤 User: WalidBenTouhami
+👤 utilisateur: WalidBenTouhami
 🌐 Port: ${PORT}
 🔧 Mode: ${NODE_ENV}
 🔗 API: http://localhost:${PORT}/api
@@ -2847,7 +2847,7 @@ exports.createProjet = async (req, res) => {
       progression: 0,
       creeLe: new Date(),
       majLe: new Date(),
-      createur: req.user ? req.user.id : undefined
+      createur: req.utilisateur ? req.utilisateur.id : undefined
     });
 
     await nouveauProjet.save();
@@ -2908,7 +2908,7 @@ exports.updateProjet = async (req, res) => {
         ...(dateFin && { dateFin: new Date(dateFin) }),
         ...(statut && { statut }),
         majLe: new Date(),
-        ...(req.user && { majPar: req.user.id })
+        ...(req.utilisateur && { majPar: req.utilisateur.id })
       },
       { new: true }
     );
@@ -2980,7 +2980,7 @@ const resolvers = {
         health: (_, __, context) => ({
             status: "ok",
             timestamp: context.timestamp || new Date().toISOString(),
-            user: context.currentUser || "WalidBenTouhami",
+            utilisateur: context.currentutilisateur || "WalidBenTouhami",
             version: "2.0.0",
             uptime: Math.floor(process.uptime())
         }),
@@ -3201,7 +3201,7 @@ const rl = readline.createInterface({
 
 // Requetes preconfigurees
 const presetQueries = {
-    health: `query { health { status timestamp user version uptime } }`,
+    health: `query { health { status timestamp utilisateur version uptime } }`,
     projets: `query { projets { _id titre description } }`,
     livrables: `query { livrables { _id titre description } }`
 };
@@ -3271,7 +3271,7 @@ async function executeQuery(input) {
         const response = await axios.post(GRAPHQL_URL, requestBody, {
             headers: {
                 'Content-Type': 'application/json',
-                'X-User': 'WalidBenTouhami'
+                'X-utilisateur': 'WalidBenTouhami'
             },
             timeout: 5000
         });
@@ -3441,7 +3441,7 @@ type Query {
 type HealthStatus {
     status: String!
     timestamp: String!
-    user: String!
+    utilisateur: String!
 }
 
 # 📌 Type Mutation
@@ -3479,7 +3479,7 @@ type Mutation {
 
 // Date actuelle pour tous les resolvers
 const currentDate = "2025-05-23 14:31:13";
-const currentUser = "WalidBenTouhami";
+const currentutilisateur = "WalidBenTouhami";
 
 // Implementation des resolvers
 const resolvers = {
@@ -3491,7 +3491,7 @@ const resolvers = {
                     _id: "projet123",
                     titre: "Projet GraphQL Test",
                     description: "Description pour les tests",
-                    equipe: ["user1", "user2"],
+                    equipe: ["utilisateur1", "utilisateur2"],
                     tuteur: "tuteur1",
                     competences: ["JavaScript", "GraphQL", "MongoDB"],
                     dateDebut: "2025-05-01",
@@ -3515,7 +3515,7 @@ const resolvers = {
                     _id: id,
                     titre: "Projet GraphQL " + id,
                     description: "Description pour les tests",
-                    equipe: ["user1", "user2"],
+                    equipe: ["utilisateur1", "utilisateur2"],
                     tuteur: "tuteur1",
                     competences: ["JavaScript", "GraphQL", "MongoDB"],
                     dateDebut: "2025-05-01",
@@ -3541,7 +3541,7 @@ const resolvers = {
                         nom: "Livrable Test 1",
                         description: "Description du livrable test 1",
                         dateLimite: "2025-06-15",
-                        urlDepot: "https://github.com/username/repo/livrable1",
+                        urlDepot: "https://github.com/utilisateurname/repo/livrable1",
                         statut: "EN_ATTENTE",
                         projetId,
                         creeLe: currentDate,
@@ -3562,7 +3562,7 @@ const resolvers = {
                     nom: "Livrable Test " + id,
                     description: "Description du livrable test " + id,
                     dateLimite: "2025-06-15",
-                    urlDepot: "https://github.com/username/repo/livrable/" + id,
+                    urlDepot: "https://github.com/utilisateurname/repo/livrable/" + id,
                     statut: "EN_ATTENTE",
                     projetId: "projet123",
                     creeLe: currentDate,
@@ -3577,7 +3577,7 @@ const resolvers = {
         health: () => ({
             status: "ok",
             timestamp: currentDate,
-            user: currentUser
+            utilisateur: currentutilisateur
         })
     },
 
@@ -3591,7 +3591,7 @@ const resolvers = {
                         nom: "Livrable Test 1",
                         description: "Description du livrable test 1",
                         dateLimite: "2025-06-15",
-                        urlDepot: "https://github.com/username/repo/livrable1",
+                        urlDepot: "https://github.com/utilisateurname/repo/livrable1",
                         statut: "EN_ATTENTE",
                         projetId: projet._id,
                         creeLe: currentDate,
@@ -3611,7 +3611,7 @@ const resolvers = {
                 _id: reference._id,
                 titre: `Projet ${reference._id} (reference)`,
                 description: "Projet resolu par reference",
-                equipe: ["user1", "user2"],
+                equipe: ["utilisateur1", "utilisateur2"],
                 competences: ["GraphQL", "Federation"],
                 dateDebut: "2025-05-01",
                 dateFin: "2025-08-23",
@@ -3625,7 +3625,7 @@ const resolvers = {
     },
 
     Mutation: {
-        creerProjet: async (_, args, { models, user }) => {
+        creerProjet: async (_, args, { models, utilisateur }) => {
             try {
                 // Pour les tests
                 return {
@@ -3642,14 +3642,14 @@ const resolvers = {
             }
         },
 
-        mettreAJourProjet: async (_, { id, ...updates }, { models, user }) => {
+        mettreAJourProjet: async (_, { id, ...updates }, { models, utilisateur }) => {
             try {
                 // Pour les tests
                 return {
                     _id: id,
                     titre: updates.titre || "Projet Mis à Jour",
                     description: updates.description || "Description mise à jour",
-                    equipe: updates.equipe || ["user1", "user2"],
+                    equipe: updates.equipe || ["utilisateur1", "utilisateur2"],
                     tuteur: updates.tuteur || "tuteur1",
                     competences: updates.competences || ["JavaScript", "GraphQL", "MongoDB"],
                     dateDebut: updates.dateDebut || "2025-05-01",
@@ -3666,7 +3666,7 @@ const resolvers = {
             }
         },
 
-        supprimerProjet: async (_, { id }, { models, user }) => {
+        supprimerProjet: async (_, { id }, { models, utilisateur }) => {
             try {
                 // Pour les tests
                 return {
@@ -3689,7 +3689,7 @@ const resolvers = {
             }
         },
 
-        ajouterLivrable: async (_, { projetId, input }, { models, user }) => {
+        ajouterLivrable: async (_, { projetId, input }, { models, utilisateur }) => {
             try {
                 // Pour les tests
                 return {
@@ -3706,7 +3706,7 @@ const resolvers = {
             }
         },
 
-        mettreAJourLivrable: async (_, { livrableId, input }, { models, user }) => {
+        mettreAJourLivrable: async (_, { livrableId, input }, { models, utilisateur }) => {
             try {
                 // Pour les tests
                 return {
@@ -3722,7 +3722,7 @@ const resolvers = {
             }
         },
 
-        supprimerLivrable: async (_, { livrableId }, { models, user }) => {
+        supprimerLivrable: async (_, { livrableId }, { models, utilisateur }) => {
             try {
                 // Pour les tests
                 return {
@@ -4147,7 +4147,7 @@ const Mutation = {
             const livrable = new Livrable({
                 ...input,
                 projetId,
-                createur: context.user?._id,
+                createur: context.utilisateur?._id,
                 creeLe: new Date(),
                 majLe: new Date()
             });
@@ -4160,7 +4160,7 @@ const Mutation = {
                 {
                     $push: { livrables: saved._id },
                     majLe: new Date(),
-                    majPar: context.user?._id
+                    majPar: context.utilisateur?._id
                 },
                 { session }
             );
@@ -4173,7 +4173,7 @@ const Mutation = {
             context.loaders.livrablesByProjetLoader.clear(projetId);
 
             logger.info(`Livrable ajoute: ${saved._id} au projet ${projetId}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -4247,7 +4247,7 @@ const Mutation = {
                 {
                     ...input,
                     majLe: new Date(),
-                    majPar: context.user?._id
+                    majPar: context.utilisateur?._id
                 },
                 { new: true, runValidators: true, session }
             ).lean();
@@ -4259,7 +4259,7 @@ const Mutation = {
             context.loaders.livrablesByProjetLoader.clear(existingLivrable.projetId);
 
             logger.info(`Livrable mis à jour: ${livrableId}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -4331,7 +4331,7 @@ const Mutation = {
                 {
                     $pull: { livrables: livrableId },
                     majLe: new Date(),
-                    majPar: context.user?._id
+                    majPar: context.utilisateur?._id
                 },
                 { session }
             );
@@ -4344,7 +4344,7 @@ const Mutation = {
             context.loaders.projetLoader.clear(projetId);
 
             logger.info(`Livrable supprime: ${livrableId} du projet ${projetId}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -4595,7 +4595,7 @@ const Mutation = {
             // Creer le projet
             const projet = new Projet({
                 ...input,
-                createur: context.user?._id,
+                createur: context.utilisateur?._id,
                 creeLe: new Date(),
                 majLe: new Date()
             });
@@ -4604,7 +4604,7 @@ const Mutation = {
 
             // Ajouter l'activite d'audit
             logger.info(`Projet cree: ${saved._id}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -4683,7 +4683,7 @@ const Mutation = {
                 {
                     ...input,
                     majLe: new Date(),
-                    majPar: context.user?._id
+                    majPar: context.utilisateur?._id
                 },
                 { new: true, runValidators: true, session }
             ).lean();
@@ -4694,7 +4694,7 @@ const Mutation = {
             context.loaders.projetLoader.clear(id);
 
             logger.info(`Projet mis à jour: ${id}`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -4776,7 +4776,7 @@ const Mutation = {
             context.loaders.livrablesByProjetLoader.clear(id);
 
             logger.info(`Projet supprime: ${id}, avec ${deletedCount} livrables`, {
-                userId: context.user?._id,
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -5243,7 +5243,7 @@ const resolvers = {
         _id: "projet123",
         titre: "Projet Test",
         description: "Description du projet",
-        equipe: ["user1"],
+        equipe: ["utilisateur1"],
         tuteur: "tuteur1",
         competences: ["JavaScript"],
         dateDebut: "2025-06-01",
@@ -5257,7 +5257,7 @@ const resolvers = {
         _id: id,
         titre: "Projet " + id,
         description: "Description du projet",
-        equipe: ["user1"],
+        equipe: ["utilisateur1"],
         tuteur: "tuteur1",
         competences: ["JavaScript"],
         dateDebut: "2025-06-01",
@@ -5420,7 +5420,7 @@ async function createStandaloneServer(app, httpServer) {
                     loaders: initLoaders(),
 
                     // Donnees utilisateur et de requete
-                    currentUser: req.currentUser || 'anonyme',
+                    currentutilisateur: req.currentutilisateur || 'anonyme',
                     timestamp: new Date().toISOString()
                 };
             }
@@ -5573,7 +5573,7 @@ function errorHandler(err, req, res, next) {
     params: req.params,
     body: req.body,
     stack: err.stack,
-    user: req.currentUser
+    utilisateur: req.currentutilisateur
   });
 
   // Reponse client
@@ -5860,7 +5860,7 @@ const validateLivrable = (req, res, next) => {
 const checkLivrablePermissions = async (req, res, next) => {
     try {
         // Si l'utilisateur est admin, autoriser toutes les operations
-        if (req.user && req.user.role === 'ADMIN') {
+        if (req.utilisateur && req.utilisateur.role === 'ADMIN') {
             return next();
         }
 
@@ -5879,10 +5879,10 @@ const checkLivrablePermissions = async (req, res, next) => {
         const projet = await Projet.findById(livrable.projetId);
 
         // Verifier si l'utilisateur est le tuteur ou le createur du projet
-        const isTuteur = projet.tuteur.equals(req.user._id);
-        const isProjetCreateur = projet.createur.equals(req.user._id);
-        const isLivrableCreateur = livrable.createur && livrable.createur.equals(req.user._id);
-        const isTeamMember = projet.equipe.some(membre => membre.equals(req.user._id));
+        const isTuteur = projet.tuteur.equals(req.utilisateur._id);
+        const isProjetCreateur = projet.createur.equals(req.utilisateur._id);
+        const isLivrableCreateur = livrable.createur && livrable.createur.equals(req.utilisateur._id);
+        const isTeamMember = projet.equipe.some(membre => membre.equals(req.utilisateur._id));
 
         // Pour les lectures, autoriser l'equipe
         if (req.method === 'GET' && (isTeamMember || isTuteur || isProjetCreateur || isLivrableCreateur)) {
@@ -5894,7 +5894,7 @@ const checkLivrablePermissions = async (req, res, next) => {
             return next();
         }
 
-        // Sinon, refuser l'acces
+        // Sinon, refutilisateur l'acces
         throw new ValidationError(
             'Vous n\'avez pas les autorisations necessaires pour cette operation',
             403
@@ -5940,7 +5940,7 @@ const validateProjet = (schema) => async (req, res, next) => {
             abortEarly: false,
             stripUnknown: true,
             context: {
-                user: req.user,
+                utilisateur: req.utilisateur,
                 operation: req.method === 'POST' ? 'create' : 'update',
                 projetId: req.params.id
             }
@@ -5984,7 +5984,7 @@ const validateProjet = (schema) => async (req, res, next) => {
 const checkProjetPermissions = async (req, res, next) => {
     try {
         // Si l'utilisateur est admin, autoriser toutes les operations
-        if (req.user && req.user.role === 'ADMIN') {
+        if (req.utilisateur && req.utilisateur.role === 'ADMIN') {
             return next();
         }
 
@@ -5998,9 +5998,9 @@ const checkProjetPermissions = async (req, res, next) => {
         }
 
         // Verifier si l'utilisateur est le createur ou le tuteur
-        const isTuteur = projet.tuteur.equals(req.user._id);
-        const isCreateur = projet.createur.equals(req.user._id);
-        const isTeamMember = projet.equipe.some(membre => membre.equals(req.user._id));
+        const isTuteur = projet.tuteur.equals(req.utilisateur._id);
+        const isCreateur = projet.createur.equals(req.utilisateur._id);
+        const isTeamMember = projet.equipe.some(membre => membre.equals(req.utilisateur._id));
 
         // Si c'est un membre de l'equipe et qu'on est en GET, autoriser
         if (req.method === 'GET' && (isTeamMember || isTuteur || isCreateur)) {
@@ -6012,7 +6012,7 @@ const checkProjetPermissions = async (req, res, next) => {
             return next();
         }
 
-        // Sinon, refuser l'acces
+        // Sinon, refutilisateur l'acces
         throw new ValidationError(
             'Vous n\'avez pas les autorisations necessaires pour cette operation',
             403
@@ -6560,7 +6560,7 @@ router.get('/health', (req, res) => {
         status: 'ok',
         service: 'livrables-api',
         timestamp: new Date().toISOString(),
-        user: req.currentUser || 'anonymous'
+        utilisateur: req.currentutilisateur || 'anonymous'
     });
 });
 
@@ -6731,7 +6731,7 @@ router.get('/health', (req, res) => {
     res.status(200).json({
         status: 'ok',
         time: new Date().toISOString(),
-        user: req.currentUser || 'anonymous',
+        utilisateur: req.currentutilisateur || 'anonymous',
         environment: process.env.NODE_ENV || 'development'
     });
 });
@@ -6836,7 +6836,7 @@ async function genererTexte(prompt) {
 
       const response = await client.post('/chat/completions', {
         model: CONFIG.MODEL,
-        messages: [{ role: 'user', content: prompt }],
+        messages: [{ role: 'utilisateur', content: prompt }],
         max_tokens: CONFIG.MAX_TOKENS,
         temperature: CONFIG.TEMPERATURE,
         stream: false,
@@ -7271,7 +7271,7 @@ dotenv.config();
 const client = axios.create({
     timeout: 10000, // 10s timeout
     headers: {
-        'User-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0'
     }
 });
 
@@ -7309,7 +7309,7 @@ async function checkGithubRepoExists(url) {
 
     // Preparer les headers avec token si disponible
     const headers = {
-        'User-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0'
     };
 
     if (CONFIG.GITHUB_TOKEN) {
@@ -7385,7 +7385,7 @@ async function getGithubRepoBranches(url) {
 
     // Preparer les headers
     const headers = {
-        'User-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0'
     };
 
     if (CONFIG.GITHUB_TOKEN) {
@@ -7426,7 +7426,7 @@ async function getGithubRepoCommits(url, limit = 5) {
 
     // Preparer les headers
     const headers = {
-        'User-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0'
     };
 
     if (CONFIG.GITHUB_TOKEN) {
@@ -9090,7 +9090,7 @@ console.log('Demarrage des tests de logs...');
 // Generer des logs pour chaque niveau
 logger.error('Erreur de test critique', { code: 'E001', source: 'test-script' });
 logger.warn('Avertissement de test', { component: 'systeme de fichiers' });
-logger.info('Information de test standard', { user: 'admin' });
+logger.info('Information de test standard', { utilisateur: 'admin' });
 logger.debug('Message de debogage detaille', { data: { id: 123, value: 'test' } });
 
 // Test de la gestion des exceptions
@@ -9104,7 +9104,7 @@ try {
 logger.info('Test avec donnees complexes', {
     utilisateur: {
         id: 1,
-        nom: 'Test User',
+        nom: 'Test utilisateur',
         roles: ['admin', 'developpeur']
     },
     statistiques: {
@@ -9677,7 +9677,7 @@ async function generateNewmanCollection() {
                 type: "default"
             },
             {
-                key: "currentUser",
+                key: "currentutilisateur",
                 value: config.metadata.author,
                 type: "default"
             }
