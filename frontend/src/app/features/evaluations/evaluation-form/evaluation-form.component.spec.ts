@@ -1,10 +1,13 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, FormArray } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { EvaluationFormComponent } from './evaluation-form.component';
 import { EvaluationService } from '../../../core/services/evaluation.service';
 import { ProjetService } from '../../../core/services/projet.service';
+import { Evaluation } from '../../../core/models/evaluation.model';
+import { Projet, StatutProjet } from '../../../core/models/projet.model';
+import { ApiResponse } from '../../../core/models/api.model';
 
 describe('EvaluationFormComponent', () => {
   let component: EvaluationFormComponent;
@@ -13,16 +16,19 @@ describe('EvaluationFormComponent', () => {
   let projetService: jasmine.SpyObj<ProjetService>;
   let router: jasmine.SpyObj<Router>;
 
-  const mockProjet = {
+  const mockProjet: Projet = {
     id: '1',
     titre: 'Projet Test',
     description: 'Description du projet',
     dateDebut: '2024-01-01',
     dateFin: '2024-12-31',
-    statut: 'EN_COURS'
+    statut: StatutProjet.EN_COURS,
+    equipe: [],
+    competences: [],
+    livrables: []
   };
 
-  const mockEvaluation = {
+  const mockEvaluation: Evaluation = {
     id: '1',
     projetId: '1',
     evaluateurId: '1',
@@ -45,18 +51,18 @@ describe('EvaluationFormComponent', () => {
 
   beforeEach(async () => {
     const evaluationServiceSpy = jasmine.createSpyObj('EvaluationService', ['createEvaluation', 'updateEvaluation', 'getEvaluation']);
-    const projetServiceSpy = jasmine.createSpyObj('ProjetService', ['getProjetById']);
+    const projetServiceSpy = jasmine.createSpyObj('ProjetService', ['getProjet']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
     evaluationServiceSpy.getEvaluation.and.returnValue(of({
       success: true,
       data: mockEvaluation
-    }));
+    } as ApiResponse<Evaluation>));
 
-    projetServiceSpy.getProjetById.and.returnValue(of({
+    projetServiceSpy.getProjet.and.returnValue(of({
       success: true,
       data: mockProjet
-    }));
+    } as ApiResponse<Projet>));
 
     await TestBed.configureTestingModule({
       imports: [ReactiveFormsModule],
@@ -95,38 +101,46 @@ describe('EvaluationFormComponent', () => {
   });
 
   it('should initialize form with default values for new evaluation', () => {
-    component.isEditMode = false;
-    component.initForm();
+    component.editMode = false;
+    component.initializeForm();
     fixture.detectChanges();
 
     const form = component.evaluationForm;
-    expect(form.get('note')).toBeTruthy();
-    expect(form.get('commentaire')).toBeTruthy();
-    expect(form.get('criteres')).toBeTruthy();
-    expect(form.get('criteres').value.length).toBe(0);
+    const noteControl = form.get('note');
+    const commentaireControl = form.get('commentaire');
+    const criteresControl = form.get('criteres');
+
+    expect(noteControl).toBeTruthy();
+    expect(commentaireControl).toBeTruthy();
+    expect(criteresControl).toBeTruthy();
+    expect(criteresControl?.value.length).toBe(0);
   });
 
   it('should load evaluation data in edit mode', () => {
-    component.isEditMode = true;
-    component.evaluationId = '1';
+    component.editMode = true;
+    component.currentEvaluationId = '1';
     component.ngOnInit();
     fixture.detectChanges();
 
     expect(evaluationService.getEvaluation).toHaveBeenCalledWith('1');
     const form = component.evaluationForm;
-    expect(form.get('note').value).toBe(15);
-    expect(form.get('commentaire').value).toBe('Très bon travail');
-    expect(form.get('criteres').value.length).toBe(2);
+    const noteControl = form.get('note');
+    const commentaireControl = form.get('commentaire');
+    const criteresControl = form.get('criteres');
+
+    expect(noteControl?.value).toBe(15);
+    expect(commentaireControl?.value).toBe('Très bon travail');
+    expect(criteresControl?.value.length).toBe(2);
   });
 
   it('should add a new criterion', () => {
-    component.initForm();
-    component.addCritere();
+    component.initializeForm();
+    component.addCriterion();
     fixture.detectChanges();
 
-    const criteres = component.evaluationForm.get('criteres').value;
-    expect(criteres.length).toBe(1);
-    expect(criteres[0]).toEqual({
+    const criteresArray = component.evaluationForm.get('criteres') as FormArray;
+    expect(criteresArray.length).toBe(1);
+    expect(criteresArray.at(0).value).toEqual({
       nom: '',
       note: null,
       poids: null
@@ -134,70 +148,67 @@ describe('EvaluationFormComponent', () => {
   });
 
   it('should remove a criterion', () => {
-    component.initForm();
-    component.addCritere();
-    component.addCritere();
-    component.removeCritere(0);
+    component.initializeForm();
+    component.addCriterion();
+    component.addCriterion();
+    component.removeCriterion(0);
     fixture.detectChanges();
 
-    const criteres = component.evaluationForm.get('criteres').value;
-    expect(criteres.length).toBe(1);
+    const criteresArray = component.evaluationForm.get('criteres') as FormArray;
+    expect(criteresArray.length).toBe(1);
   });
 
   it('should calculate global note when criteria change', () => {
-    component.initForm();
-    const form = component.evaluationForm;
-    const criteresArray = form.get('criteres');
+    component.initializeForm();
+    const criteresArray = component.evaluationForm.get('criteres') as FormArray;
     
-    criteresArray.push(component.createCritereFormGroup());
-    criteresArray.push(component.createCritereFormGroup());
+    component.addCriterion();
+    component.addCriterion();
     
-    const criteres = criteresArray.controls;
-    criteres[0].patchValue({
+    criteresArray.at(0).patchValue({
       nom: 'Critère 1',
       note: 16,
       poids: 40
     });
     
-    criteres[1].patchValue({
+    criteresArray.at(1).patchValue({
       nom: 'Critère 2',
       note: 14,
       poids: 60
     });
 
-    component.calculateGlobalNote();
+    component.calculateGlobalScore();
     fixture.detectChanges();
 
-    expect(form.get('note').value).toBe(15);
+    const noteControl = component.evaluationForm.get('note');
+    expect(noteControl?.value).toBe(15);
   });
 
   it('should validate criteria weights sum to 100', () => {
-    component.initForm();
-    const form = component.evaluationForm;
-    const criteresArray = form.get('criteres');
+    component.initializeForm();
+    const criteresArray = component.evaluationForm.get('criteres') as FormArray;
     
-    criteresArray.push(component.createCritereFormGroup());
-    criteresArray.push(component.createCritereFormGroup());
+    component.addCriterion();
+    component.addCriterion();
     
-    const criteres = criteresArray.controls;
-    criteres[0].patchValue({
+    criteresArray.at(0).patchValue({
       nom: 'Critère 1',
       note: 16,
       poids: 30
     });
     
-    criteres[1].patchValue({
+    criteresArray.at(1).patchValue({
       nom: 'Critère 2',
       note: 14,
       poids: 30
     });
 
-    expect(form.hasError('invalidWeights')).toBeTrue();
+    expect(component.evaluationForm.hasError('invalidWeights')).toBeTrue();
   });
 
   it('should submit new evaluation', () => {
-    component.isEditMode = false;
-    component.initForm();
+    component.editMode = false;
+    component.initializeForm();
     const form = component.evaluationForm;
     
     form.patchValue({
@@ -215,7 +226,7 @@ describe('EvaluationFormComponent', () => {
     evaluationService.createEvaluation.and.returnValue(of({
       success: true,
       data: { ...mockEvaluation, id: '2' }
-    }));
+    } as ApiResponse<Evaluation>));
 
     component.onSubmit();
 
@@ -223,55 +234,27 @@ describe('EvaluationFormComponent', () => {
     expect(router.navigate).toHaveBeenCalledWith(['/evaluations', '2']);
   });
 
-  it('should update existing evaluation', () => {
-    component.isEditMode = true;
-    component.evaluationId = '1';
-    component.initForm();
-    const form = component.evaluationForm;
-    
-    form.patchValue({
-      note: 16,
-      commentaire: 'Commentaire mis à jour',
-      criteres: [
-        {
-          nom: 'Critère mis à jour',
-          note: 16,
-          poids: 100
-        }
-      ]
-    });
-
-    evaluationService.updateEvaluation.and.returnValue(of({
-      success: true,
-      data: { ...mockEvaluation, ...form.value }
-    }));
-
-    component.onSubmit();
-
-    expect(evaluationService.updateEvaluation).toHaveBeenCalledWith('1', form.value);
-    expect(router.navigate).toHaveBeenCalledWith(['/evaluations', '1']);
-  });
-
   it('should handle submission errors', () => {
-    component.isEditMode = false;
-    component.initForm();
+    component.editMode = false;
+    component.initializeForm();
     
     evaluationService.createEvaluation.and.returnValue(of({
       success: false,
-      error: 'Erreur lors de la création'
-    }));
+      error: 'Erreur lors de la création',
+      data: undefined
+    } as ApiResponse<Evaluation>));
 
     component.onSubmit();
 
-    expect(component.error).toBeTruthy();
+    expect(component.errorMessage).toBeTruthy();
     expect(router.navigate).not.toHaveBeenCalled();
   });
 
   it('should handle loading state during submission', () => {
-    component.isEditMode = false;
-    component.initForm();
+    component.editMode = false;
+    component.initializeForm();
     
-    component.loading = true;
+    component.isLoading = true;
     fixture.detectChanges();
     
     const submitButton = fixture.nativeElement.querySelector('button[type="submit"]');

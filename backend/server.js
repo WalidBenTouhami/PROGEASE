@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 const logger = require('./src/utils/logger');
 const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
-const { typeDefs } = require('./src/graphql/typeDefs');
+const { typeDefs } = require('./src/graphql/schema');
 const { resolvers } = require('./src/graphql/resolvers');
 const connecterBD = require('./config/db');
 const { NODE_ENV } = require('./config/constants');
@@ -29,7 +29,7 @@ const projetRoutes = require('./src/routes/projet.routes');
 const livrableRoutes = require('./src/routes/livrable.routes');
 const aiRoutes = require('./src/routes/ai.routes');
 const utilisateurRoutes = require('./src/routes/utilisateur.routes');
-const evaluationRouter = require('./src/routers/evaluation.router');
+const evaluationRouter = require('./src/routes/evaluation.router');
 
 // Initialisation des variables principales
 const app = express();

@@ -10,7 +10,8 @@
 const mongoose = require('mongoose');
 const Evaluation = require('../../models/evaluation.model');
 const Projet = require('../../models/projet.model');
-const User = require('../../models/user.model');
+const Livrable = require('../../models/livrable.model');
+const User = require('../../models/utilisateur.model');
 const logger = require('../../utils/logger');
 const { AppError, ERROR_CODES } = require('../../middleware/errorHandlers');
 const { validateInput } = require('../../utils/validators');

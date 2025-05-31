@@ -1,0 +1,37 @@
+<div class="container mx-auto p-4">
+  <div *ngIf="loading" class="loader">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="error" class="bg-red-50 p-4 rounded-lg mb-4">
+    {{ error }}
+  </div>
+
+  <ng-container *ngIf="evaluations$ | async as evaluationsResponse">
+    <div *ngIf="evaluationsResponse.success && evaluationsResponse.data?.length === 0" class="empty-message">
+      Aucune évaluation disponible
+    </div>
+
+    <div *ngIf="evaluationsResponse.success && evaluationsResponse.data" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <mat-card *ngFor="let evaluation of evaluationsResponse.data" class="evaluation-card">
+        <mat-card-header>
+          <mat-card-title>{{ evaluation.projet?.titre || 'Projet sans titre' }}</mat-card-title>
+          <mat-card-subtitle>
+            Par {{ evaluation.evaluateur?.nom }} {{ evaluation.evaluateur?.prenom }}
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="note">{{ evaluation.note }}/20</p>
+          <p class="date">{{ evaluation.dateEvaluation | date:'d MMMM yyyy' }}</p>
+          <p>{{ evaluation.commentaire }}</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button [routerLink]="['/evaluations', evaluation.id]">Détails</button>
+          <button mat-button color="warn" (click)="deleteEvaluation(evaluation.id!)" *ngIf="evaluation.id">
+            Supprimer
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </ng-container>
+</div> 

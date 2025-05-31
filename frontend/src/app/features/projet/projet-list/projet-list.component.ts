@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Projet, StatutProjet } from '../../../core/models/projet.model';
 import { ProjetService } from '../../../core/services/projet.service';
+import { ApiResponse } from '../../../core/models/api.model';
 
 @Component({
   selector: 'app-projet-list',
@@ -98,10 +99,14 @@ export class ProjetListComponent implements OnInit {
 
   loadProjets() {
     this.projetService.getProjets().subscribe({
-      next: (projets) => {
-        this.dataSource.data = projets;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
+      next: (response: ApiResponse<Projet[]>) => {
+        if (response.success && response.data) {
+          this.dataSource.data = response.data;
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+        } else {
+          console.error('Error loading projets: No data received');
+        }
       },
       error: (err) => {
         console.error('Error loading projets:', err);

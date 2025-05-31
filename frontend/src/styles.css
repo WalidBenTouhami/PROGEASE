@@ -3,6 +3,12 @@
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles below */
+
 :root {
   --primary-color: #18223a;
   --secondary-color: #151b2b;

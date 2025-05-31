@@ -1,6 +1,6 @@
 const axios = require('axios');
 
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const testAPI = async () => {
     try {

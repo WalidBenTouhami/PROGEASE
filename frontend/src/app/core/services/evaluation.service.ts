@@ -3,41 +3,8 @@ import { Apollo } from 'apollo-angular';
 import { gql } from 'apollo-angular';
 import { map, Observable, catchError, throwError } from 'rxjs';
 import { Evaluation, EvaluationStats, UpdateEvaluationInput, EvaluationCritere, Projet, User, CreateEvaluationInput } from '../models/evaluation.model';
-
-type ApiResponse<T> = {
-  success: boolean;
-  data: T;
-};
-
-const GET_EVALUATIONS = gql`
-  query GetEvaluations($projetId: ID) {
-    evaluations(projetId: $projetId) {
-      id
-      projetId
-      evaluateurId
-      note
-      commentaire
-      criteres {
-        nom
-        note
-        poids
-      }
-      dateEvaluation
-      creeLe
-      majLe
-      projet {
-        id
-        titre
-        description
-      }
-      evaluateur {
-        id
-        nom
-        prenom
-      }
-    }
-  }
-`;
+import { ApiResponse } from '../models/api.model';
+import { GET_EVALUATIONS, DELETE_EVALUATION } from './graphql/evaluation.queries';
 
 const GET_EVALUATION = gql`
   query GetEvaluation($id: ID!) {
@@ -98,14 +65,6 @@ const UPDATE_EVALUATION = gql`
   }
 `;
 
-const DELETE_EVALUATION = gql`
-  mutation DeleteEvaluation($id: ID!) {
-    deleteEvaluation(id: $id) {
-      id
-    }
-  }
-`;
-
 const CREATE_EVALUATION = gql`
   mutation CreateEvaluation($input: CreateEvaluationInput!) {
     createEvaluation(input: $input) {
@@ -136,28 +95,40 @@ const CREATE_EVALUATION = gql`
   }
 `;
 
+interface EvaluationsQueryResponse {
+  evaluations: Evaluation[];
+}
+
+interface DeleteEvaluationMutationResponse {
+  deleteEvaluation: {
+    id: string;
+  };
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class EvaluationService {
   constructor(private apollo: Apollo) {}
 
-  getEvaluations(projetId?: string): Observable<ApiResponse<Evaluation[]>> {
-    return this.apollo
-      .watchQuery<{ evaluations: Evaluation[] }>({
-        query: GET_EVALUATIONS,
-        variables: projetId && projetId !== 'ALL' ? { projetId } : {},
+  getEvaluations(filters?: { projetId?: string; evaluateurId?: string }): Observable<ApiResponse<Evaluation[]>> {
+    return this.apollo.query<EvaluationsQueryResponse>({
+      query: GET_EVALUATIONS,
+      variables: { ...filters }
+    }).pipe(
+      map(result => ({
+        success: true,
+        data: result.data.evaluations
+      })),
+      catchError(error => {
+        console.error('Erreur lors du chargement des évaluations:', error);
+        return throwError(() => ({
+          success: false,
+          data: [],
+          error: error.message || 'Une erreur est survenue lors du chargement des évaluations'
+        }));
       })
-      .valueChanges.pipe(
-        map((result) => ({
-          success: true,
-          data: result.data.evaluations
-        })),
-        catchError((error) => {
-          console.error('Erreur lors du chargement des évaluations:', error);
-          return throwError(() => new Error('Impossible de charger les évaluations.'));
-        })
-      );
+    );
   }
 
   getEvaluation(id: string): Observable<ApiResponse<Evaluation>> {
@@ -205,29 +176,23 @@ export class EvaluationService {
   }
 
   deleteEvaluation(id: string): Observable<ApiResponse<string>> {
-    return this.apollo
-      .mutate<{ deleteEvaluation: { id: string } }>({
-        mutation: DELETE_EVALUATION,
-        variables: { id },
-        refetchQueries: [
-          { query: GET_EVALUATIONS }
-        ]
+    return this.apollo.mutate<DeleteEvaluationMutationResponse>({
+      mutation: DELETE_EVALUATION,
+      variables: { id }
+    }).pipe(
+      map(result => ({
+        success: true,
+        data: id
+      })),
+      catchError(error => {
+        console.error('Erreur lors de la suppression:', error);
+        return throwError(() => ({
+          success: false,
+          data: id,
+          error: error.message || 'Une erreur est survenue lors de la suppression'
+        }));
       })
-      .pipe(
-        map(result => {
-          if (!result.data) {
-            throw new Error('Aucune donnée retournée par la mutation');
-          }
-          return {
-            success: true,
-            data: result.data.deleteEvaluation.id
-          };
-        }),
-        catchError((error) => {
-          console.error('Erreur lors de la suppression de l\'évaluation:', error);
-          return throwError(() => new Error('Impossible de supprimer l\'évaluation'));
-        })
-      );
+    );
   }
 
   getEvaluationStats(projetId: string): Observable<ApiResponse<EvaluationStats>> {

@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { Livrable, StatutLivrable } from '../../../core/models/livrable.model';
 import { LivrableService } from '../../../core/services/livrable.service';
+import { ApiResponse } from '../../../core/models/api.model';
 
 @Component({
   selector: 'app-livrable-list',
@@ -93,10 +94,14 @@ export class LivrableListComponent implements OnInit {
 
   loadLivrables() {
     this.livrableService.getLivrables().subscribe({
-      next: (livrables) => {
-        this.dataSource.data = livrables;
-        this.dataSource.paginator = this.paginator;
-        this.dataSource.sort = this.sort;
+      next: (response: ApiResponse<Livrable[]>) => {
+        if (response.success && response.data) {
+          this.dataSource.data = response.data;
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.sort;
+        } else {
+          console.error('Error loading livrables: No data received');
+        }
       },
       error: (err) => {
         console.error('Error loading livrables:', err);

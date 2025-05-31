@@ -27,7 +27,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.15.1",
     "nodemailer": "^7.0.3",
-    "pdfkit": "^0.17.1"
+    "pdfkit": "^0.17.1",
+    "tailwindcss": "^3.4.17"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^18.2.0",

@@ -6,6 +6,7 @@ import { LivrableService } from '../../services/livrable.service';
 import { AlertService } from '../../services/atert.service';
 import { Projet, StatutProjet, CreateProjetInput, UpdateProjetInput } from '../../models/projet.model';
 import { Livrable, StatutLivrable, CreateLivrableInput, UpdateLivrableInput } from '../../models/livrable.model';
+import { ApiResponse } from '../../models/api.model';
 
 @Component({
   selector: 'app-api-tester',
@@ -126,9 +127,13 @@ export class ApiTesterComponent implements OnInit {
   // CRUD Projets
   getAllProjets() {
     this.projetService.getProjets().subscribe({
-      next: (projets: Projet[]) => {
-        this.projets = projets;
-        this.alertService.success('Projets récupérés avec succès');
+      next: (response: ApiResponse<Projet[]>) => {
+        if (response.success && response.data) {
+          this.projets = response.data;
+          this.alertService.success('Projets récupérés avec succès');
+        } else {
+          this.alertService.error('Erreur lors de la récupération des projets');
+        }
       },
       error: (error: Error) => this.alertService.error('Erreur lors de la récupération des projets')
     });
@@ -148,9 +153,13 @@ export class ApiTesterComponent implements OnInit {
     };
 
     this.projetService.createProjet(newProjet).subscribe({
-      next: () => {
-        this.alertService.success('Projet créé avec succès');
-        this.getAllProjets();
+      next: (response: ApiResponse<Projet>) => {
+        if (response.success) {
+          this.alertService.success('Projet créé avec succès');
+          this.getAllProjets();
+        } else {
+          this.alertService.error('Erreur lors de la création du projet');
+        }
       },
       error: (error: Error) => this.alertService.error('Erreur lors de la création du projet')
     });
@@ -172,9 +181,13 @@ export class ApiTesterComponent implements OnInit {
     };
 
     this.projetService.updateProjet(this.selectedProjet.id, updatedProjet).subscribe({
-      next: () => {
-        this.alertService.success('Projet mis à jour avec succès');
-        this.getAllProjets();
+      next: (response: ApiResponse<Projet>) => {
+        if (response.success) {
+          this.alertService.success('Projet mis à jour avec succès');
+          this.getAllProjets();
+        } else {
+          this.alertService.error('Erreur lors de la mise à jour du projet');
+        }
       },
       error: (error: Error) => this.alertService.error('Erreur lors de la mise à jour du projet')
     });
@@ -184,10 +197,14 @@ export class ApiTesterComponent implements OnInit {
     if (!this.selectedProjet?.id) return;
 
     this.projetService.deleteProjet(this.selectedProjet.id).subscribe({
-      next: () => {
-        this.alertService.success('Projet supprimé avec succès');
-        this.selectedProjet = null;
-        this.getAllProjets();
+      next: (response: ApiResponse<string>) => {
+        if (response.success) {
+          this.alertService.success('Projet supprimé avec succès');
+          this.selectedProjet = null;
+          this.getAllProjets();
+        } else {
+          this.alertService.error('Erreur lors de la suppression du projet');
+        }
       },
       error: (error: Error) => this.alertService.error('Erreur lors de la suppression du projet')
     });
@@ -196,9 +213,13 @@ export class ApiTesterComponent implements OnInit {
   // CRUD Livrables
   getAllLivrables() {
     this.livrableService.getLivrables().subscribe({
-      next: (livrables: Livrable[]) => {
-        this.livrables = livrables;
-        this.alertService.success('Livrables récupérés avec succès');
+      next: (response: ApiResponse<Livrable[]>) => {
+        if (response.success && response.data) {
+          this.livrables = response.data;
+          this.alertService.success('Livrables récupérés avec succès');
+        } else {
+          this.alertService.error('Erreur lors de la récupération des livrables');
+        }
       },
       error: (error: Error) => this.alertService.error('Erreur lors de la récupération des livrables')
     });
@@ -206,9 +227,13 @@ export class ApiTesterComponent implements OnInit {
 
   getLivrablesForProject(projetId: string) {
     this.livrableService.getLivrablesByProjet(projetId).subscribe({
-      next: (livrables: Livrable[]) => {
-        this.livrables = livrables;
-        this.alertService.success('Livrables du projet récupérés avec succès');
+      next: (response: ApiResponse<Livrable[]>) => {
+        if (response.success && response.data) {
+          this.livrables = response.data;
+          this.alertService.success('Livrables du projet récupérés avec succès');
+        } else {
+          this.alertService.error('Erreur lors de la récupération des livrables du projet');
+        }
       },
       error: (error: Error) => this.alertService.error('Erreur lors de la récupération des livrables du projet')
     });
@@ -227,9 +252,13 @@ export class ApiTesterComponent implements OnInit {
     };
 
     this.livrableService.createLivrable(newLivrable).subscribe({
-      next: () => {
-        this.alertService.success('Livrable créé avec succès');
-        this.getLivrablesForProject(this.selectedProjet!.id!);
+      next: (response: ApiResponse<Livrable>) => {
+        if (response.success) {
+          this.alertService.success('Livrable créé avec succès');
+          this.getLivrablesForProject(this.selectedProjet!.id!);
+        } else {
+          this.alertService.error('Erreur lors de la création du livrable');
+        }
       },
       error: (error: Error) => this.alertService.error('Erreur lors de la création du livrable')
     });
@@ -249,10 +278,14 @@ export class ApiTesterComponent implements OnInit {
     };
 
     this.livrableService.updateLivrable(this.selectedLivrable.id, updatedLivrable).subscribe({
-      next: () => {
-        this.alertService.success('Livrable mis à jour avec succès');
-        if (this.selectedProjet?.id) {
-          this.getLivrablesForProject(this.selectedProjet.id);
+      next: (response: ApiResponse<Livrable>) => {
+        if (response.success) {
+          this.alertService.success('Livrable mis à jour avec succès');
+          if (this.selectedProjet?.id) {
+            this.getLivrablesForProject(this.selectedProjet.id);
+          }
+        } else {
+          this.alertService.error('Erreur lors de la mise à jour du livrable');
         }
       },
       error: (error: Error) => this.alertService.error('Erreur lors de la mise à jour du livrable')
@@ -263,11 +296,15 @@ export class ApiTesterComponent implements OnInit {
     if (!this.selectedLivrable?.id) return;
 
     this.livrableService.deleteLivrable(this.selectedLivrable.id).subscribe({
-      next: () => {
-        this.alertService.success('Livrable supprimé avec succès');
-        this.selectedLivrable = null;
-        if (this.selectedProjet?.id) {
-          this.getLivrablesForProject(this.selectedProjet.id);
+      next: (response: ApiResponse<boolean>) => {
+        if (response.success) {
+          this.alertService.success('Livrable supprimé avec succès');
+          this.selectedLivrable = null;
+          if (this.selectedProjet?.id) {
+            this.getLivrablesForProject(this.selectedProjet.id);
+          }
+        } else {
+          this.alertService.error('Erreur lors de la suppression du livrable');
         }
       },
       error: (error: Error) => this.alertService.error('Erreur lors de la suppression du livrable')

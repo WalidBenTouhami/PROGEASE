@@ -1,7 +1,7 @@
 const Projet = require('../models/projet.model');
 const Livrable = require('../models/livrable.model');
 const Evaluation = require('../models/evaluation.model');
-const User = require('../models/user.model');
+const User = require('../models/utilisateur.model');
 const { generateAIAnalysis, predictPerformance, generateLearningRecommendations } = require('../services/ai.service');
 const { GraphQLScalarType, Kind } = require('graphql');
 const aiResolver = require('./resolvers/ai.resolver');

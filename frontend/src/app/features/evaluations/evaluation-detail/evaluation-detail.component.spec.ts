@@ -4,13 +4,14 @@ import { of } from 'rxjs';
 import { EvaluationDetailComponent } from './evaluation-detail.component';
 import { EvaluationService } from '../../../core/services/evaluation.service';
 import { CommonModule } from '@angular/common';
+import { Evaluation } from '../../../core/models/evaluation.model';
 
 describe('EvaluationDetailComponent', () => {
   let component: EvaluationDetailComponent;
   let fixture: ComponentFixture<EvaluationDetailComponent>;
   let evaluationService: jasmine.SpyObj<EvaluationService>;
 
-  const mockEvaluation = {
+  const mockEvaluation: Evaluation = {
     id: '1',
     projetId: '1',
     evaluateurId: '1',
@@ -84,16 +85,19 @@ describe('EvaluationDetailComponent', () => {
   });
 
   it('should display evaluation details', () => {
-    const compiled = fixture.nativeElement;
+    const compiled = fixture.nativeElement as HTMLElement;
     
     // Vérifier le titre du projet
-    expect(compiled.querySelector('h2').textContent).toContain('Projet Test');
+    const title = compiled.querySelector('h2');
+    expect(title?.textContent).toContain('Projet Test');
     
     // Vérifier le nom de l'évaluateur
-    expect(compiled.querySelector('p').textContent).toContain('John Doe');
+    const evaluateur = compiled.querySelector('p');
+    expect(evaluateur?.textContent).toContain('John Doe');
     
     // Vérifier la note globale
-    expect(compiled.querySelector('.text-3xl').textContent).toContain('15/20');
+    const note = compiled.querySelector('.text-3xl');
+    expect(note?.textContent).toContain('15/20');
     
     // Vérifier les critères
     const criteres = compiled.querySelectorAll('.border-b');
@@ -110,10 +114,12 @@ describe('EvaluationDetailComponent', () => {
     expect(criteres[1].textContent).toContain('60%');
     
     // Vérifier le commentaire
-    expect(compiled.querySelector('.whitespace-pre-line').textContent).toContain('Très bon travail');
+    const commentaire = compiled.querySelector('.whitespace-pre-line');
+    expect(commentaire?.textContent).toContain('Très bon travail');
     
     // Vérifier la date
-    expect(compiled.querySelector('.text-gray-500').textContent).toContain('15 mars 2024');
+    const date = compiled.querySelector('.text-gray-500');
+    expect(date?.textContent).toContain('15 mars 2024');
   });
 
   it('should handle loading state', () => {

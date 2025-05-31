@@ -8,6 +8,7 @@ import { Livrable, StatutLivrable } from '../models/livrable.model';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Apollo } from 'apollo-angular';
 import { of } from 'rxjs';
+import { CreateProjetInput } from '../models/projet.input';
 
 describe('ProjetService Integration Tests', () => {
   let projetService: ProjetService;
@@ -17,20 +18,21 @@ describe('ProjetService Integration Tests', () => {
 
   const apiUrl = `${environment.apiUrl}/projets`;
 
-  const mockProjet: Projet & { _id: string } = {
-    _id: '1',
+  const mockProjet: Projet = {
+    id: '1',
     titre: 'Projet Test',
     description: 'Description du projet test',
-    dateDebut: new Date('2024-01-01'),
-    dateFin: new Date('2024-12-31'),
+    dateDebut: '2024-01-01',
+    dateFin: '2024-12-31',
     statut: StatutProjet.EN_COURS,
     equipe: ['utilisateur1', 'utilisateur2'],
     tuteur: 'tuteur1',
     competences: ['Angular', 'Node.js'],
     progression: 0,
-    creeLe: new Date(),
-    majLe: new Date(),
-    livrables: ['1', '2']
+    creeLe: '2024-01-01',
+    majLe: '2024-01-01',
+    livrables: ['1', '2'],
+    responsableId: 'resp1'
   };
 
   const mockLivrables: Livrable[] = [
@@ -59,7 +61,11 @@ describe('ProjetService Integration Tests', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [HttpClientTestingModule],
-      providers: [ProjetService, LivrableService, { provide: Apollo, useValue: jasmine.createSpyObj('Apollo', ['watchQuery', 'mutate'])}]
+      providers: [
+        ProjetService,
+        LivrableService,
+        { provide: Apollo, useValue: jasmine.createSpyObj('Apollo', ['watchQuery', 'mutate']) }
+      ]
     });
 
     projetService = TestBed.inject(ProjetService);
@@ -78,28 +84,29 @@ describe('ProjetService Integration Tests', () => {
   });
 
   it('should retrieve a project with its deliverables', fakeAsync(() => {
-    projetService.recupererProjetParId('1').subscribe(projet => {
-      expect(projet._id).toBe('1');
-      expect(projet.titre).toBe('Projet Test');
-      expect(projet.livrables.length).toBe(2);
+    projetService.getProjet('1').subscribe((response) => {
+      expect(response.data.id).toBe('1');
+      expect(response.data.titre).toBe('Projet Test');
+      expect(response.data.livrables.length).toBe(2);
     });
 
     const projetReq = httpMock.expectOne(`${apiUrl}/1`);
     expect(projetReq.request.method).toBe('GET');
-    projetReq.flush(mockProjet);
+    projetReq.flush({ data: mockProjet });
   }));
 
   it('should create a project and its deliverables', fakeAsync(() => {
-    const { _id, ...nouveauProjet } = { ...mockProjet };
+    const { id, creeLe, majLe, ...nouveauProjet } = { ...mockProjet };
+    const createInput: CreateProjetInput = nouveauProjet;
 
-    projetService.creerProjet(nouveauProjet).subscribe(projet => {
-      expect(projet._id).toBeDefined();
-      expect(projet.titre).toBe('Projet Test');
+    projetService.createProjet(createInput).subscribe((response) => {
+      expect(response.data.id).toBeDefined();
+      expect(response.data.titre).toBe('Projet Test');
     });
 
     const req = httpMock.expectOne(apiUrl);
     expect(req.request.method).toBe('POST');
-    req.flush({ ...mockProjet });
+    req.flush({ data: mockProjet });
   }));
 
   it('should update a project and its deliverables', fakeAsync(() => {
@@ -123,10 +130,10 @@ describe('ProjetService Integration Tests', () => {
       ]
     };
 
-    projetService.recupererProjetParId('1').subscribe(projet => {
-      expect(projet.progression).toBeDefined();
-      if (projet.progression) {
-        expect(projet.progression).toBe(50); // 1 terminé sur 2 livrables
+    projetService.getProjet('1').subscribe(projet => {
+      expect(projet.data.progression).toBeDefined();
+      if (projet.data.progression) {
+        expect(projet.data.progression).toBe(50); // 1 terminé sur 2 livrables
       }
     });
 
@@ -136,7 +143,7 @@ describe('ProjetService Integration Tests', () => {
   }));
 
   it('should handle project not found error', fakeAsync(() => {
-    projetService.recupererProjetParId('999').subscribe({
+    projetService.getProjet('999').subscribe({
       error: (error) => {
         expect(error.status).toBe(404);
         expect(error.error).toBe('Projet non trouvé');
@@ -149,7 +156,7 @@ describe('ProjetService Integration Tests', () => {
   }));
 
   it('should handle server errors gracefully', fakeAsync(() => {
-    projetService.recupererProjets().subscribe({
+    projetService.getProjets().subscribe({
       error: (error) => {
         expect(error.status).toBe(500);
         expect(error.error).toBe('Erreur serveur');
@@ -162,7 +169,7 @@ describe('ProjetService Integration Tests', () => {
   }));
 
   it('should handle timeout error', (done) => {
-    projetService.recupererProjets().subscribe({
+    projetService.getProjets().subscribe({
       error: (error) => {
         expect(error instanceof HttpErrorResponse).toBeTruthy();
         expect(error.error instanceof ErrorEvent).toBeTruthy();
@@ -213,7 +220,7 @@ describe('ProjetService Error Handling', () => {
 
   describe('Error Handling', () => {
     it('should handle 404 error when project not found', (done) => {
-      projetService.recupererProjetParId('999').subscribe({
+      projetService.getProjet('999').subscribe({
         error: (error) => {
           expect(error.status).toBe(404);
           expect(error.error).toBe('Projet non trouvé');
@@ -240,7 +247,7 @@ describe('ProjetService Error Handling', () => {
         majLe: new Date()
       };
 
-      projetService.creerProjet(invalidProjet as Projet).subscribe({
+      projetService.createProjet(invalidProjet as Projet).subscribe({
         error: (error) => {
           expect(error.status).toBe(400);
           expect(error.error).toBe('Données de projet invalides');
@@ -253,7 +260,7 @@ describe('ProjetService Error Handling', () => {
     });
 
     it('should handle 500 server error', (done) => {
-      projetService.recupererProjets().subscribe({
+      projetService.getProjets().subscribe({
         error: (error) => {
           expect(error.status).toBe(500);
           expect(error.error).toBe('Erreur serveur interne');
@@ -266,7 +273,7 @@ describe('ProjetService Error Handling', () => {
     });
 
     it('should handle network error', (done) => {
-      projetService.recupererProjets().subscribe({
+      projetService.getProjets().subscribe({
         error: (error) => {
           expect(error.status).toBe(0);
           expect(error.statusText).toBe('Unknown Error');
@@ -281,7 +288,7 @@ describe('ProjetService Error Handling', () => {
     });
 
     it('should handle unauthorized error', (done) => {
-      projetService.recupererProjets().subscribe({
+      projetService.getProjets().subscribe({
         error: (error) => {
           expect(error.status).toBe(401);
           expect(error.error).toBe('Non autorisé');
@@ -294,7 +301,7 @@ describe('ProjetService Error Handling', () => {
     });
 
     it('should handle forbidden error', (done) => {
-      projetService.recupererProjets().subscribe({
+      projetService.getProjets().subscribe({
         error: (error) => {
           expect(error.status).toBe(403);
           expect(error.error).toBe('Accès interdit');
@@ -338,7 +345,7 @@ describe('ProjetService Error Handling', () => {
     });
 
     it('should handle invalid ID format', (done) => {
-      projetService.recupererProjetParId('invalid-id').subscribe({
+      projetService.getProjet('invalid-id').subscribe({
         error: (error) => {
           expect(error.status).toBe(400);
           expect(error.error).toBe('Format d\'ID invalide');
@@ -417,7 +424,7 @@ describe('ProjetService', () => {
     });
   });
 
-  describe('getProjetById', () => {
+  describe('getProjet', () => {
     it('should return a projet by id', (done) => {
       const response = {
         data: {
@@ -429,7 +436,7 @@ describe('ProjetService', () => {
         valueChanges: of(response)
       } as any);
 
-      service.getProjetById('1').subscribe(result => {
+      service.getProjet('1').subscribe(result => {
         expect(result.data).toEqual(mockProjet);
         expect(result.success).toBeTrue();
         done();
@@ -445,7 +452,7 @@ describe('ProjetService', () => {
         })
       } as any);
 
-      service.getProjetById('999').subscribe(result => {
+      service.getProjet('999').subscribe(result => {
         expect(result.success).toBeFalse();
         expect(result.error).toBeTruthy();
         done();

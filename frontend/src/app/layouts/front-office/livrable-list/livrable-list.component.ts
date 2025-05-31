@@ -20,6 +20,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { AlertService } from '../../../core/services/atert.service';
 import { MatDialog } from '@angular/material/dialog';
 import { ThemePalette } from '@angular/material/core';
+import { ApiResponse } from '../../../core/models/api.model';
 
 @Component({
   selector: 'app-livrable-list',
@@ -156,9 +157,14 @@ export class LivrableListComponent implements OnInit {
   loadLivrables() {
     this.chargement = true;
     this.livrableService.getLivrables().subscribe({
-      next: (livrables) => {
-        this.livrables = livrables;
-        this.filterLivrables();
+      next: (response: ApiResponse<Livrable[]>) => {
+        if (response.success && response.data) {
+          this.livrables = response.data;
+          this.filterLivrables();
+        } else {
+          this.alertService.error('Erreur lors du chargement des livrables');
+          this.erreur = "Erreur lors du chargement des livrables.";
+        }
         this.chargement = false;
       },
       error: (error) => {
@@ -173,9 +179,14 @@ export class LivrableListComponent implements OnInit {
   loadLivrablesForProject() {
     this.chargement = true;
     this.livrableService.getLivrablesByProjet(this.projetId).subscribe({
-      next: (livrables) => {
-        this.livrables = livrables;
-        this.filterLivrables();
+      next: (response: ApiResponse<Livrable[]>) => {
+        if (response.success && response.data) {
+          this.livrables = response.data;
+          this.filterLivrables();
+        } else {
+          this.alertService.error('Erreur lors du chargement des livrables');
+          this.erreur = "Erreur lors du chargement des livrables.";
+        }
         this.chargement = false;
       },
       error: (error) => {
@@ -219,12 +230,16 @@ export class LivrableListComponent implements OnInit {
 
     if (confirm('Êtes-vous sûr de vouloir supprimer ce livrable ?')) {
       this.livrableService.deleteLivrable(livrable.id).subscribe({
-        next: () => {
-          this.alertService.success('Livrable supprimé avec succès');
-          if (this.projetId) {
-            this.loadLivrablesForProject();
+        next: (response: ApiResponse<boolean>) => {
+          if (response.success) {
+            this.alertService.success('Livrable supprimé avec succès');
+            if (this.projetId) {
+              this.loadLivrablesForProject();
+            } else {
+              this.loadLivrables();
+            }
           } else {
-            this.loadLivrables();
+            this.alertService.error('Erreur lors de la suppression du livrable');
           }
         },
         error: (error) => {

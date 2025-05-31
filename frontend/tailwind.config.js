@@ -3,7 +3,6 @@ module.exports = {
   content: [
     "./src/**/*.{html,ts}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -38,7 +37,7 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/forms'),
-    require('@tailwindcss/typography')
+    require('@tailwindcss/typography'),
   ],
   corePlugins: {
     preflight: false,
