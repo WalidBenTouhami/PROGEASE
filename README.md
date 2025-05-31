@@ -27,7 +27,7 @@ This section presents a detailed audit of the PROGEASE codebase, covering archit
 #### a. Security
 - Uses `helmet` for HTTP headers, CORS with environment-based origins, and global rate limiting.
 - Environment variables are validated; sensitive data is never exposed in logs.
-- Password policy and JWT session config are present (verify user/auth endpoints).
+- Password policy and JWT session config are present (verify utilisateur/auth endpoints).
 
 #### b. Error Handling & Logging
 - Centralized error handling for HTTP, process, and GraphQL errors, with custom `winston` logger.
@@ -36,7 +36,7 @@ This section presents a detailed audit of the PROGEASE codebase, covering archit
 
 #### c. Validation
 - Input validation via `yup` and `express-validator`.
-- Mongoose validation mapped to user-friendly errors.
+- Mongoose validation mapped to utilisateur-friendly errors.
 
 #### d. API Design
 - REST and GraphQL supported, with aligned models and endpoints.
@@ -77,7 +77,7 @@ This section presents a detailed audit of the PROGEASE codebase, covering archit
 - Auto-generated API docs, easy onboarding for new contributors.
 
 ### 6. Potential Gaps & Recommendations
-- **User Authentication**: JWT and password policy are configured, but explicit user registration/login endpoints and UI should be verified.
+- **utilisateur Authentication**: JWT and password policy are configured, but explicit utilisateur registration/login endpoints and UI should be verified.
 - **Authorization Middleware**: Ensure all sensitive routes are protected in both REST and GraphQL.
 - **E2E Testing**: Consider adding Cypress or Playwright for full-stack E2E tests.
 - **Secrets Management**: Use environment variables or a secrets manager in production.
@@ -97,7 +97,7 @@ This section presents a detailed audit of the PROGEASE codebase, covering archit
 | **Docs/Onboarding** | ✅ Excellent| Root/Frontend README, auto API docs, clear scripts                     |
 | **UI/UX**           | ✅ Modern   | Responsive, branded, modular templates                                |
 | **DevOps**          | ✅ Complete | CI/CD, badges, artifacts, codegen, test automation                    |
-| **Potential Gaps**  | ⚠️ Review  | Explicit user auth flows, E2E tests, a11y, production secrets          |
+| **Potential Gaps**  | ⚠️ Review  | Explicit utilisateur auth flows, E2E tests, a11y, production secrets          |
 
 ---
 

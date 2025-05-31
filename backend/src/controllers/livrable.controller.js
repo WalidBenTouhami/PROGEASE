@@ -155,7 +155,7 @@ exports.create = async (req, res) => {
         logger.monitoring('Livrable cree', {
             livrableId: nouveauLivrable._id,
             projetId: nouveauLivrable.projetId,
-            user: req.user?.id
+            utilisateur: req.utilisateur?.id
         });
 
         res.status(201).json({
@@ -214,7 +214,7 @@ exports.update = async (req, res) => {
         logger.monitoring('Livrable mis à jour', {
             livrableId,
             projetId: livrable.projetId,
-            user: req.user?.id
+            utilisateur: req.utilisateur?.id
         });
 
         res.status(200).json({
@@ -260,7 +260,7 @@ exports.delete = async (req, res) => {
         logger.monitoring('Livrable supprime', {
             livrableId,
             projetId: livrable.projetId,
-            user: req.user?.id
+            utilisateur: req.utilisateur?.id
         });
 
         res.status(200).json({

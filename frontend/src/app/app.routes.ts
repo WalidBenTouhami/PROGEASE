@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { ApiTestComponent } from './core/api-test/api-test.component';
+import { ApiTesterComponent } from './core/components/api-tester/api-tester.component';
 
 export const routes: Routes = [
   {
@@ -34,5 +35,9 @@ export const routes: Routes = [
   {
     path: '**',
     redirectTo: 'front-office'
-  }
+  },
+  {
+    path: 'api-test',
+    component: ApiTesterComponent
+  },
 ];

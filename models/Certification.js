@@ -16,7 +16,7 @@ const certificatSchema = new mongoose.Schema({
   dateemission: { type: Date, default: Date.now },
   utilisateurId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",  // Assurez-vous que le modèle User existe
+    ref: "utilisateur",  // Assurez-vous que le modèle utilisateur existe
     required: true
   }
 });

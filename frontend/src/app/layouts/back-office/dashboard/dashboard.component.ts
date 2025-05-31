@@ -66,7 +66,15 @@ export class BackOfficeDashboardComponent implements OnInit {
     projetsEnRetard: 0
   };
 
-  constructor() {}
+  constructor() {
+    // Initialiser les statistiques avec des valeurs par défaut
+    this.statistiques = {
+      totalProjets: 15,
+      projetsActifs: 8,
+      projetsTermines: 5,
+      projetsEnRetard: 2
+    };
+  }
 
   ngOnInit() {
     // Initialize dashboard data
@@ -80,12 +88,6 @@ export class BackOfficeDashboardComponent implements OnInit {
 
     // Simuler un chargement des données
     setTimeout(() => {
-      this.statistiques = {
-        totalProjets: 15,
-        projetsActifs: 8,
-        projetsTermines: 5,
-        projetsEnRetard: 2
-      };
       this.chargement = false;
     }, 1000);
   }

@@ -10,7 +10,7 @@ import { environment } from '../../../environments/environment';
 export class AuthService {
   private readonly API_URL = `${environment.apiUrl}/auth`;
   private readonly TOKEN_KEY = 'auth_token';
-  private readonly USER_KEY = 'user_data';
+  private readonly utilisateur_KEY = 'utilisateur_data';
 
   constructor(private http: HttpClient) {}
 
@@ -19,7 +19,7 @@ export class AuthService {
       tap((response: any) => {
         if (response.token) {
           localStorage.setItem(this.TOKEN_KEY, response.token);
-          localStorage.setItem(this.USER_KEY, JSON.stringify(response.user));
+          localStorage.setItem(this.utilisateur_KEY, JSON.stringify(response.utilisateur));
         }
       })
     );
@@ -29,7 +29,7 @@ export class AuthService {
     return new Observable(subscriber => {
       try {
         localStorage.removeItem(this.TOKEN_KEY);
-        localStorage.removeItem(this.USER_KEY);
+        localStorage.removeItem(this.utilisateur_KEY);
         subscriber.next();
         subscriber.complete();
       } catch (error) {
@@ -46,8 +46,8 @@ export class AuthService {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  getCurrentUser(): any {
-    const userData = localStorage.getItem(this.USER_KEY);
-    return userData ? JSON.parse(userData) : null;
+  getCurrentutilisateur(): any {
+    const utilisateurData = localStorage.getItem(this.utilisateur_KEY);
+    return utilisateurData ? JSON.parse(utilisateurData) : null;
   }
-} 
+}

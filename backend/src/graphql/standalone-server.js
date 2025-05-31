@@ -32,7 +32,7 @@ async function createStandaloneServer(app, httpServer, schema) {
             '/graphql',
             expressMiddleware(server, {
                 context: async ({ req }) => ({
-                    currentUser: req.currentUser,
+                    currentutilisateur: req.currentutilisateur,
                     timestamp: req.timestamp
                 })
             })

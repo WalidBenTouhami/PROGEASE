@@ -93,7 +93,7 @@ function createApolloMiddleware(server, options = {}) {
             const context = {
                 // Metadonnees de requete pour le traçage et le debogage
                 ip: req.ip || req.connection?.remoteAddress,
-                userAgent: req.headers['user-agent'],
+                utilisateurAgent: req.headers['utilisateur-agent'],
 
                 // Ajout de l'objet requete pour acceder aux headers
                 req,

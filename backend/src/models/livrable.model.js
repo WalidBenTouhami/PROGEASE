@@ -3,12 +3,12 @@ const { Schema } = mongoose;
 const { Enums } = require('../../config/constants');
 
 const livrableSchema = new Schema({
-    titre: {
+    intitule: {
         type: String,
-        required: [true, 'Le titre du livrable est requis.'],
+        required: [true, 'L\'intitulé du livrable est requis.'],
         trim: true,
-        minlength: [5, 'Le titre doit contenir au moins 5 caractères.'],
-        maxlength: [100, 'Le titre ne peut pas dépasser 100 caractères.']
+        minlength: [5, 'L\'intitulé doit contenir au moins 5 caractères.'],
+        maxlength: [100, 'L\'intitulé ne peut pas dépasser 100 caractères.']
     },
     description: {
         type: String,
@@ -27,14 +27,14 @@ const livrableSchema = new Schema({
             message: props => `${props.value} n'est pas un ID projet valide!`
         }
     },
-    dateEcheance: {
+    dateLimite: {
         type: Date,
-        required: [true, 'La date d\'échéance est requise.'],
+        required: [true, 'La date limite est requise.'],
         validate: {
             validator: function(v) {
                 return v instanceof Date && !isNaN(v);
             },
-            message: 'Format de date d\'échéance invalide.'
+            message: 'Format de date limite invalide.'
         }
     },
     statut: {
@@ -46,7 +46,7 @@ const livrableSchema = new Schema({
         },
         default: Enums.StatutLivrable.EN_ATTENTE
     },
-    urlLivrable: {
+    urlDepot: {
         type: String,
         trim: true,
         validate: {
@@ -87,8 +87,16 @@ const livrableSchema = new Schema({
 // Indexes
 livrableSchema.index({ projetId: 1 });
 livrableSchema.index({ statut: 1 });
-livrableSchema.index({ dateEcheance: 1 });
+livrableSchema.index({ dateLimite: 1 });
 livrableSchema.index({ 'commentaires.auteur': 1 });
+
+// Virtual for checking if deliverable is late
+livrableSchema.virtual('estEnRetard').get(function() {
+    if (!this.dateLimite) return false;
+    if (this.statut === Enums.StatutLivrable.TERMINE ||
+        this.statut === Enums.StatutLivrable.VALIDE) return false;
+    return new Date() > this.dateLimite;
+});
 
 // Pre-save middleware
 livrableSchema.pre('save', function(next) {

@@ -15,6 +15,8 @@ const { validateInput } = require('../../utils/validators');
 const { handleMongooseError } = require('../../utils/errorUtils');
 const { Enum } = require('../../../config/constants');
 const { checkAuthorization } = require('../../utils/auth.utils');
+const Livrable = require('../../models/livrable.model');
+const Evaluation = require('../../models/evaluation.model');
 
 /**
  * Transforme un document MongoDB Projet en type GraphQL
@@ -308,16 +310,16 @@ const Mutation = {
                 ...input,
                 statut: input.statut || Enum.StatutProjet.BROUILLON,
                 progression: 0,
-                createur: context.user?._id,
+                createur: context.utilisateur?._id,
                 creeLe: new Date(),
                 majLe: new Date()
             });
 
             const saved = await projet.save({ session });
 
-            // Add audit activity
-            logger.info(`Project created: ${saved._id}`, {
-                userId: context.user?._id,
+            // Ajouter l'activite d'audit
+            logger.info(`Projet cree: ${saved._id}`, {
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -378,7 +380,7 @@ const Mutation = {
             const updateData = {
                 ...input,
                 majLe: new Date(),
-                majPar: context.user?._id
+                majPar: context.utilisateur?._id
             };
 
             // Convert dates if present
@@ -417,8 +419,8 @@ const Mutation = {
             // Invalidate DataLoader cache
             context.loaders.projetLoader.clear(id);
 
-            logger.info(`Project updated: ${id}`, {
-                userId: context.user?._id,
+            logger.info(`Projet mis à jour: ${id}`, {
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 
@@ -468,8 +470,8 @@ const Mutation = {
             }
 
             // Delete associated deliverables first
-            const Livrable = require('../../models/livrable.model');
             await Livrable.deleteMany({ projetId: id }).session(session);
+            await Evaluation.deleteMany({ projetId: id }).session(session);
 
             const projetSupprime = await Projet.findByIdAndDelete(id).session(session);
 
@@ -487,8 +489,8 @@ const Mutation = {
             // Invalidate DataLoader cache
             context.loaders.projetLoader.clear(id);
 
-            logger.info(`Project deleted: ${id}`, {
-                userId: context.user?._id,
+            logger.info(`Projet supprime: ${id}`, {
+                utilisateurId: context.utilisateur?._id,
                 requestId: context.requestId
             });
 

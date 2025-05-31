@@ -1,16 +1,16 @@
 <mat-sidenav-container class="backoffice-layout" role="main">
   <mat-sidenav #sidenav mode="side" opened class="bo-sidebar" role="navigation">
     <div class="bo-sidebar-header">
-      <img src="assets/PROGEASE.png" 
-           alt="PROGEASE Logo" 
+      <img src="assets/PROGEASE.png"
+           alt="PROGEASE Logo"
            class="bo-logo-small"
            loading="lazy" />
       <span class="bo-sidebar-title">PROGEASE</span>
     </div>
 
     <mat-nav-list>
-      <a mat-list-item 
-         routerLink="/back-office/dashboard" 
+      <a mat-list-item
+         routerLink="/back-office/dashboard"
          routerLinkActive="active"
          matTooltip="Tableau de bord administrateur"
          aria-label="Dashboard">
@@ -18,8 +18,8 @@
         <span>Dashboard</span>
       </a>
 
-      <a mat-list-item 
-         routerLink="/back-office/projet-management" 
+      <a mat-list-item
+         routerLink="/back-office/projet-management"
          routerLinkActive="active"
          matTooltip="Gérer les projets"
          aria-label="Gestion des projets">
@@ -27,8 +27,8 @@
         <span>Gestion Projets</span>
       </a>
 
-      <a mat-list-item 
-         routerLink="/back-office/livrable-management" 
+      <a mat-list-item
+         routerLink="/back-office/livrable-management"
          routerLinkActive="active"
          matTooltip="Gérer les livrables"
          aria-label="Gestion des livrables">
@@ -36,8 +36,8 @@
         <span>Gestion Livrables</span>
       </a>
 
-      <a mat-list-item 
-         routerLink="/back-office/users" 
+      <a mat-list-item
+         routerLink="/back-office/utilisateurs"
          routerLinkActive="active"
          matTooltip="Gérer les utilisateurs"
          aria-label="Gestion des utilisateurs">
@@ -45,8 +45,8 @@
         <span>Utilisateurs</span>
       </a>
 
-      <a mat-list-item 
-         routerLink="/back-office/settings" 
+      <a mat-list-item
+         routerLink="/back-office/settings"
          routerLinkActive="active"
          matTooltip="Paramètres de l'application"
          aria-label="Paramètres">
@@ -57,32 +57,32 @@
   </mat-sidenav>
   <mat-sidenav-content>
     <mat-toolbar color="primary" class="bo-header" role="banner">
-      <button mat-icon-button 
-              (click)="sidenav.toggle()" 
+      <button mat-icon-button
+              (click)="sidenav.toggle()"
               class="hide-desktop"
               matTooltip="Toggle menu"
               aria-label="Toggle navigation menu">
         <mat-icon>menu</mat-icon>
       </button>
 
-      <img src="assets/PROGEASE.png" 
-           alt="PROGEASE Logo" 
-           class="bo-logo" 
+      <img src="assets/PROGEASE.png"
+           alt="PROGEASE Logo"
+           class="bo-logo"
            loading="lazy" />
 
       <span class="bo-title">PROGEASE Back-Office</span>
       <span class="spacer"></span>
 
-      <div class="bo-user-menu">
-        <button mat-button 
-                [matMenuTriggerFor]="userMenu"
+      <div class="bo-utilisateur-menu">
+        <button mat-button
+                [matMenuTriggerFor]="utilisateurMenu"
                 aria-label="Menu utilisateur">
           <mat-icon>account_circle</mat-icon>
           <span>Admin</span>
           <mat-icon>arrow_drop_down</mat-icon>
         </button>
-        
-        <mat-menu #userMenu="matMenu">
+
+        <mat-menu #utilisateurMenu="matMenu">
           <button mat-menu-item routerLink="/back-office/profile">
             <mat-icon>person</mat-icon>
             <span>Profil</span>
@@ -96,12 +96,12 @@
     </mat-toolbar>
     <main class="bo-main" [@fadeAnimation]="o.isActivated ? o.activatedRoute : ''">
       <app-breadcrumb [items]="breadcrumbItems"></app-breadcrumb>
-      
+
       <router-outlet #o="outlet"></router-outlet>
 
-      <button mat-fab 
-              class="back-to-top" 
-              (click)="scrollToTop()" 
+      <button mat-fab
+              class="back-to-top"
+              (click)="scrollToTop()"
               *ngIf="showBackToTop"
               matTooltip="Retour en haut"
               aria-label="Retourner en haut de la page">

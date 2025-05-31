@@ -3,6 +3,8 @@ const User = require('../models/user.model');
 const Project = require('../models/project.model');
 const Evaluation = require('../models/evaluation.model');
 const Deliverable = require('../models/deliverable.model');
+const { Enums } = require('../../config/constants');
+const logger = require('../utils/logger');
 require('dotenv').config();
 
 // Helper function to add days to current date
@@ -27,74 +29,74 @@ const users = [
     nom: "Ben Ali",
     prenom: "Ahmed",
     email: "ahmed.benali@esprit.tn",
-    role: "ETUDIANT"
+    role: Enums.UserRole.ETUDIANT
   },
   {
     nom: "Trabelsi",
     prenom: "Sarra",
     email: "sarra.trabelsi@esprit.tn",
-    role: "ETUDIANT"
+    role: Enums.UserRole.ETUDIANT
   },
   {
     nom: "Gharbi",
     prenom: "Karim",
     email: "karim.gharbi@esprit.tn",
-    role: "ETUDIANT"
+    role: Enums.UserRole.ETUDIANT
   },
   {
     nom: "Bouazizi",
     prenom: "Nour",
     email: "nour.bouazizi@esprit.tn",
-    role: "ETUDIANT"
+    role: Enums.UserRole.ETUDIANT
   },
   {
     nom: "Mejri",
     prenom: "Amine",
     email: "amine.mejri@esprit.tn",
-    role: "ETUDIANT"
+    role: Enums.UserRole.ETUDIANT
   },
   {
     nom: "Chaari",
     prenom: "Rania",
     email: "rania.chaari@esprit.tn",
-    role: "ETUDIANT"
+    role: Enums.UserRole.ETUDIANT
   },
   {
     nom: "Oueslati",
     prenom: "Youssef",
     email: "youssef.oueslati@esprit.tn",
-    role: "ETUDIANT"
+    role: Enums.UserRole.ETUDIANT
   },
   // Tutors
   {
     nom: "Karray",
     prenom: "Mohamed",
     email: "mohamed.karray@esprit.tn",
-    role: "TUTEUR"
+    role: Enums.UserRole.TUTEUR
   },
   {
     nom: "Ben Ayed",
     prenom: "Leila",
     email: "leila.benayed@esprit.tn",
-    role: "TUTEUR"
+    role: Enums.UserRole.TUTEUR
   },
   {
     nom: "Mansouri",
     prenom: "Yassine",
     email: "yassine.mansouri@esprit.tn",
-    role: "TUTEUR"
+    role: Enums.UserRole.TUTEUR
   },
   {
     nom: "Belhadj",
     prenom: "Asma",
     email: "asma.belhadj@esprit.tn",
-    role: "TUTEUR"
+    role: Enums.UserRole.TUTEUR
   },
   {
     nom: "Maaloul",
     prenom: "Slim",
     email: "slim.maaloul@esprit.tn",
-    role: "TUTEUR"
+    role: Enums.UserRole.TUTEUR
   }
 ];
 
@@ -483,126 +485,35 @@ const projects = [
   }
 ];
 
-const evaluations = [
-  // E-commerce Platform Evaluations
-  {
-    score: 17,
-    comments: "Excellent travail sur l'interface utilisateur. La gestion du multilingue est particulièrement bien implémentée. Points d'amélioration : ajouter plus de tests unitaires et optimiser les performances de rendu.",
-    criteria: [
-      { name: "Qualité du code", score: 18, weight: 0.3 },
-      { name: "Documentation", score: 16, weight: 0.2 },
-      { name: "Tests", score: 15, weight: 0.2 },
-      { name: "Performance", score: 19, weight: 0.3 }
-    ],
-    createdAt: subtractDays(15),
-    updatedAt: subtractDays(15)
-  },
-  {
-    score: 15,
-    comments: "Bonne structure de la base de données et architecture solide. La documentation API est complète. Suggestions : améliorer la gestion des erreurs et ajouter plus de validations.",
-    criteria: [
-      { name: "Architecture", score: 16, weight: 0.4 },
-      { name: "Performance", score: 14, weight: 0.3 },
-      { name: "Documentation", score: 15, weight: 0.3 }
-    ],
-    createdAt: subtractDays(10),
-    updatedAt: subtractDays(10)
-  },
-  // Stage Management System Evaluations
-  {
-    score: 18,
-    comments: "Implémentation remarquable du module de gestion des stages. L'intégration avec le système existant est parfaite. Le code est propre et bien documenté.",
-    criteria: [
-      { name: "Intégration", score: 19, weight: 0.4 },
-      { name: "Qualité du code", score: 18, weight: 0.3 },
-      { name: "Documentation", score: 17, weight: 0.3 }
-    ],
-    createdAt: subtractDays(5),
-    updatedAt: subtractDays(5)
-  },
-  {
-    score: 16,
-    comments: "L'interface d'évaluation est intuitive et répond bien aux besoins. Quelques améliorations possibles sur l'UX des formulaires.",
-    criteria: [
-      { name: "Design UI/UX", score: 17, weight: 0.4 },
-      { name: "Fonctionnalités", score: 16, weight: 0.3 },
-      { name: "Performance", score: 15, weight: 0.3 }
-    ],
-    createdAt: subtractDays(2),
-    updatedAt: subtractDays(2)
-  },
-  // Carpooling App Evaluations
-  {
-    score: 14,
-    comments: "L'application mobile montre un bon potentiel. L'intégration de la géolocalisation est bien faite. Points à améliorer : gestion du cache et des états hors ligne.",
-    criteria: [
-      { name: "Fonctionnalités", score: 15, weight: 0.3 },
-      { name: "Performance", score: 13, weight: 0.3 },
-      { name: "UX Mobile", score: 14, weight: 0.2 },
-      { name: "Tests", score: 14, weight: 0.2 }
-    ],
-    createdAt: new Date(),
-    updatedAt: new Date()
-  },
-  // Facial Recognition System Evaluations
-  {
-    score: 19,
-    comments: "Excellente implémentation du système de reconnaissance faciale. La précision est remarquable et le temps de traitement est optimal.",
-    criteria: [
-      { name: "Précision", score: 19, weight: 0.4 },
-      { name: "Performance", score: 18, weight: 0.3 },
-      { name: "Sécurité", score: 20, weight: 0.3 }
-    ],
-    createdAt: subtractDays(20),
-    updatedAt: subtractDays(20)
-  },
-  {
-    score: 17,
-    comments: "Interface de gestion très bien conçue. La documentation technique est exhaustive. Suggestion : ajouter des rapports d'accès plus détaillés.",
-    criteria: [
-      { name: "UI/UX", score: 17, weight: 0.3 },
-      { name: "Documentation", score: 18, weight: 0.3 },
-      { name: "Fonctionnalités", score: 16, weight: 0.4 }
-    ],
-    createdAt: subtractDays(18),
-    updatedAt: subtractDays(18)
-  },
-  // E-learning Platform Evaluations
-  {
-    score: 16,
-    comments: "Le module de visioconférence fonctionne très bien. La qualité audio/vidéo est excellente. Suggestions pour l'amélioration de la gestion de la bande passante.",
-    criteria: [
-      { name: "Qualité Streaming", score: 17, weight: 0.4 },
-      { name: "Performance", score: 15, weight: 0.3 },
-      { name: "Stabilité", score: 16, weight: 0.3 }
-    ],
-    createdAt: subtractDays(8),
-    updatedAt: subtractDays(8)
-  },
-  // Library Management System Evaluations
-  {
-    score: 18,
-    comments: "Système de réservation très efficace. L'intégration des notifications est particulièrement bien pensée. Interface utilisateur intuitive.",
-    criteria: [
-      { name: "Fonctionnalités", score: 18, weight: 0.4 },
-      { name: "UX", score: 19, weight: 0.3 },
-      { name: "Performance", score: 17, weight: 0.3 }
-    ],
-    createdAt: subtractDays(40),
-    updatedAt: subtractDays(40)
-  },
-  {
-    score: 17,
-    comments: "Excellent travail sur le catalogue numérique. La recherche est rapide et précise. Suggestions pour améliorer les filtres de recherche avancée.",
-    criteria: [
-      { name: "Performance", score: 17, weight: 0.3 },
-      { name: "Fonctionnalités", score: 18, weight: 0.4 },
-      { name: "UI", score: 16, weight: 0.3 }
-    ],
-    createdAt: subtractDays(35),
-    updatedAt: subtractDays(35)
-  }
-];
+const generateEvaluations = (projects, users) => {
+  return projects.map(project => {
+    const evaluateur = users.find(u => u.role === Enums.UserRole.TUTEUR);
+    return {
+      projetId: project._id,
+      evaluateurId: evaluateur._id,
+      note: Math.floor(Math.random() * 11) + 10, // Note entre 10 et 20
+      commentaire: `Évaluation du projet ${project.title}`,
+      criteres: [
+        {
+          nom: 'Qualité du code',
+          note: Math.floor(Math.random() * 11) + 10,
+          poids: 0.4
+        },
+        {
+          nom: 'Documentation',
+          note: Math.floor(Math.random() * 11) + 10,
+          poids: 0.3
+        },
+        {
+          nom: 'Tests',
+          note: Math.floor(Math.random() * 11) + 10,
+          poids: 0.3
+        }
+      ],
+      dateEvaluation: new Date()
+    };
+  });
+};
 
 // Seeder function
 async function seed() {
@@ -679,21 +590,9 @@ async function seed() {
     }
     console.log('Updated projects with deliverable references');
 
-    // Create evaluations with different evaluators
-    const evaluationsWithRefs = evaluations.map((evaluation, index) => {
-      const projectIndex = Math.floor(index / 2); // Two evaluations per project
-      const evaluator = insertedUsers
-        .filter(u => u.role === 'TUTEUR')
-        .sort(() => 0.5 - Math.random())[0];
-
-      return {
-        ...evaluation,
-        projectId: insertedProjects[projectIndex]._id,
-        evaluatorId: evaluator._id
-      };
-    });
-
-    await Evaluation.insertMany(evaluationsWithRefs);
+    // Insert evaluations
+    const evaluations = generateEvaluations(insertedProjects, insertedUsers);
+    await Evaluation.insertMany(evaluations);
     console.log('Inserted evaluations');
 
     console.log('Seeding completed successfully');

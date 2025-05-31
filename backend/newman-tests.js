@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 
 // Configuration utilisateur
-const currentUser = 'WalidBenTouhami';
+const currentutilisateur = 'WalidBenTouhami';
 const baseUrl = 'http://localhost:5000';
 
 // Verifier que le serveur est accessible avant d'executer les tests
@@ -85,7 +85,7 @@ async function runNewmanTests() {
     // Nom du rapport avec timestamp actuel
     const reportName = `rapport-${dateFormat}`;
 
-    console.log(`Execution des tests Newman par ${currentUser} à ${formattedDate}`);
+    console.log(`Execution des tests Newman par ${currentutilisateur} à ${formattedDate}`);
 
     // Options de Newman
     newman.run({
@@ -105,7 +105,7 @@ async function runNewmanTests() {
             }
         },
         globalVar: [
-            { key: 'currentUser', value: currentUser },
+            { key: 'currentutilisateur', value: currentutilisateur },
             { key: 'timestamp', value: '2025-05-27T19:36:32Z' },
             { key: 'baseUrl', value: baseUrl },
             { key: 'testDate', value: '2025-05-27 19:36:32' }

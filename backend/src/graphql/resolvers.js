@@ -3,13 +3,11 @@ const Livrable = require('../models/livrable.model');
 const Evaluation = require('../models/evaluation.model');
 const User = require('../models/user.model');
 const { generateAIAnalysis, predictPerformance, generateLearningRecommendations } = require('../services/ai.service');
-const scalarResolvers = require('./resolvers/scalar.resolver');
-const { Query: aiQuery, Mutation: aiMutation } = require('./resolvers/ai.resolver');
-const { Query: projetQuery, Mutation: projetMutation, Projet: ProjetResolver } = require('./resolvers/projet.resolver');
-const { Query: livrableQuery, Mutation: livrableMutation, Livrable: LivrableResolver } = require('./resolvers/livrable.resolver');
-const { Query: evaluationQuery, Mutation: evaluationMutation, Evaluation: EvaluationResolver } = require('./resolvers/evaluation.resolver');
-const { GraphQLScalarType } = require('graphql');
-const { Kind } = require('graphql/language');
+const { GraphQLScalarType, Kind } = require('graphql');
+const aiResolver = require('./resolvers/ai.resolver');
+const projetResolver = require('./resolvers/projet.resolver');
+const livrableResolver = require('./resolvers/livrable.resolver');
+const evaluationResolver = require('./resolvers/evaluation.resolver');
 
 const transformId = (obj) => {
     if (!obj) return null;
@@ -25,21 +23,21 @@ const dateScalar = new GraphQLScalarType({
     name: 'Date',
     description: 'Date custom scalar type',
     serialize(value) {
-        return value.getTime();
+        return value instanceof Date ? value.toISOString() : null;
     },
     parseValue(value) {
-        return new Date(value);
+        return value ? new Date(value) : null;
     },
     parseLiteral(ast) {
-        if (ast.kind === Kind.INT) {
-            return new Date(parseInt(ast.value, 10));
+        if (ast.kind === Kind.STRING || ast.kind === Kind.INT) {
+            return new Date(ast.value);
         }
         return null;
     },
 });
 
+// Combine all resolvers
 const resolvers = {
-    ...scalarResolvers,
     Date: dateScalar,
     Query: {
         health: () => ({
@@ -49,20 +47,27 @@ const resolvers = {
             environment: process.env.NODE_ENV
         }),
         healthCheck: () => 'OK',
-        ...aiQuery,
-        ...projetQuery,
-        ...livrableQuery,
-        ...evaluationQuery
+        ...aiResolver.Query,
+        ...projetResolver.Query,
+        ...livrableResolver.Query,
+        ...evaluationResolver.Query
     },
     Mutation: {
-        ...aiMutation,
-        ...projetMutation,
-        ...livrableMutation,
-        ...evaluationMutation
+        ...aiResolver.Mutation,
+        ...projetResolver.Mutation,
+        ...livrableResolver.Mutation,
+        ...evaluationResolver.Mutation
     },
-    Projet: ProjetResolver,
-    Livrable: LivrableResolver,
-    Evaluation: EvaluationResolver
+    // Type resolvers
+    Projet: {
+        ...projetResolver.Projet
+    },
+    Livrable: {
+        ...livrableResolver.LivrableResolver
+    },
+    Evaluation: {
+        ...evaluationResolver.EvaluationResolver
+    }
 };
 
 module.exports = { resolvers };

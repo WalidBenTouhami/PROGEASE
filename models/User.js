@@ -1,15 +1,15 @@
-// src/modules/user-management/models/User.js
+// src/modules/utilisateur-management/models/utilisateur.js
 
 const mongoose = require('mongoose');  // Remplacer import par require
 const crypto = require('crypto');  // Remplacer import par require
 
-const userSchema = new mongoose.Schema({
-  userId: {
+const utilisateurSchema = new mongoose.Schema({
+  utilisateurId: {
     type: String,
     required: true,
     unique: true,
     default: function() {
-      return this._id.toString();  // Utiliser l'_id de Mongoose comme userId
+      return this._id.toString();  // Utiliser l'_id de Mongoose comme utilisateurId
     }
   },
   name: {
@@ -43,14 +43,14 @@ const userSchema = new mongoose.Schema({
 });
 
 // Générer un token de vérification
-userSchema.methods.generateVerificationToken = function () {
+utilisateurSchema.methods.generateVerificationToken = function () {
   const token = crypto.randomBytes(32).toString("hex");
   this.verificationToken = token;
   this.verificationTokenExpiration = Date.now() + 3600000; // Le token expire dans 1 heure
   return token;
 };
 
-const User = mongoose.model('User', userSchema);
+const utilisateur = mongoose.model('utilisateur', utilisateurSchema);
 
-// Exporter le modèle User avec module.exports
-module.exports = User;
+// Exporter le modèle utilisateur avec module.exports
+module.exports = utilisateur;

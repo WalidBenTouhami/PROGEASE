@@ -14,7 +14,7 @@ const logger = require('../../utils/logger');
 const { AppError, ERROR_CODES } = require('../../middleware/errorHandlers');
 const { validateInput } = require('../../utils/validators');
 const { handleMongooseError } = require('../../utils/errorUtils');
-const { Enum } = require('../../../config/constants');
+const { Enums } = require('../../../config/constants');
 const { mapProjetMongoVersGraphQL } = require('./projet.resolver');
 const { checkAuthorization } = require('../../utils/auth.utils');
 
@@ -32,7 +32,7 @@ function mapLivrableMongoVersGraphQL(doc) {
             description: doc.description || '',
             dateLimite: doc.dateLimite || null,
             urlDepot: doc.urlDepot || '',
-            statut: doc.statut || Enum.StatutLivrable.EN_ATTENTE,
+            statut: doc.statut || Enums.StatutLivrable.EN_ATTENTE,
             projetId: doc.projetId?.toString() || '',
             creeLe: doc.creeLe || new Date(),
             majLe: doc.majLe || new Date(),
@@ -71,7 +71,7 @@ const Query = {
                 filter.projetId = projetId;
             }
 
-            if (statut && Object.values(Enum.StatutLivrable).includes(statut)) {
+            if (statut && Object.values(Enums.StatutLivrable).includes(statut)) {
                 filter.statut = statut;
             }
 
@@ -238,7 +238,7 @@ const Mutation = {
                 description: { required: true, type: 'string', minLength: 10 },
                 deadline: { required: true, type: 'date' },
                 repositoryUrl: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ },
-                status: { type: 'string', enum: Object.values(Enum.StatutLivrable) }
+                status: { type: 'string', enum: Object.values(Enums.StatutLivrable) }
             });
 
             // Check if project exists
@@ -254,13 +254,9 @@ const Mutation = {
 
             // Create deliverable
             const livrable = new Livrable({
-                intitule: input.name,
-                description: input.description,
-                dateLimite: input.deadline,
-                urlDepot: input.repositoryUrl,
-                projetId: projectId,
-                statut: input.status || Enum.StatutLivrable.EN_ATTENTE,
-                createur: context.user?._id,
+                ...input,
+                statut: input.statut || Enums.StatutLivrable.EN_ATTENTE,
+                createur: context.utilisateur?._id,
                 creeLe: new Date(),
                 majLe: new Date()
             });
@@ -278,9 +274,9 @@ const Mutation = {
             context.loaders.livrablesByProjetLoader.clear(projectId);
             context.loaders.projetLoader.clear(projectId);
 
-            logger.info(`Deliverable created: ${saved._id}`, {
-                userId: context.user?._id,
-                projectId: projectId,
+            logger.info(`Livrable cree: ${saved._id}`, {
+                utilisateurId: context.utilisateur?._id,
+                projetId: input.projetId,
                 requestId: context.requestId
             });
 
@@ -341,7 +337,7 @@ const Mutation = {
                 urlDepot: input.repositoryUrl,
                 statut: input.status,
                 majLe: new Date(),
-                majPar: context.user?._id
+                majPar: context.utilisateur?._id
             };
 
             const livrable = await Livrable.findByIdAndUpdate(
@@ -370,9 +366,9 @@ const Mutation = {
             context.loaders.livrablesByProjetLoader.clear(livrable.projetId);
             context.loaders.projetLoader.clear(livrable.projetId);
 
-            logger.info(`Deliverable updated: ${id}`, {
-                userId: context.user?._id,
-                projectId: livrable.projetId,
+            logger.info(`Livrable mis à jour: ${id}`, {
+                utilisateurId: context.utilisateur?._id,
+                projetId: livrable.projetId,
                 requestId: context.requestId
             });
 
@@ -447,9 +443,9 @@ const Mutation = {
             context.loaders.livrablesByProjetLoader.clear(livrable.projetId);
             context.loaders.projetLoader.clear(livrable.projetId);
 
-            logger.info(`Deliverable deleted: ${id}`, {
-                userId: context.user?._id,
-                projectId: livrable.projetId,
+            logger.info(`Livrable supprime: ${id}`, {
+                utilisateurId: context.utilisateur?._id,
+                projetId: livrable.projetId,
                 requestId: context.requestId
             });
 
@@ -477,22 +473,23 @@ const Mutation = {
     }
 };
 
-// Resolvers pour les champs calculés
+// Resolvers pour les champs complexes du type Livrable
 const LivrableResolver = {
+    id: (parent) => parent._id.toString(),
     projet: async (parent, _, context) => {
         if (!parent.projetId) return null;
         try {
-            const projet = await context.loaders.projetLoader.load(parent.projetId);
+            const projet = await context.loaders.projetLoader.load(parent.projetId.toString());
             return mapProjetMongoVersGraphQL(projet);
         } catch (error) {
-            logger.error(`Error loading project ${parent.projetId}:`, error);
+            logger.error(`Error loading project for deliverable ${parent.id}:`, error);
             return null;
         }
     },
     estEnRetard: (parent) => {
         if (!parent.dateLimite) return false;
-        if (parent.statut === Enum.StatutLivrable.TERMINE ||
-            parent.statut === Enum.StatutLivrable.VALIDE) return false;
+        if (parent.statut === Enums.StatutLivrable.TERMINE ||
+            parent.statut === Enums.StatutLivrable.VALIDE) return false;
         return new Date() > new Date(parent.dateLimite);
     }
 };
@@ -500,6 +497,6 @@ const LivrableResolver = {
 module.exports = {
     Query,
     Mutation,
-    Livrable: LivrableResolver,
+    LivrableResolver,
     mapLivrableMongoVersGraphQL
 };

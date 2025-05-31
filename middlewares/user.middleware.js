@@ -1,4 +1,4 @@
-// src/modules/user-management/middlewares/user.middleware.js
+// src/modules/utilisateur-management/middlewares/utilisateur.middleware.js
 
 const dotenv = require('dotenv');  
 
@@ -17,7 +17,7 @@ const verifyToken = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
-    req.user = decoded;
+    req.utilisateur = decoded;
     next();
   } catch (error) {
     res.status(401).json({ message: "Invalid or expired token" });
@@ -26,7 +26,7 @@ const verifyToken = (req, res, next) => {
 
 const authorizeRoles = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
+    if (!roles.includes(req.utilisateur.role)) {
       return res
         .status(403)
         .json({ message: "Access denied: unauthorized role" });

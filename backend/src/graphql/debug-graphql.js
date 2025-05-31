@@ -197,7 +197,7 @@ async function executeQuery(input) {
         const response = await axios.post(GRAPHQL_URL, requestBody, {
             headers: {
                 'Content-Type': 'application/json',
-                'X-User': 'WalidBenTouhami'
+                'X-utilisateur': 'WalidBenTouhami'
             },
             timeout: 5000
         });

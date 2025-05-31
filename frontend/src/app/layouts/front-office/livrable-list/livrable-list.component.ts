@@ -15,6 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AlertService } from '../../../core/services/atert.service';
 
 @Component({
   selector: 'app-livrable-list',
@@ -94,6 +95,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 export class LivrableListComponent implements OnInit {
   @Input() projetId!: string;
   livrables: Livrable[] = [];
+  filteredLivrables: Livrable[] = [];
   chargement = false;
   erreur = '';
   searchTerm = '';
@@ -103,26 +105,75 @@ export class LivrableListComponent implements OnInit {
   // Exposer l'énumération pour le template
   StatutLivrable = StatutLivrable;
 
-  get livrablesFiltres() {
-    return this.livrables
-      .filter(l => !this.searchTerm || l.titre.toLowerCase().includes(this.searchTerm.toLowerCase()))
-      .filter(l => !this.selectedStatus || l.statut === this.selectedStatus);
-  }
-
-  constructor(private livrableService: LivrableService) {}
+  constructor(
+    private livrableService: LivrableService,
+    private alertService: AlertService
+  ) {}
 
   ngOnInit() {
     if (this.projetId) {
       this.chargement = true;
-      this.livrableService.getLivrables(this.projetId).subscribe({
-        next: (livrables) => {
-          this.livrables = livrables;
-          this.chargement = false;
+      this.loadLivrables();
+    }
+  }
+
+  loadLivrables() {
+    this.livrableService.getLivrables(this.projetId).subscribe({
+      next: (livrables) => {
+        this.livrables = livrables;
+        this.filterLivrables();
+        this.chargement = false;
+      },
+      error: (error) => {
+        this.alertService.error('Erreur lors du chargement des livrables');
+        console.error('Error loading livrables:', error);
+        this.erreur = "Erreur lors du chargement des livrables.";
+        this.chargement = false;
+      }
+    });
+  }
+
+  filterLivrables() {
+    this.filteredLivrables = this.livrables
+      .filter(l => !this.searchTerm || l.titre.toLowerCase().includes(this.searchTerm.toLowerCase()))
+      .filter(l => !this.selectedStatus || l.statut === this.selectedStatus);
+  }
+
+  getStatusClass(status: StatutLivrable): string {
+    switch (status) {
+      case StatutLivrable.EN_COURS:
+        return 'bg-primary';
+      case StatutLivrable.TERMINE:
+        return 'bg-success';
+      case StatutLivrable.EN_ATTENTE:
+        return 'bg-warning';
+      case StatutLivrable.SOUMIS:
+        return 'bg-info';
+      default:
+        return 'bg-secondary';
+    }
+  }
+
+  openCreateDialog() {
+    // TODO: Implement create dialog
+  }
+
+  openEditDialog(livrable: Livrable) {
+    // TODO: Implement edit dialog
+  }
+
+  deleteLivrable(livrable: Livrable) {
+    if (!livrable.id) return;
+
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce livrable ?')) {
+      this.livrableService.deleteLivrable(livrable.id).subscribe({
+        next: () => {
+          this.alertService.success('Livrable supprimé avec succès');
+          this.loadLivrables();
         },
-        error: (err) => {
-          console.error('Erreur lors du chargement des livrables:', err);
-          this.erreur = "Erreur lors du chargement des livrables.";
-          this.chargement = false;
+        error: (error) => {
+          this.alertService.error('Erreur lors de la suppression du livrable');
+          console.error('Error deleting livrable:', error);
         }
       });
     }

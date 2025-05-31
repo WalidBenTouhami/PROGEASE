@@ -103,7 +103,7 @@ exports.creerUtilisateur = async (req, res) => {
 
         await nouvelUtilisateur.save();
 
-        logger.monitoring('Utilisateur créé', { userId: nouvelUtilisateur._id });
+        logger.monitoring('Utilisateur créé', { utilisateurId: nouvelUtilisateur._id });
 
         res.status(201).json({
             success: true,
@@ -145,7 +145,7 @@ exports.mettreAJourUtilisateur = async (req, res) => {
             });
         }
 
-        logger.monitoring('Utilisateur mis à jour', { userId: id });
+        logger.monitoring('Utilisateur mis à jour', { utilisateurId: id });
 
         res.status(200).json({
             success: true,
@@ -179,7 +179,7 @@ exports.supprimerUtilisateur = async (req, res) => {
             });
         }
 
-        logger.monitoring('Utilisateur supprimé', { userId: id });
+        logger.monitoring('Utilisateur supprimé', { utilisateurId: id });
 
         res.status(200).json({
             success: true,

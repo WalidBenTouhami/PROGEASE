@@ -34,7 +34,7 @@ import { MatTableDataSource } from '@angular/material/table';
     MatCardModule
   ],
   templateUrl: './projet-list.component.html',
-  styleUrls: ['./projet-list.component.scss']
+  styleUrls: ['./projet-list.component.css']
 })
 export class ProjetListComponent implements OnInit, OnDestroy, AfterViewInit {
   projets: Projet[] = [];

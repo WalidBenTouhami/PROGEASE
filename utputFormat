@@ -1,0 +1,27 @@
+HTTP/1.1 400 Bad Request
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Resource-Policy: same-origin
+Origin-Agent-Cluster: ?1
+Referrer-Policy: no-referrer
+Strict-Transport-Security: max-age=15552000; includeSubDomains
+X-Content-Type-Options: nosniff
+X-DNS-Prefetch-Control: off
+X-Download-Options: noopen
+X-Frame-Options: SAMEORIGIN
+X-Permitted-Cross-Domain-Policies: none
+X-XSS-Protection: 0
+Access-Control-Allow-Origin: http://localhost:4200
+Vary: Origin
+Access-Control-Allow-Credentials: true
+RateLimit-Policy: 100;w=900
+RateLimit-Limit: 100
+RateLimit-Remaining: 98
+RateLimit-Reset: 610
+Content-Type: application/json; charset=utf-8
+Content-Length: 82
+ETag: W/"52-h99lG3owss7QhupJ2jG6kXk5RN8"
+Date: Fri, 30 May 2025 23:27:25 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+
+{"status":"error","message":"Expected property name or '}' in JSON at position 1"}

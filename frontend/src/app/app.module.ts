@@ -5,18 +5,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { ApolloModule } from 'apollo-angular';
 import { HttpLink } from 'apollo-angular/http';
 import { AppComponent } from './app.component';
-import { appConfig } from './app.config';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
+import { routes } from './app-routing.module';
+import { apolloProviders } from './core/apollo.config';
+import { ApiTesterComponent } from './core/components/api-tester/api-tester.component';
 
-@NgModule({
-  declarations: [
-    AppComponent
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    HttpClientModule,
-    ApolloModule
-  ],
+bootstrapApplication(AppComponent, {
   providers: [
     ...appConfig.providers
   ],

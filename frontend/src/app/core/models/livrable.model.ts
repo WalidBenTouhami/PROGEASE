@@ -1,50 +1,44 @@
 // Synced with backend/src/models/livrable.model.js
 export enum StatutLivrable {
+  EN_COURS = 'EN_COURS',
+  TERMINE = 'TERMINE',
   EN_ATTENTE = 'EN_ATTENTE',
-  SOUMIS = 'SOUMIS',
-  EN_REVISION = 'EN_REVISION',
-  VALIDE = 'VALIDE',
-  REJETE = 'REJETE'
+  SOUMIS = 'SOUMIS'
 }
 
 export interface Livrable {
-  id: string;
+  id?: string;
   titre: string;
+  intitule: string;
   description: string;
-  dateCreation: string;
   dateLimite: string;
-  dateModification: string;
   statut: StatutLivrable;
-  note?: number;
-  commentaires?: string;
-  fichiers?: string[];
   projetId: string;
-  projet?: {
-    id: string;
-    titre: string;
-  };
-  auteurId: string;
-  auteur?: {
-    id: string;
-    nom: string;
-    prenom: string;
-  };
+  dateCreation?: string;
+  dateModification?: string;
+  fichiers?: string[];
+  commentaires?: string[];
 }
 
 export interface CreateLivrableInput {
   titre: string;
+  intitule: string;
   description: string;
   dateLimite: string;
+  statut: StatutLivrable;
   projetId: string;
   fichiers?: string[];
+  commentaires?: string;
 }
 
 export interface UpdateLivrableInput {
   titre?: string;
+  intitule?: string;
   description?: string;
   dateLimite?: string;
   statut?: StatutLivrable;
-  note?: number;
-  commentaires?: string;
+  projetId?: string;
   fichiers?: string[];
+  commentaires?: string;
+  dateModification?: string;
 }

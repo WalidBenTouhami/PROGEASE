@@ -43,9 +43,9 @@ const typeDefs = gql`
 
   type Livrable {
     id: ID!
-    nom: String!
+    intitule: String!
     description: String
-    dateEcheance: String!
+    dateLimite: String!
     statut: StatutLivrable!
     projet: Projet!
     createdAt: String!

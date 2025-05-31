@@ -96,13 +96,13 @@
   letter-spacing: 2px;
 }
 
-.bo-user-menu {
+.bo-utilisateur-menu {
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
-.bo-user-menu button {
+.bo-utilisateur-menu button {
   color: var(--text-color);
 }
 
@@ -214,4 +214,4 @@
     bottom: 1rem;
     right: 1rem;
   }
-} 
+}

@@ -25,7 +25,7 @@ const validateProjet = (schema) => async (req, res, next) => {
             abortEarly: false,
             stripUnknown: true,
             context: {
-                user: req.user,
+                utilisateur: req.utilisateur,
                 operation: req.method === 'POST' ? 'create' : 'update',
                 projetId: req.params.id
             }
@@ -69,7 +69,7 @@ const validateProjet = (schema) => async (req, res, next) => {
 const checkProjetPermissions = async (req, res, next) => {
     try {
         // Si l'utilisateur est admin, autoriser toutes les operations
-        if (req.user && req.user.role === 'ADMIN') {
+        if (req.utilisateur && req.utilisateur.role === 'ADMIN') {
             return next();
         }
 
@@ -83,9 +83,9 @@ const checkProjetPermissions = async (req, res, next) => {
         }
 
         // Verifier si l'utilisateur est le createur ou le tuteur
-        const isTuteur = projet.tuteur.equals(req.user._id);
-        const isCreateur = projet.createur.equals(req.user._id);
-        const isTeamMember = projet.equipe.some(membre => membre.equals(req.user._id));
+        const isTuteur = projet.tuteur.equals(req.utilisateur._id);
+        const isCreateur = projet.createur.equals(req.utilisateur._id);
+        const isTeamMember = projet.equipe.some(membre => membre.equals(req.utilisateur._id));
 
         // Si c'est un membre de l'equipe et qu'on est en GET, autoriser
         if (req.method === 'GET' && (isTeamMember || isTuteur || isCreateur)) {
@@ -97,7 +97,7 @@ const checkProjetPermissions = async (req, res, next) => {
             return next();
         }
 
-        // Sinon, refuser l'acces
+        // Sinon, refutilisateur l'acces
         throw new ValidationError(
             'Vous n\'avez pas les autorisations necessaires pour cette operation',
             403

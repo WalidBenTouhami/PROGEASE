@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const evaluationCriteriaSchema = new Schema({
-    name: {
+const criteriaSchema = new Schema({
+    nom: {
         type: String,
         required: [true, 'Le nom du critère est requis.']
     },
-    score: {
+    note: {
         type: Number,
-        required: [true, 'Le score est requis.'],
-        min: [0, 'Le score ne peut pas être inférieur à 0.'],
-        max: [20, 'Le score ne peut pas être supérieur à 20.']
+        required: [true, 'La note est requise.'],
+        min: [0, 'La note ne peut pas être inférieure à 0.'],
+        max: [20, 'La note ne peut pas être supérieure à 20.']
     },
-    weight: {
+    poids: {
         type: Number,
         required: [true, 'Le poids est requis.'],
         min: [0, 'Le poids ne peut pas être inférieur à 0.'],
@@ -21,47 +21,57 @@ const evaluationCriteriaSchema = new Schema({
 });
 
 const evaluationSchema = new Schema({
-    projectId: {
+    projetId: {
         type: Schema.Types.ObjectId,
-        ref: 'Project',
+        ref: 'Projet',
         required: [true, 'L\'ID du projet est requis.']
     },
-    evaluatorId: {
+    evaluateurId: {
         type: Schema.Types.ObjectId,
         ref: 'User',
         required: [true, 'L\'ID de l\'évaluateur est requis.']
     },
-    score: {
+    note: {
         type: Number,
-        required: [true, 'Le score est requis.'],
-        min: [0, 'Le score ne peut pas être inférieur à 0.'],
-        max: [20, 'Le score ne peut pas être supérieur à 20.']
+        required: [true, 'La note est requise.'],
+        min: [0, 'La note ne peut pas être inférieure à 0.'],
+        max: [20, 'La note ne peut pas être supérieure à 20.']
     },
-    comments: {
+    commentaire: {
         type: String,
         trim: true
     },
-    criteria: [evaluationCriteriaSchema],
-    aiRecommendations: {
-        type: String,
-        default: ''
-    },
-    createdAt: {
+    criteres: [criteriaSchema],
+    dateEvaluation: {
         type: Date,
         default: Date.now
     },
-    updatedAt: {
+    creeLe: {
+        type: Date,
+        default: Date.now
+    },
+    majLe: {
         type: Date,
         default: Date.now
     }
+}, {
+    timestamps: { createdAt: 'creeLe', updatedAt: 'majLe' }
 });
 
-// Add index for faster queries
-evaluationSchema.index({ projectId: 1, evaluatorId: 1 });
+// Add indexes for faster queries
+evaluationSchema.index({ projetId: 1 });
+evaluationSchema.index({ evaluateurId: 1 });
+evaluationSchema.index({ dateEvaluation: -1 });
 
-// Pre-save middleware to update the updatedAt field
+// Pre-save middleware to update majLe
 evaluationSchema.pre('save', function(next) {
-    this.updatedAt = new Date();
+    this.majLe = new Date();
+    next();
+});
+
+// Pre-update middleware
+evaluationSchema.pre(['updateOne', 'findOneAndUpdate'], function(next) {
+    this.set({ majLe: new Date() });
     next();
 });
 

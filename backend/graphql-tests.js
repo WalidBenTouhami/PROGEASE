@@ -25,7 +25,7 @@ const colors = {
 const config = {
     baseUrl: 'http://localhost:5000/graphql',
     testsDir: path.join(__dirname, 'tests', 'graphql'),
-    currentUser: 'WalidBenTouhami',
+    currentutilisateur: 'WalidBenTouhami',
     currentDate: '2025-05-28 09:25:45'
 };
 
@@ -39,7 +39,7 @@ function showBanner() {
     console.log('╔══════════════════════════════════════════════════════════════╗');
     console.log('║                  PROGEASE - Tests GraphQL                    ║');
     console.log('╟──────────────────────────────────────────────────────────────╢');
-    console.log(`║ Utilisateur: ${config.currentUser.padEnd(46, ' ')}  ║`);
+    console.log(`║ Utilisateur: ${config.currentutilisateur.padEnd(46, ' ')}  ║`);
     console.log(`║ Date: ${config.currentDate.padEnd(52, ' ')}   ║`);
     console.log('╚══════════════════════════════════════════════════════════════╝');
 }
@@ -125,7 +125,7 @@ async function processGraphQLTests() {
                     }, {
                         headers: {
                             'Content-Type': 'application/json',
-                            'X-User': config.currentUser
+                            'X-utilisateur': config.currentutilisateur
                         },
                         // Diminuer le timeout pour ne pas attendre trop longtemps en cas d'erreur
                         timeout: 3000
@@ -258,7 +258,7 @@ type Query {
 type Health {
   status: String!
   timestamp: String!
-  user: String!
+  utilisateur: String!
   version: String!
   uptime: Float!
 }

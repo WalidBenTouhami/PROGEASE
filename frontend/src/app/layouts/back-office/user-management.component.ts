@@ -17,7 +17,7 @@ interface Utilisateur {
 }
 
 @Component({
-  selector: 'app-user-management',
+  selector: 'app-utilisateur-management',
   standalone: true,
   imports: [
     CommonModule,
@@ -30,10 +30,10 @@ interface Utilisateur {
     MatIconModule,
     MatButtonModule
   ],
-  templateUrl: './user-management.component.html',
-  styleUrls: ['./user-management.component.css']
+  templateUrl: './utilisateur-management.component.html',
+  styleUrls: ['./utilisateur-management.component.css']
 })
-export class UserManagementComponent {
+export class utilisateurManagementComponent {
   searchTerm = '';
   selectedRole = '';
   roles = ['Administrateur', 'Tuteur', 'Étudiant'];
@@ -49,4 +49,4 @@ export class UserManagementComponent {
       .filter(u => !this.searchTerm || u.nom.toLowerCase().includes(this.searchTerm.toLowerCase()) || u.email.toLowerCase().includes(this.searchTerm.toLowerCase()))
       .filter(u => !this.selectedRole || u.role === this.selectedRole);
   }
-} 
+}

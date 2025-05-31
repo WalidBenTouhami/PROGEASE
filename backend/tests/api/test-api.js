@@ -1,17 +1,24 @@
 const axios = require('axios');
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
 const testAPI = async () => {
     try {
+        // Attendre que le serveur soit prêt
+        console.log('Attente du démarrage du serveur...');
+        await sleep(5000);
+
         // Test de création d'utilisateur
         console.log('Test de création d\'utilisateur...');
-        const userData = {
+        const timestamp = new Date().getTime();
+        const utilisateurData = {
             nom: 'John Doe',
-            email: 'john.doe@example.com',
+            email: `john.doe.${timestamp}@example.com`,
             role: 'TUTEUR'
         };
 
-        console.log('Envoi des données:', userData);
-        const createResponse = await axios.post('http://localhost:5003/api/utilisateurs', userData);
+        console.log('Envoi des données:', utilisateurData);
+        const createResponse = await axios.post('http://localhost:5003/api/utilisateurs', utilisateurData);
         console.log('Utilisateur créé:', createResponse.data);
 
         // Test de récupération des utilisateurs

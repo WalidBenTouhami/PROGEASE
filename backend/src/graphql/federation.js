@@ -67,7 +67,7 @@ type Query {
 type HealthStatus {
     status: String!
     timestamp: String!
-    user: String!
+    utilisateur: String!
 }
 
 # 📌 Type Mutation

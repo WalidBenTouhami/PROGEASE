@@ -6,7 +6,7 @@ query GetHealth {
   health {
     status
     timestamp
-    user
+    utilisateur
     version
     uptime
   }

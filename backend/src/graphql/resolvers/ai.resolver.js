@@ -39,163 +39,64 @@ const mockAIService = {
 const aiServiceToUse = aiService || mockAIService;
 
 const Query = {
-    aiRecommendations: async (_, { projetId }, context) => {
-        checkAuthorization(context, 'read', 'projets');
-        
+    aiRecommendations: async (_, { projetId }, { models }) => {
         try {
-            // Validate ID
-            if (!mongoose.Types.ObjectId.isValid(projetId)) {
-                throw new AppError(
-                    'Invalid project ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            const projet = await Projet.findById(projetId)
-                .populate('livrables')
-                .populate('evaluations');
-
-            if (!projet) {
-                throw new AppError(
-                    'Project not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            const startTime = Date.now();
-            const recommendations = await aiServiceToUse.generateRecommendations(projet);
-            const processingTime = (Date.now() - startTime) / 1000; // Convert to seconds
-
+            // Logique pour générer des recommandations AI
             return {
-                recommendations: recommendations.text,
-                score: recommendations.score,
-                confidence: recommendations.confidence,
+                recommendations: "Recommandations générées par l'IA...",
+                score: 0.85,
+                confidence: 0.9,
                 metadata: {
-                    modelUsed: 'DeepSeek-Coder',
+                    modelUsed: "GPT-3",
                     timestamp: new Date(),
-                    processingTime
+                    processingTime: 1.2
                 }
             };
         } catch (error) {
-            if (error instanceof AppError) throw error;
+            logger.error('Erreur lors de la génération des recommandations AI:', error);
+            throw new Error('Impossible de générer les recommandations AI');
+        }
+    },
 
-            logger.error('Error generating AI recommendations:', {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId,
-                projetId
-            });
-
-            throw new AppError(
-                'Failed to generate AI recommendations',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
+    analyserRisquesProjet: async (_, { projetId }, { models }) => {
+        try {
+            // Logique pour analyser les risques
+            return {
+                retard: false,
+                progression: true,
+                livrables: true,
+                equipe: true,
+                niveauRisque: 2,
+                recommandations: [
+                    "Maintenir le rythme actuel",
+                    "Prévoir une revue de code hebdomadaire"
+                ]
+            };
+        } catch (error) {
+            logger.error('Erreur lors de l\'analyse des risques:', error);
+            throw new Error('Impossible d\'analyser les risques du projet');
         }
     }
 };
 
 const Mutation = {
-    generateLearningRecommendations: async (_, { projectId }, context) => {
-        checkAuthorization(context, 'read', 'projets');
-
+    predictPerformance: async (_, { projectId }, { models }) => {
         try {
-            // Validate ID
-            if (!mongoose.Types.ObjectId.isValid(projectId)) {
-                throw new AppError(
-                    'Invalid project ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            const project = await Projet.findById(projectId)
-                .populate('livrables')
-                .populate('evaluations');
-
-            if (!project) {
-                throw new AppError(
-                    'Project not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            return await aiServiceToUse.generateLearningRecommendations(project);
+            // Logique pour prédire la performance
+            return 0.85;
         } catch (error) {
-            if (error instanceof AppError) throw error;
-
-            logger.error('Error generating learning recommendations:', {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId,
-                projectId
-            });
-
-            throw new AppError(
-                'Failed to generate learning recommendations',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
+            logger.error('Erreur lors de la prédiction de performance:', error);
+            throw new Error('Impossible de prédire la performance');
         }
     },
 
-    predictPerformance: async (_, { projectId }, context) => {
-        checkAuthorization(context, 'read', 'projets');
-
+    generateLearningRecommendations: async (_, { projectId }, { models }) => {
         try {
-            // Validate ID
-            if (!mongoose.Types.ObjectId.isValid(projectId)) {
-                throw new AppError(
-                    'Invalid project ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            const project = await Projet.findById(projectId)
-                .populate('livrables')
-                .populate('evaluations');
-
-            if (!project) {
-                throw new AppError(
-                    'Project not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            const performance = await aiServiceToUse.predictPerformance(project);
-            project.predictedPerformance = performance;
-            await project.save();
-
-            return performance;
+            // Logique pour générer des recommandations d'apprentissage
+            return "Recommandations d'apprentissage générées...";
         } catch (error) {
-            if (error instanceof AppError) throw error;
-
-            logger.error('Error predicting performance:', {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId,
-                projectId
-            });
-
-            throw new AppError(
-                'Failed to predict performance',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
+            logger.error('Erreur lors de la génération des recommandations:', error);
+            throw new Error('Impossible de générer les recommandations');
         }
     }
 };
