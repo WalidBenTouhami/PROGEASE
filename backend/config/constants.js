@@ -31,18 +31,17 @@ const Enums = Object.freeze({
     },
     StatutProjet: {
         BROUILLON: 'BROUILLON',
-        EN_COURS: 'EN_COURS',
-        TERMINE: 'TERMINE',
-        ARCHIVE: 'ARCHIVE',
-        EN_RETARD: 'EN_RETARD',
         A_VENIR: 'A_VENIR',
+        EN_COURS: 'EN_COURS',
+        EN_RETARD: 'EN_RETARD',
+        TERMINE: 'TERMINE',
+        ARCHIVE: 'ARCHIVE'
     },
     StatutLivrable: {
-        EN_ATTENTE: 'EN_ATTENTE',
+        A_FAIRE: 'A_FAIRE',
         EN_COURS: 'EN_COURS',
-        EN_RETARD: 'EN_RETARD',
+        EN_REVISION: 'EN_REVISION',
         TERMINE: 'TERMINE',
-        VALIDE: 'VALIDE',
         REJETE: 'REJETE'
     },
     NiveauRisque: {
@@ -55,6 +54,37 @@ const Enums = Object.freeze({
         REQUIS: 'REQUIS',
         OPTIONNEL: 'OPTIONNEL',
         CONDITIONNEL: 'CONDITIONNEL'
+    },
+    TypeLivrable: {
+        DOCUMENT: 'DOCUMENT',
+        CODE: 'CODE',
+        PRESENTATION: 'PRESENTATION',
+        PROTOTYPE: 'PROTOTYPE',
+        AUTRE: 'AUTRE'
+    },
+    PrioriteProjet: {
+        BASSE: 'BASSE',
+        MOYENNE: 'MOYENNE',
+        HAUTE: 'HAUTE',
+        CRITIQUE: 'CRITIQUE'
+    },
+    TypeFormation: {
+        EN_LIGNE: 'EN_LIGNE',
+        PRESENTIEL: 'PRESENTIEL',
+        HYBRIDE: 'HYBRIDE'
+    },
+    NiveauFormation: {
+        DEBUTANT: 'DEBUTANT',
+        INTERMEDIAIRE: 'INTERMEDIAIRE',
+        AVANCE: 'AVANCE',
+        EXPERT: 'EXPERT'
+    },
+    StatutCertification: {
+        NON_COMMENCE: 'NON_COMMENCE',
+        EN_COURS: 'EN_COURS',
+        REUSSI: 'REUSSI',
+        ECHOUE: 'ECHOUE',
+        EXPIRE: 'EXPIRE'
     }
 });
 
@@ -234,6 +264,38 @@ module.exports = {
         DEVELOPMENT: 'development',
         PRODUCTION: 'production',
         TEST: 'test'
+    },
+    Config: {
+        pagination: {
+            defaultLimit: 20,
+            maxLimit: 100
+        },
+        upload: {
+            maxFileSize: 5 * 1024 * 1024, // 5MB
+            allowedMimeTypes: [
+                'image/jpeg',
+                'image/png',
+                'image/gif',
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-powerpoint',
+                'application/vnd.openxmlformats-officedocument.presentationml.presentation'
+            ]
+        },
+        security: {
+            passwordMinLength: 8,
+            passwordMaxLength: 128,
+            saltRounds: 10,
+            tokenExpiration: '24h',
+            refreshTokenExpiration: '7d'
+        },
+        email: {
+            verificationTokenExpiration: 24 * 60 * 60 * 1000, // 24 heures
+            resetPasswordTokenExpiration: 1 * 60 * 60 * 1000 // 1 heure
+        }
     }
 };
 
