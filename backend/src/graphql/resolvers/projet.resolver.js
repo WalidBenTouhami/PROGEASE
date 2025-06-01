@@ -10,7 +10,7 @@
 const mongoose = require('mongoose');
 const Projet = require('../../models/projet.model');
 const logger = require('../../utils/logger');
-const { AppError, ERROR_CODES } = require('../../middleware/errorHandlers');
+const { AppError, ERROR_CODES } = require('../../middlewares/errorHandlers');
 const { validateInput } = require('../../utils/validators');
 const { handleMongooseError } = require('../../utils/errorUtils');
 const { Enum } = require('../../../config/constants');

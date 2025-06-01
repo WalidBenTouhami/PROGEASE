@@ -6,7 +6,8 @@
 
 'use strict';
 
-const { AppError } = require('../middleware/errorHandlers');
+const rateLimit = require('express-rate-limit');
+const { AppError } = require('../middlewares/errorHandlers');
 const logger = require('../utils/logger');
 
 // Map pour suivre les requetes par IP

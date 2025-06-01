@@ -11,7 +11,7 @@ const mongoose = require('mongoose');
 const logger = require('../../utils/logger');
 const aiService = require('../../services/ai.service');
 const Projet = require('../../models/projet.model');
-const { AppError, ERROR_CODES } = require('../../middleware/errorHandlers');
+const { AppError, ERROR_CODES } = require('../../middlewares/errorHandlers');
 const { checkAuthorization } = require('../../utils/auth.utils');
 
 // Implementation temporaire des methodes manquantes du service

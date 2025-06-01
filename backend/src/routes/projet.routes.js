@@ -2,11 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const projetController = require('../controllers/projet.controller');
-const { validateRequest } = require('../middleware/validation.middleware');
-const { projetSchema } = require('../validations/projet.validation');
-const { validateId } = require('../validations/projet.validation');
-const { asyncHandler } = require('../middleware/asyncHandler');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { validateRequest } = require('../middlewares/validate.Request');
+const { validateProjetData, validateId } = require('../validations/projet.validation');
+const { asyncHandler } = require('../middlewares/asyncHandler');
+const { rateLimiter } = require('../middlewares/rateLimiter');
 
 /**
  * @route GET /api/projets/health

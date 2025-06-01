@@ -9,7 +9,7 @@
 'use strict';
 
 const { validationResult } = require('express-validator');
-const { ValidationError } = require('../middleware/errorHandlers');
+const { ValidationError } = require('../middlewares/errorHandlers');
 const logger = require('../utils/logger');
 
 /**

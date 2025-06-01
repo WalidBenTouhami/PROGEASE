@@ -5,7 +5,7 @@
 
 'use strict';
 
-const { AppError, ERROR_CODES } = require('../middleware/errorHandlers');
+const { AppError, ERROR_CODES } = require('../middlewares/errorHandlers');
 
 /**
  * Verifie si une valeur est definie (non undefined et non null)

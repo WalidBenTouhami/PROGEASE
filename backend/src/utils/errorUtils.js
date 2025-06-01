@@ -5,7 +5,7 @@
 
 'use strict';
 
-const { AppError, ERROR_CODES } = require('../middleware/errorHandlers');
+const { AppError, ERROR_CODES } = require('../middlewares/errorHandlers');
 const logger = require('./logger');
 
 /**

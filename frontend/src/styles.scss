@@ -1,5 +1,22 @@
 @use '@angular/material' as mat;
 
+// Include the common styles for Angular Material
+@include mat.core();
+
+// Define a light theme
+$light-theme: mat.define-light-theme((
+  color: (
+    primary: mat.define-palette(mat.$indigo-palette),
+    accent: mat.define-palette(mat.$pink-palette),
+    warn: mat.define-palette(mat.$red-palette),
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+// Apply the light theme by default
+@include mat.all-component-themes($light-theme);
+
 // Import Material theme
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
@@ -53,10 +70,10 @@
 html, body {
   height: 100%;
   margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
 }
 
 body {
-  font-family: Roboto, "Helvetica Neue", sans-serif;
   background-color: var(--background-color);
   color: var(--text-color);
 }

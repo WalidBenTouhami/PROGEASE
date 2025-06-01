@@ -3,8 +3,8 @@ const express = require('express');
 const router = express.Router();
 const livrableController = require('../controllers/livrable.controller');
 const { validateLivrableData, validateId } = require('../validations/livrable.validation');
-const { asyncHandler } = require('../middleware/asyncHandler');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { asyncHandler } = require('../middlewares/asyncHandler');
+const { rateLimiter } = require('../middlewares/rateLimiter');
 
 /**
  * @route GET /api/livrables/health

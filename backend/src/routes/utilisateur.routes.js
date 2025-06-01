@@ -2,14 +2,12 @@ const express = require('express');
 const router = express.Router();
 const utilisateurController = require('../controllers/utilisateur.controller');
 const { validateUtilisateurData, validateId } = require('../validations/utilisateur.validation');
-const { asyncHandler } = require('../middleware/asyncHandler');
-const { rateLimiter } = require('../middleware/rateLimiter');
+const { asyncHandler } = require('../middlewares/asyncHandler');
+const { rateLimiter } = require('../middlewares/rateLimiter');
+const { verifierToken, verifierRole } = require('../middlewares/utilisateur.middleware');
 
-/**
- * @route GET /api/utilisateurs/health
- * @description Vérifier la santé de l'API utilisateurs
- * @access Public
- */
+// --- Routes de santé et CRUD classiques ---
+
 router.get('/health', (req, res) => {
     res.status(200).json({
         success: true,
@@ -22,55 +20,38 @@ router.get('/health', (req, res) => {
     });
 });
 
-/**
- * @route GET /api/utilisateurs
- * @description Récupérer tous les utilisateurs avec filtrage et pagination
- * @access Public
- */
 router.get('/',
-    rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requêtes par minute
-    asyncHandler(utilisateurController.recupererUtilisateurs)
+    rateLimiter({ windowMs: 60000, max: 30 }),
+    asyncHandler(utilisateurController.getAllutilisateurs)
 );
 
-/**
- * @route POST /api/utilisateurs
- * @description Créer un nouvel utilisateur
- * @access Public
- */
 router.post('/',
     validateUtilisateurData,
-    asyncHandler(utilisateurController.creerUtilisateur)
+    asyncHandler(utilisateurController.createutilisateur)
 );
 
-/**
- * @route GET /api/utilisateurs/:id
- * @description Récupérer un utilisateur par son ID
- * @access Public
- */
 router.get('/:id',
     validateId('id'),
-    asyncHandler(utilisateurController.recupererUtilisateurParId)
+    asyncHandler(utilisateurController.getutilisateurById)
 );
 
-/**
- * @route PUT /api/utilisateurs/:id
- * @description Mettre à jour un utilisateur
- * @access Public
- */
 router.put('/:id',
+    verifierToken, verifierRole(['admin']),
     validateId('id'),
     validateUtilisateurData,
-    asyncHandler(utilisateurController.mettreAJourUtilisateur)
+    asyncHandler(utilisateurController.updateutilisateur)
 );
 
-/**
- * @route DELETE /api/utilisateurs/:id
- * @description Supprimer un utilisateur
- * @access Public
- */
 router.delete('/:id',
+    verifierToken, verifierRole(['admin']),
     validateId('id'),
-    asyncHandler(utilisateurController.supprimerUtilisateur)
+    asyncHandler(utilisateurController.deleteutilisateur)
 );
+
+// --- Routes Authentification & Email ---
+
+router.post('/register', asyncHandler(utilisateurController.registerutilisateur));
+router.post('/login', asyncHandler(utilisateurController.loginutilisateur));
+router.get('/verify-email', asyncHandler(utilisateurController.verifyEmail));
 
 module.exports = router;

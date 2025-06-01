@@ -1,12 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../middlewares/authMiddlewares"); // Assurez-vous que le chemin est correct
+const authMiddleware = require("../../../middlewares/authMiddlewares"); // Assurez-vous que le chemin est correct
 
 
 const {
   createCertificat,
   verifierValiditeCertificat,
-} = require("../controllers/certificationController");  
+} = require("../controllers/certificationController");
 const { genererCertificat } = require("../controllers/formationController");
 
 // Route pour creer un certificat

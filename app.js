@@ -16,10 +16,10 @@ app.use(cors({
 // Middleware
 app.use(express.json());
 
-const certificatRoutes = require('./routes/certificationRoutes'); // Routes pour les certificats
-const formationRoutes = require('./routes/formationRoutes'); // Routes pour les formations
+const certificatRoutes = require('./backend/src/routes/certificationRoutes'); // Routes pour les certificats
+const formationRoutes = require('./backend/src/routes/formationRoutes'); // Routes pour les formations
 const utilisateurRoutes = require('./routes/utilisateurRoutes.js');  
-const quizRoute = require('./routes/quizRoutes'); // Routes pour les quiz
+const quizRoute = require('./backend/src/routes/quizRoutes'); // Routes pour les quiz
 
 
 // Routes

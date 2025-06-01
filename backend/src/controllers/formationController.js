@@ -1,7 +1,7 @@
-const Formation = require("../models/Formation");  
-const Certificat = require("../models/Certification"); 
+const Formation = require("../../../models/Formation");
+const Certificat = require("../../../models/Certification");
 const utilisateur = require("../models/utilisateur"); 
-const QuizResult = require("../models/QuizResult"); 
+const QuizResult = require("../../../models/QuizResult");
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 

@@ -8,7 +8,7 @@
 
 'use strict';
 
-const { ValidationError } = require('../middleware/errorHandlers');
+const { ValidationError } = require('../middlewares/errorHandlers');
 const logger = require('../utils/logger');
 
 /**

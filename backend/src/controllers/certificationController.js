@@ -1,7 +1,7 @@
-const Formation = require("../models/Formation");
-const Certificat = require("../models/Certification"); // Assurez-vous que le modèle Certificat est bien importe
+const Formation = require("../../../models/Formation");
+const Certificat = require("../../../models/Certification"); // Assurez-vous que le modèle Certificat est bien importe
 const utilisateur = require("../models/utilisateur"); // Assurez-vous que le modèle utilisateur est bien importe
-const QuizResult = require("../models/QuizResult"); // Modèle pour les resultats des quiz
+const QuizResult = require("../../../models/QuizResult"); // Modèle pour les resultats des quiz
 
 // Fonction pour verifier si l'utilisateur a reussi tous les quiz associes aux formations requises
 const checkQuizReussis = async (utilisateurId, formationsRequises) => {

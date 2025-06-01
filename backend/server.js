@@ -5,7 +5,6 @@ const morgan = require('morgan');
 const path = require('path');
 const http = require('http');
 const helmet = require('helmet');
-const mongoose = require('mongoose');
 const logger = require('./src/utils/logger');
 const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
@@ -13,16 +12,14 @@ const { typeDefs } = require('./src/graphql/schema');
 const { resolvers } = require('./src/graphql/resolvers');
 const connecterBD = require('./config/db');
 const { NODE_ENV } = require('./config/constants');
-const { globalRateLimiter } = require('./src/middleware/rateLimiter');
-const { makeExecutableSchema } = require('@graphql-tools/schema');
+const { globalRateLimiter } = require('./src/middlewares/rateLimiter');
 
 const {
-    ERROR_MESSAGES,
     setupProcessErrorHandlers,
     setupHttpErrorHandlers,
     notFoundHandler,
     errorHandler
-} = require('./src/middleware/errorHandlers');
+} = require('./src/middlewares/errorHandlers');
 
 // Import des routes
 const projetRoutes = require('./src/routes/projet.routes');
@@ -43,7 +40,7 @@ setupHttpErrorHandlers(httpServer, PORT);
 
 // CORS et sécurité
 app.use(helmet({
-    contentSecurityPolicy: false // Désactivé pour GraphQL Playground en dev
+    contentSecurityPolicy: false
 }));
 
 app.use(cors({
@@ -92,7 +89,7 @@ const apolloServer = new ApolloServer({
     resolvers,
     formatError: (error) => {
         logger.error('GraphQL Error:', error);
-        return process.env.NODE_ENV === 'production' 
+        return process.env.NODE_ENV === 'production'
             ? { message: 'Internal server error', path: error.path }
             : error;
     }
@@ -107,9 +104,9 @@ async function startServer() {
 
         // Démarrer Apollo Server
         await apolloServer.start();
-        
+
         // Appliquer le middleware Apollo
-        app.use('/graphql', 
+        app.use('/graphql',
             cors(),
             express.json(),
             expressMiddleware(apolloServer, {
