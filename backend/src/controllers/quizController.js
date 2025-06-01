@@ -1,5 +1,5 @@
-const Quiz = require("../../../models/Quiz");
-const quizSeed = require("../models/quizSeed");
+const Quiz = require("../Quiz");
+const quizSeed = require("../seeders/quizSeed");
 
 exports.createQuiz = async (req, res) => {
   try {

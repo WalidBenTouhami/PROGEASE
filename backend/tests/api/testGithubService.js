@@ -1,5 +1,5 @@
 // testGithubService.js
-const { checkGithubRepoExists } = require('./src/services/github.service');
+const { checkGithubRepoExists } = require('../../src/services/github.service');
 
 (async () => {
     try {

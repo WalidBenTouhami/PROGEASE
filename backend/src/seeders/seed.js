@@ -2,8 +2,8 @@
     require('dotenv').config();
     const mongoose = require('mongoose');
     const { MongoClient, ObjectId } = require('mongodb');
-    const { Enum } = require('./config/constants');
-    const logger = require('./src/utils/logger');
+    const { Enum } = require('../../config/constants');
+    const logger = require('../utils/logger');
 
     const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/progease';
     const DB_NAME = MONGO_URI.split('/').pop().split('?')[0];

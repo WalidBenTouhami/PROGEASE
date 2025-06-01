@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const authMiddleware = require("../../../middlewares/authMiddlewares"); // Assurez-vous que le chemin est correct
+const authMiddleware = require("../authMiddlewares"); // Assurez-vous que le chemin est correct
 
 
 const {

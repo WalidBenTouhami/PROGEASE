@@ -1,5 +1,5 @@
 // Fichier de test pour verifier le systeme de logs
-const logger = require('./src/utils/logger');
+const logger = require('../src/utils/logger');
 
 console.log('Demarrage des tests de logs...');
 
