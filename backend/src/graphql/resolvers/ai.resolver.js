@@ -23,10 +23,10 @@ const mockAIService = {
             confidence: 0.9
         };
     },
-    generateLearningRecommendations: async (project) => {
-        return [`Recommandation d'apprentissage pour projet ${project._id}`];
+    generateLearningRecommendations: async (projet) => {
+        return [`Recommandation d'apprentissage pour projet ${projet._id}`];
     },
-    predictPerformance: async (project) => {
+    predictPerformance: async (projet) => {
         return {
             score: 0.75,
             confidence: 0.8,
@@ -80,7 +80,7 @@ const Query = {
 };
 
 const Mutation = {
-    predictPerformance: async (_, { projectId }, { models }) => {
+    predictPerformance: async (_, { projetId }, { models }) => {
         try {
             // Logique pour prédire la performance
             return 0.85;
@@ -90,7 +90,7 @@ const Mutation = {
         }
     },
 
-    generateLearningRecommendations: async (_, { projectId }, { models }) => {
+    generateLearningRecommendations: async (_, { projetId }, { models }) => {
         try {
             // Logique pour générer des recommandations d'apprentissage
             return "Recommandations d'apprentissage générées...";

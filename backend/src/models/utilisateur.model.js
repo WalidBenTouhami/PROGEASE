@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const bcrypt = require('bcryptjs');
+const { Enums } = require('../../config/constants');
 
 const utilisateurSchema = new Schema({
     nom: {
@@ -23,7 +24,7 @@ const utilisateurSchema = new Schema({
         unique: true,
         trim: true,
         lowercase: true,
-        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Email invalide']
+        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Veuillez fournir un email valide']
     },
     motDePasse: {
         type: String,
@@ -33,8 +34,8 @@ const utilisateurSchema = new Schema({
     },
     role: {
         type: String,
-        enum: ['ADMIN', 'TUTEUR', 'ETUDIANT'],
-        default: 'ETUDIANT'
+        enum: Object.values(Enums.UtilisateurRole),
+        default: Enums.UtilisateurRole.ETUDIANT
     },
     avatar: {
         type: String,
@@ -123,6 +124,13 @@ utilisateurSchema.methods.estEtudiant = function() {
 utilisateurSchema.methods.mettreAJourDerniereConnexion = function() {
     this.derniereConnexion = new Date();
     return this.save();
+};
+
+// Méthode pour masquer le mot de passe lors de la sérialisation
+utilisateurSchema.methods.toJSON = function() {
+    const obj = this.toObject();
+    delete obj.motDePasse;
+    return obj;
 };
 
 const Utilisateur = mongoose.model('Utilisateur', utilisateurSchema);

@@ -13,18 +13,18 @@ REQUIRED_ENV_VARS.forEach((envVar) => {
 
 // ✅ Énumérations globales
 const Enums = Object.freeze({
-    ProjectStatus: {
+    ProjetStatus: {
         DRAFT: "DRAFT",
         IN_PROGRESS: "IN_PROGRESS",
         COMPLETED: "COMPLETED",
         ARCHIVED: "ARCHIVED",
     },
-    UserRole: {
+    UtilisateurRole: {
         ETUDIANT: "ETUDIANT",
         TUTEUR: "TUTEUR",
         ADMIN: "ADMIN",
     },
-    DeliverableStatus: {
+    LivrableStatus: {
         COMPLETED: "COMPLETED",
         PENDING: "PENDING",
         OVERDUE: "OVERDUE",
@@ -133,7 +133,7 @@ const MessagesErreur = Object.freeze({
         VALIDATION: 'Erreur de validation des donnees.',
         RATE_LIMIT: 'Trop de requetes, veuillez reessayer plus tard.'
     },
-    PROJECT: {
+    PROJET: {
         INVALID_TEAM_MEMBER: "Un membre de l'équipe est invalide.",
         NOT_FOUND: "Projet introuvable.",
         MEMBRE_EQUIPE_INVALIDE: 'Un membre de l\'equipe est invalide.',
@@ -179,6 +179,26 @@ const StatutHttp = Object.freeze({
 });
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
+const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/progease';
+const JWT_SECRET = process.env.JWT_SECRET || 'votre_secret_jwt_super_securise_pour_la_production_2025';
+const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:4200', 'http://localhost:3000'];
+const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
+
+const API_VERSION = '2.0.0';
+const RATE_LIMIT = {
+    WINDOW_MS: 15 * 60 * 1000, // 15 minutes
+    MAX: 100 // Nombre maximum de requêtes par fenêtre
+};
+
+const ERROR_CODES = {
+    BAD_REQUEST: 'BAD_REQUEST',
+    UNAUTHORIZED: 'UNAUTHORIZED',
+    FORBIDDEN: 'FORBIDDEN',
+    NOT_FOUND: 'NOT_FOUND',
+    VALIDATION_ERROR: 'VALIDATION_ERROR',
+    INTERNAL_ERROR: 'INTERNAL_ERROR'
+};
 
 // Configuration des variables d'environnement requises
 exports.VARIABLES_ENV_OBLIGATOIRES = {
@@ -192,10 +212,10 @@ exports.VARIABLES_ENV_OBLIGATOIRES = {
 // Configuration de la base de données
 exports.DB_CONFIG = {
     COLLECTIONS: {
-        USERS: 'users',
-        PROJECTS: 'projects',
+        UTILISATEURS: 'utilisateurs',
+        PROJETS: 'projets',
         EVALUATIONS: 'evaluations',
-        DELIVERABLES: 'deliverables'
+        LIVRABLES: 'livrables'
     },
     CONNECTION_OPTIONS: {
         useNewUrlParser: true,
@@ -218,7 +238,7 @@ exports.VALIDATION = {
         MIN_LENGTH: 8,
         MAX_LENGTH: 50
     },
-    USERNAME: {
+    NOM_UTILISATEUR: {
         MIN_LENGTH: 3,
         MAX_LENGTH: 30
     }
@@ -250,16 +270,20 @@ exports.HTTP_STATUS = {
 };
 
 module.exports = {
-    MONGO_URI: process.env.MONGO_URI,
-    PORT: process.env.PORT || 3000,
-    JWT_SECRET: process.env.JWT_SECRET,
-    DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
+    NODE_ENV,
+    PORT,
+    MONGO_URI,
+    JWT_SECRET,
+    ALLOWED_ORIGINS,
+    LOG_LEVEL,
+    API_VERSION,
+    RATE_LIMIT,
+    ERROR_CODES,
+    MessagesErreur,
+    StatutHttp,
     Enums,
     SecurityConfig: ConfigSecurite,
     PaginationDefaults: PaginationParDefaut,
-    ErrorMessages: MessagesErreur,
-    HttpStatus: StatutHttp,
-    NODE_ENV,
     ENVIRONMENTS: {
         DEVELOPMENT: 'development',
         PRODUCTION: 'production',

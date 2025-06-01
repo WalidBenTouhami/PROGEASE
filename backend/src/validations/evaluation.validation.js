@@ -23,8 +23,8 @@ const evaluationSchema = yup.object().shape({
                 .max(500, 'Criterion comments must not exceed 500 characters')
         })
     ),
-    projectId: yup.string()
-        .required('Project ID is required'),
+    projetId: yup.string()
+        .required('Projet ID is required'),
     evaluatorId: yup.string()
         .required('Evaluator ID is required')
 });

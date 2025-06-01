@@ -1,16 +1,16 @@
 const Evaluation = require('../models/evaluation.model');
-const Project = require('../models/projet.model');
+const Projet = require('../models/projet.model');
 const { generateAIAnalysis } = require('../services/ai.service');
 
 // Create a new evaluation
 const createEvaluation = async (req, res) => {
     try {
-        const { projectId, evaluatorId, score, comments, criteria } = req.body;
+        const { projetId, evaluatorId, score, comments, criteria } = req.body;
 
-        // Validate project exists
-        const project = await Project.findById(projectId);
-        if (!project) {
-            return res.status(404).json({ message: 'Project not found' });
+        // Validate projet exists
+        const projet = await Projet.findById(projetId);
+        if (!projet) {
+            return res.status(404).json({ message: 'Projet not found' });
         }
 
         // Calculate weighted score if criteria is provided
@@ -23,13 +23,13 @@ const createEvaluation = async (req, res) => {
 
         // Generate AI analysis
         const aiAnalysis = await generateAIAnalysis({
-            project,
+            projet,
             score: finalScore,
             criteria
         });
 
         const evaluation = new Evaluation({
-            projectId,
+            projetId,
             evaluatorId,
             score: finalScore,
             comments,
@@ -39,10 +39,10 @@ const createEvaluation = async (req, res) => {
 
         await evaluation.save();
 
-        // Update project's average score
-        const projectEvaluations = await Evaluation.find({ projectId });
-        const averageScore = projectEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projectEvaluations.length;
-        await Project.findByIdAndUpdate(projectId, { averageScore });
+        // Update projet's average score
+        const projetEvaluations = await Evaluation.find({ projetId });
+        const averageScore = projetEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projetEvaluations.length;
+        await Projet.findByIdAndUpdate(projetId, { averageScore });
 
         res.status(201).json(evaluation);
     } catch (error) {
@@ -54,7 +54,7 @@ const createEvaluation = async (req, res) => {
 const getEvaluations = async (req, res) => {
     try {
         const {
-            projectId,
+            projetId,
             evaluatorId,
             minScore,
             maxScore,
@@ -68,7 +68,7 @@ const getEvaluations = async (req, res) => {
 
         // Build filter object
         const filter = {};
-        if (projectId) filter.projectId = projectId;
+        if (projetId) filter.projetId = projetId;
         if (evaluatorId) filter.evaluatorId = evaluatorId;
         if (minScore || maxScore) {
             filter.score = {};
@@ -89,7 +89,7 @@ const getEvaluations = async (req, res) => {
             .sort({ [sortBy]: sortOrder === 'desc' ? -1 : 1 })
             .skip(skip)
             .limit(Number(limit))
-            .populate('projectId', 'titre description')
+            .populate('projetId', 'titre description')
             .populate('evaluatorId', 'name email');
 
         // Get total count for pagination
@@ -112,7 +112,7 @@ const getEvaluations = async (req, res) => {
 const getEvaluationById = async (req, res) => {
     try {
         const evaluation = await Evaluation.findById(req.params.id)
-            .populate('projectId', 'titre description')
+            .populate('projetId', 'titre description')
             .populate('evaluatorId', 'name email');
 
         if (!evaluation) {
@@ -144,9 +144,9 @@ const updateEvaluation = async (req, res) => {
         }
 
         // Generate new AI analysis
-        const project = await Project.findById(evaluation.projectId);
+        const projet = await Projet.findById(evaluation.projetId);
         const aiAnalysis = await generateAIAnalysis({
-            project,
+            projet,
             score: finalScore,
             criteria
         });
@@ -158,10 +158,10 @@ const updateEvaluation = async (req, res) => {
 
         await evaluation.save();
 
-        // Update project's average score
-        const projectEvaluations = await Evaluation.find({ projectId: evaluation.projectId });
-        const averageScore = projectEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projectEvaluations.length;
-        await Project.findByIdAndUpdate(evaluation.projectId, { averageScore });
+        // Update projet's average score
+        const projetEvaluations = await Evaluation.find({ projetId: evaluation.projetId });
+        const averageScore = projetEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projetEvaluations.length;
+        await Projet.findByIdAndUpdate(evaluation.projetId, { averageScore });
 
         res.json(evaluation);
     } catch (error) {
@@ -179,12 +179,12 @@ const deleteEvaluation = async (req, res) => {
 
         await Evaluation.deleteOne({ _id: evaluation._id });
 
-        // Update project's average score
-        const projectEvaluations = await Evaluation.find({ projectId: evaluation.projectId });
-        const averageScore = projectEvaluations.length > 0
-            ? projectEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projectEvaluations.length
+        // Update projet's average score
+        const projetEvaluations = await Evaluation.find({ projetId: evaluation.projetId });
+        const averageScore = projetEvaluations.length > 0
+            ? projetEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projetEvaluations.length
             : 0;
-        await Project.findByIdAndUpdate(evaluation.projectId, { averageScore });
+        await Projet.findByIdAndUpdate(evaluation.projetId, { averageScore });
 
         res.json({ message: 'Evaluation deleted successfully' });
     } catch (error) {
@@ -209,7 +209,7 @@ const getEvaluationStats = async (req, res) => {
                 }
             },
             {
-                $project: {
+                $projet: {
                     _id: 0,
                     averageScore: { $round: ["$averageScore", 2] },
                     minScore: 1,

@@ -28,7 +28,7 @@ const evaluationSchema = new Schema({
     },
     evaluateurId: {
         type: Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'Utilisateur',
         required: [true, 'L\'ID de l\'évaluateur est requis.']
     },
     note: {

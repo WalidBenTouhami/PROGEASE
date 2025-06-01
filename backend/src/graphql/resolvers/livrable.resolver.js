@@ -17,6 +17,9 @@ const { handleMongooseError } = require('../../utils/errorUtils');
 const { Enums } = require('../../../config/constants');
 const { mapProjetMongoVersGraphQL } = require('./projet.resolver');
 const { checkAuthorization } = require('../../utils/auth.utils');
+const { AuthenticationError, UserInputError } = require('apollo-server-express');
+const { catchAsync } = require('../../utils/catchAsync');
+const { validerLivrable } = require('../../validations/livrable.validation');
 
 /**
  * Transforme un document MongoDB Livrable en type GraphQL
@@ -39,7 +42,7 @@ function mapLivrableMongoVersGraphQL(doc) {
             estEnRetard: doc.estEnRetard || false
         };
     } catch (error) {
-        logger.error('Error mapping deliverable:', {
+        logger.error('Error mapping livrable:', {
             error: error.message,
             docId: doc?._id
         });
@@ -52,425 +55,251 @@ const Query = {
     /**
      * Liste des livrables avec pagination et filtres
      */
-    deliverables: async (_, {
-        page = 1,
-        limit = 10,
-        projetId = null,
-        statut = null,
-        recherche = null,
-        dateLimiteMin = null,
-        dateLimiteMax = null
-    }, context) => {
-        checkAuthorization(context, 'read', 'livrables');
+    livrables: catchAsync(async (_, { input = {} }) => {
+        const { page = 1, limit = 10, projetId, type, statut, estEnRetard } = input;
+        const query = {};
 
-        try {
-            // Construire le filtre
-            const filter = {};
-
-            if (projetId && mongoose.Types.ObjectId.isValid(projetId)) {
-                filter.projetId = projetId;
-            }
-
-            if (statut && Object.values(Enums.StatutLivrable).includes(statut)) {
-                filter.statut = statut;
-            }
-
-            if (recherche) {
-                filter.$or = [
-                    { intitule: { $regex: recherche, $options: 'i' } },
-                    { description: { $regex: recherche, $options: 'i' } }
-                ];
-            }
-
-            if (dateLimiteMin) {
-                filter.dateLimite = { $gte: new Date(dateLimiteMin) };
-            }
-
-            if (dateLimiteMax) {
-                filter.dateLimite = { ...filter.dateLimite, $lte: new Date(dateLimiteMax) };
-            }
-
-            // Calculer le skip pour la pagination
-            const skip = (page - 1) * limit;
-
-            // Recuperer les livrables avec pagination
-            const livrables = await Livrable.find(filter)
-                .sort({ majLe: -1 })
-                .skip(skip)
-                .limit(limit)
-                .populate('projetId', 'titre statut')
-                .lean()
-                .exec();
-
-            // Compter le nombre total pour la pagination
-            const total = await Livrable.countDocuments(filter);
-
-            return {
-                items: livrables.map(mapLivrableMongoVersGraphQL),
-                pagination: {
-                    page,
-                    limit,
-                    total,
-                    pages: Math.ceil(total / limit),
-                    hasNextPage: skip + limit < total,
-                    hasPreviousPage: page > 1
-                }
-            };
-        } catch (error) {
-            logger.error('Error fetching deliverables:', {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId,
-                filter: { page, limit, projetId, statut }
-            });
-
-            throw new AppError(
-                'Failed to fetch deliverables',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
+        if (projetId) query.projetId = projetId;
+        if (type) query.type = type;
+        if (statut) query.statut = statut;
+        if (estEnRetard !== undefined) {
+            query.dateLimite = { $lt: new Date() };
+            query.statut = { $ne: 'TERMINE' };
         }
-    },
+
+        const livrables = await Livrable.find(query)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .sort({ dateLimite: 1 })
+            .populate('projet')
+            .populate('commentaires.auteur');
+
+        const total = await Livrable.countDocuments(query);
+
+        return {
+            livrables,
+            total,
+            page,
+            pages: Math.ceil(total / limit)
+        };
+    }),
 
     /**
-     * Get a deliverable by ID
+     * Get a livrable by ID
      */
-    deliverable: async (_, { id }, context) => {
-        checkAuthorization(context, 'read', 'livrables');
+    livrable: catchAsync(async (_, { id }) => {
+        const livrable = await Livrable.findById(id)
+            .populate('projet')
+            .populate('commentaires.auteur');
 
-        try {
-            // Validate ID
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new AppError(
-                    'Invalid deliverable ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            // Use dataloader
-            const livrable = await context.loaders.livrableLoader.load(id);
-
-            if (!livrable) {
-                throw new AppError(
-                    'Deliverable not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            return mapLivrableMongoVersGraphQL(livrable);
-        } catch (error) {
-            if (error instanceof AppError) throw error;
-
-            logger.error(`Error fetching deliverable ${id}:`, {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId
-            });
-
-            throw new AppError(
-                'Failed to fetch deliverable',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
+        if (!livrable) {
+            throw new UserInputError('Livrable non trouvé');
         }
-    },
+
+        return livrable;
+    }),
 
     /**
-     * Get deliverables by project ID
+     * Get livrables by projet ID
      */
-    livrablesByProjet: async (_, { projetId }, context) => {
-        checkAuthorization(context, 'read', 'livrables');
+    livrablesByProjet: catchAsync(async (_, { projetId }) => {
+        const livrables = await Livrable.find({ projetId })
+            .sort({ dateLimite: 1 })
+            .populate('projet')
+            .populate('commentaires.auteur');
 
-        try {
-            // Validate project ID
-            if (!mongoose.Types.ObjectId.isValid(projetId)) {
-                throw new AppError(
-                    'Invalid project ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            // Use dataloader
-            const livrables = await context.loaders.livrablesByProjetLoader.load(projetId);
-
-            return livrables.map(mapLivrableMongoVersGraphQL);
-        } catch (error) {
-            if (error instanceof AppError) throw error;
-
-            logger.error(`Error fetching deliverables for project ${projetId}:`, {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId
-            });
-
-            throw new AppError(
-                'Failed to fetch project deliverables',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
-        }
-    }
+        return livrables;
+    })
 };
 
 const Mutation = {
     /**
-     * Create a new deliverable
+     * Create a new livrable
      */
-    addDeliverable: async (_, { projectId, input }, context) => {
-        checkAuthorization(context, 'create', 'livrables');
-
-        const session = await mongoose.startSession();
-        try {
-            session.startTransaction();
-
-            // Validate input
-            validateInput(input, {
-                name: { required: true, type: 'string', minLength: 3 },
-                description: { required: true, type: 'string', minLength: 10 },
-                deadline: { required: true, type: 'date' },
-                repositoryUrl: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ },
-                status: { type: 'string', enum: Object.values(Enums.StatutLivrable) }
-            });
-
-            // Check if project exists
-            const projet = await Projet.findById(projectId).session(session);
-            if (!projet) {
-                throw new AppError(
-                    'Project not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            // Create deliverable
-            const livrable = new Livrable({
-                ...input,
-                statut: input.statut || Enums.StatutLivrable.EN_ATTENTE,
-                createur: context.utilisateur?._id,
-                creeLe: new Date(),
-                majLe: new Date()
-            });
-
-            const saved = await livrable.save({ session });
-
-            // Update project
-            projet.livrables.push(saved._id);
-            await projet.save({ session });
-
-            await session.commitTransaction();
-
-            // Invalidate DataLoader caches
-            context.loaders.livrableLoader.clear(saved._id);
-            context.loaders.livrablesByProjetLoader.clear(projectId);
-            context.loaders.projetLoader.clear(projectId);
-
-            logger.info(`Livrable cree: ${saved._id}`, {
-                utilisateurId: context.utilisateur?._id,
-                projetId: input.projetId,
-                requestId: context.requestId
-            });
-
-            return mapLivrableMongoVersGraphQL(saved);
-        } catch (error) {
-            await session.abortTransaction();
-
-            if (error instanceof AppError) throw error;
-
-            const appError = handleMongooseError(
-                error,
-                'Failed to create deliverable',
-                context.requestId
-            );
-
-            logger.error('Error creating deliverable:', {
-                error: error.message,
-                stack: error.stack,
-                input,
-                requestId: context.requestId
-            });
-
-            throw appError;
-        } finally {
-            await session.endSession();
+    addLivrable: catchAsync(async (_, { input }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
         }
-    },
+
+        const projet = await Projet.findById(input.projetId);
+        if (!projet) {
+            throw new UserInputError('Projet non trouvé');
+        }
+
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à créer un livrable pour ce projet');
+        }
+
+        const { error } = validerLivrable.creer(input);
+        if (error) {
+            throw new UserInputError(error.details[0].message);
+        }
+
+        const livrable = await Livrable.create(input);
+        return livrable.populate('projet');
+    }),
 
     /**
-     * Update a deliverable
+     * Update a livrable
      */
-    updateDeliverable: async (_, { id, input }, context) => {
-        checkAuthorization(context, 'update', 'livrables');
-
-        const session = await mongoose.startSession();
-        try {
-            session.startTransaction();
-
-            // Validate ID
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new AppError(
-                    'Invalid deliverable ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            // Validate input
-            if (input.name) validateInput({ name: input.name }, { name: { type: 'string', minLength: 3 } });
-            if (input.description) validateInput({ description: input.description }, { description: { type: 'string', minLength: 10 } });
-            if (input.repositoryUrl) validateInput({ repositoryUrl: input.repositoryUrl }, { repositoryUrl: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ } });
-
-            const updateData = {
-                intitule: input.name,
-                description: input.description,
-                dateLimite: input.deadline,
-                urlDepot: input.repositoryUrl,
-                statut: input.status,
-                majLe: new Date(),
-                majPar: context.utilisateur?._id
-            };
-
-            const livrable = await Livrable.findByIdAndUpdate(
-                id,
-                updateData,
-                {
-                    new: true,
-                    runValidators: true,
-                    session
-                }
-            ).populate('projetId', 'titre statut');
-
-            if (!livrable) {
-                throw new AppError(
-                    'Deliverable not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            await session.commitTransaction();
-
-            // Invalidate DataLoader caches
-            context.loaders.livrableLoader.clear(id);
-            context.loaders.livrablesByProjetLoader.clear(livrable.projetId);
-            context.loaders.projetLoader.clear(livrable.projetId);
-
-            logger.info(`Livrable mis à jour: ${id}`, {
-                utilisateurId: context.utilisateur?._id,
-                projetId: livrable.projetId,
-                requestId: context.requestId
-            });
-
-            return mapLivrableMongoVersGraphQL(livrable);
-        } catch (error) {
-            await session.abortTransaction();
-
-            if (error instanceof AppError) throw error;
-
-            const appError = handleMongooseError(
-                error,
-                'Failed to update deliverable',
-                context.requestId
-            );
-
-            logger.error(`Error updating deliverable ${id}:`, {
-                error: error.message,
-                stack: error.stack,
-                input,
-                requestId: context.requestId
-            });
-
-            throw appError;
-        } finally {
-            await session.endSession();
+    updateLivrable: catchAsync(async (_, { id, input }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
         }
-    },
+
+        const livrable = await Livrable.findById(id);
+        if (!livrable) {
+            throw new UserInputError('Livrable non trouvé');
+        }
+
+        const projet = await Projet.findById(livrable.projetId);
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à modifier ce livrable');
+        }
+
+        const { error } = validerLivrable.mettreAJour(input);
+        if (error) {
+            throw new UserInputError(error.details[0].message);
+        }
+
+        Object.assign(livrable, input);
+        await livrable.save();
+
+        return livrable.populate('projet').populate('commentaires.auteur');
+    }),
 
     /**
-     * Delete a deliverable
+     * Delete a livrable
      */
-    deleteDeliverable: async (_, { id }, context) => {
-        checkAuthorization(context, 'delete', 'livrables');
-
-        const session = await mongoose.startSession();
-        try {
-            session.startTransaction();
-
-            // Validate ID
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new AppError(
-                    'Invalid deliverable ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            const livrable = await Livrable.findByIdAndDelete(id).session(session);
-
-            if (!livrable) {
-                throw new AppError(
-                    'Deliverable not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            // Update parent project
-            const projet = await Projet.findById(livrable.projetId).session(session);
-            if (projet) {
-                projet.livrables = projet.livrables.filter(lId => lId.toString() !== id);
-                await projet.calculerProgression();
-                await projet.save({ session });
-            }
-
-            await session.commitTransaction();
-
-            // Invalidate DataLoader caches
-            context.loaders.livrableLoader.clear(id);
-            context.loaders.livrablesByProjetLoader.clear(livrable.projetId);
-            context.loaders.projetLoader.clear(livrable.projetId);
-
-            logger.info(`Livrable supprime: ${id}`, {
-                utilisateurId: context.utilisateur?._id,
-                projetId: livrable.projetId,
-                requestId: context.requestId
-            });
-
-            return mapLivrableMongoVersGraphQL(livrable);
-        } catch (error) {
-            await session.abortTransaction();
-
-            if (error instanceof AppError) throw error;
-
-            logger.error(`Error deleting deliverable ${id}:`, {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId
-            });
-
-            throw new AppError(
-                'Failed to delete deliverable',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
-        } finally {
-            await session.endSession();
+    deleteLivrable: catchAsync(async (_, { id }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
         }
-    }
+
+        const livrable = await Livrable.findById(id);
+        if (!livrable) {
+            throw new UserInputError('Livrable non trouvé');
+        }
+
+        const projet = await Projet.findById(livrable.projetId);
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à supprimer ce livrable');
+        }
+
+        await livrable.remove();
+        return true;
+    }),
+
+    ajouterFichier: catchAsync(async (_, { id, fichier }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
+        }
+
+        const livrable = await Livrable.findById(id);
+        if (!livrable) {
+            throw new UserInputError('Livrable non trouvé');
+        }
+
+        const projet = await Projet.findById(livrable.projetId);
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à modifier ce livrable');
+        }
+
+        livrable.fichiers.push({
+            ...fichier,
+            dateUpload: new Date()
+        });
+
+        await livrable.save();
+        return livrable.populate('projet').populate('commentaires.auteur');
+    }),
+
+    supprimerFichier: catchAsync(async (_, { id, nomFichier }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
+        }
+
+        const livrable = await Livrable.findById(id);
+        if (!livrable) {
+            throw new UserInputError('Livrable non trouvé');
+        }
+
+        const projet = await Projet.findById(livrable.projetId);
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à modifier ce livrable');
+        }
+
+        livrable.fichiers = livrable.fichiers.filter(f => f.nom !== nomFichier);
+        await livrable.save();
+
+        return livrable.populate('projet').populate('commentaires.auteur');
+    }),
+
+    ajouterCommentaire: catchAsync(async (_, { id, commentaire }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
+        }
+
+        const livrable = await Livrable.findById(id);
+        if (!livrable) {
+            throw new UserInputError('Livrable non trouvé');
+        }
+
+        livrable.commentaires.push({
+            auteur: utilisateur.id,
+            contenu: commentaire.contenu,
+            dateCreation: new Date()
+        });
+
+        await livrable.save();
+        return livrable.populate('projet').populate('commentaires.auteur');
+    }),
+
+    supprimerCommentaire: catchAsync(async (_, { id, commentaireId }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
+        }
+
+        const livrable = await Livrable.findById(id);
+        if (!livrable) {
+            throw new UserInputError('Livrable non trouvé');
+        }
+
+        const commentaire = livrable.commentaires.id(commentaireId);
+        if (!commentaire) {
+            throw new UserInputError('Commentaire non trouvé');
+        }
+
+        if (commentaire.auteur.toString() !== utilisateur.id && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à supprimer ce commentaire');
+        }
+
+        commentaire.remove();
+        await livrable.save();
+
+        return livrable.populate('projet').populate('commentaires.auteur');
+    }),
+
+    changerStatutLivrable: catchAsync(async (_, { id, statut }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
+        }
+
+        const livrable = await Livrable.findById(id);
+        if (!livrable) {
+            throw new UserInputError('Livrable non trouvé');
+        }
+
+        const projet = await Projet.findById(livrable.projetId);
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à modifier ce livrable');
+        }
+
+        livrable.statut = statut;
+        await livrable.save();
+
+        return livrable.populate('projet').populate('commentaires.auteur');
+    })
 };
 
 // Resolvers pour les champs complexes du type Livrable
@@ -482,7 +311,7 @@ const LivrableResolver = {
             const projet = await context.loaders.projetLoader.load(parent.projetId.toString());
             return mapProjetMongoVersGraphQL(projet);
         } catch (error) {
-            logger.error(`Error loading project for deliverable ${parent.id}:`, error);
+            logger.error(`Error loading projet for livrable ${parent.id}:`, error);
             return null;
         }
     },
@@ -491,6 +320,9 @@ const LivrableResolver = {
         if (parent.statut === Enums.StatutLivrable.TERMINE ||
             parent.statut === Enums.StatutLivrable.VALIDE) return false;
         return new Date() > new Date(parent.dateLimite);
+    },
+    commentaires: async (parent) => {
+        return parent.populate('commentaires.auteur').then(l => l.commentaires);
     }
 };
 

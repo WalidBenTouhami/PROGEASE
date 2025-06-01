@@ -17,6 +17,9 @@ const { Enum } = require('../../../config/constants');
 const { checkAuthorization } = require('../../utils/auth.utils');
 const Livrable = require('../../models/livrable.model');
 const Evaluation = require('../../models/evaluation.model');
+const { AuthenticationError, UserInputError } = require('apollo-server-express');
+const { catchAsync } = require('../../utils/catchAsync');
+const { validerProjet } = require('../../validations/projet.validation');
 
 /**
  * Transforme un document MongoDB Projet en type GraphQL
@@ -50,149 +53,56 @@ const Query = {
     /**
      * Liste des projets avec pagination et filtres
      */
-    projets: async (_, {
-        page = 1,
-        limit = 10,
-        statut = null,
-        recherche = null,
-        dateDebutMin = null,
-        dateFinMax = null,
-        tuteurId = null,
-        membreEquipe = null,
-        competence = null
-    }, context) => {
-        checkAuthorization(context, 'read', 'projets');
+    projets: catchAsync(async (_, { input = {} }) => {
+        const { page = 1, limit = 10, titre, statut, competences, dateDebut, dateFin } = input;
+        const query = {};
 
-        try {
-            // Construire le filtre
-            const filter = {};
+        if (titre) query.titre = new RegExp(titre, 'i');
+        if (statut) query.statut = statut;
+        if (competences && competences.length) query.competences = { $all: competences };
 
-            if (statut && Object.values(Enum.StatutProjet).includes(statut)) {
-                filter.statut = statut;
-            }
-
-            if (recherche) {
-                filter.$or = [
-                    { titre: { $regex: recherche, $options: 'i' } },
-                    { description: { $regex: recherche, $options: 'i' } }
-                ];
-            }
-
-            if (dateDebutMin) {
-                filter.dateDebut = { $gte: new Date(dateDebutMin) };
-            }
-
-            if (dateFinMax) {
-                filter.dateFin = { $lte: new Date(dateFinMax) };
-            }
-
-            if (tuteurId && mongoose.Types.ObjectId.isValid(tuteurId)) {
-                filter.tuteur = tuteurId;
-            }
-
-            if (membreEquipe && mongoose.Types.ObjectId.isValid(membreEquipe)) {
-                filter.equipe = membreEquipe;
-            }
-
-            if (competence) {
-                filter.competences = competence;
-            }
-
-            // Calculer le skip pour la pagination
-            const skip = (page - 1) * limit;
-
-            // Recuperer les projets avec pagination
-            const projets = await Projet.find(filter)
-                .sort({ majLe: -1 })
-                .skip(skip)
-                .limit(limit)
-                .populate('tuteur', 'nom prenom email')
-                .populate('equipe', 'nom prenom email')
-                .populate('livrablesComplets')
-                .lean()
-                .exec();
-
-            // Compter le nombre total pour la pagination
-            const total = await Projet.countDocuments(filter);
-
-            return {
-                items: projets.map(mapProjetMongoVersGraphQL),
-                pagination: {
-                    page,
-                    limit,
-                    total,
-                    pages: Math.ceil(total / limit),
-                    hasNextPage: skip + limit < total,
-                    hasPreviousPage: page > 1
-                }
-            };
-        } catch (error) {
-            logger.error('Error fetching projects:', {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId,
-                filter: { page, limit, statut, recherche }
-            });
-
-            throw new AppError(
-                'Failed to fetch projects',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
+        if (dateDebut || dateFin) {
+            query.dateDebut = {};
+            if (dateDebut) query.dateDebut.$gte = new Date(dateDebut);
+            if (dateFin) query.dateDebut.$lte = new Date(dateFin);
         }
-    },
+
+        const projets = await Projet.find(query)
+            .skip((page - 1) * limit)
+            .limit(limit)
+            .sort({ creeLe: -1 })
+            .populate('equipe')
+            .populate('tuteur')
+            .populate('livrables');
+
+        const total = await Projet.countDocuments(query);
+
+        return {
+            projets,
+            total,
+            page,
+            pages: Math.ceil(total / limit)
+        };
+    }),
 
     /**
-     * Get a project by ID
+     * Get a projet by ID
      */
-    projet: async (_, { id }, context) => {
-        checkAuthorization(context, 'read', 'projets');
+    projet: catchAsync(async (_, { id }) => {
+        const projet = await Projet.findById(id)
+            .populate('equipe')
+            .populate('tuteur')
+            .populate('livrables');
 
-        try {
-            // Validate ID
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new AppError(
-                    'Invalid project ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            // Use dataloader to avoid duplicate requests
-            const projet = await context.loaders.projetLoader.load(id);
-
-            if (!projet) {
-                throw new AppError(
-                    'Project not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            return mapProjetMongoVersGraphQL(projet);
-        } catch (error) {
-            if (error instanceof AppError) throw error;
-
-            logger.error(`Error fetching project ${id}:`, {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId
-            });
-
-            throw new AppError(
-                'Failed to fetch project',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
+        if (!projet) {
+            throw new UserInputError('Projet non trouvé');
         }
-    },
+
+        return projet;
+    }),
 
     /**
-     * Analyze project risks
+     * Analyze projet risks
      */
     analyserRisquesProjet: async (_, { projetId }, context) => {
         checkAuthorization(context, 'read', 'projets');
@@ -204,7 +114,7 @@ const Query = {
 
             if (!projet) {
                 throw new AppError(
-                    'Project not found',
+                    'Projet not found',
                     404,
                     ERROR_CODES.NOT_FOUND,
                     true
@@ -223,16 +133,16 @@ const Query = {
 
             const recommandations = [];
             if (risques.retard) {
-                recommandations.push('Review project schedule and adjust deadlines');
+                recommandations.push('Review projet schedule and adjust deadlines');
             }
             if (risques.progression) {
-                recommandations.push('Increase resources allocated to the project');
+                recommandations.push('Increase resources allocated to the projet');
             }
             if (risques.livrables) {
-                recommandations.push('Schedule a follow-up meeting for late deliverables');
+                recommandations.push('Schedule a follow-up meeting for late livrables');
             }
             if (risques.equipe) {
-                recommandations.push('Strengthen the project team');
+                recommandations.push('Strengthen the projet team');
             }
 
             return {
@@ -243,7 +153,7 @@ const Query = {
         } catch (error) {
             if (error instanceof AppError) throw error;
 
-            logger.error('Error analyzing project risks:', {
+            logger.error('Error analyzing projet risks:', {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId,
@@ -251,7 +161,7 @@ const Query = {
             });
 
             throw new AppError(
-                'Failed to analyze project risks',
+                'Failed to analyze projet risks',
                 500,
                 ERROR_CODES.SERVER_ERROR,
                 false
@@ -259,299 +169,204 @@ const Query = {
         }
     },
 
-    getProjectProgress: async (_, { id }, context) => {
+    getProjetProgress: async (_, { id }, context) => {
         try {
             const projet = await Projet.findById(id);
-            if (!projet) throw new Error('Project not found');
+            if (!projet) throw new Error('Projet not found');
             return projet.progression || 0;
         } catch (error) {
-            logger.error(`Error getting project progress ${id}:`, error);
-            throw new Error('Failed to get project progress');
+            logger.error(`Error getting projet progress ${id}:`, error);
+            throw new Error('Failed to get projet progress');
         }
     },
 
     getPredictedPerformance: async (_, { id }, context) => {
         try {
             const projet = await Projet.findById(id);
-            if (!projet) throw new Error('Project not found');
+            if (!projet) throw new Error('Projet not found');
             return projet.performancePredite || 0;
         } catch (error) {
             logger.error(`Error getting predicted performance ${id}:`, error);
             throw new Error('Failed to get predicted performance');
         }
-    }
+    },
+
+    mesProjets: catchAsync(async (_, __, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
+        }
+
+        return Projet.find({ equipe: utilisateur.id })
+            .populate('equipe')
+            .populate('tuteur')
+            .populate('livrables')
+            .sort({ creeLe: -1 });
+    }),
+
+    projetsTuteur: catchAsync(async (_, __, { utilisateur }) => {
+        if (!utilisateur || utilisateur.role !== 'TUTEUR') {
+            throw new AuthenticationError('Non autorisé');
+        }
+
+        return Projet.find({ tuteur: utilisateur.id })
+            .populate('equipe')
+            .populate('tuteur')
+            .populate('livrables')
+            .sort({ creeLe: -1 });
+    })
 };
 
 const Mutation = {
     /**
-     * Create a new project
+     * Create a new projet
      */
-    createProject: async (_, { input }, context) => {
-        checkAuthorization(context, 'create', 'projets');
-
-        const session = await mongoose.startSession();
-        try {
-            session.startTransaction();
-
-            // Validate input
-            validateInput(input, {
-                titre: { required: true, type: 'string', minLength: 5 },
-                description: { required: true, type: 'string', minLength: 10 },
-                equipe: { type: 'array', itemType: 'string' },
-                tuteur: { type: 'string' },
-                competences: { required: true, type: 'array', itemType: 'string', minLength: 1 },
-                dateDebut: { required: true, type: 'date' },
-                dateFin: { required: true, type: 'date' },
-                urlDepot: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ }
-            });
-
-            // Create project
-            const projet = new Projet({
-                ...input,
-                statut: input.statut || Enum.StatutProjet.BROUILLON,
-                progression: 0,
-                createur: context.utilisateur?._id,
-                creeLe: new Date(),
-                majLe: new Date()
-            });
-
-            const saved = await projet.save({ session });
-
-            // Ajouter l'activite d'audit
-            logger.info(`Projet cree: ${saved._id}`, {
-                utilisateurId: context.utilisateur?._id,
-                requestId: context.requestId
-            });
-
-            await session.commitTransaction();
-
-            // Invalidate DataLoader cache
-            context.loaders.projetLoader.clear(saved._id);
-
-            return mapProjetMongoVersGraphQL(saved);
-        } catch (error) {
-            await session.abortTransaction();
-
-            const appError = handleMongooseError(
-                error,
-                'Failed to create project',
-                context.requestId
-            );
-
-            logger.error('Error creating project:', {
-                error: error.message,
-                stack: error.stack,
-                input,
-                requestId: context.requestId
-            });
-
-            throw appError;
-        } finally {
-            await session.endSession();
+    createProjet: catchAsync(async (_, { input }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
         }
-    },
+
+        const { error } = validerProjet.creer(input);
+        if (error) {
+            throw new UserInputError(error.details[0].message);
+        }
+
+        const projet = await Projet.create({
+            ...input,
+            equipe: [...input.equipe, utilisateur.id],
+            statut: input.statut || Enum.StatutProjet.BROUILLON,
+            progression: 0,
+            createur: utilisateur._id,
+            creeLe: new Date(),
+            majLe: new Date()
+        });
+
+        return projet.populate('equipe').populate('tuteur');
+    }),
 
     /**
-     * Update an existing project
+     * Update an existing projet
      */
-    updateProject: async (_, { id, input }, context) => {
-        checkAuthorization(context, 'update', 'projets');
-
-        const session = await mongoose.startSession();
-        try {
-            session.startTransaction();
-
-            // Validate ID
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new AppError(
-                    'Invalid project ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            // Validate input
-            if (input.titre) validateInput({ titre: input.titre }, { titre: { type: 'string', minLength: 5 } });
-            if (input.description) validateInput({ description: input.description }, { description: { type: 'string', minLength: 10 } });
-            if (input.competences) validateInput({ competences: input.competences }, { competences: { type: 'array', itemType: 'string', minLength: 1 } });
-            if (input.urlDepot) validateInput({ urlDepot: input.urlDepot }, { urlDepot: { type: 'string', pattern: /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/ } });
-
-            const updateData = {
-                ...input,
-                majLe: new Date(),
-                majPar: context.utilisateur?._id
-            };
-
-            // Convert dates if present
-            if (updateData.dateDebut) updateData.dateDebut = new Date(updateData.dateDebut);
-            if (updateData.dateFin) updateData.dateFin = new Date(updateData.dateFin);
-
-            const projetMisAJour = await Projet.findByIdAndUpdate(
-                id,
-                updateData,
-                {
-                    new: true,
-                    runValidators: true,
-                    session
-                }
-            ).populate('tuteur', 'nom prenom email')
-                .populate('equipe', 'nom prenom email')
-                .populate('livrablesComplets');
-
-            if (!projetMisAJour) {
-                throw new AppError(
-                    'Project not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            // Recalculate progress if necessary
-            if (input.livrables || input.statut) {
-                await projetMisAJour.calculerProgression();
-                await projetMisAJour.save({ session });
-            }
-
-            await session.commitTransaction();
-
-            // Invalidate DataLoader cache
-            context.loaders.projetLoader.clear(id);
-
-            logger.info(`Projet mis à jour: ${id}`, {
-                utilisateurId: context.utilisateur?._id,
-                requestId: context.requestId
-            });
-
-            return mapProjetMongoVersGraphQL(projetMisAJour);
-        } catch (error) {
-            await session.abortTransaction();
-
-            if (error instanceof AppError) throw error;
-
-            const appError = handleMongooseError(
-                error,
-                'Failed to update project',
-                context.requestId
-            );
-
-            logger.error(`Error updating project ${id}:`, {
-                error: error.message,
-                stack: error.stack,
-                input,
-                requestId: context.requestId
-            });
-
-            throw appError;
-        } finally {
-            await session.endSession();
+    updateProjet: catchAsync(async (_, { id, input }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
         }
-    },
+
+        const projet = await Projet.findById(id);
+        if (!projet) {
+            throw new UserInputError('Projet non trouvé');
+        }
+
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à modifier ce projet');
+        }
+
+        const { error } = validerProjet.mettreAJour(input);
+        if (error) {
+            throw new UserInputError(error.details[0].message);
+        }
+
+        Object.assign(projet, input);
+        await projet.save();
+
+        return projet.populate('equipe').populate('tuteur');
+    }),
 
     /**
-     * Delete a project
+     * Delete a projet
      */
-    deleteProject: async (_, { id }, context) => {
-        checkAuthorization(context, 'delete', 'projets');
-
-        const session = await mongoose.startSession();
-        try {
-            session.startTransaction();
-
-            // Validate ID
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new AppError(
-                    'Invalid project ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
-            }
-
-            // Delete associated deliverables first
-            await Livrable.deleteMany({ projetId: id }).session(session);
-            await Evaluation.deleteMany({ projetId: id }).session(session);
-
-            const projetSupprime = await Projet.findByIdAndDelete(id).session(session);
-
-            if (!projetSupprime) {
-                throw new AppError(
-                    'Project not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
-            }
-
-            await session.commitTransaction();
-
-            // Invalidate DataLoader cache
-            context.loaders.projetLoader.clear(id);
-
-            logger.info(`Projet supprime: ${id}`, {
-                utilisateurId: context.utilisateur?._id,
-                requestId: context.requestId
-            });
-
-            return mapProjetMongoVersGraphQL(projetSupprime);
-        } catch (error) {
-            await session.abortTransaction();
-
-            if (error instanceof AppError) throw error;
-
-            logger.error(`Error deleting project ${id}:`, {
-                error: error.message,
-                stack: error.stack,
-                requestId: context.requestId
-            });
-
-            throw new AppError(
-                'Failed to delete project',
-                500,
-                ERROR_CODES.SERVER_ERROR,
-                false
-            );
-        } finally {
-            await session.endSession();
+    deleteProjet: catchAsync(async (_, { id }, { utilisateur }) => {
+        if (!utilisateur || utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé');
         }
-    }
+
+        const projet = await Projet.findById(id);
+        if (!projet) {
+            throw new UserInputError('Projet non trouvé');
+        }
+
+        await projet.remove();
+        return true;
+    }),
+
+    ajouterMembreProjet: catchAsync(async (_, { projetId, utilisateurId }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
+        }
+
+        const projet = await Projet.findById(projetId);
+        if (!projet) {
+            throw new UserInputError('Projet non trouvé');
+        }
+
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à modifier ce projet');
+        }
+
+        if (projet.equipe.includes(utilisateurId)) {
+            throw new UserInputError('L\'utilisateur est déjà membre du projet');
+        }
+
+        projet.equipe.push(utilisateurId);
+        await projet.save();
+
+        return projet.populate('equipe').populate('tuteur');
+    }),
+
+    retirerMembreProjet: catchAsync(async (_, { projetId, utilisateurId }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
+        }
+
+        const projet = await Projet.findById(projetId);
+        if (!projet) {
+            throw new UserInputError('Projet non trouvé');
+        }
+
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à modifier ce projet');
+        }
+
+        if (!projet.equipe.includes(utilisateurId)) {
+            throw new UserInputError('L\'utilisateur n\'est pas membre du projet');
+        }
+
+        projet.equipe = projet.equipe.filter(id => id.toString() !== utilisateurId);
+        await projet.save();
+
+        return projet.populate('equipe').populate('tuteur');
+    }),
+
+    changerStatutProjet: catchAsync(async (_, { id, statut }, { utilisateur }) => {
+        if (!utilisateur) {
+            throw new AuthenticationError('Non authentifié');
+        }
+
+        const projet = await Projet.findById(id);
+        if (!projet) {
+            throw new UserInputError('Projet non trouvé');
+        }
+
+        if (!projet.equipe.includes(utilisateur.id) && utilisateur.role !== 'ADMIN') {
+            throw new AuthenticationError('Non autorisé à modifier ce projet');
+        }
+
+        projet.statut = statut;
+        await projet.save();
+
+        return projet.populate('equipe').populate('tuteur');
+    })
 };
 
 // Resolvers pour les champs complexes du type Projet
 const ProjetResolver = {
-    equipe: async (parent, _, context) => {
-        if (!parent.equipe || parent.equipe.length === 0) return [];
-        try {
-            const users = await context.loaders.userLoader.loadMany(
-                parent.equipe.map(id => id.toString())
-            );
-            return users.filter(Boolean);
-        } catch (error) {
-            logger.error(`Error loading team members for project ${parent.id}:`, error);
-            return [];
-        }
+    equipe: async (parent) => {
+        return parent.populate('equipe').then(p => p.equipe);
     },
-    tuteur: async (parent, _, context) => {
-        if (!parent.tuteur) return null;
-        try {
-            return await context.loaders.userLoader.load(parent.tuteur.toString());
-        } catch (error) {
-            logger.error(`Error loading tutor for project ${parent.id}:`, error);
-            return null;
-        }
+    tuteur: async (parent) => {
+        return parent.populate('tuteur').then(p => p.tuteur);
     },
-    livrables: async (parent, _, context) => {
-        if (!parent.livrables || parent.livrables.length === 0) return [];
-        try {
-            const livrables = await context.loaders.livrableLoader.loadMany(
-                parent.livrables.map(id => id.toString())
-            );
-            return livrables.filter(Boolean);
-        } catch (error) {
-            logger.error(`Error loading deliverables for project ${parent.id}:`, error);
-            return [];
-        }
+    livrables: async (parent) => {
+        return parent.populate('livrables').then(p => p.livrables);
     },
     evaluations: async (parent, _, context) => {
         if (!parent.evaluations || parent.evaluations.length === 0) return [];
@@ -561,7 +376,7 @@ const ProjetResolver = {
             );
             return evaluations.filter(Boolean);
         } catch (error) {
-            logger.error(`Error loading evaluations for project ${parent.id}:`, error);
+            logger.error(`Error loading evaluations for projet ${parent.id}:`, error);
             return [];
         }
     }

@@ -1,0 +1,10 @@
+2025-06-02 00:12:50 [32minfo[39m: [32m✅ Mode test forcé pour les tests[39m
+2025-06-02 00:12:50 [32minfo[39m: [32mGestionnaires d'erreurs du processus configures[39m
+2025-06-02 00:12:50 [32minfo[39m: [32mGestionnaires d'erreurs HTTP configures[39m
+2025-06-02 00:12:51 [32minfo[39m: [32m✅ Connecté à MongoDB[39m
+2025-06-02 00:12:51 [32minfo[39m: [32m✅ Serveur démarré sur le port 5003[39m
+2025-06-02 00:12:51 [32minfo[39m: [32mAPI REST disponible sur http://localhost:5003/api[39m
+2025-06-02 00:12:51 [32minfo[39m: [32mGraphQL v4 disponible sur http://localhost:5003/graphql[39m
+2025-06-02 00:12:52 [32minfo[39m: [32mDonnees de test dejà presentes[39m
+2025-06-02 00:12:52 [32minfo[39m: [32mDonnées de test créées/vérifiées avec succès[39m
+2025-06-02 00:21:24 [32minfo[39m: [32mSignal SIGINT reçu. Arret du serveur...[39m

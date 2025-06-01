@@ -113,16 +113,6 @@ const createFormation = async (req, res) => {
   }
 };
 
-// Lister toutes les formations
-const getAllFormations = async (req, res) => {
-  try {
-    const formations = await Formation.find().populate("contenu.quiz");
-    res.status(200).json(formations);
-  } catch (error) {
-    res.status(500).json({ error: "Erreur serveur" });
-  }
-};
-
 // Ajouter un utilisateur à une formation (s'il est etudiant)
 const addutilisateurToFormation = async (req, res) => {
   const { formationId } = req.params;
@@ -210,7 +200,6 @@ const verifierValiditeCertificat = async (req, res) => {
 // Exporter les fonctions
 module.exports = {
   createFormation,
-  getAllFormations,
   addutilisateurToFormation,
   addModuleToFormation,
   genererCertificat,

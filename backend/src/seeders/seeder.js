@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const User = require('../models/user.model');
+const Utilisateur = require('../models/utilisateur.model');
 const Projet = require('../models/projet.model');
 const Livrable = require('../models/livrable.model');
 const Evaluation = require('../models/evaluation.model');
@@ -21,14 +21,14 @@ function subtractDays(days) {
 }
 
 // Exemples d'utilisateurs
-const users = [
-  { nom: "Ben Ali", prenom: "Ahmed", email: "ahmed.benali@esprit.tn", role: Enum.UserRole.ETUDIANT },
-  { nom: "Trabelsi", prenom: "Sarra", email: "sarra.trabelsi@esprit.tn", role: Enum.UserRole.ETUDIANT },
-  { nom: "Gharbi", prenom: "Karim", email: "karim.gharbi@esprit.tn", role: Enum.UserRole.ETUDIANT },
-  { nom: "Bouazizi", prenom: "Nour", email: "nour.bouazizi@esprit.tn", role: Enum.UserRole.ETUDIANT },
-  { nom: "Mejri", prenom: "Amine", email: "amine.mejri@esprit.tn", role: Enum.UserRole.ETUDIANT },
-  { nom: "Karray", prenom: "Mohamed", email: "mohamed.karray@esprit.tn", role: Enum.UserRole.TUTEUR },
-  { nom: "Ben Ayed", prenom: "Leila", email: "leila.benayed@esprit.tn", role: Enum.UserRole.TUTEUR }
+const utilisateurs = [
+  { nom: "Ben Ali", prenom: "Ahmed", email: "ahmed.benali@esprit.tn", role: Enum.UtilisateurRole.ETUDIANT },
+  { nom: "Trabelsi", prenom: "Sarra", email: "sarra.trabelsi@esprit.tn", role: Enum.UtilisateurRole.ETUDIANT },
+  { nom: "Gharbi", prenom: "Karim", email: "karim.gharbi@esprit.tn", role: Enum.UtilisateurRole.ETUDIANT },
+  { nom: "Bouazizi", prenom: "Nour", email: "nour.bouazizi@esprit.tn", role: Enum.UtilisateurRole.ETUDIANT },
+  { nom: "Mejri", prenom: "Amine", email: "amine.mejri@esprit.tn", role: Enum.UtilisateurRole.ETUDIANT },
+  { nom: "Karray", prenom: "Mohamed", email: "mohamed.karray@esprit.tn", role: Enum.UtilisateurRole.TUTEUR },
+  { nom: "Ben Ayed", prenom: "Leila", email: "leila.benayed@esprit.tn", role: Enum.UtilisateurRole.TUTEUR }
 ];
 
 // Exemples de projets (structure conforme)
@@ -75,18 +75,18 @@ async function seed() {
     await mongoose.connect(process.env.MONGO_URI);
     logger.info('Connected to MongoDB');
 
-    await User.deleteMany({});
+    await Utilisateur.deleteMany({});
     await Projet.deleteMany({});
     await Livrable.deleteMany({});
     await Evaluation.deleteMany({});
     logger.info('Collections vidées');
 
     // Création des utilisateurs
-    const insertedUsers = await User.insertMany(users);
+    const insertedUtilisateurs = await Utilisateur.insertMany(utilisateurs);
 
     // Attribution des équipes et tuteurs
-    const etudiants = insertedUsers.filter(u => u.role === Enum.UserRole.ETUDIANT).map(u => u._id);
-    const tuteurs = insertedUsers.filter(u => u.role === Enum.UserRole.TUTEUR).map(u => u._id);
+    const etudiants = insertedUtilisateurs.filter(u => u.role === Enum.UtilisateurRole.ETUDIANT).map(u => u._id);
+    const tuteurs = insertedUtilisateurs.filter(u => u.role === Enum.UtilisateurRole.TUTEUR).map(u => u._id);
 
     // Création des projets avec équipes et tuteur
     const projetsToInsert = projets.map((p, i) => ({

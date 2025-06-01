@@ -1,61 +1,98 @@
 const Utilisateur = require('../models/utilisateur.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const crypto = require('crypto');
+const logger = require('../utils/logger');
+const { JWT_SECRET } = require('../../config/constants');
+const { formatUtilisateurResponse } = require('../utils/formatters');
+const { AppError } = require('../utils/appError');
+const { MessagesErreur, StatutHttp, Enums } = require('../../config/constants');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_key';
-const JWT_EXPIRES_IN = '7d';
+class UtilisateurService {
+    // Créer un nouvel utilisateur
+    async creerUtilisateur(donneesUtilisateur) {
+        const utilisateurExistant = await Utilisateur.findOne({ email: donneesUtilisateur.email });
+        if (utilisateurExistant) {
+            throw new AppError('Un utilisateur avec cet email existe déjà', 400);
+        }
 
-// Inscription d’un utilisateur
-async function registerutilisateur({ name, email, password, role, utilisateurId }) {
-    // Vérifier si l’email existe déjà
-    const existing = await Utilisateur.findOne({ email });
-    if (existing) throw new Error('Email déjà utilisé');
+        const utilisateur = await Utilisateur.create(donneesUtilisateur);
+        return utilisateur;
+    }
 
-    const hash = await bcrypt.hash(password, 10);
+    // Obtenir tous les utilisateurs
+    async obtenirUtilisateurs(filtres = {}) {
+        const utilisateurs = await Utilisateur.find(filtres).select('-motDePasse');
+        return utilisateurs;
+    }
 
-    // Générer un token de vérification d’email
-    const verificationToken = crypto.randomBytes(32).toString('hex');
-    const verificationTokenExpiration = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    // Obtenir un utilisateur par ID
+    async obtenirUtilisateurParId(id) {
+        const utilisateur = await Utilisateur.findById(id).select('-motDePasse');
+        if (!utilisateur) {
+            throw new AppError(MessagesErreur.GENERAL.NON_TROUVE, StatutHttp.NON_TROUVE);
+        }
+        return utilisateur;
+    }
 
-    const utilisateur = new Utilisateur({
-        utilisateurId,
-        name,
-        email,
-        password: hash,
-        role,
-        isVerified: false,
-        verificationToken,
-        verificationTokenExpiration,
-        creeLe: new Date(),
-        majLe: new Date()
-    });
+    // Mettre à jour un utilisateur
+    async mettreAJourUtilisateur(id, donneesMiseAJour) {
+        const utilisateur = await Utilisateur.findByIdAndUpdate(
+            id,
+            { $set: donneesMiseAJour },
+            { new: true, runValidators: true }
+        ).select('-motDePasse');
 
-    await utilisateur.save();
+        if (!utilisateur) {
+            throw new AppError('Utilisateur non trouvé', 404);
+        }
+        return utilisateur;
+    }
 
-    // Générer un JWT
-    const token = jwt.sign({ id: utilisateur._id, role: utilisateur.role }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
+    // Supprimer un utilisateur
+    async supprimerUtilisateur(id) {
+        const utilisateur = await Utilisateur.findByIdAndDelete(id);
+        if (!utilisateur) {
+            throw new AppError('Utilisateur non trouvé', 404);
+        }
+        return utilisateur;
+    }
 
-    // Ici, tu peux envoyer un email de vérification avec le token
+    // Authentification
+    async authentifier(email, motDePasse) {
+        const utilisateur = await Utilisateur.findOne({ email }).select('+motDePasse');
+        if (!utilisateur || !(await utilisateur.comparerMotDePasse(motDePasse))) {
+            throw new AppError(MessagesErreur.AUTH.INVALID_CREDENTIALS, StatutHttp.NON_AUTORISE);
+        }
 
-    return { utilisateur, token };
+        // Mettre à jour la dernière connexion
+        utilisateur.derniereConnexion = new Date();
+        await utilisateur.save({ validateBeforeSave: false });
+
+        // Générer le token JWT
+        const token = jwt.sign(
+            { id: utilisateur._id, role: utilisateur.role },
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN }
+        );
+
+        return { utilisateur, token };
+    }
+
+    // Vérifier le token JWT
+    async verifierToken(token) {
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            const utilisateur = await Utilisateur.findById(decoded.id).select('-motDePasse');
+            
+            if (!utilisateur) {
+                throw new AppError(MessagesErreur.GENERAL.NON_TROUVE, StatutHttp.NON_TROUVE);
+            }
+
+            return utilisateur;
+        } catch (error) {
+            throw new AppError(MessagesErreur.AUTH.TOKEN_INVALIDE, StatutHttp.NON_AUTORISE);
+        }
+    }
 }
 
-// Connexion d’un utilisateur
-async function loginutilisateur(email, password) {
-    const utilisateur = await Utilisateur.findOne({ email });
-    if (!utilisateur) throw new Error('Utilisateur non trouvé');
-    if (!utilisateur.isVerified) throw new Error('Email non vérifié');
-
-    const match = await bcrypt.compare(password, utilisateur.password);
-    if (!match) throw new Error('Mot de passe incorrect');
-
-    const token = jwt.sign({ id: utilisateur._id, role: utilisateur.role }, JWT_SECRET, { expiresIn: JWT_EXPIRES_IN });
-
-    return { utilisateur, token };
-}
-
-module.exports = {
-    registerutilisateur,
-    loginutilisateur
-};
+module.exports = new UtilisateurService();

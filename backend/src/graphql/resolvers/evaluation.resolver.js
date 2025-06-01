@@ -11,7 +11,7 @@ const mongoose = require('mongoose');
 const Evaluation = require('../../models/evaluation.model');
 const Projet = require('../../models/projet.model');
 const Livrable = require('../../models/livrable.model');
-const User = require('../../models/utilisateur.model');
+const Utilisateur = require('../../models/utilisateur.model');
 const logger = require('../../utils/logger');
 const { AppError, ERROR_CODES } = require('../../middlewares/errorHandlers');
 const { validateInput } = require('../../utils/validators');
@@ -80,21 +80,21 @@ const Query = {
         }
     },
 
-    getEvaluationStats: async (_, { projectId }, context) => {
+    getEvaluationStats: async (_, { projetId }, context) => {
         checkAuthorization(context, 'read', 'evaluations');
 
         try {
-            // Validate project ID
-            if (!mongoose.Types.ObjectId.isValid(projectId)) {
+            // Validate projet ID
+            if (!mongoose.Types.ObjectId.isValid(projetId)) {
                 throw new AppError(
-                    'Invalid project ID',
+                    'Invalid projet ID',
                     400,
                     ERROR_CODES.BAD_REQUEST,
                     true
                 );
             }
 
-            const evaluations = await Evaluation.find({ projetId: projectId });
+            const evaluations = await Evaluation.find({ projetId: projetId });
 
             if (evaluations.length === 0) {
                 return {
@@ -124,7 +124,7 @@ const Query = {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId,
-                projectId
+                projetId
             });
 
             throw new AppError(
@@ -191,15 +191,15 @@ const EvaluationResolver = {
             const projet = await context.loaders.projetLoader.load(parent.projetId.toString());
             return projet;
         } catch (error) {
-            logger.error(`Error loading project for evaluation ${parent.id}:`, error);
+            logger.error(`Error loading projet for evaluation ${parent.id}:`, error);
             return null;
         }
     },
     evaluateur: async (parent, _, context) => {
         try {
             if (!parent.evaluateurId) return null;
-            const user = await context.loaders.userLoader.load(parent.evaluateurId.toString());
-            return user;
+            const utilisateur = await context.loaders.utilisateurLoader.load(parent.evaluateurId.toString());
+            return utilisateur;
         } catch (error) {
             logger.error(`Error loading evaluator for evaluation ${parent.id}:`, error);
             return null;

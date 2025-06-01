@@ -1,7 +1,7 @@
 const { expect } = require('chai');
 const { EvaluationService } = require('../../src/services/evaluation.service');
 const { DatabaseService } = require('../../src/services/database.service');
-const { mockProjet, mockEvaluation, mockUser } = require('../mocks/data');
+const { mockProjet, mockEvaluation, mockUtilisateur } = require('../mocks/data');
 
 describe('EvaluationService', () => {
   let evaluationService;
@@ -16,7 +16,7 @@ describe('EvaluationService', () => {
     it('should create a new evaluation', async () => {
       const evaluationData = {
         projetId: mockProjet.id,
-        evaluateurId: mockUser.id,
+        evaluateurId: mockUtilisateur.id,
         note: 15,
         commentaire: 'Très bon travail',
         criteres: [
@@ -57,7 +57,7 @@ describe('EvaluationService', () => {
     it('should validate criteria weights sum to 100', async () => {
       const evaluationData = {
         projetId: mockProjet.id,
-        evaluateurId: mockUser.id,
+        evaluateurId: mockUtilisateur.id,
         note: 15,
         commentaire: 'Test',
         criteres: [
@@ -103,7 +103,7 @@ describe('EvaluationService', () => {
     });
 
     it('should filter evaluations by evaluateurId', async () => {
-      const evaluateurId = mockUser.id;
+      const evaluateurId = mockUtilisateur.id;
       const evaluations = await evaluationService.getEvaluations({ evaluateurId });
       expect(evaluations).to.be.an('array');
       evaluations.forEach(evaluation => {
@@ -174,7 +174,7 @@ describe('EvaluationService', () => {
   });
 
   describe('getEvaluationStats', () => {
-    it('should return evaluation statistics for a project', async () => {
+    it('should return evaluation statistics for a projet', async () => {
       const stats = await evaluationService.getEvaluationStats(mockProjet.id);
       expect(stats).to.have.property('moyenneNote');
       expect(stats).to.have.property('noteMax');
@@ -182,8 +182,8 @@ describe('EvaluationService', () => {
       expect(stats).to.have.property('totalEvaluations');
     });
 
-    it('should return zero stats for a project with no evaluations', async () => {
-      const stats = await evaluationService.getEvaluationStats('empty-project-id');
+    it('should return zero stats for a projet with no evaluations', async () => {
+      const stats = await evaluationService.getEvaluationStats('empty-projet-id');
       expect(stats.moyenneNote).to.equal(0);
       expect(stats.noteMax).to.equal(0);
       expect(stats.noteMin).to.equal(0);

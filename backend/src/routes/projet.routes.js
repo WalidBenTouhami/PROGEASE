@@ -2,8 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const projetController = require('../controllers/projet.controller');
-const { validateRequest } = require('../middlewares/validate.Request');
-const { validateProjetData, validateId } = require('../validations/projet.validation');
+const { validateRequest } = require('../middlewares/validateRequest');
+const { validateProjetData, validateId, projetSchema } = require('../validations/projet.validation');
 const { asyncHandler } = require('../middlewares/asyncHandler');
 const { rateLimiter } = require('../middlewares/rateLimiter');
 

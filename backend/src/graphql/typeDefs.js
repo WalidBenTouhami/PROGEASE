@@ -14,12 +14,12 @@ const typeDefs = gql`
         recommandations: [String!]!
     }
 
-    type User {
+    type Utilisateur {
         id: ID!
         nom: String!
         prenom: String!
         email: String!
-        role: UserRole!
+        role: UtilisateurRole!
         createdAt: Date!
         updatedAt: Date!
     }
@@ -29,8 +29,8 @@ const typeDefs = gql`
         titre: String!
         description: String!
         statut: ProjetStatus!
-        equipe: [User!]!
-        tuteur: User
+        equipe: [Utilisateur!]!
+        tuteur: Utilisateur
         competences: [String!]!
         dateDebut: Date!
         dateFin: Date!
@@ -62,7 +62,7 @@ const typeDefs = gql`
         projetId: ID!
         projet: Projet!
         evaluateurId: ID!
-        evaluateur: User!
+        evaluateur: Utilisateur!
         score: Float!
         commentaires: String
         criteres: [EvaluationCritere!]!
@@ -97,7 +97,7 @@ const typeDefs = gql`
         processingTime: Float!
     }
 
-    type PaginatedDeliverables {
+    type PaginatedLivrables {
         items: [Livrable!]!
         pagination: PaginationInfo!
     }
@@ -111,7 +111,7 @@ const typeDefs = gql`
         hasPreviousPage: Boolean!
     }
 
-    enum UserRole {
+    enum UtilisateurRole {
         ETUDIANT
         TUTEUR
         ADMIN
@@ -135,15 +135,15 @@ const typeDefs = gql`
     }
 
     type Query {
-        # Project queries
+        # Projet queries
         projets: [Projet!]!
         projet(id: ID!): Projet
-        getProjectProgress(id: ID!): Float!
+        getProjetProgress(id: ID!): Float!
         getPredictedPerformance(id: ID!): Float!
         analyserRisquesProjet(projetId: ID!): RiskAnalysis!
 
-        # Deliverable queries
-        deliverables(
+        # Livrable queries
+        livrables(
             page: Int
             limit: Int
             projetId: ID
@@ -151,18 +151,18 @@ const typeDefs = gql`
             recherche: String
             dateLimiteMin: Date
             dateLimiteMax: Date
-        ): PaginatedDeliverables!
-        deliverable(id: ID!): Livrable
+        ): PaginatedLivrables!
+        livrable(id: ID!): Livrable
         livrablesByProjet(projetId: ID!): [Livrable!]!
 
         # Evaluation queries
-        evaluations(projectId: ID!): [Evaluation!]!
+        evaluations(projetId: ID!): [Evaluation!]!
         evaluation(id: ID!): Evaluation
-        getEvaluationStats(projectId: ID!): EvaluationStats!
+        getEvaluationStats(projetId: ID!): EvaluationStats!
 
-        # User queries
-        users: [User!]!
-        user(id: ID!): User
+        # Utilisateur queries
+        utilisateurs: [Utilisateur!]!
+        utilisateur(id: ID!): Utilisateur
 
         # AI queries
         aiRecommendations(projetId: ID!): AiRecommendationResult!
@@ -180,15 +180,15 @@ const typeDefs = gql`
     }
 
     type Mutation {
-        # Project mutations
-        createProject(input: CreateProjectInput!): Projet!
-        updateProject(id: ID!, input: UpdateProjectInput!): Projet!
-        deleteProject(id: ID!): Projet!
+        # Projet mutations
+        createProjet(input: CreateProjetInput!): Projet!
+        updateProjet(id: ID!, input: UpdateProjetInput!): Projet!
+        deleteProjet(id: ID!): Projet!
 
-        # Deliverable mutations
-        addDeliverable(projectId: ID!, input: CreateDeliverableInput!): Livrable!
-        updateDeliverable(id: ID!, input: UpdateDeliverableInput!): Livrable!
-        deleteDeliverable(id: ID!): Livrable!
+        # Livrable mutations
+        addLivrable(projetId: ID!, input: CreateLivrableInput!): Livrable!
+        updateLivrable(id: ID!, input: UpdateLivrableInput!): Livrable!
+        deleteLivrable(id: ID!): Livrable!
 
         # Evaluation mutations
         createEvaluation(input: CreateEvaluationInput!): Evaluation!
@@ -196,11 +196,11 @@ const typeDefs = gql`
         deleteEvaluation(id: ID!): Evaluation!
 
         # AI-powered mutations
-        predictPerformance(projectId: ID!): Float!
-        generateLearningRecommendations(projectId: ID!): String!
+        predictPerformance(projetId: ID!): Float!
+        generateLearningRecommendations(projetId: ID!): String!
     }
 
-    input CreateProjectInput {
+    input CreateProjetInput {
         titre: String!
         description: String!
         statut: ProjetStatus!
@@ -211,7 +211,7 @@ const typeDefs = gql`
         dateFin: Date!
     }
 
-    input UpdateProjectInput {
+    input UpdateProjetInput {
         titre: String
         description: String
         statut: ProjetStatus
@@ -222,7 +222,7 @@ const typeDefs = gql`
         dateFin: Date
     }
 
-    input CreateDeliverableInput {
+    input CreateLivrableInput {
         name: String!
         description: String!
         deadline: Date!
@@ -230,7 +230,7 @@ const typeDefs = gql`
         status: LivrableStatus
     }
 
-    input UpdateDeliverableInput {
+    input UpdateLivrableInput {
         name: String
         description: String
         deadline: Date

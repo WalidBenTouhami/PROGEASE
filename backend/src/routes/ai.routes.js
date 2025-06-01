@@ -12,16 +12,28 @@ const aiController = require('../controllers/ai.controller');
 router.post('/analyze', aiController.analyserProjet);
 
 /**
- * @route POST /api/ai/generer-texte
- * @desc Genere du texte en français
+ * @route POST /api/ai/recommendations
+ * @desc Génère des recommandations pour un projet
  */
-router.post('/generer-texte', aiController.genererTexte);
+router.post('/recommendations/:projetId', aiController.genererRecommandations);
 
 /**
- * @route POST /api/ai/generate-text
- * @desc Generates text in English
+ * @route POST /api/ai/analyze-livrables
+ * @desc Analyse les livrables d'un projet
  */
-router.post('/generate-text', aiController.genererTexte);
+router.post('/analyze-livrables/:projetId', aiController.analyserLivrables);
+
+/**
+ * @route POST /api/ai/evaluate-livrable
+ * @desc Évalue un livrable
+ */
+router.post('/evaluate-livrable/:livrableId', aiController.evaluerLivrable);
+
+/**
+ * @route GET /api/ai/progress-report
+ * @desc Génère un rapport d'avancement
+ */
+router.get('/progress-report/:projetId', aiController.genererRapportAvancement);
 
 // Route health
 router.get('/health', (req, res) => {

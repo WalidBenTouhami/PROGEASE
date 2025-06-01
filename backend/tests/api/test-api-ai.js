@@ -30,7 +30,7 @@ const testAPI = async () => {
         // Test de génération de texte (anglais)
         console.log('\nTest de génération de texte (anglais)...');
         const promptEn = {
-            prompt: 'Generate a detailed description of key features for a student project management application.'
+            prompt: 'Generate a detailed description of key features for a student projet management application.'
         };
 
         console.log('Envoi du prompt (EN):', promptEn);

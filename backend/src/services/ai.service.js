@@ -125,18 +125,18 @@ function validerReponseJSON(reponse) {
 /**
  * Génère une analyse IA pour une évaluation
  * @param {Object} params - Paramètres pour l'analyse
- * @param {Object} params.project - Objet projet
+ * @param {Object} params.projet - Objet projet
  * @param {number} params.score - Score d'évaluation
  * @param {Array} params.criteria - Critères d'évaluation
  * @returns {string} - Analyse générée par l'IA
  */
-async function generateAIAnalysis({ project, score, criteria }) {
+async function generateAIAnalysis({ projet, score, criteria }) {
   try {
     const prompt = `
       Analysez cette évaluation de projet :
-      Projet : ${project.titre}
-      Description : ${project.description}
-      Compétences : ${project.skills.join(', ')}
+      Projet : ${projet.titre}
+      Description : ${projet.description}
+      Compétences : ${projet.skills.join(', ')}
       Score : ${score}/20
       Critères : ${JSON.stringify(criteria)}
       
@@ -149,7 +149,7 @@ async function generateAIAnalysis({ project, score, criteria }) {
 
     const response = await client.post('/chat/completions', {
       model: CONFIG.MODEL,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'utilisateur', content: prompt }],
       max_tokens: CONFIG.MAX_TOKENS,
       temperature: CONFIG.TEMPERATURE
     });
@@ -189,7 +189,7 @@ async function predictPerformance(history) {
 
     const response = await client.chat.completions.create({
       model: CONFIG.MODEL,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'utilisateur', content: prompt }],
       max_tokens: CONFIG.MAX_TOKENS
     });
 
@@ -247,16 +247,16 @@ function calculateVariance(scores) {
 
 /**
  * Génère des recommandations d'apprentissage basées sur les compétences et les scores
- * @param {Object} project - Objet projet
+ * @param {Object} projet - Objet projet
  * @param {Array} evaluations - Évaluations du projet
  * @returns {Object} - Recommandations d'apprentissage
  */
-async function generateLearningRecommendations(project, evaluations) {
+async function generateLearningRecommendations(projet, evaluations) {
   try {
     const prompt = `
       Basé sur ce projet et ses évaluations :
-      Projet : ${project.titre}
-      Compétences : ${project.skills.join(', ')}
+      Projet : ${projet.titre}
+      Compétences : ${projet.skills.join(', ')}
       Évaluations : ${JSON.stringify(evaluations)}
       
       Fournissez :
@@ -268,7 +268,7 @@ async function generateLearningRecommendations(project, evaluations) {
 
     const response = await client.post('/chat/completions', {
       model: CONFIG.MODEL,
-      messages: [{ role: 'user', content: prompt }],
+      messages: [{ role: 'utilisateur', content: prompt }],
       max_tokens: CONFIG.MAX_TOKENS,
       temperature: CONFIG.TEMPERATURE
     });
@@ -279,7 +279,7 @@ async function generateLearningRecommendations(project, evaluations) {
 
     return {
       recommendations: response.data.choices[0].message.content,
-      priorite: calculatePriority(project, evaluations)
+      priorite: calculatePriority(projet, evaluations)
     };
   } catch (error) {
     logger.error('Erreur lors de la génération des recommandations:', error);
@@ -289,11 +289,11 @@ async function generateLearningRecommendations(project, evaluations) {
 
 /**
  * Calcule le niveau de priorité pour les recommandations
- * @param {Object} project - Objet projet
+ * @param {Object} projet - Objet projet
  * @param {Array} evaluations - Évaluations du projet
  * @returns {string} - Niveau de priorité
  */
-function calculatePriority(project, evaluations) {
+function calculatePriority(projet, evaluations) {
   const averageScore = evaluations.reduce((sum, eval) => sum + eval.score, 0) / evaluations.length;
   if (averageScore < 10) return 'HAUTE';
   if (averageScore < 15) return 'MOYENNE';
@@ -354,7 +354,7 @@ async function traiterReponseIA(prompt) {
     try {
         const response = await client.post('/chat/completions', {
             model: CONFIG.MODEL,
-            messages: [{ role: 'user', content: prompt }],
+            messages: [{ role: 'utilisateur', content: prompt }],
             max_tokens: CONFIG.MAX_TOKENS,
             temperature: CONFIG.TEMPERATURE
         });
@@ -700,10 +700,10 @@ async function recommanderApprentissage(competences) {
 
 // Mock AI service implementation
 const mockAIService = {
-    generateRecommendations: async (project) => {
-        logger.debug('Generating mock recommendations for project:', project._id);
+    generateRecommendations: async (projet) => {
+        logger.debug('Generating mock recommendations for projet:', projet._id);
         return {
-            text: 'Based on the project progress and evaluations, here are some recommendations:\n' +
+            text: 'Based on the projet progress and evaluations, here are some recommendations:\n' +
                   '1. Focus on improving code quality and documentation\n' +
                   '2. Consider implementing automated tests\n' +
                   '3. Regular code reviews would be beneficial',
@@ -712,16 +712,16 @@ const mockAIService = {
         };
     },
 
-    generateLearningRecommendations: async (project) => {
-        logger.debug('Generating mock learning recommendations for project:', project._id);
+    generateLearningRecommendations: async (projet) => {
+        logger.debug('Generating mock learning recommendations for projet:', projet._id);
         return 'To improve your learning outcomes:\n' +
                '1. Review the fundamentals of software architecture\n' +
                '2. Practice test-driven development\n' +
-               '3. Study design patterns applicable to your project';
+               '3. Study design patterns applicable to your projet';
     },
 
-    predictPerformance: async (project) => {
-        logger.debug('Predicting mock performance for project:', project._id);
+    predictPerformance: async (projet) => {
+        logger.debug('Predicting mock performance for projet:', projet._id);
         // Return a score between 0 and 1
         return 0.75;
     }

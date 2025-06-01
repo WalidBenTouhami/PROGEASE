@@ -1,115 +1,108 @@
-// src/middleware/errorHandlers.js
 const logger = require('../utils/logger');
+const { ERROR_CODES, MessagesErreur, StatutHttp } = require('../../config/constants');
 
-// Messages d'erreur standardises
-const ERROR_MESSAGES = {
-    STARTUP_ERROR: (msg) => `Erreur au démarrage du serveur: ${msg}`,
-    FATAL_ERROR: (msg) => `Erreur fatale: ${msg}`,
-    NOT_FOUND: 'Resource non trouvée'
+class AppError extends Error {
+    constructor(message, statusCode = 500, code = ERROR_CODES.INTERNAL_ERROR, isOperational = true) {
+        super(message);
+        this.statusCode = statusCode;
+        this.code = code;
+        this.isOperational = isOperational;
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
+
+class ValidationError extends AppError {
+    constructor(message, details) {
+        super(message, StatutHttp.BAD_REQUEST, ERROR_CODES.VALIDATION_ERROR, true);
+        this.details = details;
+    }
+}
+
+const notFoundHandler = (req, res, next) => {
+    next(new AppError(
+        `Route ${req.originalUrl} non trouvée`,
+        StatutHttp.NOT_FOUND,
+        ERROR_CODES.NOT_FOUND,
+        true
+    ));
 };
 
-/**
- * Configuration des gestionnaires d'erreurs au niveau du processus
- */
+const errorHandler = (err, req, res, next) => {
+    err.statusCode = err.statusCode || StatutHttp.INTERNAL_ERROR;
+    err.code = err.code || ERROR_CODES.INTERNAL_ERROR;
+
+    // Log l'erreur
+    if (err.statusCode === StatutHttp.INTERNAL_ERROR) {
+        logger.error('Erreur serveur:', {
+            error: err.message,
+            stack: err.stack,
+            code: err.code,
+            path: req.path,
+            method: req.method
+        });
+    } else {
+        logger.warn('Erreur client:', {
+            error: err.message,
+            code: err.code,
+            path: req.path,
+            method: req.method
+        });
+    }
+
+    // Réponse d'erreur
+    res.status(err.statusCode).json({
+        success: false,
+        message: err.message,
+        code: err.code,
+        ...(process.env.NODE_ENV === 'development' && {
+            stack: err.stack,
+            details: err.details
+        })
+    });
+};
+
 const setupProcessErrorHandlers = () => {
-    // Gestion des exceptions non capturees
-    process.on('uncaughtException', (error) => {
-        logger.error('Uncaught Exception:', error);
+    process.on('uncaughtException', (err) => {
+        logger.error('Uncaught Exception:', err);
         process.exit(1);
     });
 
-    // Gestion des rejets de promesses non geres
-    process.on('unhandledRejection', (reason, promise) => {
-        logger.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    process.on('unhandledRejection', (err) => {
+        logger.error('Unhandled Rejection:', err);
         process.exit(1);
     });
-
-    // Gestion de l'arret propre du serveur
-    process.on('SIGTERM', () => {
-        logger.info('Signal SIGTERM reçu. Arret du serveur...');
-        process.exit(0);
-    });
-
-    process.on('SIGINT', () => {
-        logger.info('Signal SIGINT reçu. Arret du serveur...');
-        process.exit(0);
-    });
-
-    logger.info('Gestionnaires d\'erreurs du processus configures');
 };
 
-/**
- * Configuration des gestionnaires d'erreurs au niveau HTTP
- * @param {Object} server - Serveur HTTP à configurer
- * @param {number} port - Port d'ecoute du serveur
- */
 const setupHttpErrorHandlers = (server, port) => {
-    // Gestion des erreurs d'ecoute du serveur
     server.on('error', (error) => {
-        if (error.syscall !== 'listen') throw error;
-
-        const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
-
-        switch (error.code) {
-        case 'EACCES':
-            logger.error(`${bind} requires elevated privileges`);
-            process.exit(1);
-            break;
-        case 'EADDRINUSE':
-            logger.error(`${bind} is already in use`);
-            process.exit(1);
-            break;
-        default:
+        if (error.syscall !== 'listen') {
             throw error;
         }
-    });
 
-    // Gestion des connexions interrompues
-    server.on('clientError', (error, socket) => {
-        logger.warn('Erreur client HTTP:', error);
+        const bind = typeof port === 'string'
+            ? 'Pipe ' + port
+            : 'Port ' + port;
 
-        // Ne pas laisser la connexion ouverte
-        if (socket.writable) {
-            socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+        switch (error.code) {
+            case 'EACCES':
+                logger.error(`${bind} requires elevated privileges`);
+                process.exit(1);
+                break;
+            case 'EADDRINUSE':
+                logger.error(`${bind} is already in use`);
+                process.exit(1);
+                break;
+            default:
+                throw error;
         }
-    });
-
-    logger.info('Gestionnaires d\'erreurs HTTP configures');
-};
-
-/**
- * Middleware pour gerer les ressources non trouvees (404)
- * @param {Object} req - Requete Express
- * @param {Object} res - Reponse Express
- * @param {Function} next - Fonction suivante
- */
-const notFoundHandler = (req, res) => {
-    res.status(404).json({
-        status: 'error',
-        message: ERROR_MESSAGES.NOT_FOUND
-    });
-};
-
-/**
- * Middleware pour gerer les erreurs (500)
- * @param {Object} err - Erreur capturee
- * @param {Object} req - Requete Express
- * @param {Object} res - Reponse Express
- * @param {Function} next - Fonction suivante
- */
-const errorHandler = (err, req, res, next) => {
-    logger.error('Erreur:', err);
-
-    res.status(err.status || 500).json({
-        status: 'error',
-        message: err.message || 'Erreur interne du serveur'
     });
 };
 
 module.exports = {
-    ERROR_MESSAGES,
-    setupProcessErrorHandlers,
-    setupHttpErrorHandlers,
+    AppError,
+    ValidationError,
     notFoundHandler,
-    errorHandler
-};
+    errorHandler,
+    setupProcessErrorHandlers,
+    setupHttpErrorHandlers
+}; 

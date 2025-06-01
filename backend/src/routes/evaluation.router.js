@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const evaluationController = require('../controllers/evaluation.controller');
-const { validateRequest } = require('../middlewares/validate.Request');
+const { validateRequest } = require('../middlewares/validateRequest');
 const { evaluationSchema } = require('../validations/evaluation.validation');
 
 // Routes

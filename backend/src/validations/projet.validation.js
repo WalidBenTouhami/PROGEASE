@@ -1,40 +1,46 @@
 const yup = require('yup');
 const mongoose = require('mongoose');
 const { MessagesErreur, StatutHttp, Enums } = require('../../config/constants');
+const { AppError } = require('../middlewares/errorHandlers');
+const { ERROR_CODES } = require('../../config/constants');
 
 // Schema de validation Yup pour les projets
 const projetSchema = yup.object().shape({
     titre: yup.string()
-        .required('Le titre du projet est requis.')
-        .min(5, 'Le titre doit contenir au moins 5 caractères.')
-        .max(100, 'Le titre ne peut pas dépasser 100 caractères.'),
+        .required('Le titre est requis')
+        .min(3, 'Le titre doit contenir au moins 3 caractères')
+        .max(100, 'Le titre ne peut pas dépasser 100 caractères'),
     description: yup.string()
-        .required('La description du projet est requise.')
-        .min(10, 'La description doit contenir au moins 10 caractères.'),
-    equipe: yup.array().of(
-        yup.string()
-            .required('L\'ID du membre est requis.')
-            .matches(/^[0-9a-fA-F]{24}$/, 'ID de membre invalide.')
-    ),
-    tuteur: yup.string()
-        .nullable()
-        .test('is-mongo-id', 'ID tuteur invalide.',
-            val => !val || mongoose.Types.ObjectId.isValid(val)),
-    skills: yup.array()
-        .of(yup.string().required())
-        .min(1, 'Au moins une compétence est requise.'),
+        .required('La description est requise')
+        .min(10, 'La description doit contenir au moins 10 caractères')
+        .max(1000, 'La description ne peut pas dépasser 1000 caractères'),
     dateDebut: yup.date()
-        .required('La date de début est requise.')
-        .min(new Date(), 'La date de début doit être ultérieure à aujourd\'hui.'),
+        .required('La date de début est requise'),
     dateFin: yup.date()
-        .required('La date de fin est requise.')
-        .min(yup.ref('dateDebut'), 'La date de fin doit être ultérieure à la date de début.'),
+        .required('La date de fin est requise')
+        .min(yup.ref('dateDebut'), 'La date de fin doit être postérieure à la date de début'),
     statut: yup.string()
-        .required('Le statut est requis.')
-        .oneOf(Object.values(Enums.StatutProjet), 'Statut de projet invalide.'),
-    urlDepot: yup.string()
-        .nullable()
-        .url('L\'URL du dépôt doit être valide.')
+        .required('Le statut est requis')
+        .oneOf(['EN_COURS', 'TERMINE', 'EN_PAUSE', 'ANNULE'], 'Statut invalide'),
+    priorite: yup.number()
+        .required('La priorité est requise')
+        .min(1, 'La priorité minimale est 1')
+        .max(5, 'La priorité maximale est 5'),
+    responsable: yup.string()
+        .required('Le responsable est requis'),
+    equipe: yup.array()
+        .of(yup.string())
+        .min(1, 'L\'équipe doit contenir au moins un membre'),
+    tags: yup.array()
+        .of(yup.string())
+        .nullable(),
+    budget: yup.number()
+        .positive('Le budget doit être positif')
+        .nullable(),
+    progression: yup.number()
+        .min(0, 'La progression ne peut pas être négative')
+        .max(100, 'La progression ne peut pas dépasser 100%')
+        .default(0)
 });
 
 // Middleware de validation des données de projet
@@ -62,18 +68,16 @@ const validateProjetData = async (req, res, next) => {
 };
 
 // Middleware de validation des IDs
-const validateId = (paramName, source = 'params') => {
-    return (req, res, next) => {
-        const id = source === 'params' ? req.params[paramName] : req.body[paramName];
-
-        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(StatutHttp.MAUVAISE_REQUETE).json({
-                erreur: MessagesErreur.GENERAL.ID_INVALIDE,
-                details: `L'ID '${paramName}' est invalide ou manquant.`
-            });
-        }
-        next();
-    };
+const validateId = (paramName) => (req, res, next) => {
+    const id = req.params[paramName];
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+        throw new AppError(
+            'ID invalide',
+            StatutHttp.BAD_REQUEST,
+            ERROR_CODES.VALIDATION_ERROR
+        );
+    }
+    next();
 };
 
 module.exports = {

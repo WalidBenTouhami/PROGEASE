@@ -1,57 +1,34 @@
 const express = require('express');
 const router = express.Router();
-const utilisateurController = require('../controllers/utilisateur.controller');
-const { validateUtilisateurData, validateId } = require('../validations/utilisateur.validation');
-const { asyncHandler } = require('../middlewares/asyncHandler');
-const { rateLimiter } = require('../middlewares/rateLimiter');
-const { verifierToken, verifierRole } = require('../middlewares/utilisateur.middleware');
+const { 
+    validateInscription,
+    validateConnexion,
+    validateMiseAJourProfil,
+    validateChangementMotDePasse,
+    verifierToken,
+    verifierRole,
+    verifierProprietaire,
+    verifierEmailUnique
+} = require('../middlewares/utilisateur.middleware');
+const UtilisateurController = require('../controllers/utilisateur.controller');
 
-// --- Routes de santé et CRUD classiques ---
+// Routes publiques
+router.post('/inscription', validateInscription, UtilisateurController.inscription);
+router.post('/connexion', validateConnexion, UtilisateurController.connexion);
+router.post('/mot-de-passe-oublie', UtilisateurController.motDePasseOublie);
+router.post('/reinitialiser-mot-de-passe/:token', UtilisateurController.reinitialiserMotDePasse);
 
-router.get('/health', (req, res) => {
-    res.status(200).json({
-        success: true,
-        message: 'Health check OK',
-        data: {
-            status: 'ok',
-            service: 'utilisateurs-api',
-            timestamp: new Date().toISOString()
-        }
-    });
-});
+// Routes protégées
+router.use(verifierToken);
 
-router.get('/',
-    rateLimiter({ windowMs: 60000, max: 30 }),
-    asyncHandler(utilisateurController.getAllutilisateurs)
-);
+router.get('/profil', UtilisateurController.getProfil);
+router.put('/profil', validateMiseAJourProfil, verifierEmailUnique, UtilisateurController.mettreAJourProfil);
+router.put('/changer-mot-de-passe', validateChangementMotDePasse, UtilisateurController.changerMotDePasse);
 
-router.post('/',
-    validateUtilisateurData,
-    asyncHandler(utilisateurController.createutilisateur)
-);
-
-router.get('/:id',
-    validateId('id'),
-    asyncHandler(utilisateurController.getutilisateurById)
-);
-
-router.put('/:id',
-    verifierToken, verifierRole(['admin']),
-    validateId('id'),
-    validateUtilisateurData,
-    asyncHandler(utilisateurController.updateutilisateur)
-);
-
-router.delete('/:id',
-    verifierToken, verifierRole(['admin']),
-    validateId('id'),
-    asyncHandler(utilisateurController.deleteutilisateur)
-);
-
-// --- Routes Authentification & Email ---
-
-router.post('/register', asyncHandler(utilisateurController.registerutilisateur));
-router.post('/login', asyncHandler(utilisateurController.loginutilisateur));
-router.get('/verify-email', asyncHandler(utilisateurController.verifyEmail));
+// Routes admin
+router.get('/', verifierRole('ADMIN'), UtilisateurController.getAllUtilisateurs);
+router.get('/:id', verifierRole('ADMIN'), UtilisateurController.getUtilisateurById);
+router.put('/:id', verifierRole('ADMIN'), validateMiseAJourProfil, verifierEmailUnique, UtilisateurController.mettreAJourUtilisateur);
+router.delete('/:id', verifierRole('ADMIN'), UtilisateurController.supprimerUtilisateur);
 
 module.exports = router;
