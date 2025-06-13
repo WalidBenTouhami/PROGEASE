@@ -1,18 +1,27 @@
 // Synced with backend/src/models/utilisateur.model.js
+export enum UtilisateurRole {
+    ETUDIANT = 'ETUDIANT',
+    TUTEUR = 'TUTEUR',
+    ADMIN = 'ADMIN'
+}
+
 export interface Utilisateur {
     _id?: string;
     nom: string;
+    prenom: string;
     email: string;
-    role: RoleUtilisateur;
-    competences?: string[];
+    motDePasse?: string;
+    role: UtilisateurRole;
+    avatar?: string;
+    actif?: boolean;
+    emailVerifie?: boolean;
+    dateEmailVerifie?: string;
     projets?: string[];
-    disponibilite?: boolean;
-    creeLe?: Date;
-    majLe?: Date;
-}
-
-export enum RoleUtilisateur {
-    ADMIN = 'ADMIN',
-    TUTEUR = 'TUTEUR',
-    ETUDIANT = 'ETUDIANT'
+    formations?: string[];
+    certifications?: string[];
+    derniereConnexion?: string;
+    tentativesConnexion?: number;
+    dateBlocage?: string;
+    creeLe?: string;
+    majLe?: string;
 } 

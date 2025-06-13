@@ -138,7 +138,7 @@ const Query = {
 };
 
 const Mutation = {
-    createEvaluation: async (_, { input }, context) => {
+    creerEvaluation: async (_, { input }, context) => {
         checkAuthorization(context, 'create', 'evaluations');
         try {
             const evaluation = new Evaluation({
@@ -154,7 +154,7 @@ const Mutation = {
         }
     },
 
-    updateEvaluation: async (_, { id, input }, context) => {
+    mettreAJourEvaluation: async (_, { id, input }, context) => {
         checkAuthorization(context, 'update', 'evaluations');
         try {
             const evaluation = await Evaluation.findByIdAndUpdate(
@@ -170,7 +170,7 @@ const Mutation = {
         }
     },
 
-    deleteEvaluation: async (_, { id }, context) => {
+    supprimerEvaluation: async (_, { id }, context) => {
         checkAuthorization(context, 'delete', 'evaluations');
         try {
             const evaluation = await Evaluation.findByIdAndDelete(id);

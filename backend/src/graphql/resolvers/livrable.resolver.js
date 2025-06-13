@@ -114,9 +114,9 @@ const Query = {
 
 const Mutation = {
     /**
-     * Create a new livrable
+     * Créer un nouveau livrable
      */
-    addLivrable: catchAsync(async (_, { input }, { utilisateur }) => {
+    creerLivrable: catchAsync(async (_, { input }, { utilisateur }) => {
         if (!utilisateur) {
             throw new AuthenticationError('Non authentifié');
         }
@@ -140,9 +140,9 @@ const Mutation = {
     }),
 
     /**
-     * Update a livrable
+     * Mettre à jour un livrable
      */
-    updateLivrable: catchAsync(async (_, { id, input }, { utilisateur }) => {
+    mettreAJourLivrable: catchAsync(async (_, { id, input }, { utilisateur }) => {
         if (!utilisateur) {
             throw new AuthenticationError('Non authentifié');
         }
@@ -169,9 +169,9 @@ const Mutation = {
     }),
 
     /**
-     * Delete a livrable
+     * Supprimer un livrable
      */
-    deleteLivrable: catchAsync(async (_, { id }, { utilisateur }) => {
+    supprimerLivrable: catchAsync(async (_, { id }, { utilisateur }) => {
         if (!utilisateur) {
             throw new AuthenticationError('Non authentifié');
         }
@@ -302,33 +302,7 @@ const Mutation = {
     })
 };
 
-// Resolvers pour les champs complexes du type Livrable
-const LivrableResolver = {
-    id: (parent) => parent._id.toString(),
-    projet: async (parent, _, context) => {
-        if (!parent.projetId) return null;
-        try {
-            const projet = await context.loaders.projetLoader.load(parent.projetId.toString());
-            return mapProjetMongoVersGraphQL(projet);
-        } catch (error) {
-            logger.error(`Error loading projet for livrable ${parent.id}:`, error);
-            return null;
-        }
-    },
-    estEnRetard: (parent) => {
-        if (!parent.dateLimite) return false;
-        if (parent.statut === Enums.StatutLivrable.TERMINE ||
-            parent.statut === Enums.StatutLivrable.VALIDE) return false;
-        return new Date() > new Date(parent.dateLimite);
-    },
-    commentaires: async (parent) => {
-        return parent.populate('commentaires.auteur').then(l => l.commentaires);
-    }
-};
-
 module.exports = {
     Query,
-    Mutation,
-    LivrableResolver,
-    mapLivrableMongoVersGraphQL
+    Mutation
 };

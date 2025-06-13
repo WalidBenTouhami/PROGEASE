@@ -5,8 +5,8 @@
     const { Enum } = require('../../config/constants');
     const logger = require('../utils/logger');
 
-    const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/progease';
-    const DB_NAME = MONGO_URI.split('/').pop().split('?')[0];
+    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/progease';
+    const DB_NAME = MONGODB_URI.split('/').pop().split('?')[0];
 
     // Helper to generate random ObjectId
     function randomId() {
@@ -18,7 +18,7 @@
 
         try {
             // Connexion directe avec le driver natif MongoDB (contourne les validateurs Mongoose)
-            client = new MongoClient(MONGO_URI);
+            client = new MongoClient(MONGODB_URI);
             await client.connect();
             const db = client.db(DB_NAME);
 

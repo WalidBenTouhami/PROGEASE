@@ -92,6 +92,7 @@ const typeDefs = gql`
         livrables(input: FiltreLivrableInput): PaginationLivrable!
         livrable(id: ID!): Livrable
         livrablesProjet(projetId: ID!): [Livrable!]!
+        livrablesByProjet(projetId: ID!): [Livrable!]!
     }
 
     extend type Mutation {

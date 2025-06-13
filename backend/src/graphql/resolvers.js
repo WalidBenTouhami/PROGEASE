@@ -60,12 +60,6 @@ const resolvers = {
     // Type resolvers
     Projet: {
         ...projetResolver.Projet
-    },
-    Livrable: {
-        ...livrableResolver.LivrableResolver
-    },
-    Evaluation: {
-        ...evaluationResolver.EvaluationResolver
     }
 };
 

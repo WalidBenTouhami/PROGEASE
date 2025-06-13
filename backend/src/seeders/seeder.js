@@ -72,7 +72,7 @@ const livrableTemplates = [
 // Seeder principal
 async function seed() {
   try {
-    await mongoose.connect(process.env.MONGO_URI);
+    await mongoose.connect(process.env.MONGODB_URI);
     logger.info('Connected to MongoDB');
 
     await Utilisateur.deleteMany({});

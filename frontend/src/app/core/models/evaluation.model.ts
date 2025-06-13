@@ -15,20 +15,20 @@ export interface User {
   role: string;
 }
 
-export interface EvaluationCritere {
+export interface CritereEvaluation {
   nom: string;
   note: number;
   poids: number;
 }
 
 export interface Evaluation {
-  id?: string;
+  _id?: string;
   projetId: string;
   evaluateurId: string;
   note: number;
-  commentaire: string;
-  criteres: EvaluationCritere[];
-  dateEvaluation: string;
+  commentaire?: string;
+  criteres: CritereEvaluation[];
+  dateEvaluation?: string;
   creeLe?: string;
   majLe?: string;
   
@@ -46,7 +46,7 @@ export interface EvaluationStats {
 export interface UpdateEvaluationInput {
   note?: number;
   commentaire?: string;
-  criteres?: EvaluationCritere[];
+  criteres?: CritereEvaluation[];
 }
 
 export interface CreateEvaluationInput {
@@ -54,5 +54,5 @@ export interface CreateEvaluationInput {
   evaluateurId: string;
   note: number;
   commentaire: string;
-  criteres: EvaluationCritere[];
+  criteres: CritereEvaluation[];
 } 

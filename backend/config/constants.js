@@ -4,7 +4,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 require('dotenv').config();
 
 // ✅ Validation des variables d'environnement critiques
-const REQUIRED_ENV_VARS = ["MONGO_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
+const REQUIRED_ENV_VARS = ["MONGODB_URI", "PORT", "JWT_SECRET", "DEEPSEEK_API_KEY"];
 REQUIRED_ENV_VARS.forEach((envVar) => {
     if (!process.env[envVar]) {
         throw new Error(`La variable d'environnement ${envVar} est manquante.`);
@@ -13,36 +13,27 @@ REQUIRED_ENV_VARS.forEach((envVar) => {
 
 // ✅ Énumérations globales
 const Enums = Object.freeze({
-    ProjetStatus: {
-        DRAFT: "DRAFT",
-        IN_PROGRESS: "IN_PROGRESS",
-        COMPLETED: "COMPLETED",
-        ARCHIVED: "ARCHIVED",
-    },
     UtilisateurRole: {
         ETUDIANT: "ETUDIANT",
         TUTEUR: "TUTEUR",
         ADMIN: "ADMIN",
-    },
-    LivrableStatus: {
-        COMPLETED: "COMPLETED",
-        PENDING: "PENDING",
-        OVERDUE: "OVERDUE",
     },
     StatutProjet: {
         BROUILLON: 'BROUILLON',
         A_VENIR: 'A_VENIR',
         EN_COURS: 'EN_COURS',
         EN_RETARD: 'EN_RETARD',
+        BLOQUE: 'BLOQUE',
         TERMINE: 'TERMINE',
         ARCHIVE: 'ARCHIVE'
     },
     StatutLivrable: {
-        A_FAIRE: 'A_FAIRE',
+        PLANIFIE: 'PLANIFIE',
         EN_COURS: 'EN_COURS',
-        EN_REVISION: 'EN_REVISION',
-        TERMINE: 'TERMINE',
-        REJETE: 'REJETE'
+        SOUMIS: 'SOUMIS',
+        VALIDE: 'VALIDE',
+        REFUSE: 'REFUSE',
+        ARCHIVE: 'ARCHIVE'
     },
     NiveauRisque: {
         FAIBLE: 'FAIBLE',
@@ -85,6 +76,30 @@ const Enums = Object.freeze({
         REUSSI: 'REUSSI',
         ECHOUE: 'ECHOUE',
         EXPIRE: 'EXPIRE'
+    },
+    StatutTache: {
+        A_FAIRE: 'A_FAIRE',
+        EN_COURS: 'EN_COURS',
+        TERMINEE: 'TERMINEE',
+        BLOQUEE: 'BLOQUEE'
+    },
+    TypeSignalement: {
+        BLOQUE: 'BLOQUE',
+        URGENT: 'URGENT',
+        RETARD: 'RETARD',
+        AUTRE: 'AUTRE'
+    },
+    PrioriteSignalement: {
+        BASSE: 'BASSE',
+        MOYENNE: 'MOYENNE',
+        HAUTE: 'HAUTE',
+        URGENTE: 'URGENTE'
+    },
+    StatutSignalement: {
+        OUVERT: 'OUVERT',
+        EN_COURS: 'EN_COURS',
+        RESOLU: 'RESOLU',
+        FERME: 'FERME'
     }
 });
 
@@ -180,7 +195,7 @@ const StatutHttp = Object.freeze({
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/progease';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/progease';
 const JWT_SECRET = process.env.JWT_SECRET || 'votre_secret_jwt_super_securise_pour_la_production_2025';
 const ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:4200', 'http://localhost:3000'];
 const LOG_LEVEL = process.env.LOG_LEVEL || 'info';
@@ -272,7 +287,7 @@ exports.HTTP_STATUS = {
 module.exports = {
     NODE_ENV,
     PORT,
-    MONGO_URI,
+    MONGODB_URI,
     JWT_SECRET,
     ALLOWED_ORIGINS,
     LOG_LEVEL,

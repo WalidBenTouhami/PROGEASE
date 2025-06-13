@@ -3022,3 +3022,18 @@ Use mongoose.model(name, schema) {"metadata":{"service":"progease-api","stack":"
 {"level":"info","message":"Donnees de test dejà presentes","service":"progease-api","timestamp":"2025-06-01 20:10:24"}
 {"level":"info","message":"Données de test créées/vérifiées avec succès","service":"progease-api","timestamp":"2025-06-01 20:10:24"}
 {"level":"info","message":"Signal SIGINT reçu. Arret du serveur...","service":"progease-api","timestamp":"2025-06-01 20:11:32"}
+{"level":"info","message":"✅ Connecté à MongoDB","timestamp":"2025-06-10T23:49:24.312Z"}
+{"level":"info","message":"✅ Serveur démarré sur le port 5003","timestamp":"2025-06-10T23:49:24.315Z"}
+{"level":"info","message":"✅ Mode: development","timestamp":"2025-06-10T23:49:24.315Z"}
+{"level":"info","message":"SIGINT reçu. Arrêt gracieux...","timestamp":"2025-06-10T23:50:08.962Z"}
+{"level":"info","message":"✅ Connecté à MongoDB","timestamp":"2025-06-10T23:51:59.633Z"}
+{"level":"info","message":"✅ Serveur démarré sur le port 5003","timestamp":"2025-06-10T23:51:59.636Z"}
+{"level":"info","message":"✅ Mode: development","timestamp":"2025-06-10T23:51:59.636Z"}
+{"level":"info","message":"SIGINT reçu. Arrêt gracieux...","timestamp":"2025-06-10T23:53:03.733Z"}
+{"level":"info","message":"✅ Connecté à MongoDB","timestamp":"2025-06-11T00:02:48.944Z"}
+{"level":"info","message":"✅ Serveur démarré sur le port 5003","timestamp":"2025-06-11T00:02:48.948Z"}
+{"level":"info","message":"✅ Mode: development","timestamp":"2025-06-11T00:02:48.948Z"}
+{"level":"info","message":"SIGINT reçu. Arrêt gracieux...","timestamp":"2025-06-11T00:03:07.300Z"}
+{"level":"info","message":"Serveur démarré sur le port undefined","timestamp":"2025-06-11T00:37:02.871Z"}
+{"level":"info","message":"Mode: undefined","timestamp":"2025-06-11T00:37:02.873Z"}
+{"level":"info","message":"GraphQL Playground: http://localhost:undefined/graphql","timestamp":"2025-06-11T00:37:02.873Z"}

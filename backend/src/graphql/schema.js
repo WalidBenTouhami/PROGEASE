@@ -22,6 +22,7 @@ const projetTypeDefs = require('./schemas/projet.schema');
 const livrableTypeDefs = require('./schemas/livrable.schema');
 const formationTypeDefs = require('./schemas/formation.schema');
 const certificationTypeDefs = require('./schemas/certification.schema');
+const quizTypeDefs = require('./schemas/quiz.schema');
 
 // Importer tous les resolvers
 const utilisateurResolvers = require('./resolvers/utilisateur.resolver');
@@ -29,6 +30,7 @@ const projetResolvers = require('./resolvers/projet.resolver');
 const livrableResolvers = require('./resolvers/livrable.resolver');
 const formationResolvers = require('./resolvers/formation.resolver');
 const certificationResolvers = require('./resolvers/certification.resolver');
+const quizResolvers = require('./resolvers/quiz.resolver');
 
 // Fusionner tous les types
 const typeDefs = [
@@ -37,7 +39,8 @@ const typeDefs = [
     projetTypeDefs,
     livrableTypeDefs,
     formationTypeDefs,
-    certificationTypeDefs
+    certificationTypeDefs,
+    quizTypeDefs
 ];
 
 // Fusionner tous les resolvers
@@ -47,7 +50,8 @@ const resolvers = merge(
     projetResolvers,
     livrableResolvers,
     formationResolvers,
-    certificationResolvers
+    certificationResolvers,
+    quizResolvers
 );
 
 // Créer le schema exécutable

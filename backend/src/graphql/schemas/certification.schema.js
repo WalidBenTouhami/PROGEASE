@@ -49,7 +49,7 @@ const typeDefs = gql`
         dateExpiration: DateTime
         numeroUnique: String!
         formationsTerminees: [FormationTerminee!]
-        quizFinalResultat: QuizResultat
+        quizFinalResultat: ResultatQuiz
         projetFinalResultat: Projet
         creeLe: DateTime!
         majLe: DateTime!

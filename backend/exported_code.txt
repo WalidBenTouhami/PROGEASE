@@ -128,7 +128,7 @@ require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 // Tableau des variables necessaires et fonction pour verifier/logger sans crash
 const VARIABLES_ENV_OBLIGATOIRES = {
-    CRITIQUES: ["MONGO_URI", "JWT_SECRET"],
+    CRITIQUES: ["MONGODB_URI", "JWT_SECRET"],
     RECOMMANDEES: ["PORT", "DEEPSEEK_API_KEY"]
 };
 
@@ -233,7 +233,7 @@ const StatutHttp = Object.freeze({
 });
 
 module.exports = {
-    MONGO_URI: process.env.MONGO_URI,
+    MONGODB_URI: process.env.MONGODB_URI,
     PORT: process.env.PORT || 3000,
     JWT_SECRET: process.env.JWT_SECRET,
     DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,
@@ -1861,7 +1861,7 @@ console.log('[3] Verification des configurations...');
 const envVars = [
     'NODE_ENV',
     'PORT',
-    'MONGO_URI',
+    'MONGODB_URI',
     'JWT_SECRET',
     'DEEPSEEK_API_KEY'
 ];
@@ -1873,7 +1873,7 @@ console.log('');
 
 // Verification de la connexion MongoDB
 console.log('[4] Verification de la connexion MongoDB...');
-const mongoUri = process.env.MONGO_URI;
+const mongoUri = process.env.MONGODB_URI;
 console.log(`URI MongoDB: ${mongoUri ? '✅ Definie' : '❌ Non definie'}`);
 
 if (mongoUri) {
@@ -2349,7 +2349,7 @@ app.use('/graphql', graphqlHTTP({
 async function startServer() {
     try {
         // Connexion à la base de donnees
-        await connecterBD(process.env.MONGO_URI || 'mongodb://localhost:27017/progease');
+        await connecterBD(process.env.MONGODB_URI || 'mongodb://localhost:27017/progease');
         logger.info('Connecte à MongoDB avec succes');
 
         // Creer les donnees de test pour Newman
@@ -9078,7 +9078,7 @@ module.exports = {
 
 require('dotenv').config({ path: './.env' });
 
-console.log('MONGO_URI:', process.env.MONGO_URI);
+console.log('MONGODB_URI:', process.env.MONGODB_URI);
 
 // ======= Contenu de test-logs.js =======
 

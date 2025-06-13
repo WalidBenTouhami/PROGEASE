@@ -54,7 +54,7 @@ console.log('[3] Verification des configurations...');
 const envVars = [
     'NODE_ENV',
     'PORT',
-    'MONGO_URI',
+    'MONGODB_URI',
     'JWT_SECRET',
     'DEEPSEEK_API_KEY'
 ];
@@ -66,7 +66,7 @@ console.log('');
 
 // Verification de la connexion MongoDB
 console.log('[4] Verification de la connexion MongoDB...');
-const mongoUri = process.env.MONGO_URI;
+const mongoUri = process.env.MONGODB_URI;
 console.log(`URI MongoDB: ${mongoUri ? '✅ Definie' : '❌ Non definie'}`);
 
 if (mongoUri) {

@@ -1,11 +1,17 @@
-import { Component } from '@angular/core';
-import { RouterModule, RouterOutlet } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatListModule } from '@angular/material/list';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { LoadingService } from './services/loading.service';
+import { ErrorService } from './services/error.service';
+import { AuthService } from './services/auth.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -13,16 +19,154 @@ import { MatListModule } from '@angular/material/list';
   imports: [
     CommonModule,
     RouterModule,
-    RouterOutlet,
     MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatSidenavModule,
-    MatListModule
+    MatListModule,
+    MatProgressBarModule,
+    MatSnackBarModule
   ],
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  template: `
+    <div class="app-container">
+      <!-- Barre de chargement -->
+      <mat-progress-bar
+        *ngIf="isLoading$ | async"
+        mode="indeterminate"
+        class="loading-bar">
+      </mat-progress-bar>
+
+      <!-- Barre d'outils -->
+      <mat-toolbar color="primary" *ngIf="isAuthenticated$ | async">
+        <button mat-icon-button (click)="toggleSidenav()">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span>ProgEase</span>
+        <span class="toolbar-spacer"></span>
+        <button mat-icon-button (click)="logout()">
+          <mat-icon>exit_to_app</mat-icon>
+        </button>
+      </mat-toolbar>
+
+      <!-- Menu latéral -->
+      <mat-sidenav-container>
+        <mat-sidenav
+          #sidenav
+          mode="side"
+          [opened]="true"
+          class="sidenav">
+          <mat-nav-list>
+            <a mat-list-item routerLink="/tableau-de-bord">
+              <mat-icon>dashboard</mat-icon>
+              <span>Tableau de bord</span>
+            </a>
+            <a mat-list-item routerLink="/projets">
+              <mat-icon>folder</mat-icon>
+              <span>Projets</span>
+            </a>
+            <a mat-list-item routerLink="/utilisateurs">
+              <mat-icon>people</mat-icon>
+              <span>Utilisateurs</span>
+            </a>
+            <a mat-list-item routerLink="/parametres">
+              <mat-icon>settings</mat-icon>
+              <span>Paramètres</span>
+            </a>
+          </mat-nav-list>
+        </mat-sidenav>
+
+        <!-- Contenu principal -->
+        <mat-sidenav-content>
+          <div class="content">
+            <router-outlet></router-outlet>
+          </div>
+        </mat-sidenav-content>
+      </mat-sidenav-container>
+
+      <!-- Messages d'erreur -->
+      <div *ngIf="error$ | async as error" class="error-message">
+        {{ error }}
+      </div>
+    </div>
+  `,
+  styles: [`
+    .app-container {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    .loading-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+
+    .toolbar-spacer {
+      flex: 1 1 auto;
+    }
+
+    .sidenav {
+      width: 250px;
+    }
+
+    .content {
+      padding: 20px;
+      height: calc(100vh - 64px);
+      overflow-y: auto;
+    }
+
+    .error-message {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #f44336;
+      color: white;
+      padding: 16px;
+      border-radius: 4px;
+      z-index: 1000;
+    }
+
+    mat-nav-list {
+      a {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 16px;
+        
+        mat-icon {
+          margin-right: 8px;
+        }
+      }
+    }
+  `]
 })
-export class AppComponent {
-  title = 'PROGEASE';
+export class AppComponent implements OnInit {
+  isLoading$: Observable<boolean>;
+  error$: Observable<string>;
+  isAuthenticated$: Observable<boolean>;
+
+  constructor(
+    private loadingService: LoadingService,
+    private errorService: ErrorService,
+    private authService: AuthService
+  ) {
+    this.isLoading$ = this.loadingService.isLoading$;
+    this.error$ = this.errorService.error$;
+    this.isAuthenticated$ = this.authService.isAuthenticated$;
+  }
+
+  ngOnInit(): void {
+    // Initialisation du composant
+  }
+
+  toggleSidenav(): void {
+    // TODO: Implémenter la logique de basculement du menu latéral
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
 }

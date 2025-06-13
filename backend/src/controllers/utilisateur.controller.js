@@ -255,19 +255,91 @@ class UtilisateurController {
         }
     }
 
+    // Mot de passe oublié
+    static async motDePasseOublie(req, res) {
+        try {
+            const { email } = req.body;
+            const utilisateur = await Utilisateur.findOne({ email });
+
+            if (!utilisateur) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Aucun utilisateur trouvé avec cet email'
+                });
+            }
+
+            // Générer un token de réinitialisation
+            const resetToken = crypto.randomBytes(32).toString('hex');
+            utilisateur.resetPasswordToken = crypto
+                .createHash('sha256')
+                .update(resetToken)
+                .digest('hex');
+            utilisateur.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+
+            await utilisateur.save();
+
+            // TODO: Envoyer l'email avec le lien de réinitialisation
+            // Pour l'instant, on renvoie juste le token
+            res.json({
+                success: true,
+                message: 'Un email de réinitialisation a été envoyé',
+                resetToken // À retirer en production
+            });
+        } catch (error) {
+            logger.error('Erreur lors de la demande de réinitialisation:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la demande de réinitialisation'
+            });
+        }
+    }
+
+    // Réinitialiser le mot de passe
+    static async reinitialiserMotDePasse(req, res) {
+        try {
+            const { token } = req.params;
+            const { motDePasse } = req.body;
+
+            const utilisateur = await Utilisateur.findOne({
+                resetPasswordToken: crypto
+                    .createHash('sha256')
+                    .update(token)
+                    .digest('hex'),
+                resetPasswordExpires: { $gt: Date.now() }
+            });
+
+            if (!utilisateur) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Token invalide ou expiré'
+                });
+            }
+
+            utilisateur.motDePasse = motDePasse;
+            utilisateur.resetPasswordToken = undefined;
+            utilisateur.resetPasswordExpires = undefined;
+            await utilisateur.save();
+
+            res.json({
+                success: true,
+                message: 'Mot de passe réinitialisé avec succès'
+            });
+        } catch (error) {
+            logger.error('Erreur lors de la réinitialisation du mot de passe:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Erreur lors de la réinitialisation du mot de passe'
+            });
+        }
+    }
+
     // Obtenir tous les utilisateurs (admin)
     static async getAllUtilisateurs(req, res) {
         try {
-            const utilisateurs = await Utilisateur.find();
+            const utilisateurs = await Utilisateur.find().select('-motDePasse');
             res.json({
                 success: true,
-                utilisateurs: utilisateurs.map(u => ({
-                    id: u._id,
-                    email: u.email,
-                    nom: u.nom,
-                    prenom: u.prenom,
-                    role: u.role
-                }))
+                utilisateurs
             });
         } catch (error) {
             logger.error('Erreur lors de la récupération des utilisateurs:', error);
@@ -281,23 +353,16 @@ class UtilisateurController {
     // Obtenir un utilisateur par ID (admin)
     static async getUtilisateurById(req, res) {
         try {
-            const utilisateur = await Utilisateur.findById(req.params.id);
+            const utilisateur = await Utilisateur.findById(req.params.id).select('-motDePasse');
             if (!utilisateur) {
                 return res.status(404).json({
                     success: false,
                     message: 'Utilisateur non trouvé'
                 });
             }
-
             res.json({
                 success: true,
-                utilisateur: {
-                    id: utilisateur._id,
-                    email: utilisateur.email,
-                    nom: utilisateur.nom,
-                    prenom: utilisateur.prenom,
-                    role: utilisateur.role
-                }
+                utilisateur
             });
         } catch (error) {
             logger.error('Erreur lors de la récupération de l\'utilisateur:', error);
@@ -309,14 +374,10 @@ class UtilisateurController {
     }
 
     // Mettre à jour un utilisateur (admin)
-    static async updateUtilisateur(req, res) {
+    static async mettreAJourUtilisateur(req, res) {
         try {
             const { nom, prenom, email, role } = req.body;
-            const utilisateur = await Utilisateur.findByIdAndUpdate(
-                req.params.id,
-                { nom, prenom, email, role },
-                { new: true, runValidators: true }
-            );
+            const utilisateur = await Utilisateur.findById(req.params.id);
 
             if (!utilisateur) {
                 return res.status(404).json({
@@ -324,6 +385,13 @@ class UtilisateurController {
                     message: 'Utilisateur non trouvé'
                 });
             }
+
+            utilisateur.nom = nom || utilisateur.nom;
+            utilisateur.prenom = prenom || utilisateur.prenom;
+            utilisateur.email = email || utilisateur.email;
+            if (role) utilisateur.role = role;
+
+            await utilisateur.save();
 
             res.json({
                 success: true,
@@ -345,7 +413,7 @@ class UtilisateurController {
     }
 
     // Supprimer un utilisateur (admin)
-    static async deleteUtilisateur(req, res) {
+    static async supprimerUtilisateur(req, res) {
         try {
             const utilisateur = await Utilisateur.findByIdAndDelete(req.params.id);
             if (!utilisateur) {
@@ -354,7 +422,6 @@ class UtilisateurController {
                     message: 'Utilisateur non trouvé'
                 });
             }
-
             res.json({
                 success: true,
                 message: 'Utilisateur supprimé avec succès'

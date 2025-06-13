@@ -3,7 +3,13 @@ const express = require('express');
 const router = express.Router();
 const projetController = require('../controllers/projet.controller');
 const { validateRequest } = require('../middlewares/validateRequest');
-const { validateProjetData, validateId, projetSchema } = require('../validations/projet.validation');
+const { 
+    validateProjetData, 
+    validateId, 
+    validateStatistiquesRequest, 
+    projetSchema, 
+    signalementSchema 
+} = require('../validations/projet.validation');
 const { asyncHandler } = require('../middlewares/asyncHandler');
 const { rateLimiter } = require('../middlewares/rateLimiter');
 
@@ -88,6 +94,28 @@ router.get('/:id/livrables',
         req.params.projetId = req.params.id;
         await livrableController.findByProjet(req, res);
     })
+);
+
+/**
+ * @route GET /api/projets/statistiques
+ * @description Obtenir les statistiques des projets par thème et catégorie
+ * @access Public
+ */
+router.get('/statistiques',
+    rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requetes par minute
+    validateStatistiquesRequest,
+    asyncHandler(projetController.obtenirStatistiques)
+);
+
+/**
+ * @route POST /api/projets/signalement
+ * @description Signaler un problème sur un projet ou une tâche
+ * @access Public
+ */
+router.post('/signalement',
+    rateLimiter({ windowMs: 60000, max: 10 }),  // max 10 requetes par minute
+    validateRequest(signalementSchema),
+    asyncHandler(projetController.signalerProbleme)
 );
 
 module.exports = router;

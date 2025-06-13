@@ -301,4 +301,186 @@ function genererRecommandations(risques) {
     return recommandations;
 }
 
+/**
+ * Obtenir les statistiques des projets par thème et catégorie
+ */
+exports.obtenirStatistiques = async (req, res) => {
+    try {
+        const { dateDebut, dateFin } = req.query;
+        const filter = {};
+
+        if (dateDebut || dateFin) {
+            filter.creeLe = {};
+            if (dateDebut) filter.creeLe.$gte = new Date(dateDebut);
+            if (dateFin) filter.creeLe.$lte = new Date(dateFin);
+        }
+
+        // Statistiques par thème
+        const statsParTheme = await Projet.aggregate([
+            { $match: filter },
+            {
+                $group: {
+                    _id: '$theme',
+                    total: { $sum: 1 },
+                    enCours: {
+                        $sum: {
+                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.EN_COURS] }, 1, 0]
+                        }
+                    },
+                    termines: {
+                        $sum: {
+                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.TERMINE] }, 1, 0]
+                        }
+                    },
+                    progressionMoyenne: { $avg: '$progression' }
+                }
+            }
+        ]);
+
+        // Statistiques par catégorie
+        const statsParCategorie = await Projet.aggregate([
+            { $match: filter },
+            { $unwind: '$categories' },
+            {
+                $group: {
+                    _id: '$categories',
+                    total: { $sum: 1 },
+                    enCours: {
+                        $sum: {
+                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.EN_COURS] }, 1, 0]
+                        }
+                    },
+                    termines: {
+                        $sum: {
+                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.TERMINE] }, 1, 0]
+                        }
+                    },
+                    progressionMoyenne: { $avg: '$progression' }
+                }
+            }
+        ]);
+
+        // Statistiques globales
+        const statsGlobales = await Projet.aggregate([
+            { $match: filter },
+            {
+                $group: {
+                    _id: null,
+                    totalProjets: { $sum: 1 },
+                    progressionMoyenne: { $avg: '$progression' },
+                    projetsEnRetard: {
+                        $sum: {
+                            $cond: [
+                                {
+                                    $and: [
+                                        { $eq: ['$statut', Enums.StatutProjet.EN_COURS] },
+                                        { $lt: ['$progression', 100] },
+                                        { $lt: [new Date(), '$dateFin'] }
+                                    ]
+                                },
+                                1,
+                                0
+                            ]
+                        }
+                    }
+                }
+            }
+        ]);
+
+        res.status(200).json({
+            success: true,
+            message: 'Statistiques des projets récupérées avec succès',
+            data: {
+                parTheme: statsParTheme,
+                parCategorie: statsParCategorie,
+                globales: statsGlobales[0] || {
+                    totalProjets: 0,
+                    progressionMoyenne: 0,
+                    projetsEnRetard: 0
+                }
+            }
+        });
+    } catch (error) {
+        logger.error('Erreur lors de la récupération des statistiques des projets:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors de la récupération des statistiques des projets',
+            error: error.message
+        });
+    }
+};
+
+/**
+ * Signaler un problème sur un projet ou une tâche
+ */
+exports.signalerProbleme = async (req, res) => {
+    try {
+        const { projetId, type, description, priorite, tacheId } = req.body;
+
+        const projet = await Projet.findById(projetId);
+        if (!projet) {
+            return res.status(404).json({
+                success: false,
+                message: 'Projet non trouvé',
+                error: 'Projet non trouvé'
+            });
+        }
+
+        // Vérifier si la tâche existe si tacheId est fourni
+        if (tacheId) {
+            const tache = projet.taches.find(t => t._id.toString() === tacheId);
+            if (!tache) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Tâche non trouvée',
+                    error: 'Tâche non trouvée'
+                });
+            }
+        }
+
+        // Créer le signalement
+        const signalement = {
+            type,
+            description,
+            priorite: priorite || 'MOYENNE',
+            tacheId,
+            signalePar: req.utilisateur ? req.utilisateur.id : undefined,
+            dateSignalement: new Date(),
+            statut: 'OUVERT'
+        };
+
+        // Ajouter le signalement au projet
+        projet.signalements = projet.signalements || [];
+        projet.signalements.push(signalement);
+
+        // Mettre à jour le statut du projet si nécessaire
+        if (type === 'BLOQUE' || type === 'URGENT') {
+            projet.statut = Enums.StatutProjet.BLOQUE;
+        }
+
+        await projet.save();
+
+        logger.monitoring('Problème signalé', {
+            projetId,
+            tacheId,
+            type,
+            priorite,
+            utilisateur: req.utilisateur?.id
+        });
+
+        res.status(201).json({
+            success: true,
+            message: 'Problème signalé avec succès',
+            data: signalement
+        });
+    } catch (error) {
+        logger.error('Erreur lors du signalement du problème:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Erreur lors du signalement du problème',
+            error: error.message
+        });
+    }
+};
+
 module.exports = exports;

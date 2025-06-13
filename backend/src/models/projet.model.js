@@ -117,7 +117,92 @@ const projetSchema = new Schema({
     majLe: {
         type: Date,
         default: Date.now,
-    }
+    },
+    theme: {
+        type: String,
+        required: [true, 'Le thème du projet est requis.'],
+        trim: true
+    },
+    categories: [{
+        type: String,
+        required: true,
+        trim: true
+    }],
+    taches: [{
+        titre: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        description: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        dateDebut: {
+            type: Date,
+            required: true
+        },
+        dateFin: {
+            type: Date,
+            required: true
+        },
+        statut: {
+            type: String,
+            enum: ['A_FAIRE', 'EN_COURS', 'TERMINEE', 'BLOQUEE'],
+            default: 'A_FAIRE'
+        },
+        progression: {
+            type: Number,
+            min: 0,
+            max: 100,
+            default: 0
+        },
+        assigneA: {
+            type: Schema.Types.ObjectId,
+            ref: 'Utilisateur'
+        }
+    }],
+    signalements: [{
+        type: {
+            type: String,
+            required: true,
+            enum: ['BLOQUE', 'URGENT', 'RETARD', 'AUTRE']
+        },
+        description: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        priorite: {
+            type: String,
+            enum: ['BASSE', 'MOYENNE', 'HAUTE', 'URGENTE'],
+            default: 'MOYENNE'
+        },
+        tacheId: {
+            type: Schema.Types.ObjectId
+        },
+        signalePar: {
+            type: Schema.Types.ObjectId,
+            ref: 'Utilisateur'
+        },
+        dateSignalement: {
+            type: Date,
+            default: Date.now
+        },
+        statut: {
+            type: String,
+            enum: ['OUVERT', 'EN_COURS', 'RESOLU', 'FERME'],
+            default: 'OUVERT'
+        },
+        resolution: {
+            type: String,
+            trim: true
+        },
+        dateResolution: {
+            type: Date
+        }
+    }]
 }, {
     toJSON: { virtuals: true, getters: true },
     toObject: { virtuals: true, getters: true }
@@ -226,6 +311,24 @@ projetSchema.statics.rechercheAvancee = async function(criteres = {}) {
         .limit(options.limit)
         .sort(options.sort)
         .lean();
+};
+
+// Méthode pour calculer les statistiques du projet
+projetSchema.methods.calculerStatistiques = function() {
+    const stats = {
+        totalTaches: this.taches.length,
+        tachesTerminees: this.taches.filter(t => t.statut === 'TERMINEE').length,
+        tachesEnCours: this.taches.filter(t => t.statut === 'EN_COURS').length,
+        tachesBloquees: this.taches.filter(t => t.statut === 'BLOQUEE').length,
+        signalementsOuverts: this.signalements.filter(s => s.statut === 'OUVERT').length,
+        signalementsUrgents: this.signalements.filter(s => s.priorite === 'URGENTE').length
+    };
+
+    stats.progressionMoyenne = this.taches.length > 0
+        ? Math.round(this.taches.reduce((acc, t) => acc + t.progression, 0) / this.taches.length)
+        : 0;
+
+    return stats;
 };
 
 module.exports = mongoose.model('Projet', projetSchema);

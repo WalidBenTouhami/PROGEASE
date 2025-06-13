@@ -20,6 +20,7 @@ const Evaluation = require('../../models/evaluation.model');
 const { AuthenticationError, UserInputError } = require('apollo-server-express');
 const { catchAsync } = require('../../utils/catchAsync');
 const { validerProjet } = require('../../validations/projet.validation');
+const projetService = require('../../services/projet.service');
 
 /**
  * Transforme un document MongoDB Projet en type GraphQL
@@ -220,7 +221,7 @@ const Mutation = {
     /**
      * Create a new projet
      */
-    createProjet: catchAsync(async (_, { input }, { utilisateur }) => {
+    creerProjet: catchAsync(async (_, { input }, { utilisateur }) => {
         if (!utilisateur) {
             throw new AuthenticationError('Non authentifié');
         }
@@ -246,7 +247,7 @@ const Mutation = {
     /**
      * Update an existing projet
      */
-    updateProjet: catchAsync(async (_, { id, input }, { utilisateur }) => {
+    mettreAJourProjet: catchAsync(async (_, { id, input }, { utilisateur }) => {
         if (!utilisateur) {
             throw new AuthenticationError('Non authentifié');
         }
@@ -275,17 +276,7 @@ const Mutation = {
      * Delete a projet
      */
     deleteProjet: catchAsync(async (_, { id }, { utilisateur }) => {
-        if (!utilisateur || utilisateur.role !== 'ADMIN') {
-            throw new AuthenticationError('Non autorisé');
-        }
-
-        const projet = await Projet.findById(id);
-        if (!projet) {
-            throw new UserInputError('Projet non trouvé');
-        }
-
-        await projet.remove();
-        return true;
+        return await projetService.supprimerProjet(id, utilisateur);
     }),
 
     ajouterMembreProjet: catchAsync(async (_, { projetId, utilisateurId }, { utilisateur }) => {
@@ -385,6 +376,5 @@ const ProjetResolver = {
 module.exports = {
     Query,
     Mutation,
-    Projet: ProjetResolver,
-    mapProjetMongoVersGraphQL
+    Projet: ProjetResolver
 };

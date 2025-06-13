@@ -175,7 +175,7 @@ module.exports = gql`
         """
         Récupère tous les quiz avec pagination et filtres
         """
-        quiz(input: FiltreQuizInput): PaginationQuiz!
+        quizzes(input: FiltreQuizInput): PaginationQuiz!
     }
 
     extend type Mutation {

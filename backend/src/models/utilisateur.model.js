@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const bcrypt = require('bcryptjs');
-const { Enums } = require('../../config/constants');
+const config = require('../config');
 
 const utilisateurSchema = new Schema({
     nom: {
@@ -24,26 +24,29 @@ const utilisateurSchema = new Schema({
         unique: true,
         trim: true,
         lowercase: true,
-        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Veuillez fournir un email valide']
+        match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Veuillez fournir un email valide'],
+        index: true
     },
     motDePasse: {
         type: String,
         required: [true, 'Le mot de passe est requis'],
         minlength: [8, 'Le mot de passe doit contenir au moins 8 caractères'],
-        select: false // Ne pas inclure par défaut dans les requêtes
+        select: false
     },
     role: {
         type: String,
-        enum: Object.values(Enums.UtilisateurRole),
-        default: Enums.UtilisateurRole.ETUDIANT
+        enum: ['ADMIN', 'TUTEUR', 'ETUDIANT'],
+        default: 'ETUDIANT',
+        index: true
     },
     avatar: {
         type: String,
-        default: 'default-avatar.png'
+        default: 'avatar-par-defaut.png'
     },
-    estActif: {
+    actif: {
         type: Boolean,
-        default: true
+        default: true,
+        index: true
     },
     emailVerifie: {
         type: Boolean,
@@ -67,6 +70,30 @@ const utilisateurSchema = new Schema({
     derniereConnexion: {
         type: Date
     },
+    tentativesConnexion: {
+        type: Number,
+        default: 0
+    },
+    dateBlocage: {
+        type: Date
+    },
+    preferences: {
+        theme: {
+            type: String,
+            enum: ['clair', 'sombre', 'systeme'],
+            default: 'systeme'
+        },
+        notifications: {
+            email: {
+                type: Boolean,
+                default: true
+            },
+            push: {
+                type: Boolean,
+                default: true
+            }
+        }
+    },
     creeLe: {
         type: Date,
         default: Date.now
@@ -79,58 +106,120 @@ const utilisateurSchema = new Schema({
     timestamps: {
         createdAt: 'creeLe',
         updatedAt: 'majLe'
+    },
+    toJSON: {
+        virtuals: true,
+        transform: function(doc, ret) {
+            delete ret.motDePasse;
+            delete ret.__v;
+            return ret;
+        }
+    },
+    toObject: {
+        virtuals: true
     }
 });
 
-// Index pour optimiser les recherches
-utilisateurSchema.index({ email: 1 });
-utilisateurSchema.index({ role: 1 });
+// Index composé pour optimiser les recherches
+utilisateurSchema.index({ email: 1, role: 1 });
+utilisateurSchema.index({ actif: 1, role: 1 });
 
 // Middleware pre-save pour hasher le mot de passe
 utilisateurSchema.pre('save', async function(next) {
     if (!this.isModified('motDePasse')) return next();
     
     try {
-        const salt = await bcrypt.genSalt(10);
-        this.motDePasse = await bcrypt.hash(this.motDePasse, salt);
+        const sel = await bcrypt.genSalt(10);
+        this.motDePasse = await bcrypt.hash(this.motDePasse, sel);
         this.majLe = new Date();
         next();
-    } catch (error) {
-        next(error);
+    } catch (erreur) {
+        next(erreur);
     }
 });
 
-// Méthode pour comparer les mots de passe
-utilisateurSchema.methods.comparerMotDePasse = async function(motDePasse) {
-    return await bcrypt.compare(motDePasse, this.motDePasse);
+// Méthodes d'instance
+utilisateurSchema.methods = {
+    // Comparaison des mots de passe
+    comparerMotDePasse: async function(motDePasse) {
+        return await bcrypt.compare(motDePasse, this.motDePasse);
+    },
+
+    // Vérification des rôles
+    estAdmin: function() {
+        return this.role === 'ADMIN';
+    },
+
+    estTuteur: function() {
+        return this.role === 'TUTEUR';
+    },
+
+    estEtudiant: function() {
+        return this.role === 'ETUDIANT';
+    },
+
+    // Mise à jour de la dernière connexion
+    mettreAJourDerniereConnexion: function() {
+        this.derniereConnexion = new Date();
+        this.tentativesConnexion = 0;
+        return this.save();
+    },
+
+    // Gestion des tentatives de connexion
+    incrementerTentativesConnexion: async function() {
+        this.tentativesConnexion += 1;
+        if (this.tentativesConnexion >= 5) {
+            this.dateBlocage = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+        }
+        return this.save();
+    },
+
+    // Vérification du blocage
+    estBloque: function() {
+        if (!this.dateBlocage) return false;
+        return Date.now() < this.dateBlocage;
+    },
+
+    // Réinitialisation du blocage
+    reinitialiserBlocage: function() {
+        this.tentativesConnexion = 0;
+        this.dateBlocage = null;
+        return this.save();
+    }
 };
 
-// Méthode pour vérifier si l'utilisateur est admin
-utilisateurSchema.methods.estAdmin = function() {
-    return this.role === 'ADMIN';
-};
+// Méthodes statiques
+utilisateurSchema.statics = {
+    // Recherche d'utilisateurs avec pagination
+    rechercher: async function(criteres, options = {}) {
+        const {
+            page = 1,
+            limite = 10,
+            tri = '-creeLe',
+            champs = '-motDePasse'
+        } = options;
 
-// Méthode pour vérifier si l'utilisateur est tuteur
-utilisateurSchema.methods.estTuteur = function() {
-    return this.role === 'TUTEUR';
-};
+        const requete = this.find(criteres)
+            .select(champs)
+            .sort(tri)
+            .skip((page - 1) * limite)
+            .limit(limite);
 
-// Méthode pour vérifier si l'utilisateur est étudiant
-utilisateurSchema.methods.estEtudiant = function() {
-    return this.role === 'ETUDIANT';
-};
+        const [utilisateurs, total] = await Promise.all([
+            requete.exec(),
+            this.countDocuments(criteres)
+        ]);
 
-// Méthode pour mettre à jour la dernière connexion
-utilisateurSchema.methods.mettreAJourDerniereConnexion = function() {
-    this.derniereConnexion = new Date();
-    return this.save();
-};
-
-// Méthode pour masquer le mot de passe lors de la sérialisation
-utilisateurSchema.methods.toJSON = function() {
-    const obj = this.toObject();
-    delete obj.motDePasse;
-    return obj;
+        return {
+            utilisateurs,
+            pagination: {
+                page,
+                limite,
+                total,
+                pages: Math.ceil(total / limite)
+            }
+        };
+    }
 };
 
 const Utilisateur = mongoose.model('Utilisateur', utilisateurSchema);

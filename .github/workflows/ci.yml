@@ -14,7 +14,7 @@ jobs:
         image: mongo:5.0
         ports: [27017:27017]
     env:
-      MONGO_URI: mongodb://localhost:27017/progease
+      MONGODB_URI: mongodb://localhost:27017/progease
       NODE_ENV: test
       PORT: 5000
       CORS_ORIGINS: http://localhost:3000

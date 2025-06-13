@@ -1,23 +1,43 @@
 // Synced with backend/src/models/livrable.model.js
 export enum StatutLivrable {
-  EN_COURS = 'EN_COURS',
-  TERMINE = 'TERMINE',
   EN_ATTENTE = 'EN_ATTENTE',
-  SOUMIS = 'SOUMIS'
+  EN_COURS = 'EN_COURS',
+  EN_REVISION = 'EN_REVISION',
+  VALIDE = 'VALIDE',
+  REJETE = 'REJETE'
+}
+
+export enum TypeLivrable {
+  DOCUMENT = 'DOCUMENT',
+  CODE = 'CODE',
+  PRESENTATION = 'PRESENTATION',
+  RAPPORT = 'RAPPORT',
+  AUTRE = 'AUTRE'
 }
 
 export interface Livrable {
-  id?: string;
-  titre: string;
+  _id?: string;
   intitule: string;
   description: string;
+  type: TypeLivrable;
+  projetId: string;
   dateLimite: string;
   statut: StatutLivrable;
-  projetId: string;
-  dateCreation?: string;
-  dateModification?: string;
-  fichiers?: string[];
-  commentaires?: string[];
+  urlDepot?: string;
+  fichiers?: {
+    nom: string;
+    url: string;
+    type: string;
+    taille: number;
+    dateUpload: string;
+  }[];
+  commentaires?: {
+    auteur: string;
+    contenu: string;
+    dateCreation: string;
+  }[];
+  creeLe?: string;
+  majLe?: string;
 }
 
 export interface CreateLivrableInput {

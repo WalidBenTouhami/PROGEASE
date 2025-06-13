@@ -2,9 +2,10 @@ import { Livrable } from './livrable.model';
 
 // Synced with backend/src/models/projet.model.js
 export enum StatutProjet {
+    BROUILLON = 'BROUILLON',
     EN_COURS = 'EN_COURS',
+    EN_REVISION = 'EN_REVISION',
     TERMINE = 'TERMINE',
-    EN_ATTENTE = 'EN_ATTENTE',
     ANNULE = 'ANNULE'
 }
 
@@ -16,15 +17,15 @@ export interface Membre {
 }
 
 export interface Projet {
-    id?: string;
+    _id?: string;
     titre: string;
     description: string;
-    equipe?: string[];
+    equipe: string[];
     tuteur?: string;
-    competences?: string[];
-    dateDebut: string;
-    dateFin: string;
-    livrables?: string[];
+    competences: string[];
+    dateDebut: string; // ISO string
+    dateFin: string;   // ISO string
+    livrables: string[];
     statut: StatutProjet;
     progression?: number;
     creeLe?: string;
