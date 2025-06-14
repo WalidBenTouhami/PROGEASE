@@ -1,0 +1,64 @@
+name: Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    - name: Install dependencies
+      run: |
+        cd frontend
+        npm ci
+    
+    - name: Run unit tests
+      run: |
+        cd frontend
+        npm run test:ci
+    
+    - name: Run E2E tests
+      run: |
+        cd frontend
+        npm run test:e2e
+    
+    - name: Run security tests
+      run: |
+        cd frontend
+        npm run test:security
+    
+    - name: Run accessibility tests
+      run: |
+        cd frontend
+        npm run test:accessibility
+    
+    - name: Run performance tests
+      run: |
+        cd frontend
+        npm run test:performance
+    
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: |
+          frontend/cypress/videos
+          frontend/cypress/screenshots
+          frontend/coverage 

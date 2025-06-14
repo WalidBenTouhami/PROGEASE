@@ -1,10 +1,33 @@
-import { ActionReducerMap } from '@ngrx/store';
-import * as fromProjet from './reducers/projet.reducer';
+import { ActionReducerMap, MetaReducer } from '@ngrx/store';
+import { storeFreeze } from 'ngrx-store-freeze';
+import { environment } from '../../environments/environment';
+
+// Import reducers
+import * as fromAuth from './auth/auth.reducer';
+import * as fromUser from './user/user.reducer';
+import * as fromAdmin from './admin/admin.reducer';
+import * as fromUI from './ui/ui.reducer';
 
 export interface AppState {
-  projets: fromProjet.ProjetState;
+  auth: fromAuth.State;
+  user: fromUser.State;
+  admin: fromAdmin.State;
+  ui: fromUI.State;
 }
 
 export const reducers: ActionReducerMap<AppState> = {
-  projets: fromProjet.projetReducer
-}; 
+  auth: fromAuth.reducer,
+  user: fromUser.reducer,
+  admin: fromAdmin.reducer,
+  ui: fromUI.reducer
+};
+
+export const metaReducers: MetaReducer<AppState>[] = !environment.production
+  ? [storeFreeze]
+  : [];
+
+// Selectors
+export const selectAuthState = (state: AppState) => state.auth;
+export const selectUserState = (state: AppState) => state.user;
+export const selectAdminState = (state: AppState) => state.admin;
+export const selectUIState = (state: AppState) => state.ui; 

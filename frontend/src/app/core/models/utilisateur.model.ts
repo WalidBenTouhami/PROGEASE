@@ -13,7 +13,7 @@ export interface Utilisateur {
     motDePasse?: string;
     role: UtilisateurRole;
     avatar?: string;
-    actif?: boolean;
+    actif: boolean;
     emailVerifie?: boolean;
     dateEmailVerifie?: string;
     projets?: string[];
@@ -22,6 +22,14 @@ export interface Utilisateur {
     derniereConnexion?: string;
     tentativesConnexion?: number;
     dateBlocage?: string;
-    creeLe?: string;
-    majLe?: string;
+    creeLe: string;
+    majLe: string;
+    preferences?: {
+        theme: 'light' | 'dark';
+        language: string;
+        notifications: {
+            email: boolean;
+            push: boolean;
+        };
+    };
 } 

@@ -1,0 +1,61 @@
+<div class="container">
+  <h1>Tableau de Bord des Statistiques</h1>
+
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading && statistiques" class="stats-grid">
+    <!-- Utilisateurs -->
+    <mat-card class="stats-card">
+      <mat-card-header>
+        <mat-card-title>Utilisateurs</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{statistiques.totalUtilisateurs}}</div>
+        <div class="stat-label">Total</div>
+        <div class="stat-value">{{statistiques.utilisateursActifs}}</div>
+        <div class="stat-label">Actifs</div>
+        <mat-progress-bar
+          mode="determinate"
+          [value]="calculerPourcentage(statistiques.utilisateursActifs, statistiques.totalUtilisateurs)">
+        </mat-progress-bar>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Projets -->
+    <mat-card class="stats-card">
+      <mat-card-header>
+        <mat-card-title>Projets</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{statistiques.projetsEnCours}}</div>
+        <div class="stat-label">En cours</div>
+        <div class="stat-value">{{statistiques.projetsTermines}}</div>
+        <div class="stat-label">Terminés</div>
+        <mat-progress-bar
+          mode="determinate"
+          [value]="calculerPourcentage(statistiques.projetsTermines, statistiques.projetsEnCours + statistiques.projetsTermines)">
+        </mat-progress-bar>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Taux de Completion -->
+    <mat-card class="stats-card">
+      <mat-card-header>
+        <mat-card-title>Taux de Completion</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="stat-value">{{statistiques.tauxCompletion | number:'1.0-1'}}%</div>
+        <mat-progress-bar
+          mode="determinate"
+          [value]="statistiques.tauxCompletion">
+        </mat-progress-bar>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <div *ngIf="!loading && !statistiques" class="no-data">
+    Aucune donnée disponible
+  </div>
+</div> 

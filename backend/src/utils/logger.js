@@ -49,7 +49,7 @@ const transports = [
 ];
 
 // Ajout de transports supplémentaires en développement
-if (config.serveur.environnement === 'development') {
+if (config.server.env === 'development') {
     transports.push(
         new winston.transports.File({
             filename: path.join('logs', 'debug.log'),
@@ -64,7 +64,7 @@ if (config.serveur.environnement === 'development') {
 
 // Création du logger
 const logger = winston.createLogger({
-    level: config.journaux.niveau,
+    level: config.logging.level,
     format: combine(
         timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
         json()

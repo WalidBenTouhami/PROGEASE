@@ -36,12 +36,21 @@ const creerApplication = async () => {
         contentSecurityPolicy: {
             directives: {
                 defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", "'unsafe-inline'"],
-                styleSrc: ["'self'", "'unsafe-inline'"],
-                imgSrc: ["'self'", 'data:', 'https:'],
-                connectSrc: ["'self'", 'https://api.progease.com']
+                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+                imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+                connectSrc: ["'self'", 'https://api.progease.com', 'wss:', 'ws:'],
+                fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+                objectSrc: ["'none'"],
+                mediaSrc: ["'self'"],
+                frameSrc: ["'self'"],
+                workerSrc: ["'self'", 'blob:'],
+                childSrc: ["'self'", 'blob:']
             }
-        }
+        },
+        crossOriginEmbedderPolicy: false,
+        crossOriginOpenerPolicy: false,
+        crossOriginResourcePolicy: { policy: "cross-origin" }
     }));
     app.use(mongoSanitize()); // Protection contre les injections NoSQL
     app.use(xss()); // Protection contre les attaques XSS
@@ -49,9 +58,10 @@ const creerApplication = async () => {
 
     // Middleware de base
     app.use(cors({
-        origin: config.cors.origine,
+        origin: true, // Autoriser toutes les origines
         credentials: true,
-        methods: config.cors.methodes
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        allowedHeaders: ['Content-Type', 'Authorization', 'x-api-version', 'apollographql-client-name', 'apollographql-client-version']
     }));
     app.use(compression());
     app.use(morgan('dev', {
@@ -67,7 +77,25 @@ const creerApplication = async () => {
 
     // Configuration de la base de données
     try {
-        await mongoose.connect(config.baseDeDonnees.uri, config.baseDeDonnees.options);
+        const optionsMongoDB = {
+            maxPoolSize: 10,
+            minPoolSize: 5,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+            family: 4,
+            autoIndex: config.serveur.environnement === 'development',
+            retryWrites: true,
+            w: 'majority',
+            readPreference: 'primary',
+            readConcern: { level: 'local' },
+            writeConcern: { w: 'majority', wtimeout: 2500 },
+            compressors: ['zlib'],
+            maxIdleTimeMS: 60000,
+            connectTimeoutMS: 10000,
+            heartbeatFrequencyMS: 10000,
+            appName: 'progease-api'
+        };
+        await mongoose.connect(config.baseDeDonnees.uri, optionsMongoDB);
         logger.info('✅ Connexion à MongoDB établie avec succès');
     } catch (erreur) {
         logger.error('❌ Erreur de connexion à MongoDB:', erreur);
@@ -82,19 +110,9 @@ const creerApplication = async () => {
         }),
         formatError: (erreur) => {
             logger.error('Erreur GraphQL:', erreur);
-            
-            // Supprimer les détails techniques des erreurs en production
-            if (config.serveur.environnement === 'production') {
-                delete erreur.extensions.exception;
-                delete erreur.extensions.stacktrace;
-            }
-            
             return {
                 message: erreur.message,
-                code: erreur.extensions?.code || 'INTERNAL_SERVER_ERROR',
-                ...(config.serveur.environnement === 'development' && {
-                    stack: erreur.extensions?.exception?.stack
-                })
+                code: erreur.extensions?.code || 'INTERNAL_SERVER_ERROR'
             };
         },
         plugins: [
@@ -103,7 +121,18 @@ const creerApplication = async () => {
                     logger.info('🚀 Serveur GraphQL démarré');
                 }
             }
-        ]
+        ],
+        playground: {
+            settings: {
+                'editor.theme': 'dark',
+                'editor.reuseHeaders': true,
+                'tracing.hideTracingResponse': true,
+                'queryPlan.hideQueryPlanResponse': true
+            }
+        },
+        introspection: true,
+        csrfPrevention: false,
+        cache: 'bounded'
     });
 
     await serveurApollo.start();

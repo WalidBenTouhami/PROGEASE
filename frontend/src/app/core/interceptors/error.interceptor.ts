@@ -8,11 +8,17 @@ import {
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
+import { NotificationService } from '../../services/notification.service';
+import { SessionService } from '../../services/session.service';
 
 @Injectable()
 export class ErrorInterceptor implements HttpInterceptor {
-  constructor(private snackBar: MatSnackBar) {}
+  constructor(
+    private router: Router,
+    private notificationService: NotificationService,
+    private sessionService: SessionService
+  ) {}
 
   intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     return next.handle(request).pipe(
@@ -24,16 +30,35 @@ export class ErrorInterceptor implements HttpInterceptor {
           errorMessage = error.error.message;
         } else {
           // Erreur côté serveur
-          errorMessage = error.error?.message || `Erreur ${error.status}: ${error.statusText}`;
+          switch (error.status) {
+            case 400:
+              errorMessage = 'Requête invalide';
+              break;
+            case 401:
+              errorMessage = 'Non authentifié';
+              this.sessionService.deconnexion().subscribe(() => {
+                this.router.navigate(['/login']);
+              });
+              break;
+            case 403:
+              errorMessage = 'Accès non autorisé';
+              break;
+            case 404:
+              errorMessage = 'Ressource non trouvée';
+              break;
+            case 500:
+              errorMessage = 'Erreur serveur';
+              break;
+            default:
+              errorMessage = `Erreur ${error.status}: ${error.message}`;
+          }
         }
 
-        // Afficher le message d'erreur
-        this.snackBar.open(errorMessage, 'Fermer', {
-          duration: 5000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['error-snackbar']
-        });
+        // Notification de l'erreur
+        this.notificationService.showError(errorMessage);
+
+        // Log de l'erreur
+        console.error('Erreur HTTP:', error);
 
         return throwError(() => error);
       })

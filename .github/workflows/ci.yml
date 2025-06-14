@@ -27,7 +27,22 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18
+          cache: 'npm'
 
+      # Vérification de la sécurité des dépendances
+      - name: Security audit backend
+        run: |
+          cd backend
+          npm audit --production
+          npm audit fix || true
+
+      - name: Security audit frontend
+        run: |
+          cd frontend
+          npm audit --production
+          npm audit fix || true
+
+      # Installation des dépendances
       - name: Install backend dependencies
         run: |
           cd backend
@@ -38,37 +53,67 @@ jobs:
           cd frontend
           npm ci
 
+      # Vérification du formatage du code
+      - name: Check code formatting backend
+        run: |
+          cd backend
+          npm run format:check || true
+
+      - name: Check code formatting frontend
+        run: |
+          cd frontend
+          npm run format:check || true
+
+      # Linting
       - name: Lint backend
         run: |
           cd backend
-          npm run lint || true
+          npm run lint
 
       - name: Lint frontend
         run: |
           cd frontend
-          npm run lint || true
+          npm run lint
+
+      # Build
+      - name: Build backend
+        run: |
+          cd backend
+          npm run build
 
       - name: Build frontend
         run: |
           cd frontend
-          npm run build --if-present
+          npm run build
 
+      # Tests avec couverture
+      - name: Run backend tests with coverage
+        run: |
+          cd backend
+          npm test -- --coverage
+
+      - name: Run frontend tests with coverage
+        run: |
+          cd frontend
+          npm test -- --watch=false --browsers=ChromeHeadless --coverage
+
+      # Upload des rapports de couverture
+      - name: Upload coverage reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-reports
+          path: |
+            backend/coverage/
+            frontend/coverage/
+
+      # Démarrage du backend pour les tests d'intégration
       - name: Start backend (in background)
         run: |
           cd backend
           npm run start &
-          sleep 10
+          sleep 15  # Augmenté à 15 secondes pour plus de fiabilité
 
-      - name: Run backend tests
-        run: |
-          cd backend
-          npm test
-
-      - name: Run frontend tests
-        run: |
-          cd frontend
-          npm test -- --watch=false --browsers=ChromeHeadless
-
+      # Tests d'intégration et génération de docs
       - name: Generate and validate backend tests/docs
         run: |
           cd backend
@@ -78,6 +123,7 @@ jobs:
           node tools/test-generator.js --validate-rest
           node tools/test-generator.js --docs
 
+      # Upload des artefacts
       - name: Upload API docs artifact
         uses: actions/upload-artifact@v3
         with:
@@ -90,6 +136,20 @@ jobs:
           name: test-reports
           path: backend/reports/
 
+      # Déploiement conditionnel (uniquement sur main)
+      - name: Deploy to production
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "Déploiement en production..."
+          # Ajoutez ici vos commandes de déploiement
+          # Par exemple:
+          # - Configuration des secrets
+          # - Déploiement sur votre plateforme (Heroku, AWS, etc.)
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          # Ajoutez d'autres variables d'environnement nécessaires
+
+      # Installation des dépendances supplémentaires
       - name: Install additional dependencies
         run: |
           cd frontend

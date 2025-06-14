@@ -6,10 +6,10 @@ const mongoose = require('mongoose');
 (async () => {
     try {
         const app = await createApp();
-        const server = app.listen(config.port, () => {
-            logger.info(`Serveur démarré sur le port ${config.port}`);
-            logger.info(`Mode: ${config.nodeEnv}`);
-            logger.info(`GraphQL Playground: http://localhost:${config.port}/graphql`);
+        const server = app.listen(config.serveur.port, () => {
+            logger.info(`Serveur démarré sur le port ${config.serveur.port}`);
+            logger.info(`Mode: ${config.serveur.environnement}`);
+            logger.info(`GraphQL Playground: http://localhost:${config.serveur.port}/graphql`);
         });
 
         // Fonction pour arrêter proprement le serveur

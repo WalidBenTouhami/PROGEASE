@@ -129,7 +129,8 @@ const certificationObtenuSchema = new Schema({
     },
     numeroUnique: {
         type: String,
-        unique: true
+        unique: true,
+        index: true
     },
     formationsTerminees: [{
         formation: {
@@ -180,7 +181,6 @@ certificationObtenuSchema.index({ certification: 1, utilisateur: 1 }, { unique: 
 certificationObtenuSchema.index({ utilisateur: 1 });
 certificationObtenuSchema.index({ statut: 1 });
 certificationObtenuSchema.index({ dateExpiration: 1 });
-certificationObtenuSchema.index({ numeroUnique: 1 }, { unique: true });
 
 // Middleware pre-save pour certification obtenue
 certificationObtenuSchema.pre('save', function(next) {

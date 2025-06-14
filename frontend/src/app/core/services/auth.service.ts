@@ -1,20 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, of } from 'rxjs';
 import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
-
-export interface User {
-  id: number;
-  email: string;
-  nom: string;
-  prenom: string;
-  role: 'ETUDIANT' | 'TUTEUR';
-}
+import { Utilisateur, UtilisateurRole } from '../models/utilisateur.model';
+import { map, tap } from 'rxjs/operators';
 
 export interface LoginResponse {
   token: string;
-  user: User;
+  user: Utilisateur;
 }
 
 export interface RegisterRequest {
@@ -22,84 +16,133 @@ export interface RegisterRequest {
   password: string;
   nom: string;
   prenom: string;
-  role: 'ETUDIANT' | 'TUTEUR';
+  role: UtilisateurRole;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  private currentUserSubject = new BehaviorSubject<Utilisateur | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
+  private readonly TOKEN_KEY = 'auth_token';
+  private readonly USER_KEY = 'current_user';
+  private readonly API_URL = `${environment.apiUrl}/auth`;
 
   constructor(
     private http: HttpClient,
     private router: Router
   ) {
     // Vérifier si un utilisateur est déjà connecté au chargement
-    const storedUser = localStorage.getItem('currentUser');
+    const storedUser = localStorage.getItem('current_user');
     if (storedUser) {
       this.currentUserSubject.next(JSON.parse(storedUser));
     }
   }
 
   login(email: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, { email, password })
-      .pipe(
-        tap(response => {
-          // Stocker le token et les informations utilisateur
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
-        })
-      );
+    return this.http.post<LoginResponse>(`${this.API_URL}/login`, { email, password }).pipe(
+      tap(response => {
+        this.setToken(response.token);
+        this.setCurrentUser(response.user);
+      })
+    );
   }
 
-  register(userData: RegisterRequest): Observable<User> {
-    return this.http.post<User>(`${environment.apiUrl}/auth/register`, userData);
+  register(userData: RegisterRequest): Observable<Utilisateur> {
+    return this.http.post<Utilisateur>(`${this.API_URL}/register`, userData);
   }
 
   logout(): void {
-    // Supprimer les données de session
-    localStorage.removeItem('token');
-    localStorage.removeItem('currentUser');
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
     this.currentUserSubject.next(null);
     this.router.navigate(['/auth/login']);
   }
 
   forgotPassword(email: string): Observable<void> {
-    return this.http.post<void>(`${environment.apiUrl}/auth/forgot-password`, { email });
+    return this.http.post<void>(`${this.API_URL}/forgot-password`, { email });
   }
 
   resetPassword(token: string, password: string): Observable<void> {
-    return this.http.post<void>(`${environment.apiUrl}/auth/reset-password`, { token, password });
+    return this.http.post<void>(`${this.API_URL}/reset-password`, { token, password });
   }
 
   getToken(): string | null {
-    return localStorage.getItem('token');
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
 
-  getCurrentUser(): User | null {
-    return this.currentUserSubject.value;
+  getCurrentUser(): Observable<Utilisateur> {
+    const cachedUser = this.getCurrentUserFromStorage();
+    if (cachedUser) {
+      return of(cachedUser);
+    }
+    return this.http.get<Utilisateur>(`${this.API_URL}/me`).pipe(
+      tap(user => this.setCurrentUser(user))
+    );
   }
 
-  hasRole(role: 'ETUDIANT' | 'TUTEUR'): boolean {
-    const user = this.getCurrentUser();
-    return user?.role === role;
+  getUserRole(): Observable<UtilisateurRole> {
+    return this.getCurrentUser().pipe(
+      map(user => user.role)
+    );
+  }
+
+  hasRole(role: UtilisateurRole): Observable<boolean> {
+    return this.getUserRole().pipe(
+      map(userRole => userRole === role)
+    );
   }
 
   refreshToken(): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh-token`, {})
+    return this.http.post<LoginResponse>(`${this.API_URL}/refresh-token`, {})
       .pipe(
         tap(response => {
-          localStorage.setItem('token', response.token);
-          localStorage.setItem('currentUser', JSON.stringify(response.user));
-          this.currentUserSubject.next(response.user);
+          this.setToken(response.token);
+          this.setCurrentUser(response.user);
         })
       );
+  }
+
+  updateUser(user: Partial<Utilisateur>): Observable<Utilisateur> {
+    return this.http.patch<Utilisateur>(`${this.API_URL}/me`, user).pipe(
+      tap(updatedUser => this.setCurrentUser(updatedUser))
+    );
+  }
+
+  changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/change-password`, {
+      currentPassword,
+      newPassword
+    });
+  }
+
+  private getCurrentUserFromStorage(): Utilisateur | null {
+    const userStr = localStorage.getItem(this.USER_KEY);
+    if (!userStr) return null;
+    try {
+      const user = JSON.parse(userStr);
+      return {
+        ...user,
+        creeLe: user.creeLe,
+        majLe: user.majLe,
+        derniereConnexion: user.derniereConnexion
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  private setCurrentUser(user: Utilisateur): void {
+    localStorage.setItem(this.USER_KEY, JSON.stringify(user));
+    this.currentUserSubject.next(user);
+  }
+
+  private setToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
   }
 }

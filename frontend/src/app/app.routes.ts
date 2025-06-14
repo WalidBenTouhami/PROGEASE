@@ -3,6 +3,7 @@ import { ApiTestComponent } from './core/api-test/api-test.component';
 import { ApiTesterComponent } from './core/components/api-tester/api-tester.component';
 import { AuthGuard } from './core/guards/auth.guard';
 import { RoleGuard } from './core/guards/role.guard';
+import { AdminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   {
@@ -31,12 +32,27 @@ export const routes: Routes = [
   },
   {
     path: '',
-    redirectTo: 'auth/login',
+    redirectTo: 'dashboard',
     pathMatch: 'full'
   },
   {
     path: 'auth',
-    loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+  },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'admin',
+    loadChildren: () => import('./features/admin/admin.module').then(m => m.AdminModule),
+    canActivate: [AuthGuard, AdminGuard]
+  },
+  {
+    path: 'profile',
+    loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'etudiant',
@@ -51,37 +67,8 @@ export const routes: Routes = [
     loadChildren: () => import('./features/tuteur/tuteur.routes').then(m => m.TUTEUR_ROUTES)
   },
   {
-    path: 'admin',
-    canActivate: [AuthGuard, RoleGuard],
-    data: { roles: ['ADMIN'] },
-    loadComponent: () => import('./layouts/admin-layout/admin-layout.component').then(m => m.AdminLayoutComponent),
-    children: [
-      {
-        path: '',
-        redirectTo: 'tableau-de-bord',
-        pathMatch: 'full'
-      },
-      {
-        path: 'tableau-de-bord',
-        loadComponent: () => import('./features/admin/tableau-de-bord/tableau-de-bord.component').then(m => m.TableauDeBordComponent)
-      },
-      {
-        path: 'utilisateurs',
-        loadComponent: () => import('./features/admin/utilisateurs/utilisateurs.component').then(m => m.UtilisateursComponent)
-      },
-      {
-        path: 'projets',
-        loadComponent: () => import('./features/admin/projets/projets.component').then(m => m.ProjetsComponent)
-      },
-      {
-        path: 'parametres',
-        loadComponent: () => import('./features/admin/parametres/parametres.component').then(m => m.ParametresComponent)
-      }
-    ]
-  },
-  {
     path: '**',
-    redirectTo: 'auth/login'
+    redirectTo: 'dashboard'
   },
   {
     path: 'api-test',
