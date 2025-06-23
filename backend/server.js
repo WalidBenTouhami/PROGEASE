@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: './.env' });
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -175,7 +175,8 @@ app.use((req, res, next) => {
   });
   next();
 });
-
+const PORT = config.server.port || 3000; // Valeur par défaut au cas où
+const ENV = config.server.env || 'development';
 // Swagger documentation
 app.use('/api-docs', swaggerMiddleware);
 
