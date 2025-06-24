@@ -266,3 +266,23 @@
 {"level":"info","message":"Serveur démarré sur le port 4000","service":"progease-api","timestamp":"2025-06-24 18:52:36"}
 {"level":"info","message":"Mode: development","service":"progease-api","timestamp":"2025-06-24 18:52:36"}
 {"level":"info","message":"GraphQL Playground: http://localhost:4000/graphql","service":"progease-api","timestamp":"2025-06-24 18:52:36"}
+{"level":"info","message":"✅ Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-06-24 19:23:17"}
+{"level":"info","message":"🚀 Serveur GraphQL démarré","service":"progease-api","timestamp":"2025-06-24 19:23:17"}
+{"level":"info","message":"Serveur démarré sur le port 4000","service":"progease-api","timestamp":"2025-06-24 19:23:17"}
+{"level":"info","message":"Mode: development","service":"progease-api","timestamp":"2025-06-24 19:23:17"}
+{"level":"info","message":"GraphQL Playground: http://localhost:4000/graphql","service":"progease-api","timestamp":"2025-06-24 19:23:17"}
+{"level":"info","message":"✅ Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-06-24 19:26:37"}
+{"level":"info","message":"🚀 Serveur GraphQL démarré","service":"progease-api","timestamp":"2025-06-24 19:26:37"}
+{"level":"info","message":"Serveur démarré sur le port 4000","service":"progease-api","timestamp":"2025-06-24 19:26:37"}
+{"level":"info","message":"Mode: development","service":"progease-api","timestamp":"2025-06-24 19:26:37"}
+{"level":"info","message":"GraphQL Playground: http://localhost:4000/graphql","service":"progease-api","timestamp":"2025-06-24 19:26:37"}
+{"level":"info","message":"✅ Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-06-24 20:02:21"}
+{"level":"info","message":"🚀 Serveur GraphQL démarré","service":"progease-api","timestamp":"2025-06-24 20:02:21"}
+{"level":"info","message":"Serveur démarré sur le port 4000","service":"progease-api","timestamp":"2025-06-24 20:02:21"}
+{"level":"info","message":"Mode: development","service":"progease-api","timestamp":"2025-06-24 20:02:21"}
+{"level":"info","message":"GraphQL Playground: http://localhost:4000/graphql","service":"progease-api","timestamp":"2025-06-24 20:02:21"}
+{"level":"info","message":"✅ Connexion à MongoDB établie avec succès","service":"progease-api","timestamp":"2025-06-24 20:20:14"}
+{"level":"info","message":"🚀 Serveur GraphQL démarré","service":"progease-api","timestamp":"2025-06-24 20:20:14"}
+{"level":"info","message":"Serveur démarré sur le port 4000","service":"progease-api","timestamp":"2025-06-24 20:20:14"}
+{"level":"info","message":"Mode: development","service":"progease-api","timestamp":"2025-06-24 20:20:14"}
+{"level":"info","message":"GraphQL Playground: http://localhost:4000/graphql","service":"progease-api","timestamp":"2025-06-24 20:20:14"}
