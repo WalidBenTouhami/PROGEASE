@@ -16,7 +16,6 @@ Sentry.init({
   integrations: [
     new BrowserTracing({
       tracingOrigins: ['localhost', environment.apiUrl],
-      routingInstrumentation: Sentry.routingInstrumentation,
     }),
   ],
   tracesSampleRate: isDevMode() ? 1.0 : 0.2,
