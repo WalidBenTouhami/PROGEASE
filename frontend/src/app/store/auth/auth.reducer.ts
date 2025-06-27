@@ -1,11 +1,11 @@
-import { createReducer, on } from '@ngrx/store';
+import { createReducer, on, Action } from '@ngrx/store';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import * as AuthActions from './auth.actions';
-import { User } from '../../core/models/user.model';
+import { Utilisateur } from '../../core/models/utilisateur.model';
 
 export const AUTH_FEATURE_KEY = 'auth';
 
-export interface State extends EntityState<User> {
+export interface State extends EntityState<Utilisateur> {
   selectedId?: string | number;
   loaded: boolean;
   error?: string | null;
@@ -18,7 +18,7 @@ export interface AuthPartialState {
   readonly [AUTH_FEATURE_KEY]: State;
 }
 
-export const authAdapter: EntityAdapter<User> = createEntityAdapter<User>();
+export const authAdapter: EntityAdapter<Utilisateur> = createEntityAdapter<Utilisateur>();
 
 export const initialState: State = authAdapter.getInitialState({
   loaded: false,
@@ -80,7 +80,7 @@ export const authReducer = createReducer(
   on(AuthActions.updateUserSuccess, (state, { user }) => ({
     ...state,
     ...authAdapter.updateOne(
-      { id: user.id, changes: user },
+      { id: user._id!, changes: user },
       state
     ),
     loading: false,

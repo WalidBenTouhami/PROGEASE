@@ -142,7 +142,7 @@ export class AuthService {
     this.currentUserSubject.next(user);
   }
 
-  private setToken(token: string): void {
+  public setToken(token: string): void {
     localStorage.setItem(this.TOKEN_KEY, token);
   }
 }

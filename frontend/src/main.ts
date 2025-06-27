@@ -16,7 +16,7 @@ Sentry.init({
   integrations: [
     new BrowserTracing({
       tracingOrigins: ['localhost', environment.apiUrl],
-    }),
+    }) as any, // Type assertion to fix compatibility issue
   ],
   tracesSampleRate: isDevMode() ? 1.0 : 0.2,
   environment: environment.production ? 'production' : 'development',

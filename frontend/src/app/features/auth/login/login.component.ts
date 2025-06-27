@@ -43,7 +43,7 @@ import * as AuthActions from '../../../store/auth/auth.actions';
               label="Email"
               type="email"
               formControlName="email"
-              required
+              [required]="true"
               [errorMessage]="'Please enter a valid email address'"
             ></app-form-field>
 
@@ -51,7 +51,7 @@ import * as AuthActions from '../../../store/auth/auth.actions';
               label="Password"
               type="password"
               formControlName="password"
-              required
+              [required]="true"
             ></app-form-field>
 
             <div class="form-actions">

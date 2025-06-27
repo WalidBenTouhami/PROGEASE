@@ -14,17 +14,17 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
-// Components
+// Components (standalone)
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { ErrorBoundaryComponent } from './components/error-boundary/error-boundary.component';
 import { FormFieldComponent } from './components/form-field/form-field.component';
 import { PageHeaderComponent } from './components/page-header/page-header.component';
 
-// Directives
+// Directives (standalone)
 import { DebounceClickDirective } from './directives/debounce-click.directive';
 import { ScrollTrackerDirective } from './directives/scroll-tracker.directive';
 
-// Pipes
+// Pipes (standalone)
 import { FormatDatePipe } from './pipes/format-date.pipe';
 import { TruncatePipe } from './pipes/truncate.pipe';
 
@@ -40,45 +40,45 @@ const materialModules = [
   MatTooltipModule
 ];
 
-const components = [
+const standaloneComponents = [
   LoadingSpinnerComponent,
   ErrorBoundaryComponent,
   FormFieldComponent,
   PageHeaderComponent
 ];
 
-const directives = [
+const standaloneDirectives = [
   DebounceClickDirective,
   ScrollTrackerDirective
 ];
 
-const pipes = [
+const standalonePipes = [
   FormatDatePipe,
   TruncatePipe
 ];
 
 @NgModule({
   declarations: [
-    ...components,
-    ...directives,
-    ...pipes
+    // Remove standalone components, directives, and pipes from declarations
   ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    ...materialModules
+    ...materialModules,
+    // Import standalone components, directives, and pipes
+    ...standaloneComponents,
+    ...standaloneDirectives,
+    ...standalonePipes
   ],
   exports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    ...materialModules,
-    ...components,
-    ...directives,
-    ...pipes
+    ...materialModules
+    // Remove standalone components from exports since they can't be exported from NgModule
   ]
 })
 export class SharedModule { } 

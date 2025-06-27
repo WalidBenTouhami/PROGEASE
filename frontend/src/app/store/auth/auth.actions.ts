@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { User } from '../../core/models/user.model';
+import { Utilisateur } from '../../core/models/utilisateur.model';
 
 export const login = createAction(
   '[Auth] Login',
@@ -8,7 +8,7 @@ export const login = createAction(
 
 export const loginSuccess = createAction(
   '[Auth] Login Success',
-  props<{ user: User; token: string }>()
+  props<{ user: Utilisateur; token: string }>()
 );
 
 export const loginFailure = createAction(
@@ -26,7 +26,7 @@ export const loadUser = createAction(
 
 export const loadUserSuccess = createAction(
   '[Auth] Load User Success',
-  props<{ user: User }>()
+  props<{ user: Utilisateur }>()
 );
 
 export const loadUserFailure = createAction(
@@ -36,12 +36,12 @@ export const loadUserFailure = createAction(
 
 export const updateUser = createAction(
   '[Auth] Update User',
-  props<{ user: Partial<User> }>()
+  props<{ user: Partial<Utilisateur> }>()
 );
 
 export const updateUserSuccess = createAction(
   '[Auth] Update User Success',
-  props<{ user: User }>()
+  props<{ user: Utilisateur }>()
 );
 
 export const updateUserFailure = createAction(

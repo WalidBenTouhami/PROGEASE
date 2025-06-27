@@ -1,5 +1,5 @@
 import { ActionReducerMap, MetaReducer } from '@ngrx/store';
-import { storeFreeze } from 'ngrx-store-freeze';
+// import { storeFreeze } from 'ngrx-store-freeze'; // Temporarily removed
 import { environment } from '../../environments/environment';
 
 // Import reducers
@@ -23,7 +23,7 @@ export const reducers: ActionReducerMap<AppState> = {
 };
 
 export const metaReducers: MetaReducer<AppState>[] = !environment.production
-  ? [storeFreeze]
+  ? [] // Temporarily removed storeFreeze
   : [];
 
 // Selectors

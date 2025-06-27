@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { map } from 'rxjs/operators';
 import { selectUserRole } from '../../store/auth/auth.selectors';
+import { UtilisateurRole } from '../models/utilisateur.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,7 +18,7 @@ export class AdminGuard implements CanActivate {
   canActivate(): Observable<boolean | UrlTree> {
     return this.store.select(selectUserRole).pipe(
       map(role => {
-        if (role === 'ADMIN') {
+        if (role === UtilisateurRole.ADMIN) {
           return true;
         }
         return this.router.createUrlTree(['/dashboard']);

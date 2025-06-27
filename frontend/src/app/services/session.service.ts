@@ -39,7 +39,7 @@ export class SessionService {
   }
 
   rafraichirToken(): Observable<any> {
-    return this.http.post(`${this.apiUrl}/rafraichir-token`, {}).pipe(
+    return this.http.post<{token: string}>(`${this.apiUrl}/rafraichir-token`, {}).pipe(
       tap(response => {
         if (response.token) {
           localStorage.setItem('token', response.token);

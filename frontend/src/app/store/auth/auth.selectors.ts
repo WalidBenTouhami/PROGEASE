@@ -1,5 +1,5 @@
 import { createFeatureSelector, createSelector } from '@ngrx/store';
-import { AUTH_FEATURE_KEY, State } from './auth.reducer';
+import { AUTH_FEATURE_KEY, State, authAdapter } from './auth.reducer';
 
 export const selectAuthState = createFeatureSelector<State>(AUTH_FEATURE_KEY);
 
@@ -10,7 +10,7 @@ export const selectIsAuthenticated = createSelector(
 
 export const selectUser = createSelector(
   selectAuthState,
-  (state: State) => state.user
+  (state: State) => state.selectedId ? state.entities[state.selectedId] : null
 );
 
 export const selectUserRole = createSelector(

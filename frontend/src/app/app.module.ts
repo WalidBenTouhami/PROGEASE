@@ -25,7 +25,7 @@ import { CacheInterceptor } from './core/interceptors/cache.interceptor';
 
 @NgModule({
   declarations: [
-    AppComponent
+    // Remove AppComponent from declarations since it's standalone
   ],
   imports: [
     BrowserModule,
@@ -34,6 +34,8 @@ import { CacheInterceptor } from './core/interceptors/cache.interceptor';
     AppRoutingModule,
     SharedModule,
     CoreModule,
+    // Import AppComponent since it's standalone
+    AppComponent,
     StoreModule.forRoot(reducers, { metaReducers }),
     EffectsModule.forRoot([AuthEffects]),
     StoreDevtoolsModule.instrument({
