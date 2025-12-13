@@ -202,7 +202,7 @@ async function predictPerformance(history) {
       niveauConfiance: confidenceLevel
     };
   } catch (error) {
-    console.error('Erreur lors de la prédiction de performance:', error);
+    logger.error('Erreur lors de la prédiction de performance:', error);
     return {
       prediction: 'Impossible de générer la prédiction pour le moment.',
       confidence: 0,

@@ -58,9 +58,9 @@ const creerApplication = async () => {
 
     // Middleware de base
     app.use(cors({
-        origin: true, // Autoriser toutes les origines
+        origin: config.cors.origine.split(','),
         credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+        methods: config.cors.methodes,
         allowedHeaders: ['Content-Type', 'Authorization', 'x-api-version', 'apollographql-client-name', 'apollographql-client-version']
     }));
     app.use(compression());

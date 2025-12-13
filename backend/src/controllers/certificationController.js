@@ -2,6 +2,7 @@ const Formation = require("../Formation");
 const Certificat = require("../Certification"); // Assurez-vous que le modèle Certificat est bien importe
 const utilisateur = require("../models/utilisateur"); // Assurez-vous que le modèle utilisateur est bien importe
 const QuizResult = require("../QuizResult"); // Modèle pour les resultats des quiz
+const logger = require("../utils/logger");
 
 // Fonction pour verifier si l'utilisateur a reussi tous les quiz associes aux formations requises
 const checkQuizReussis = async (utilisateurId, formationsRequises) => {
@@ -27,7 +28,7 @@ const checkQuizReussis = async (utilisateurId, formationsRequises) => {
 
     return true;
   } catch (error) {
-    console.error("Erreur lors de la verification des quiz:", error);
+    logger.error("Erreur lors de la verification des quiz:", error);
     return false;
   }
 };
@@ -62,7 +63,7 @@ const createCertificat = async (req, res) => {
       certificat: nouveauCertificat,
     });
   } catch (error) {
-    console.error("Erreur serveur:", error);
+    logger.error("Erreur serveur:", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };

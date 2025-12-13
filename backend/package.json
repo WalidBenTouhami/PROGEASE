@@ -11,7 +11,11 @@
     "test:coverage": "jest --coverage",
     "test:newman": "node newman-tests.js",
     "start:mongodb": "node scripts/start-mongodb.js",
-    "start:all": "concurrently \"npm run start:mongodb\" \"npm run start\""
+    "start:all": "concurrently \"npm run start:mongodb\" \"npm run start\"",
+    "lint": "eslint src --ext .js",
+    "lint:fix": "eslint src --ext .js --fix",
+    "format": "prettier --write \"src/**/*.js\"",
+    "format:check": "prettier --check \"src/**/*.js\""
   },
   "keywords": [
     "api",
@@ -54,7 +58,7 @@
     "morgan": "^1.10.0",
     "negotiator": "^0.6.3",
     "node-cache": "^5.1.2",
-    "nodemailer": "^6.9.7",
+    "nodemailer": "^7.0.11",
     "winston": "^3.11.0",
     "xss-clean": "^0.1.4",
     "yup": "^1.6.1"
