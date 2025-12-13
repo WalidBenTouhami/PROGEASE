@@ -40,7 +40,12 @@ router.get(
  * @description Creer un nouveau livrable
  * @access Public
  */
-router.post('/', validateLivrableData, asyncHandler(livrableController.create));
+router.post(
+    '/',
+    rateLimiter({ windowMs: 60000, max: 30 }),
+    validateLivrableData,
+    asyncHandler(livrableController.create)
+);
 
 /**
  * @route GET /api/livrables/projet/:projetId
@@ -67,6 +72,7 @@ router.get('/:livrableId', validateId('livrableId'), asyncHandler(livrableContro
  */
 router.put(
     '/:livrableId',
+    rateLimiter({ windowMs: 60000, max: 30 }),
     validateId('livrableId'),
     validateLivrableData,
     asyncHandler(livrableController.update)
@@ -77,6 +83,11 @@ router.put(
  * @description Supprimer un livrable
  * @access Public
  */
-router.delete('/:livrableId', validateId('livrableId'), asyncHandler(livrableController.delete));
+router.delete(
+    '/:livrableId',
+    rateLimiter({ windowMs: 60000, max: 10 }),
+    validateId('livrableId'),
+    asyncHandler(livrableController.delete)
+);
 
 module.exports = router;

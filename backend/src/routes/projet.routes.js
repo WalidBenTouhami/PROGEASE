@@ -63,6 +63,7 @@ router.get('/:id', validateId('id'), asyncHandler(projetController.recupererProj
  */
 router.put(
     '/:id',
+    rateLimiter({ windowMs: 60000, max: 30 }),
     validateId('id'),
     validateRequest(projetSchema),
     asyncHandler(projetController.mettreAJourProjet)
@@ -73,7 +74,12 @@ router.put(
  * @description Supprimer un projet
  * @access Public
  */
-router.delete('/:id', validateId('id'), asyncHandler(projetController.supprimerProjet));
+router.delete(
+    '/:id',
+    rateLimiter({ windowMs: 60000, max: 10 }),
+    validateId('id'),
+    asyncHandler(projetController.supprimerProjet)
+);
 
 /**
  * @route GET /api/projets/:id/livrables
