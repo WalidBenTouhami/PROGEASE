@@ -20,7 +20,9 @@
     "test:all": "npm run test:ci && npm run test:e2e && npm run test:security && npm run test:accessibility && npm run test:performance",
     "serve:ssr:frontend": "node dist/frontend/server/server.mjs",
     "clean": "rimraf dist",
-    "codegen": "graphql-codegen"
+    "codegen": "graphql-codegen",
+    "lint": "ng lint",
+    "format:check": "echo 'No format check configured for frontend'"
   },
   "private": true,
   "dependencies": {
