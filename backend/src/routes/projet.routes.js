@@ -47,6 +47,7 @@ router.get('/',
  * @access Public
  */
 router.post('/',
+    rateLimiter({ windowMs: 60000, max: 30 }),
     validateRequest(projetSchema),
     asyncHandler(projetController.creerProjet)
 );
@@ -57,6 +58,7 @@ router.post('/',
  * @access Public
  */
 router.get('/:id',
+    rateLimiter({ windowMs: 60000, max: 50 }),
     validateId('id'),
     asyncHandler(projetController.recupererProjetParId)
 );
@@ -67,6 +69,7 @@ router.get('/:id',
  * @access Public
  */
 router.put('/:id',
+    rateLimiter({ windowMs: 60000, max: 30 }),
     validateId('id'),
     validateRequest(projetSchema),
     asyncHandler(projetController.mettreAJourProjet)
@@ -78,6 +81,7 @@ router.put('/:id',
  * @access Public
  */
 router.delete('/:id',
+    rateLimiter({ windowMs: 60000, max: 20 }),
     validateId('id'),
     asyncHandler(projetController.supprimerProjet)
 );
@@ -88,6 +92,7 @@ router.delete('/:id',
  * @access Public
  */
 router.get('/:id/livrables',
+    rateLimiter({ windowMs: 60000, max: 50 }),
     validateId('id'),
     asyncHandler(async (req, res) => {
         const livrableController = require('../controllers/livrable.controller');

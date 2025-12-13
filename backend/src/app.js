@@ -58,7 +58,7 @@ const creerApplication = async () => {
 
     // Middleware de base
     app.use(cors({
-        origin: true, // Autoriser toutes les origines
+        origin: config.cors.origine.split(',').map(o => o.trim()),
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'x-api-version', 'apollographql-client-name', 'apollographql-client-version']

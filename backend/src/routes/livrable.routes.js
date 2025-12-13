@@ -40,6 +40,7 @@ router.get('/',
  * @access Public
  */
 router.post('/',
+    rateLimiter({ windowMs: 60000, max: 30 }),
     validateLivrableData,
     asyncHandler(livrableController.create)
 );
@@ -50,6 +51,7 @@ router.post('/',
  * @access Public
  */
 router.get('/projet/:projetId',
+    rateLimiter({ windowMs: 60000, max: 50 }),
     validateId('projetId'),
     asyncHandler(livrableController.findByProjet)
 );
@@ -60,6 +62,7 @@ router.get('/projet/:projetId',
  * @access Public
  */
 router.get('/:livrableId',
+    rateLimiter({ windowMs: 60000, max: 50 }),
     validateId('livrableId'),
     asyncHandler(livrableController.findOne)
 );
@@ -70,6 +73,7 @@ router.get('/:livrableId',
  * @access Public
  */
 router.put('/:livrableId',
+    rateLimiter({ windowMs: 60000, max: 30 }),
     validateId('livrableId'),
     validateLivrableData,
     asyncHandler(livrableController.update)
@@ -81,6 +85,7 @@ router.put('/:livrableId',
  * @access Public
  */
 router.delete('/:livrableId',
+    rateLimiter({ windowMs: 60000, max: 20 }),
     validateId('livrableId'),
     asyncHandler(livrableController.delete)
 );
