@@ -18,8 +18,8 @@ class UtilisateurController {
             status: 'success',
             results: utilisateurs.length,
             data: {
-                utilisateurs
-            }
+                utilisateurs,
+            },
         });
     }
 
@@ -29,8 +29,8 @@ class UtilisateurController {
         res.status(200).json({
             status: 'success',
             data: {
-                utilisateur
-            }
+                utilisateur,
+            },
         });
     }
 
@@ -40,8 +40,8 @@ class UtilisateurController {
         res.status(201).json({
             status: 'success',
             data: {
-                utilisateur
-            }
+                utilisateur,
+            },
         });
     }
 
@@ -54,8 +54,8 @@ class UtilisateurController {
         res.status(200).json({
             status: 'success',
             data: {
-                utilisateur
-            }
+                utilisateur,
+            },
         });
     }
 
@@ -64,7 +64,7 @@ class UtilisateurController {
         await utilisateurService.supprimerUtilisateur(req.params.id);
         res.status(204).json({
             status: 'success',
-            data: null
+            data: null,
         });
     }
 
@@ -78,7 +78,7 @@ class UtilisateurController {
             if (utilisateurExistant) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Cet email est déjà utilisé'
+                    message: 'Cet email est déjà utilisé',
                 });
             }
 
@@ -88,7 +88,7 @@ class UtilisateurController {
                 motDePasse,
                 nom,
                 prenom,
-                role: 'UTILISATEUR'
+                role: 'UTILISATEUR',
             });
 
             // Générer le token
@@ -102,14 +102,14 @@ class UtilisateurController {
                     email: utilisateur.email,
                     nom: utilisateur.nom,
                     prenom: utilisateur.prenom,
-                    role: utilisateur.role
-                }
+                    role: utilisateur.role,
+                },
             });
         } catch (error) {
-            logger.error('Erreur lors de l\'inscription:', error);
+            logger.error("Erreur lors de l'inscription:", error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de l\'inscription'
+                message: "Erreur lors de l'inscription",
             });
         }
     }
@@ -124,7 +124,7 @@ class UtilisateurController {
             if (!utilisateur) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Email ou mot de passe incorrect'
+                    message: 'Email ou mot de passe incorrect',
                 });
             }
 
@@ -133,7 +133,7 @@ class UtilisateurController {
             if (!motDePasseCorrect) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Email ou mot de passe incorrect'
+                    message: 'Email ou mot de passe incorrect',
                 });
             }
 
@@ -148,14 +148,14 @@ class UtilisateurController {
                     email: utilisateur.email,
                     nom: utilisateur.nom,
                     prenom: utilisateur.prenom,
-                    role: utilisateur.role
-                }
+                    role: utilisateur.role,
+                },
             });
         } catch (error) {
             logger.error('Erreur lors de la connexion:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la connexion'
+                message: 'Erreur lors de la connexion',
             });
         }
     }
@@ -167,7 +167,7 @@ class UtilisateurController {
 
         res.status(200).json({
             success: true,
-            message: 'Email vérifié avec succès'
+            message: 'Email vérifié avec succès',
         });
     }
 
@@ -182,14 +182,14 @@ class UtilisateurController {
                     email: utilisateur.email,
                     nom: utilisateur.nom,
                     prenom: utilisateur.prenom,
-                    role: utilisateur.role
-                }
+                    role: utilisateur.role,
+                },
             });
         } catch (error) {
             logger.error('Erreur lors de la récupération du profil:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la récupération du profil'
+                message: 'Erreur lors de la récupération du profil',
             });
         }
     }
@@ -211,14 +211,14 @@ class UtilisateurController {
                     email: utilisateur.email,
                     nom: utilisateur.nom,
                     prenom: utilisateur.prenom,
-                    role: utilisateur.role
-                }
+                    role: utilisateur.role,
+                },
             });
         } catch (error) {
             logger.error('Erreur lors de la mise à jour du profil:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la mise à jour du profil'
+                message: 'Erreur lors de la mise à jour du profil',
             });
         }
     }
@@ -227,14 +227,16 @@ class UtilisateurController {
     static async changerMotDePasse(req, res) {
         try {
             const { ancienMotDePasse, nouveauMotDePasse } = req.body;
-            const utilisateur = await Utilisateur.findById(req.utilisateur.id).select('+motDePasse');
+            const utilisateur = await Utilisateur.findById(req.utilisateur.id).select(
+                '+motDePasse'
+            );
 
             // Vérifier l'ancien mot de passe
             const motDePasseCorrect = await utilisateur.verifierMotDePasse(ancienMotDePasse);
             if (!motDePasseCorrect) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Ancien mot de passe incorrect'
+                    message: 'Ancien mot de passe incorrect',
                 });
             }
 
@@ -244,13 +246,13 @@ class UtilisateurController {
 
             res.json({
                 success: true,
-                message: 'Mot de passe modifié avec succès'
+                message: 'Mot de passe modifié avec succès',
             });
         } catch (error) {
             logger.error('Erreur lors du changement de mot de passe:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors du changement de mot de passe'
+                message: 'Erreur lors du changement de mot de passe',
             });
         }
     }
@@ -264,7 +266,7 @@ class UtilisateurController {
             if (!utilisateur) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Aucun utilisateur trouvé avec cet email'
+                    message: 'Aucun utilisateur trouvé avec cet email',
                 });
             }
 
@@ -283,13 +285,13 @@ class UtilisateurController {
             res.json({
                 success: true,
                 message: 'Un email de réinitialisation a été envoyé',
-                resetToken // À retirer en production
+                resetToken, // À retirer en production
             });
         } catch (error) {
             logger.error('Erreur lors de la demande de réinitialisation:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la demande de réinitialisation'
+                message: 'Erreur lors de la demande de réinitialisation',
             });
         }
     }
@@ -301,17 +303,14 @@ class UtilisateurController {
             const { motDePasse } = req.body;
 
             const utilisateur = await Utilisateur.findOne({
-                resetPasswordToken: crypto
-                    .createHash('sha256')
-                    .update(token)
-                    .digest('hex'),
-                resetPasswordExpires: { $gt: Date.now() }
+                resetPasswordToken: crypto.createHash('sha256').update(token).digest('hex'),
+                resetPasswordExpires: { $gt: Date.now() },
             });
 
             if (!utilisateur) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Token invalide ou expiré'
+                    message: 'Token invalide ou expiré',
                 });
             }
 
@@ -322,13 +321,13 @@ class UtilisateurController {
 
             res.json({
                 success: true,
-                message: 'Mot de passe réinitialisé avec succès'
+                message: 'Mot de passe réinitialisé avec succès',
             });
         } catch (error) {
             logger.error('Erreur lors de la réinitialisation du mot de passe:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la réinitialisation du mot de passe'
+                message: 'Erreur lors de la réinitialisation du mot de passe',
             });
         }
     }
@@ -339,13 +338,13 @@ class UtilisateurController {
             const utilisateurs = await Utilisateur.find().select('-motDePasse');
             res.json({
                 success: true,
-                utilisateurs
+                utilisateurs,
             });
         } catch (error) {
             logger.error('Erreur lors de la récupération des utilisateurs:', error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la récupération des utilisateurs'
+                message: 'Erreur lors de la récupération des utilisateurs',
             });
         }
     }
@@ -357,18 +356,18 @@ class UtilisateurController {
             if (!utilisateur) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Utilisateur non trouvé'
+                    message: 'Utilisateur non trouvé',
                 });
             }
             res.json({
                 success: true,
-                utilisateur
+                utilisateur,
             });
         } catch (error) {
-            logger.error('Erreur lors de la récupération de l\'utilisateur:', error);
+            logger.error("Erreur lors de la récupération de l'utilisateur:", error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la récupération de l\'utilisateur'
+                message: "Erreur lors de la récupération de l'utilisateur",
             });
         }
     }
@@ -382,7 +381,7 @@ class UtilisateurController {
             if (!utilisateur) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Utilisateur non trouvé'
+                    message: 'Utilisateur non trouvé',
                 });
             }
 
@@ -400,14 +399,14 @@ class UtilisateurController {
                     email: utilisateur.email,
                     nom: utilisateur.nom,
                     prenom: utilisateur.prenom,
-                    role: utilisateur.role
-                }
+                    role: utilisateur.role,
+                },
             });
         } catch (error) {
-            logger.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
+            logger.error("Erreur lors de la mise à jour de l'utilisateur:", error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la mise à jour de l\'utilisateur'
+                message: "Erreur lors de la mise à jour de l'utilisateur",
             });
         }
     }
@@ -419,18 +418,18 @@ class UtilisateurController {
             if (!utilisateur) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Utilisateur non trouvé'
+                    message: 'Utilisateur non trouvé',
                 });
             }
             res.json({
                 success: true,
-                message: 'Utilisateur supprimé avec succès'
+                message: 'Utilisateur supprimé avec succès',
             });
         } catch (error) {
-            logger.error('Erreur lors de la suppression de l\'utilisateur:', error);
+            logger.error("Erreur lors de la suppression de l'utilisateur:", error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur lors de la suppression de l\'utilisateur'
+                message: "Erreur lors de la suppression de l'utilisateur",
             });
         }
     }

@@ -83,7 +83,7 @@ class UtilisateurService {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             const utilisateur = await Utilisateur.findById(decoded.id).select('-motDePasse');
-            
+
             if (!utilisateur) {
                 throw new AppError(MessagesErreur.GENERAL.NON_TROUVE, StatutHttp.NON_TROUVE);
             }

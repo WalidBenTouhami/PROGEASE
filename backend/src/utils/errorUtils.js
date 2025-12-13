@@ -15,7 +15,11 @@ const logger = require('./logger');
  * @param {string} [requestId] - ID de requete pour le traçage
  * @returns {AppError} Erreur formatee
  */
-function handleMongooseError(error, defaultMessage = 'Erreur de base de donnees', requestId = null) {
+function handleMongooseError(
+    error,
+    defaultMessage = 'Erreur de base de donnees',
+    requestId = null
+) {
     // Si c'est dejà une AppError, on la retourne directement
     if (error instanceof AppError) {
         return error;
@@ -26,7 +30,7 @@ function handleMongooseError(error, defaultMessage = 'Erreur de base de donnees'
         name: error.name,
         code: error.code,
         stack: error.stack,
-        requestId
+        requestId,
     });
 
     // Erreurs de validation Mongoose
@@ -64,7 +68,7 @@ function handleMongooseError(error, defaultMessage = 'Erreur de base de donnees'
     // Erreurs de timeout de connexion
     if (error.name === 'MongoTimeoutError') {
         return new AppError(
-            'Delai d\'attente depasse pour la requete à la base de donnees',
+            "Delai d'attente depasse pour la requete à la base de donnees",
             504,
             ERROR_CODES.TIMEOUT,
             false
@@ -82,14 +86,9 @@ function handleMongooseError(error, defaultMessage = 'Erreur de base de donnees'
     }
 
     // Erreurs inconnues
-    return new AppError(
-        defaultMessage,
-        500,
-        ERROR_CODES.SERVER_ERROR,
-        false
-    );
+    return new AppError(defaultMessage, 500, ERROR_CODES.SERVER_ERROR, false);
 }
 
 module.exports = {
-    handleMongooseError
+    handleMongooseError,
 };

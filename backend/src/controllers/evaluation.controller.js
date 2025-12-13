@@ -17,7 +17,7 @@ const createEvaluation = async (req, res) => {
         let finalScore = score;
         if (criteria && criteria.length > 0) {
             finalScore = criteria.reduce((total, criterion) => {
-                return total + (criterion.score * criterion.weight);
+                return total + criterion.score * criterion.weight;
             }, 0);
         }
 
@@ -25,7 +25,7 @@ const createEvaluation = async (req, res) => {
         const aiAnalysis = await generateAIAnalysis({
             projet,
             score: finalScore,
-            criteria
+            criteria,
         });
 
         const evaluation = new Evaluation({
@@ -34,14 +34,15 @@ const createEvaluation = async (req, res) => {
             score: finalScore,
             comments,
             criteria,
-            aiRecommendations: aiAnalysis
+            aiRecommendations: aiAnalysis,
         });
 
         await evaluation.save();
 
         // Update projet's average score
         const projetEvaluations = await Evaluation.find({ projetId });
-        const averageScore = projetEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projetEvaluations.length;
+        const averageScore =
+            projetEvaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / projetEvaluations.length;
         await Projet.findByIdAndUpdate(projetId, { averageScore });
 
         res.status(201).json(evaluation);
@@ -63,7 +64,7 @@ const getEvaluations = async (req, res) => {
             sortBy = 'createdAt',
             sortOrder = 'desc',
             page = 1,
-            limit = 10
+            limit = 10,
         } = req.query;
 
         // Build filter object
@@ -100,8 +101,8 @@ const getEvaluations = async (req, res) => {
             pagination: {
                 total,
                 page: Number(page),
-                pages: Math.ceil(total / limit)
-            }
+                pages: Math.ceil(total / limit),
+            },
         });
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -134,7 +135,7 @@ const updateEvaluation = async (req, res) => {
         let finalScore = score;
         if (criteria && criteria.length > 0) {
             finalScore = criteria.reduce((total, criterion) => {
-                return total + (criterion.score * criterion.weight);
+                return total + criterion.score * criterion.weight;
             }, 0);
         }
 
@@ -148,7 +149,7 @@ const updateEvaluation = async (req, res) => {
         const aiAnalysis = await generateAIAnalysis({
             projet,
             score: finalScore,
-            criteria
+            criteria,
         });
 
         evaluation.score = finalScore;
@@ -160,7 +161,8 @@ const updateEvaluation = async (req, res) => {
 
         // Update projet's average score
         const projetEvaluations = await Evaluation.find({ projetId: evaluation.projetId });
-        const averageScore = projetEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projetEvaluations.length;
+        const averageScore =
+            projetEvaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / projetEvaluations.length;
         await Projet.findByIdAndUpdate(evaluation.projetId, { averageScore });
 
         res.json(evaluation);
@@ -181,9 +183,11 @@ const deleteEvaluation = async (req, res) => {
 
         // Update projet's average score
         const projetEvaluations = await Evaluation.find({ projetId: evaluation.projetId });
-        const averageScore = projetEvaluations.length > 0
-            ? projetEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projetEvaluations.length
-            : 0;
+        const averageScore =
+            projetEvaluations.length > 0
+                ? projetEvaluations.reduce((sum, evalItem) => sum + evalItem.score, 0) /
+                  projetEvaluations.length
+                : 0;
         await Projet.findByIdAndUpdate(evaluation.projetId, { averageScore });
 
         res.json({ message: 'Evaluation deleted successfully' });
@@ -199,25 +203,25 @@ const getEvaluationStats = async (req, res) => {
             {
                 $group: {
                     _id: null,
-                    averageScore: { $avg: "$score" },
-                    minScore: { $min: "$score" },
-                    maxScore: { $max: "$score" },
+                    averageScore: { $avg: '$score' },
+                    minScore: { $min: '$score' },
+                    maxScore: { $max: '$score' },
                     totalEvaluations: { $sum: 1 },
                     scoreDistribution: {
-                        $push: "$score"
-                    }
-                }
+                        $push: '$score',
+                    },
+                },
             },
             {
                 $projet: {
                     _id: 0,
-                    averageScore: { $round: ["$averageScore", 2] },
+                    averageScore: { $round: ['$averageScore', 2] },
                     minScore: 1,
                     maxScore: 1,
                     totalEvaluations: 1,
-                    scoreDistribution: 1
-                }
-            }
+                    scoreDistribution: 1,
+                },
+            },
         ]);
 
         // Calculate score distribution in ranges
@@ -226,7 +230,7 @@ const getEvaluationStats = async (req, res) => {
             '0-5': 0,
             '6-10': 0,
             '11-15': 0,
-            '16-20': 0
+            '16-20': 0,
         };
 
         distribution.forEach(score => {
@@ -236,26 +240,28 @@ const getEvaluationStats = async (req, res) => {
             else ranges['16-20']++;
         });
 
-        const response = stats[0] ? {
-            ...stats[0],
-            scoreDistribution: ranges
-        } : {
-            averageScore: 0,
-            minScore: 0,
-            maxScore: 0,
-            totalEvaluations: 0,
-            scoreDistribution: ranges
-        };
+        const response = stats[0]
+            ? {
+                  ...stats[0],
+                  scoreDistribution: ranges,
+              }
+            : {
+                  averageScore: 0,
+                  minScore: 0,
+                  maxScore: 0,
+                  totalEvaluations: 0,
+                  scoreDistribution: ranges,
+              };
 
         res.status(200).json({
             status: 'success',
-            data: response
+            data: response,
         });
     } catch (error) {
         res.status(500).json({
             status: 'error',
             message: 'Error fetching evaluation statistics',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -266,5 +272,5 @@ module.exports = {
     getEvaluationById,
     updateEvaluation,
     deleteEvaluation,
-    getEvaluationStats
-}; 
+    getEvaluationStats,
+};

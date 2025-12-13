@@ -4,30 +4,33 @@ const { MessagesErreur, StatutHttp, Enums } = require('../../config/constants');
 
 // Schema de validation Yup pour les livrables
 const livrableSchema = yup.object().shape({
-    titre: yup.string()
+    titre: yup
+        .string()
         .required('Le titre est requis.')
         .min(3, 'Le titre doit contenir au moins 3 caractères.')
         .max(150, 'Le titre ne peut pas dépasser 150 caractères.'),
-    
-    description: yup.string()
+
+    description: yup
+        .string()
         .required('La description est requise.')
         .min(10, 'La description doit contenir au moins 10 caractères.'),
-    
-    projetId: yup.string()
-        .required('L\'ID du projet est requis.')
+
+    projetId: yup
+        .string()
+        .required("L'ID du projet est requis.")
         .matches(/^[0-9a-fA-F]{24}$/, 'ID de projet invalide.'),
-    
-    dateLimite: yup.date()
+
+    dateLimite: yup
+        .date()
         .required('La date limite est requise.')
-        .min(new Date(), 'La date limite doit être ultérieure à aujourd\'hui.'),
-    
-    statut: yup.string()
+        .min(new Date(), "La date limite doit être ultérieure à aujourd'hui."),
+
+    statut: yup
+        .string()
         .required('Le statut est requis.')
         .oneOf(Object.values(Enums.StatutLivrable), 'Statut invalide.'),
-    
-    urlLivrable: yup.string()
-        .nullable()
-        .url('L\'URL du livrable doit être valide.')
+
+    urlLivrable: yup.string().nullable().url("L'URL du livrable doit être valide."),
 });
 
 // Middleware de validation des donnees de livrable
@@ -46,7 +49,7 @@ const validateLivrableData = async (req, res, next) => {
     } catch (error) {
         res.status(StatutHttp.MAUVAISE_REQUETE).json({
             erreur: MessagesErreur.GENERAL.VALIDATION,
-            details: error.errors || error.message
+            details: error.errors || error.message,
         });
     }
 };
@@ -59,7 +62,7 @@ const validateId = (paramName, source = 'params') => {
         if (!id || !mongoose.Types.ObjectId.isValid(id)) {
             return res.status(StatutHttp.MAUVAISE_REQUETE).json({
                 erreur: MessagesErreur.GENERAL.ID_INVALIDE,
-                details: `L'ID '${paramName}' est invalide ou manquant.`
+                details: `L'ID '${paramName}' est invalide ou manquant.`,
             });
         }
         next();
@@ -69,5 +72,5 @@ const validateId = (paramName, source = 'params') => {
 module.exports = {
     validateLivrableData,
     validateId,
-    livrableSchema // Export pour tests et réutilisation
+    livrableSchema, // Export pour tests et réutilisation
 };

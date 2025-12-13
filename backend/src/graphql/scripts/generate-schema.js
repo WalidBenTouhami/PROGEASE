@@ -7,7 +7,7 @@ const {
     generateEnumDefinition,
     generateAllEnums,
     injectEnumsInSchema,
-    generateSchemaFile
+    generateSchemaFile,
 } = require('../schema-enum-generator');
 const { Enum } = require('../../../config/constants');
 
@@ -29,7 +29,7 @@ try {
         TERMINE: 'Projet termine avec succes',
         ARCHIVE: 'Projet archive',
         EN_RETARD: 'Projet en retard sur le planning',
-        A_VENIR: 'Projet planifie mais non demarre'
+        A_VENIR: 'Projet planifie mais non demarre',
     });
 
     const statutLivrableEnum = generateEnumDefinition('StatutLivrable', Enum.StatutLivrable, {
@@ -38,7 +38,7 @@ try {
         EN_RETARD: 'Livrable en retard sur le planning',
         TERMINE: 'Livrable termine',
         VALIDE: 'Livrable valide par le tuteur',
-        REJETE: 'Livrable rejete, necessite des modifications'
+        REJETE: 'Livrable rejete, necessite des modifications',
     });
 
     console.log('Enumerations personnalisees generees:');
@@ -63,10 +63,12 @@ try {
             'Pagination',
             'ProjetResponse',
             'LivrableResponse',
-            'RisqueAnalyse'
+            'RisqueAnalyse',
         ];
 
-        const missingTypes = requiredTypes.filter(type => !schemaWithEnums.includes(`type ${type}`));
+        const missingTypes = requiredTypes.filter(
+            type => !schemaWithEnums.includes(`type ${type}`)
+        );
         if (missingTypes.length > 0) {
             throw new Error(`Types manquants dans le schema: ${missingTypes.join(', ')}`);
         }
@@ -82,7 +84,7 @@ try {
     const requiredFields = {
         Projet: ['_id', 'titre', 'description', 'statut', 'progression', 'estEnRetard'],
         Livrable: ['_id', 'intitule', 'description', 'dateLimite', 'statut', 'estEnRetard'],
-        Pagination: ['total', 'pages', 'page', 'limit', 'hasNextPage', 'hasPreviousPage']
+        Pagination: ['total', 'pages', 'page', 'limit', 'hasNextPage', 'hasPreviousPage'],
     };
 
     Object.entries(requiredFields).forEach(([type, fields]) => {
@@ -102,7 +104,6 @@ try {
     });
 
     console.log('✅ Validation des champs obligatoires reussie');
-
 } catch (error) {
     console.error(`❌ Erreur: ${error.message}`);
     process.exit(1);

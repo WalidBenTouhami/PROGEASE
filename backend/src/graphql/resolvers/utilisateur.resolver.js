@@ -41,7 +41,7 @@ function mapUtilisateurMongoVersGraphQL(doc) {
         statut: doc.statut || 'ACTIF',
         dernierConnexion: doc.dernierConnexion ? doc.dernierConnexion.toISOString() : null,
         creeLe: doc.creeLe ? doc.creeLe.toISOString() : null,
-        majLe: doc.majLe ? doc.majLe.toISOString() : null
+        majLe: doc.majLe ? doc.majLe.toISOString() : null,
     };
 }
 
@@ -62,7 +62,7 @@ const resolvers = {
 
                 return mapUtilisateurMongoVersGraphQL(utilisateur);
             } catch (error) {
-                logger.error('Erreur lors de la récupération de l\'utilisateur:', error);
+                logger.error("Erreur lors de la récupération de l'utilisateur:", error);
                 throw handleMongooseError(error);
             }
         },
@@ -78,7 +78,7 @@ const resolvers = {
                 query.$or = [
                     { nom: { $regex: recherche, $options: 'i' } },
                     { prenom: { $regex: recherche, $options: 'i' } },
-                    { email: { $regex: recherche, $options: 'i' } }
+                    { email: { $regex: recherche, $options: 'i' } },
                 ];
             }
 
@@ -96,7 +96,7 @@ const resolvers = {
                 utilisateurs,
                 total,
                 page,
-                pages: Math.ceil(total / limit)
+                pages: Math.ceil(total / limit),
             };
         }),
 
@@ -105,7 +105,7 @@ const resolvers = {
                 throw new AuthenticationError('Non authentifié');
             }
             return Utilisateur.findById(utilisateur.id);
-        })
+        }),
     },
 
     Mutation: {
@@ -187,14 +187,14 @@ const resolvers = {
                 ...input,
                 role: 'ETUDIANT',
                 estActif: true,
-                emailVerifie: false
+                emailVerifie: false,
             });
 
             const token = signToken(nouvelUtilisateur);
 
             return {
                 token,
-                utilisateur: nouvelUtilisateur
+                utilisateur: nouvelUtilisateur,
             };
         }),
 
@@ -215,7 +215,7 @@ const resolvers = {
 
             return {
                 token,
-                utilisateur
+                utilisateur,
             };
         }),
 
@@ -239,20 +239,20 @@ const resolvers = {
         verifierEmail: catchAsync(async (_, { token }) => {
             // TODO: Implémenter la vérification d'email avec le token
             return true;
-        })
+        }),
     },
 
     Utilisateur: {
-        projets: async (parent) => {
+        projets: async parent => {
             return parent.populate('projets').then(u => u.projets);
         },
-        formations: async (parent) => {
+        formations: async parent => {
             return parent.populate('formations').then(u => u.formations);
         },
-        certifications: async (parent) => {
+        certifications: async parent => {
             return parent.populate('certifications').then(u => u.certifications);
-        }
-    }
+        },
+    },
 };
 
-module.exports = resolvers; 
+module.exports = resolvers;

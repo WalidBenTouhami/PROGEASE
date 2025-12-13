@@ -9,7 +9,7 @@ class Forum {
         this.vues = 0;
         this.votes = {
             positifs: [],
-            negatifs: []
+            negatifs: [],
         };
         this.estResolu = false;
         this.creeLe = new Date();
@@ -24,11 +24,11 @@ class Forum {
             ...reponse,
             votes: {
                 positifs: [],
-                negatifs: []
+                negatifs: [],
             },
             estSolution: false,
             creeLe: new Date(),
-            majLe: new Date()
+            majLe: new Date(),
         });
     }
 
@@ -125,9 +125,9 @@ class Forum {
             votes: this.votes,
             estResolu: this.estResolu,
             creeLe: this.creeLe,
-            majLe: this.majLe
+            majLe: this.majLe,
         };
     }
 }
 
-module.exports = Forum; 
+module.exports = Forum;

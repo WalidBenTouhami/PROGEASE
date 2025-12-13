@@ -17,35 +17,25 @@ const formatLog = printf(({ niveau, message, timestamp, ...metadata }) => {
 const transports = [
     // Transport console avec couleurs
     new winston.transports.Console({
-        format: combine(
-            colorize(),
-            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-            formatLog
-        )
+        format: combine(colorize(), timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), formatLog),
     }),
     // Transport fichier pour les erreurs
     new winston.transports.File({
         filename: path.join('logs', 'erreurs.log'),
         level: 'error',
-        format: combine(
-            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-            json()
-        ),
+        format: combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), json()),
         maxsize: 5242880, // 5MB
         maxFiles: 5,
-        tailable: true
+        tailable: true,
     }),
     // Transport fichier pour tous les logs
     new winston.transports.File({
         filename: path.join('logs', 'application.log'),
-        format: combine(
-            timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-            json()
-        ),
+        format: combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), json()),
         maxsize: 5242880, // 5MB
         maxFiles: 5,
-        tailable: true
-    })
+        tailable: true,
+    }),
 ];
 
 // Ajout de transports supplémentaires en développement
@@ -54,10 +44,7 @@ if (config.server.env === 'development') {
         new winston.transports.File({
             filename: path.join('logs', 'debug.log'),
             level: 'debug',
-            format: combine(
-                timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-                json()
-            )
+            format: combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), json()),
         })
     );
 }
@@ -65,32 +52,23 @@ if (config.server.env === 'development') {
 // Création du logger
 const logger = winston.createLogger({
     level: config.logging.level,
-    format: combine(
-        timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-        json()
-    ),
+    format: combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), json()),
     defaultMeta: { service: 'progease-api' },
     transports,
     // Gestion des exceptions non capturées
     exceptionHandlers: [
         new winston.transports.File({
             filename: path.join('logs', 'exceptions.log'),
-            format: combine(
-                timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-                json()
-            )
-        })
+            format: combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), json()),
+        }),
     ],
     // Gestion des rejets de promesses non capturés
     rejectionHandlers: [
         new winston.transports.File({
             filename: path.join('logs', 'rejets.log'),
-            format: combine(
-                timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-                json()
-            )
-        })
-    ]
+            format: combine(timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }), json()),
+        }),
+    ],
 });
 
 // Méthodes utilitaires
@@ -104,7 +82,7 @@ logger.requete = (req, res, next) => {
             status: res.statusCode,
             duree: `${duree}ms`,
             ip: req.ip,
-            userAgent: req.get('user-agent')
+            userAgent: req.get('user-agent'),
         });
     });
     next();
@@ -117,7 +95,7 @@ logger.erreur = (err, req, res, next) => {
         method: req.method,
         url: req.originalUrl,
         ip: req.ip,
-        userAgent: req.get('user-agent')
+        userAgent: req.get('user-agent'),
     });
     next(err);
 };

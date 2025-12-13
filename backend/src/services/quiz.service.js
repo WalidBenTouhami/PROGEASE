@@ -12,13 +12,15 @@ async function creerQuiz(data) {
         const quiz = new Quiz({
             ...data,
             creeLe: new Date(),
-            majLe: new Date()
+            majLe: new Date(),
         });
 
         const quizSauvegarde = await quiz.save();
         return formatQuizResponse(quizSauvegarde);
     } catch (error) {
-        logger.error(`Erreur lors de la création du quiz: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la création du quiz: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -37,14 +39,14 @@ async function recupererQuiz(options = {}) {
             categorie,
             niveau,
             auteur,
-            tri = 'recent'
+            tri = 'recent',
         } = options;
 
         const query = {};
         if (recherche) {
             query.$or = [
                 { titre: { $regex: recherche, $options: 'i' } },
-                { description: { $regex: recherche, $options: 'i' } }
+                { description: { $regex: recherche, $options: 'i' } },
             ];
         }
         if (categorie) query.categorie = categorie;
@@ -74,17 +76,19 @@ async function recupererQuiz(options = {}) {
                 .skip(skip)
                 .limit(limite)
                 .lean(),
-            Quiz.countDocuments(query)
+            Quiz.countDocuments(query),
         ]);
 
         return {
             quiz: quiz.map(formatQuizResponse),
             page,
             totalPages: Math.ceil(total / limite),
-            total
+            total,
         };
     } catch (error) {
-        logger.error(`Erreur lors de la récupération des quiz: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la récupération des quiz: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -96,9 +100,7 @@ async function recupererQuiz(options = {}) {
  */
 async function recupererQuizParId(id) {
     try {
-        const quiz = await Quiz.findById(id)
-            .populate('auteur', 'nom prenom avatar')
-            .lean();
+        const quiz = await Quiz.findById(id).populate('auteur', 'nom prenom avatar').lean();
 
         if (!quiz) {
             throw new Error('Quiz non trouvé');
@@ -106,7 +108,9 @@ async function recupererQuizParId(id) {
 
         return formatQuizResponse(quiz);
     } catch (error) {
-        logger.error(`Erreur lors de la récupération du quiz: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la récupération du quiz: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -123,7 +127,7 @@ async function mettreAJourQuiz(id, data) {
             id,
             {
                 ...data,
-                majLe: new Date()
+                majLe: new Date(),
             },
             { new: true, runValidators: true }
         ).populate('auteur', 'nom prenom avatar');
@@ -134,7 +138,9 @@ async function mettreAJourQuiz(id, data) {
 
         return formatQuizResponse(quiz);
     } catch (error) {
-        logger.error(`Erreur lors de la mise à jour du quiz: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la mise à jour du quiz: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -152,7 +158,9 @@ async function supprimerQuiz(id) {
         }
         return true;
     } catch (error) {
-        logger.error(`Erreur lors de la suppression du quiz: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la suppression du quiz: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -177,7 +185,7 @@ async function soumettreReponses(quizId, utilisateurId, reponses) {
         quiz.questions.forEach((question, index) => {
             const reponseUtilisateur = reponses[index];
             const estCorrecte = question.reponseCorrecte === reponseUtilisateur;
-            
+
             if (estCorrecte) {
                 score += question.points || 1;
             }
@@ -187,7 +195,7 @@ async function soumettreReponses(quizId, utilisateurId, reponses) {
                 reponseUtilisateur,
                 reponseCorrecte: question.reponseCorrecte,
                 estCorrecte,
-                points: estCorrecte ? (question.points || 1) : 0
+                points: estCorrecte ? question.points || 1 : 0,
             });
         });
 
@@ -198,19 +206,21 @@ async function soumettreReponses(quizId, utilisateurId, reponses) {
             score,
             scoreMaximum: quiz.questions.reduce((total, q) => total + (q.points || 1), 0),
             resultatsDetailles,
-            dateSoumission: new Date()
+            dateSoumission: new Date(),
         };
 
         quiz.participations.push(resultat);
         quiz.nombreParticipations = (quiz.nombreParticipations || 0) + 1;
         quiz.scoreTotal = (quiz.scoreTotal || 0) + score;
         quiz.scoreMoyen = quiz.scoreTotal / quiz.nombreParticipations;
-        
+
         await quiz.save();
 
         return resultat;
     } catch (error) {
-        logger.error(`Erreur lors de la soumission des réponses: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la soumission des réponses: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -235,24 +245,39 @@ async function recupererStatistiques(id) {
             nombreParticipations,
             scoreMoyen: nombreParticipations > 0 ? quiz.scoreTotal / nombreParticipations : 0,
             scoreMaximum,
-            tauxReussite: nombreParticipations > 0 ? 
-                (participations.filter(p => p.score >= scoreMaximum * 0.7).length / nombreParticipations) * 100 : 0,
+            tauxReussite:
+                nombreParticipations > 0
+                    ? (participations.filter(p => p.score >= scoreMaximum * 0.7).length /
+                          nombreParticipations) *
+                      100
+                    : 0,
             repartitionScores: {
                 excellent: participations.filter(p => p.score >= scoreMaximum * 0.9).length,
-                bon: participations.filter(p => p.score >= scoreMaximum * 0.7 && p.score < scoreMaximum * 0.9).length,
-                moyen: participations.filter(p => p.score >= scoreMaximum * 0.5 && p.score < scoreMaximum * 0.7).length,
-                faible: participations.filter(p => p.score < scoreMaximum * 0.5).length
+                bon: participations.filter(
+                    p => p.score >= scoreMaximum * 0.7 && p.score < scoreMaximum * 0.9
+                ).length,
+                moyen: participations.filter(
+                    p => p.score >= scoreMaximum * 0.5 && p.score < scoreMaximum * 0.7
+                ).length,
+                faible: participations.filter(p => p.score < scoreMaximum * 0.5).length,
             },
             questionsStats: quiz.questions.map((question, index) => ({
                 texte: question.texte,
-                tauxReussite: nombreParticipations > 0 ?
-                    (participations.filter(p => p.resultatsDetailles[index].estCorrecte).length / nombreParticipations) * 100 : 0
-            }))
+                tauxReussite:
+                    nombreParticipations > 0
+                        ? (participations.filter(p => p.resultatsDetailles[index].estCorrecte)
+                              .length /
+                              nombreParticipations) *
+                          100
+                        : 0,
+            })),
         };
 
         return stats;
     } catch (error) {
-        logger.error(`Erreur lors de la récupération des statistiques: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la récupération des statistiques: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -264,5 +289,5 @@ module.exports = {
     mettreAJourQuiz,
     supprimerQuiz,
     soumettreReponses,
-    recupererStatistiques
-}; 
+    recupererStatistiques,
+};

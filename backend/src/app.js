@@ -24,51 +24,63 @@ const limiteurGlobal = rateLimit({
     max: 100, // limite chaque IP à 100 requêtes par fenêtre
     message: {
         succes: false,
-        message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard'
-    }
+        message: 'Trop de requêtes depuis cette IP, veuillez réessayer plus tard',
+    },
 });
 
 const creerApplication = async () => {
     const app = express();
 
     // Middleware de sécurité
-    app.use(helmet({
-        contentSecurityPolicy: {
-            directives: {
-                defaultSrc: ["'self'"],
-                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-                styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-                imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
-                connectSrc: ["'self'", 'https://api.progease.com', 'wss:', 'ws:'],
-                fontSrc: ["'self'", 'https://fonts.gstatic.com'],
-                objectSrc: ["'none'"],
-                mediaSrc: ["'self'"],
-                frameSrc: ["'self'"],
-                workerSrc: ["'self'", 'blob:'],
-                childSrc: ["'self'", 'blob:']
-            }
-        },
-        crossOriginEmbedderPolicy: false,
-        crossOriginOpenerPolicy: false,
-        crossOriginResourcePolicy: { policy: "cross-origin" }
-    }));
+    app.use(
+        helmet({
+            contentSecurityPolicy: {
+                directives: {
+                    defaultSrc: ["'self'"],
+                    scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+                    styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+                    imgSrc: ["'self'", 'data:', 'https:', 'blob:'],
+                    connectSrc: ["'self'", 'https://api.progease.com', 'wss:', 'ws:'],
+                    fontSrc: ["'self'", 'https://fonts.gstatic.com'],
+                    objectSrc: ["'none'"],
+                    mediaSrc: ["'self'"],
+                    frameSrc: ["'self'"],
+                    workerSrc: ["'self'", 'blob:'],
+                    childSrc: ["'self'", 'blob:'],
+                },
+            },
+            crossOriginEmbedderPolicy: false,
+            crossOriginOpenerPolicy: false,
+            crossOriginResourcePolicy: { policy: 'cross-origin' },
+        })
+    );
     app.use(mongoSanitize()); // Protection contre les injections NoSQL
     app.use(xss()); // Protection contre les attaques XSS
     app.use(hpp()); // Protection contre la pollution des paramètres HTTP
 
     // Middleware de base
-    app.use(cors({
-        origin: true, // Autoriser toutes les origines
-        credentials: true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization', 'x-api-version', 'apollographql-client-name', 'apollographql-client-version']
-    }));
+    app.use(
+        cors({
+            origin: config.cors.origine.split(',').map(o => o.trim()),
+            credentials: true,
+            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+            allowedHeaders: [
+                'Content-Type',
+                'Authorization',
+                'x-api-version',
+                'apollographql-client-name',
+                'apollographql-client-version',
+            ],
+        })
+    );
     app.use(compression());
-    app.use(morgan('dev', {
-        stream: {
-            write: message => logger.info(message.trim())
-        }
-    }));
+    app.use(
+        morgan('dev', {
+            stream: {
+                write: message => logger.info(message.trim()),
+            },
+        })
+    );
     app.use(json({ limit: '10mb' }));
     app.use(cookieParser());
 
@@ -93,7 +105,7 @@ const creerApplication = async () => {
             maxIdleTimeMS: 60000,
             connectTimeoutMS: 10000,
             heartbeatFrequencyMS: 10000,
-            appName: 'progease-api'
+            appName: 'progease-api',
         };
         await mongoose.connect(config.baseDeDonnees.uri, optionsMongoDB);
         logger.info('✅ Connexion à MongoDB établie avec succès');
@@ -106,33 +118,33 @@ const creerApplication = async () => {
     const serveurApollo = new ApolloServer({
         schema,
         context: ({ req }) => ({
-            utilisateur: req.utilisateur
+            utilisateur: req.utilisateur,
         }),
-        formatError: (erreur) => {
+        formatError: erreur => {
             logger.error('Erreur GraphQL:', erreur);
             return {
                 message: erreur.message,
-                code: erreur.extensions?.code || 'INTERNAL_SERVER_ERROR'
+                code: erreur.extensions?.code || 'INTERNAL_SERVER_ERROR',
             };
         },
         plugins: [
             {
                 async serverWillStart() {
                     logger.info('🚀 Serveur GraphQL démarré');
-                }
-            }
+                },
+            },
         ],
         playground: {
             settings: {
                 'editor.theme': 'dark',
                 'editor.reuseHeaders': true,
                 'tracing.hideTracingResponse': true,
-                'queryPlan.hideQueryPlanResponse': true
-            }
+                'queryPlan.hideQueryPlanResponse': true,
+            },
         },
         introspection: true,
         csrfPrevention: false,
-        cache: 'bounded'
+        cache: 'bounded',
     });
 
     await serveurApollo.start();
@@ -141,16 +153,16 @@ const creerApplication = async () => {
     app.use(protegerRoute);
 
     // Démarrer le serveur Apollo
-    serveurApollo.applyMiddleware({ 
+    serveurApollo.applyMiddleware({
         app,
         path: '/graphql',
-        cors: false
+        cors: false,
     });
 
     // Routes REST API
     const aiRoutes = require('./routes/ai.routes');
     const schedulingRoutes = require('./routes/scheduling.routes');
-    
+
     app.use('/api/ai', aiRoutes);
     app.use('/api/scheduling', schedulingRoutes);
 
@@ -165,9 +177,9 @@ const creerApplication = async () => {
                 services: {
                     graphql: 'operational',
                     ai: 'operational',
-                    scheduling: 'operational'
-                }
-            }
+                    scheduling: 'operational',
+                },
+            },
         });
     });
 
@@ -178,11 +190,11 @@ const creerApplication = async () => {
     app.use((req, res) => {
         res.status(404).json({
             succes: false,
-            message: 'Route non trouvée'
+            message: 'Route non trouvée',
         });
     });
 
     return app;
 };
 
-module.exports = creerApplication; 
+module.exports = creerApplication;

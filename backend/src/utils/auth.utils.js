@@ -21,5 +21,5 @@ function checkAuthorization(context, requiredRole = null) {
 }
 
 module.exports = {
-    checkAuthorization
+    checkAuthorization,
 };

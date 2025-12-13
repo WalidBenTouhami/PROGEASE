@@ -199,4 +199,4 @@ module.exports = gql`
         """
         soumettreReponses(quizId: ID!, reponses: [String!]!): ResultatQuiz!
     }
-`; 
+`;

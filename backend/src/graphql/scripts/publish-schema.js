@@ -23,13 +23,16 @@ const CONFIG = {
     apiKey: process.env.APOLLO_KEY,
     subgraphName: process.env.APOLLO_SUBGRAPH_NAME || 'progease-projets',
     routingUrl: process.env.APOLLO_ROUTING_URL || 'http://localhost:5000/graphql',
-    schemaPath: path.resolve(__dirname, process.env.APOLLO_SCHEMA_PATH || '../src/graphql/schema-template.graphql'),
-    outputDir: path.resolve(__dirname, process.env.APOLLO_SCHEMA_OUTPUT_DIR || './schema-output')
+    schemaPath: path.resolve(
+        __dirname,
+        process.env.APOLLO_SCHEMA_PATH || '../src/graphql/schema-template.graphql'
+    ),
+    outputDir: path.resolve(__dirname, process.env.APOLLO_SCHEMA_OUTPUT_DIR || './schema-output'),
 };
 
 // Verification de la presence de la cle Apollo
 if (!CONFIG.apiKey) {
-    log('APOLLO_KEY non definie dans les variables d\'environnement', 'WARNING');
+    log("APOLLO_KEY non definie dans les variables d'environnement", 'WARNING');
 }
 
 // Creer le repertoire de sortie s'il n'existe pas
@@ -41,10 +44,10 @@ function log(message, type = 'INFO') {
     // noinspection JSDeprecatedSymbols
     const timestamp = getCurrentDateTime().replace('T', ' ').substr(0, 19);
     const prefix = {
-        'INFO': '📝',
-        'SUCCESS': '✅',
-        'WARNING': '⚠️',
-        'ERROR': '❌'
+        INFO: '📝',
+        SUCCESS: '✅',
+        WARNING: '⚠️',
+        ERROR: '❌',
     };
 
     console.log(`${prefix[type] || '📝'} [${timestamp}] ${type}: ${message}`);
@@ -63,7 +66,10 @@ async function main() {
             // Si on ne peut pas acceder directement au SDL, on l'extrait du fichier
             log('Utilisation du fichier schema-template.graphql');
             try {
-                const schemaFilePath = path.resolve(__dirname, '../src/graphql/schema-template.graphql');
+                const schemaFilePath = path.resolve(
+                    __dirname,
+                    '../src/graphql/schema-template.graphql'
+                );
                 if (fs.existsSync(schemaFilePath)) {
                     sdl = fs.readFileSync(schemaFilePath, 'utf8');
                     log('Fichier schema-template.graphql charge avec succes');
@@ -93,7 +99,7 @@ async function main() {
             utilisateur: process.env.utilisateur || 'defaultutilisateur',
             version: '2.0.0',
             subgraph: CONFIG.subgraphName,
-            routingUrl: CONFIG.routingUrl
+            routingUrl: CONFIG.routingUrl,
         };
         fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
         log(`Metadonnees sauvegardees dans ${metadataPath}`, 'SUCCESS');
@@ -133,8 +139,8 @@ async function publishToApolloStudio(schemaPath) {
         const execOptions = {
             env: {
                 ...process.env,
-                APOLLO_KEY: CONFIG.apiKey
-            }
+                APOLLO_KEY: CONFIG.apiKey,
+            },
         };
 
         exec(command, execOptions, (error, stdout, stderr) => {

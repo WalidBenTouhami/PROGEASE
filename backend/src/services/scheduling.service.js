@@ -34,7 +34,7 @@ async function genererRappels(projet) {
                     message: `Le projet "${projet.titre}" se termine dans ${joursRestants} jour(s)`,
                     priorite: joursRestants <= 3 ? 'HAUTE' : 'MOYENNE',
                     dateRappel: new Date(dateFin.getTime() - 3 * MS_PER_DAY), // 3 jours avant
-                    destinataires: projet.equipe || []
+                    destinataires: projet.equipe || [],
                 });
             }
         }
@@ -54,7 +54,7 @@ async function genererRappels(projet) {
                             priorite: joursRestants <= 2 ? 'URGENTE' : 'HAUTE',
                             dateRappel: new Date(dateLimite.getTime() - 2 * MS_PER_DAY), // 2 jours avant
                             destinataires: projet.equipe || [],
-                            livrableId: livrable._id
+                            livrableId: livrable._id,
                         });
                     }
                 }
@@ -76,7 +76,7 @@ async function genererRappels(projet) {
                             priorite: joursRestants <= 1 ? 'URGENTE' : 'MOYENNE',
                             dateRappel: new Date(dateFin.getTime() - 1 * MS_PER_DAY), // 1 jour avant
                             destinataires: tache.assigneA ? [tache.assigneA] : projet.equipe || [],
-                            tacheId: tache._id
+                            tacheId: tache._id,
                         });
                     }
                 }
@@ -85,7 +85,7 @@ async function genererRappels(projet) {
 
         logger.info('Rappels générés', {
             projetId: projet._id,
-            nombreRappels: rappels.length
+            nombreRappels: rappels.length,
         });
 
         return rappels;
@@ -111,7 +111,7 @@ async function planifierEvenements(params) {
         const evenements = [];
         const dateDebut = new Date(projet.dateDebut);
         const dateFin = new Date(projet.dateFin);
-        
+
         let intervalleJours;
         switch (frequence) {
             case 'QUOTIDIEN':
@@ -130,7 +130,7 @@ async function planifierEvenements(params) {
                 intervalleJours = 7;
         }
 
-        let dateActuelle = new Date(dateDebut);
+        const dateActuelle = new Date(dateDebut);
         let compteur = 1;
 
         while (dateActuelle <= dateFin) {
@@ -143,7 +143,7 @@ async function planifierEvenements(params) {
                 participants: projet.equipe || [],
                 tuteur: projet.tuteur,
                 lieu: 'À définir',
-                statut: 'PLANIFIE'
+                statut: 'PLANIFIE',
             });
 
             dateActuelle.setDate(dateActuelle.getDate() + intervalleJours);
@@ -152,21 +152,21 @@ async function planifierEvenements(params) {
 
         // Ajouter des événements clés
         const dureeProjet = Math.ceil((dateFin - dateDebut) / MS_PER_DAY);
-        
+
         // Revue de mi-parcours
         if (dureeProjet >= 14) {
             const dateMiParcours = new Date(dateDebut.getTime() + (dateFin - dateDebut) / 2);
             evenements.push({
                 type: 'REVUE',
                 titre: `Revue de mi-parcours - ${projet.titre}`,
-                description: 'Revue intermédiaire du projet pour évaluer l\'avancement',
+                description: "Revue intermédiaire du projet pour évaluer l'avancement",
                 date: dateMiParcours,
                 duree: 90,
                 participants: projet.equipe || [],
                 tuteur: projet.tuteur,
                 lieu: 'À définir',
                 statut: 'PLANIFIE',
-                importance: 'HAUTE'
+                importance: 'HAUTE',
             });
         }
 
@@ -182,13 +182,13 @@ async function planifierEvenements(params) {
             tuteur: projet.tuteur,
             lieu: 'À définir',
             statut: 'PLANIFIE',
-            importance: 'CRITIQUE'
+            importance: 'CRITIQUE',
         });
 
         logger.info('Événements planifiés', {
             projetId: projet._id,
             nombreEvenements: evenements.length,
-            frequence
+            frequence,
         });
 
         return {
@@ -197,8 +197,8 @@ async function planifierEvenements(params) {
                 total: evenements.length,
                 reunions: evenements.filter(e => e.type === 'REUNION').length,
                 revues: evenements.filter(e => e.type === 'REVUE').length,
-                soutenances: evenements.filter(e => e.type === 'SOUTENANCE').length
-            }
+                soutenances: evenements.filter(e => e.type === 'SOUTENANCE').length,
+            },
         };
     } catch (error) {
         logger.error('Erreur lors de la planification des événements:', error);
@@ -217,7 +217,7 @@ async function envoyerNotifications(rappels) {
             return {
                 success: true,
                 message: 'Aucun rappel à envoyer',
-                envoyes: 0
+                envoyes: 0,
             };
         }
 
@@ -234,12 +234,12 @@ async function envoyerNotifications(rappels) {
                     titre: rappel.titre,
                     destinataires: rappel.destinataires,
                     dateEnvoi: maintenant,
-                    statut: 'ENVOYE'
+                    statut: 'ENVOYE',
                 });
 
                 logger.info('Notification envoyée', {
                     type: rappel.type,
-                    destinataires: rappel.destinataires.length
+                    destinataires: rappel.destinataires.length,
                 });
             }
         }
@@ -248,10 +248,10 @@ async function envoyerNotifications(rappels) {
             success: true,
             message: `${notificationsEnvoyees.length} notification(s) envoyée(s)`,
             envoyes: notificationsEnvoyees.length,
-            notifications: notificationsEnvoyees
+            notifications: notificationsEnvoyees,
         };
     } catch (error) {
-        logger.error('Erreur lors de l\'envoi des notifications:', error);
+        logger.error("Erreur lors de l'envoi des notifications:", error);
         throw error;
     }
 }
@@ -270,9 +270,7 @@ function detecterConflits(evenements) {
         }
 
         // Trier les événements par date
-        const evenementsTries = [...evenements].sort((a, b) => 
-            new Date(a.date) - new Date(b.date)
-        );
+        const evenementsTries = [...evenements].sort((a, b) => new Date(a.date) - new Date(b.date));
 
         for (let i = 0; i < evenementsTries.length - 1; i++) {
             const evt1 = evenementsTries[i];
@@ -284,9 +282,8 @@ function detecterConflits(evenements) {
             // Vérifier le chevauchement
             if (fin1 > debut2) {
                 // Vérifier si les participants sont communs
-                const participantsCommuns = evt1.participants?.filter(p => 
-                    evt2.participants?.includes(p)
-                ) || [];
+                const participantsCommuns =
+                    evt1.participants?.filter(p => evt2.participants?.includes(p)) || [];
 
                 if (participantsCommuns.length > 0 || evt1.tuteur === evt2.tuteur) {
                     conflits.push({
@@ -294,15 +291,15 @@ function detecterConflits(evenements) {
                         evenement1: {
                             titre: evt1.titre,
                             date: evt1.date,
-                            duree: evt1.duree
+                            duree: evt1.duree,
                         },
                         evenement2: {
                             titre: evt2.titre,
                             date: evt2.date,
-                            duree: evt2.duree
+                            duree: evt2.duree,
                         },
                         participantsCommuns: participantsCommuns,
-                        gravite: participantsCommuns.length > 2 ? 'HAUTE' : 'MOYENNE'
+                        gravite: participantsCommuns.length > 2 ? 'HAUTE' : 'MOYENNE',
                     });
                 }
             }
@@ -310,7 +307,7 @@ function detecterConflits(evenements) {
 
         logger.info('Détection de conflits terminée', {
             nombreEvenements: evenements.length,
-            nombreConflits: conflits.length
+            nombreConflits: conflits.length,
         });
 
         return conflits;
@@ -324,5 +321,5 @@ module.exports = {
     genererRappels,
     planifierEvenements,
     envoyerNotifications,
-    detecterConflits
+    detecterConflits,
 };

@@ -15,7 +15,7 @@ const resolvers = {
             if (recherche) {
                 query.$or = [
                     { titre: { $regex: recherche, $options: 'i' } },
-                    { description: { $regex: recherche, $options: 'i' } }
+                    { description: { $regex: recherche, $options: 'i' } },
                 ];
             }
 
@@ -33,7 +33,7 @@ const resolvers = {
                 formations,
                 total,
                 page,
-                pages: Math.ceil(total / limit)
+                pages: Math.ceil(total / limit),
             };
         }),
 
@@ -56,7 +56,7 @@ const resolvers = {
             }
 
             return Formation.find({
-                'participants.utilisateur': utilisateur.id
+                'participants.utilisateur': utilisateur.id,
             })
                 .populate('formateur')
                 .populate('participants.utilisateur')
@@ -74,7 +74,7 @@ const resolvers = {
                 .populate('participants.utilisateur')
                 .populate('evaluations.utilisateur')
                 .sort({ creeLe: -1 });
-        })
+        }),
     },
 
     Mutation: {
@@ -90,7 +90,7 @@ const resolvers = {
 
             const formation = await Formation.create({
                 ...input,
-                formateur: utilisateur.id
+                formateur: utilisateur.id,
             });
 
             return formation.populate('formateur');
@@ -122,7 +122,8 @@ const resolvers = {
 
             await formation.save();
 
-            return formation.populate('formateur')
+            return formation
+                .populate('formateur')
                 .populate('participants.utilisateur')
                 .populate('evaluations.utilisateur');
         }),
@@ -156,7 +157,7 @@ const resolvers = {
             }
 
             if (!formation.estPublie) {
-                throw new UserInputError('Cette formation n\'est pas encore publiée');
+                throw new UserInputError("Cette formation n'est pas encore publiée");
             }
 
             const dejaInscrit = formation.participants.some(
@@ -171,12 +172,13 @@ const resolvers = {
                 utilisateur: utilisateur.id,
                 dateInscription: new Date(),
                 progression: 0,
-                modulesTermines: []
+                modulesTermines: [],
             });
 
             await formation.save();
 
-            return formation.populate('formateur')
+            return formation
+                .populate('formateur')
                 .populate('participants.utilisateur')
                 .populate('evaluations.utilisateur');
         }),
@@ -196,7 +198,7 @@ const resolvers = {
             );
 
             if (participantIndex === -1) {
-                throw new UserInputError('Vous n\'êtes pas inscrit à cette formation');
+                throw new UserInputError("Vous n'êtes pas inscrit à cette formation");
             }
 
             formation.participants.splice(participantIndex, 1);
@@ -231,7 +233,7 @@ const resolvers = {
                 utilisateur: utilisateur.id,
                 note,
                 commentaire,
-                date: new Date()
+                date: new Date(),
             };
 
             if (evaluationIndex === -1) {
@@ -242,7 +244,8 @@ const resolvers = {
 
             await formation.save();
 
-            return formation.populate('formateur')
+            return formation
+                .populate('formateur')
                 .populate('participants.utilisateur')
                 .populate('evaluations.utilisateur');
         }),
@@ -262,7 +265,7 @@ const resolvers = {
             );
 
             if (!participant) {
-                throw new UserInputError('Vous n\'êtes pas inscrit à cette formation');
+                throw new UserInputError("Vous n'êtes pas inscrit à cette formation");
             }
 
             const module = formation.modules.id(moduleId);
@@ -279,23 +282,24 @@ const resolvers = {
                 await formation.save();
             }
 
-            return formation.populate('formateur')
+            return formation
+                .populate('formateur')
                 .populate('participants.utilisateur')
                 .populate('evaluations.utilisateur');
-        })
+        }),
     },
 
     Formation: {
-        formateur: async (parent) => {
+        formateur: async parent => {
             return parent.populate('formateur').then(f => f.formateur);
         },
-        participants: async (parent) => {
+        participants: async parent => {
             return parent.populate('participants.utilisateur').then(f => f.participants);
         },
-        evaluations: async (parent) => {
+        evaluations: async parent => {
             return parent.populate('evaluations.utilisateur').then(f => f.evaluations);
-        }
-    }
+        },
+    },
 };
 
-module.exports = resolvers; 
+module.exports = resolvers;

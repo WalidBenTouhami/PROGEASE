@@ -10,7 +10,12 @@
 
 const { ValidationError } = require('./errorHandlers');
 const logger = require('../utils/logger');
-const { validateCreationQuizData, validateMiseAJourQuizData, validateSoumissionReponsesData, validateId } = require('../validations/quiz.validation');
+const {
+    validateCreationQuizData,
+    validateMiseAJourQuizData,
+    validateSoumissionReponsesData,
+    validateId,
+} = require('../validations/quiz.validation');
 const Quiz = require('../models/quiz.model');
 
 /**
@@ -24,7 +29,7 @@ const validateCreation = async (req, res, next) => {
         logger.warn('Validation de la création du quiz échouée', {
             path: req.path,
             method: req.method,
-            errors: error.details
+            errors: error.details,
         });
         next(new ValidationError('Validation de la création du quiz échouée', error.details));
     }
@@ -41,7 +46,7 @@ const validateMiseAJour = async (req, res, next) => {
         logger.warn('Validation de la mise à jour du quiz échouée', {
             path: req.path,
             method: req.method,
-            errors: error.details
+            errors: error.details,
         });
         next(new ValidationError('Validation de la mise à jour du quiz échouée', error.details));
     }
@@ -58,9 +63,11 @@ const validateSoumissionReponses = async (req, res, next) => {
         logger.warn('Validation de la soumission des réponses échouée', {
             path: req.path,
             method: req.method,
-            errors: error.details
+            errors: error.details,
         });
-        next(new ValidationError('Validation de la soumission des réponses échouée', error.details));
+        next(
+            new ValidationError('Validation de la soumission des réponses échouée', error.details)
+        );
     }
 };
 
@@ -75,14 +82,17 @@ const verifierProprietaire = async (req, res, next) => {
         if (!quiz) {
             return res.status(404).json({
                 success: false,
-                message: 'Quiz non trouvé'
+                message: 'Quiz non trouvé',
             });
         }
 
-        if (quiz.auteur.toString() !== req.utilisateur.id && !req.utilisateur.roles.includes('ADMIN')) {
+        if (
+            quiz.auteur.toString() !== req.utilisateur.id &&
+            !req.utilisateur.roles.includes('ADMIN')
+        ) {
             return res.status(403).json({
                 success: false,
-                message: 'Accès non autorisé'
+                message: 'Accès non autorisé',
             });
         }
 
@@ -105,21 +115,25 @@ const verifierAcces = async (req, res, next) => {
         if (!quiz) {
             return res.status(404).json({
                 success: false,
-                message: 'Quiz non trouvé'
+                message: 'Quiz non trouvé',
             });
         }
 
-        if (!quiz.estPublic && quiz.auteur.toString() !== req.utilisateur.id && !req.utilisateur.roles.includes('ADMIN')) {
+        if (
+            !quiz.estPublic &&
+            quiz.auteur.toString() !== req.utilisateur.id &&
+            !req.utilisateur.roles.includes('ADMIN')
+        ) {
             return res.status(403).json({
                 success: false,
-                message: 'Accès non autorisé'
+                message: 'Accès non autorisé',
             });
         }
 
         req.quiz = quiz;
         next();
     } catch (error) {
-        logger.error('Erreur lors de la vérification de l\'accès:', error);
+        logger.error("Erreur lors de la vérification de l'accès:", error);
         next(error);
     }
 };
@@ -135,18 +149,18 @@ const verifierParticipation = async (req, res, next) => {
         if (!quiz) {
             return res.status(404).json({
                 success: false,
-                message: 'Quiz non trouvé'
+                message: 'Quiz non trouvé',
             });
         }
 
-        const dejaParticipe = quiz.participations.some(p => 
-            p.utilisateur.toString() === req.utilisateur.id
+        const dejaParticipe = quiz.participations.some(
+            p => p.utilisateur.toString() === req.utilisateur.id
         );
 
         if (dejaParticipe) {
             return res.status(400).json({
                 success: false,
-                message: 'Vous avez déjà participé à ce quiz'
+                message: 'Vous avez déjà participé à ce quiz',
             });
         }
 
@@ -167,21 +181,21 @@ const verifierNombreQuestions = async (req, res, next) => {
         if (!questions || !Array.isArray(questions)) {
             return res.status(400).json({
                 success: false,
-                message: 'Les questions doivent être un tableau'
+                message: 'Les questions doivent être un tableau',
             });
         }
 
         if (questions.length < 1) {
             return res.status(400).json({
                 success: false,
-                message: 'Le quiz doit contenir au moins une question'
+                message: 'Le quiz doit contenir au moins une question',
             });
         }
 
         if (questions.length > 50) {
             return res.status(400).json({
                 success: false,
-                message: 'Le quiz ne peut pas contenir plus de 50 questions'
+                message: 'Le quiz ne peut pas contenir plus de 50 questions',
             });
         }
 
@@ -203,21 +217,21 @@ const verifierReponses = async (req, res, next) => {
         if (!quiz) {
             return res.status(404).json({
                 success: false,
-                message: 'Quiz non trouvé'
+                message: 'Quiz non trouvé',
             });
         }
 
         if (!reponses || !Array.isArray(reponses)) {
             return res.status(400).json({
                 success: false,
-                message: 'Les réponses doivent être un tableau'
+                message: 'Les réponses doivent être un tableau',
             });
         }
 
         if (reponses.length !== quiz.questions.length) {
             return res.status(400).json({
                 success: false,
-                message: 'Le nombre de réponses ne correspond pas au nombre de questions'
+                message: 'Le nombre de réponses ne correspond pas au nombre de questions',
             });
         }
 
@@ -237,5 +251,5 @@ module.exports = {
     verifierAcces,
     verifierParticipation,
     verifierNombreQuestions,
-    verifierReponses
-}; 
+    verifierReponses,
+};

@@ -180,11 +180,7 @@ const typeDefs = gql`
         """
         Change le mot de passe d'un utilisateur
         """
-        changerMotDePasse(
-            id: ID!
-            ancienMotDePasse: String!
-            nouveauMotDePasse: String!
-        ): Boolean!
+        changerMotDePasse(id: ID!, ancienMotDePasse: String!, nouveauMotDePasse: String!): Boolean!
 
         inscription(input: UtilisateurInput!): AuthPayload!
         connexion(email: String!, motDePasse: String!): AuthPayload!
@@ -193,4 +189,4 @@ const typeDefs = gql`
     }
 `;
 
-module.exports = typeDefs; 
+module.exports = typeDefs;

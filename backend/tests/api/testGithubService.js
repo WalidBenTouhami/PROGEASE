@@ -3,7 +3,7 @@ const { checkGithubRepoExists } = require('../../src/services/github.service');
 
 (async () => {
     try {
-    // URL valide
+        // URL valide
         const urlValid = 'https://github.com/WalidBenTouhami/PROGEASE';
         const existsValid = await checkGithubRepoExists(urlValid);
         console.log(`Le depôt "${urlValid}" existe ?`, existsValid);

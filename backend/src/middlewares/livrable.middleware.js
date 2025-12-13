@@ -29,14 +29,14 @@ const validateLivrable = (req, res, next) => {
         const formattedErrors = errors.array().map(err => ({
             field: err.param,
             message: err.msg,
-            value: err.value
+            value: err.value,
         }));
 
         // Journaliser l'erreur
         logger.warn('Validation du livrable echouee', {
             path: req.path,
             method: req.method,
-            errors: formattedErrors
+            errors: formattedErrors,
         });
 
         // Creer une erreur de validation standardisee
@@ -84,11 +84,15 @@ const checkLivrablePermissions = async (req, res, next) => {
         // Verifier si l'utilisateur est le tuteur ou le createur du projet
         const isTuteur = projet.tuteur.equals(req.utilisateur._id);
         const isProjetCreateur = projet.createur.equals(req.utilisateur._id);
-        const isLivrableCreateur = livrable.createur && livrable.createur.equals(req.utilisateur._id);
+        const isLivrableCreateur =
+            livrable.createur && livrable.createur.equals(req.utilisateur._id);
         const isTeamMember = projet.equipe.some(membre => membre.equals(req.utilisateur._id));
 
         // Pour les lectures, autoriser l'equipe
-        if (req.method === 'GET' && (isTeamMember || isTuteur || isProjetCreateur || isLivrableCreateur)) {
+        if (
+            req.method === 'GET' &&
+            (isTeamMember || isTuteur || isProjetCreateur || isLivrableCreateur)
+        ) {
             return next();
         }
 
@@ -99,7 +103,7 @@ const checkLivrablePermissions = async (req, res, next) => {
 
         // Sinon, refutilisateur l'acces
         throw new ValidationError(
-            'Vous n\'avez pas les autorisations necessaires pour cette operation',
+            "Vous n'avez pas les autorisations necessaires pour cette operation",
             403
         );
     } catch (error) {

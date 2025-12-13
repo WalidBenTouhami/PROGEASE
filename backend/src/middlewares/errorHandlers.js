@@ -2,7 +2,12 @@ const logger = require('../utils/logger');
 const { ERROR_CODES, MessagesErreur, StatutHttp } = require('../../config/constants');
 
 class AppError extends Error {
-    constructor(message, statusCode = 500, code = ERROR_CODES.INTERNAL_ERROR, isOperational = true) {
+    constructor(
+        message,
+        statusCode = 500,
+        code = ERROR_CODES.INTERNAL_ERROR,
+        isOperational = true
+    ) {
         super(message);
         this.statusCode = statusCode;
         this.code = code;
@@ -19,12 +24,14 @@ class ValidationError extends AppError {
 }
 
 const notFoundHandler = (req, res, next) => {
-    next(new AppError(
-        `Route ${req.originalUrl} non trouvée`,
-        StatutHttp.NOT_FOUND,
-        ERROR_CODES.NOT_FOUND,
-        true
-    ));
+    next(
+        new AppError(
+            `Route ${req.originalUrl} non trouvée`,
+            StatutHttp.NOT_FOUND,
+            ERROR_CODES.NOT_FOUND,
+            true
+        )
+    );
 };
 
 const errorHandler = (err, req, res, next) => {
@@ -38,14 +45,14 @@ const errorHandler = (err, req, res, next) => {
             stack: err.stack,
             code: err.code,
             path: req.path,
-            method: req.method
+            method: req.method,
         });
     } else {
         logger.warn('Erreur client:', {
             error: err.message,
             code: err.code,
             path: req.path,
-            method: req.method
+            method: req.method,
         });
     }
 
@@ -56,32 +63,30 @@ const errorHandler = (err, req, res, next) => {
         code: err.code,
         ...(process.env.NODE_ENV === 'development' && {
             stack: err.stack,
-            details: err.details
-        })
+            details: err.details,
+        }),
     });
 };
 
 const setupProcessErrorHandlers = () => {
-    process.on('uncaughtException', (err) => {
+    process.on('uncaughtException', err => {
         logger.error('Uncaught Exception:', err);
         process.exit(1);
     });
 
-    process.on('unhandledRejection', (err) => {
+    process.on('unhandledRejection', err => {
         logger.error('Unhandled Rejection:', err);
         process.exit(1);
     });
 };
 
 const setupHttpErrorHandlers = (server, port) => {
-    server.on('error', (error) => {
+    server.on('error', error => {
         if (error.syscall !== 'listen') {
             throw error;
         }
 
-        const bind = typeof port === 'string'
-            ? 'Pipe ' + port
-            : 'Port ' + port;
+        const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
         switch (error.code) {
             case 'EACCES':
@@ -104,5 +109,5 @@ module.exports = {
     notFoundHandler,
     errorHandler,
     setupProcessErrorHandlers,
-    setupHttpErrorHandlers
-}; 
+    setupHttpErrorHandlers,
+};

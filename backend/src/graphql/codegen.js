@@ -21,14 +21,15 @@ try {
 
         // Verifier à nouveau l'existence du fichier
         if (!fs.existsSync(schemaPath)) {
-            throw new Error(`Le fichier schema.graphql n'existe pas à l'emplacement: ${schemaPath}`);
+            throw new Error(
+                `Le fichier schema.graphql n'existe pas à l'emplacement: ${schemaPath}`
+            );
         }
     }
 
     // Charger le fichier schema.graphql
     typeDefs = fs.readFileSync(schemaPath, 'utf8');
     console.log('[GraphQL] Schema charge avec succes depuis:', schemaPath);
-
 } catch (error) {
     console.error('[GraphQL] Erreur lors du chargement du schema:', error);
     throw new Error('Impossible de charger le schema GraphQL: ' + error.message);

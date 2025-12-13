@@ -61,7 +61,7 @@ const filesToExport = [
     'test-env.js',
     'test-logs.js',
     'testGithubService.js',
-    'tools/test-generator.js'
+    'tools/test-generator.js',
 ];
 
 // Chemin du fichier de sortie
@@ -74,7 +74,7 @@ async function exportCode() {
     try {
         let outputContent = '';
 
-        console.log('🚀 Debut de l\'export des fichiers...\n');
+        console.log("🚀 Debut de l'export des fichiers...\n");
 
         for (const file of filesToExport) {
             const filePath = path.resolve(file);
@@ -92,7 +92,7 @@ async function exportCode() {
         fs.writeFileSync(outputFile, outputContent, 'utf-8');
         console.log(`\n✅ Code exporte avec succes dans : ${outputFile}`);
     } catch (error) {
-        console.error('❌ Erreur lors de l\'exportation :', error.message);
+        console.error("❌ Erreur lors de l'exportation :", error.message);
     }
 }
 

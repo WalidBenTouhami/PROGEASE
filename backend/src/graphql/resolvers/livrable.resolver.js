@@ -39,12 +39,12 @@ function mapLivrableMongoVersGraphQL(doc) {
             projetId: doc.projetId?.toString() || '',
             creeLe: doc.creeLe || new Date(),
             majLe: doc.majLe || new Date(),
-            estEnRetard: doc.estEnRetard || false
+            estEnRetard: doc.estEnRetard || false,
         };
     } catch (error) {
         logger.error('Error mapping livrable:', {
             error: error.message,
-            docId: doc?._id
+            docId: doc?._id,
         });
         return null;
     }
@@ -80,7 +80,7 @@ const Query = {
             livrables,
             total,
             page,
-            pages: Math.ceil(total / limit)
+            pages: Math.ceil(total / limit),
         };
     }),
 
@@ -109,7 +109,7 @@ const Query = {
             .populate('commentaires.auteur');
 
         return livrables;
-    })
+    }),
 };
 
 const Mutation = {
@@ -207,7 +207,7 @@ const Mutation = {
 
         livrable.fichiers.push({
             ...fichier,
-            dateUpload: new Date()
+            dateUpload: new Date(),
         });
 
         await livrable.save();
@@ -248,7 +248,7 @@ const Mutation = {
         livrable.commentaires.push({
             auteur: utilisateur.id,
             contenu: commentaire.contenu,
-            dateCreation: new Date()
+            dateCreation: new Date(),
         });
 
         await livrable.save();
@@ -299,10 +299,10 @@ const Mutation = {
         await livrable.save();
 
         return livrable.populate('projet').populate('commentaires.auteur');
-    })
+    }),
 };
 
 module.exports = {
     Query,
-    Mutation
+    Mutation,
 };

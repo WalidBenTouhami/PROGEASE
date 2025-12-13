@@ -1,4 +1,10 @@
-const { ApolloError, ValidationError, UserInputError, AuthenticationError, ForbiddenError } = require('apollo-server-express');
+const {
+    ApolloError,
+    ValidationError,
+    UserInputError,
+    AuthenticationError,
+    ForbiddenError,
+} = require('apollo-server-express');
 const { MongoError } = require('mongodb');
 const { JsonWebTokenError, TokenExpiredError } = require('jsonwebtoken');
 const { ValidationError: MongooseValidationError } = require('mongoose');
@@ -19,7 +25,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
         stack: err.stack,
         path: req.path,
         method: req.method,
-        ip: req.ip
+        ip: req.ip,
     });
 
     // Gestion des erreurs en fonction de l'environnement
@@ -28,7 +34,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
             succes: false,
             message: err.message,
             erreur: err,
-            stack: err.stack
+            stack: err.stack,
         });
     }
 
@@ -36,7 +42,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
     if (err instanceof AppError) {
         return res.status(err.statusCode).json({
             succes: false,
-            message: err.message
+            message: err.message,
         });
     }
 
@@ -45,7 +51,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
         return res.status(400).json({
             succes: false,
             message: err.message,
-            code: err.extensions?.code
+            code: err.extensions?.code,
         });
     }
 
@@ -54,7 +60,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
         return res.status(400).json({
             succes: false,
             message: err.message,
-            erreurs: err.extensions?.exception?.errors
+            erreurs: err.extensions?.exception?.errors,
         });
     }
 
@@ -63,7 +69,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
         return res.status(400).json({
             succes: false,
             message: err.message,
-            erreurs: err.extensions?.exception?.errors
+            erreurs: err.extensions?.exception?.errors,
         });
     }
 
@@ -71,7 +77,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
     if (err instanceof AuthenticationError) {
         return res.status(401).json({
             succes: false,
-            message: err.message
+            message: err.message,
         });
     }
 
@@ -79,7 +85,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
     if (err instanceof ForbiddenError) {
         return res.status(403).json({
             succes: false,
-            message: err.message
+            message: err.message,
         });
     }
 
@@ -89,7 +95,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
             const champ = Object.keys(err.keyPattern)[0];
             return res.status(400).json({
                 succes: false,
-                message: `Un document avec cette valeur de ${champ} existe déjà`
+                message: `Un document avec cette valeur de ${champ} existe déjà`,
             });
         }
     }
@@ -100,7 +106,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
         return res.status(400).json({
             succes: false,
             message: 'Erreur de validation des données',
-            erreurs
+            erreurs,
         });
     }
 
@@ -108,14 +114,14 @@ const gestionnaireErreurs = (err, req, res, next) => {
     if (err instanceof JsonWebTokenError) {
         return res.status(401).json({
             succes: false,
-            message: 'Token d\'authentification invalide'
+            message: "Token d'authentification invalide",
         });
     }
 
     if (err instanceof TokenExpiredError) {
         return res.status(401).json({
             succes: false,
-            message: 'Token d\'authentification expiré'
+            message: "Token d'authentification expiré",
         });
     }
 
@@ -123,7 +129,7 @@ const gestionnaireErreurs = (err, req, res, next) => {
     logger.error('Erreur non gérée:', err);
     return res.status(500).json({
         succes: false,
-        message: 'Une erreur inattendue est survenue'
+        message: 'Une erreur inattendue est survenue',
     });
 };
 
@@ -144,5 +150,5 @@ const requeteNonAutorisee = (req, res, next) => {
 module.exports = {
     gestionnaireErreurs,
     routeNonTrouvee,
-    requeteNonAutorisee
-}; 
+    requeteNonAutorisee,
+};

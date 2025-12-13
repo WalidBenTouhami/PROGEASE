@@ -21,11 +21,11 @@ if (!DEEPSEEK_API_KEY) {
 const client = axios.create({
     baseURL: 'https://api.deepseek.com/v1',
     headers: {
-        'Authorization': `Bearer ${DEEPSEEK_API_KEY}`,
-        'Content-Type': 'application/json'
+        Authorization: `Bearer ${DEEPSEEK_API_KEY}`,
+        'Content-Type': 'application/json',
     },
     timeout: 30000, // 30s timeout
-    validateStatus: status => status < 500 // Accepter tous les codes de statut < 500
+    validateStatus: status => status < 500, // Accepter tous les codes de statut < 500
 });
 
 // Configuration des modeles IA
@@ -34,7 +34,7 @@ const CONFIG = {
     MAX_TOKENS: parseInt(process.env.AI_MAX_TOKENS || '1000', 10),
     TEMPERATURE: parseFloat(process.env.AI_TEMPERATURE || '0.7'),
     RETRY_LIMIT: parseInt(process.env.AI_RETRY_LIMIT || '3', 10),
-    RETRY_DELAY: parseInt(process.env.AI_RETRY_DELAY || '1000', 10)
+    RETRY_DELAY: parseInt(process.env.AI_RETRY_DELAY || '1000', 10),
 };
 
 /**
@@ -42,7 +42,7 @@ const CONFIG = {
  * @param {number} ms - Delai en millisecondes
  * @returns {Promise<void>}
  */
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Gere les erreurs dans le processus IA avec logging detaille
@@ -58,16 +58,17 @@ async function gererErreurIA(erreur, prompt = 'N/A', reponse = null) {
         status: erreur.response?.status,
         promptLength: prompt.length,
         modelUsed: CONFIG.MODEL,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
     };
 
     logger.error('❌ Erreur lors du traitement IA', errorDetails);
 
     if (reponse) {
         logger.error('❌ Reponse IA partielle:', {
-            response: typeof reponse === 'string'
-                ? reponse.substring(0, 500)
-                : JSON.stringify(reponse).substring(0, 500)
+            response:
+                typeof reponse === 'string'
+                    ? reponse.substring(0, 500)
+                    : JSON.stringify(reponse).substring(0, 500),
         });
     }
 
@@ -83,7 +84,7 @@ async function gererErreurIA(erreur, prompt = 'N/A', reponse = null) {
 async function genererTexte(prompt) {
     try {
         logger.info('Génération de texte en cours', {
-            promptLength: prompt.length
+            promptLength: prompt.length,
         });
 
         // En mode test, retourner une réponse prédéfinie
@@ -116,9 +117,9 @@ function validerReponseJSON(reponse) {
     } catch (erreur) {
         logger.warn('echec de parsing JSON direct', {
             error: erreur.message,
-            responsePreview: reponse.substring(0, 100)
+            responsePreview: reponse.substring(0, 100),
         });
-        throw new Error('La reponse de l\'IA n\'est pas un JSON valide');
+        throw new Error("La reponse de l'IA n'est pas un JSON valide");
     }
 }
 
@@ -131,8 +132,8 @@ function validerReponseJSON(reponse) {
  * @returns {string} - Analyse générée par l'IA
  */
 async function generateAIAnalysis({ projet, score, criteria }) {
-  try {
-    const prompt = `
+    try {
+        const prompt = `
       Analysez cette évaluation de projet :
       Projet : ${projet.titre}
       Description : ${projet.description}
@@ -147,22 +148,22 @@ async function generateAIAnalysis({ projet, score, criteria }) {
       4. Suggestions de développement des compétences
     `;
 
-    const response = await client.post('/chat/completions', {
-      model: CONFIG.MODEL,
-      messages: [{ role: 'utilisateur', content: prompt }],
-      max_tokens: CONFIG.MAX_TOKENS,
-      temperature: CONFIG.TEMPERATURE
-    });
+        const response = await client.post('/chat/completions', {
+            model: CONFIG.MODEL,
+            messages: [{ role: 'utilisateur', content: prompt }],
+            max_tokens: CONFIG.MAX_TOKENS,
+            temperature: CONFIG.TEMPERATURE,
+        });
 
-    if (!response.data?.choices?.[0]?.message?.content) {
-      throw new Error('Réponse API invalide');
+        if (!response.data?.choices?.[0]?.message?.content) {
+            throw new Error('Réponse API invalide');
+        }
+
+        return response.data.choices[0].message.content;
+    } catch (error) {
+        logger.error("Erreur lors de la génération de l'analyse IA:", error);
+        throw new Error("Impossible de générer l'analyse IA pour le moment.");
     }
-
-    return response.data.choices[0].message.content;
-  } catch (error) {
-    logger.error('Erreur lors de la génération de l\'analyse IA:', error);
-    throw new Error('Impossible de générer l\'analyse IA pour le moment.');
-  }
 }
 
 /**
@@ -171,12 +172,14 @@ async function generateAIAnalysis({ projet, score, criteria }) {
  * @returns {Object} - Métriques de performance prédites
  */
 async function predictPerformance(history) {
-  try {
-    if (!history || history.length === 0) {
-      throw new Error('Les données historiques sont nécessaires pour la prédiction de performance.');
-    }
+    try {
+        if (!history || history.length === 0) {
+            throw new Error(
+                'Les données historiques sont nécessaires pour la prédiction de performance.'
+            );
+        }
 
-    const prompt = `
+        const prompt = `
       Basé sur ces évaluations historiques :
       ${JSON.stringify(history)}
       
@@ -187,28 +190,28 @@ async function predictPerformance(history) {
       4. Probabilité de succès
     `;
 
-    const response = await client.chat.completions.create({
-      model: CONFIG.MODEL,
-      messages: [{ role: 'utilisateur', content: prompt }],
-      max_tokens: CONFIG.MAX_TOKENS
-    });
+        const response = await client.chat.completions.create({
+            model: CONFIG.MODEL,
+            messages: [{ role: 'utilisateur', content: prompt }],
+            max_tokens: CONFIG.MAX_TOKENS,
+        });
 
-    const confidence = calculateConfidence(history);
-    const confidenceLevel = getConfidenceLevel(confidence);
+        const confidence = calculateConfidence(history);
+        const confidenceLevel = getConfidenceLevel(confidence);
 
-    return {
-      prediction: response.choices[0].message.content,
-      confidence: confidence,
-      niveauConfiance: confidenceLevel
-    };
-  } catch (error) {
-    console.error('Erreur lors de la prédiction de performance:', error);
-    return {
-      prediction: 'Impossible de générer la prédiction pour le moment.',
-      confidence: 0,
-      niveauConfiance: 'FAIBLE'
-    };
-  }
+        return {
+            prediction: response.choices[0].message.content,
+            confidence: confidence,
+            niveauConfiance: confidenceLevel,
+        };
+    } catch (error) {
+        logger.error('Erreur lors de la prédiction de performance:', error);
+        return {
+            prediction: 'Impossible de générer la prédiction pour le moment.',
+            confidence: 0,
+            niveauConfiance: 'FAIBLE',
+        };
+    }
 }
 
 /**
@@ -217,9 +220,9 @@ async function predictPerformance(history) {
  * @returns {number} - Score de confiance (0-1)
  */
 function calculateConfidence(history) {
-  const recentEvaluations = history.slice(-3);
-  const scoreVariance = calculateVariance(recentEvaluations.map(e => e.score));
-  return Math.max(0, 1 - (scoreVariance / 100));
+    const recentEvaluations = history.slice(-3);
+    const scoreVariance = calculateVariance(recentEvaluations.map(e => e.score));
+    return Math.max(0, 1 - scoreVariance / 100);
 }
 
 /**
@@ -228,11 +231,11 @@ function calculateConfidence(history) {
  * @returns {string} - Niveau de confiance
  */
 function getConfidenceLevel(confidence) {
-  if (confidence >= 0.9) return 'TRÈS ÉLEVÉ';
-  if (confidence >= 0.7) return 'ÉLEVÉ';
-  if (confidence >= 0.5) return 'MOYEN';
-  if (confidence >= 0.3) return 'FAIBLE';
-  return 'TRÈS FAIBLE';
+    if (confidence >= 0.9) return 'TRÈS ÉLEVÉ';
+    if (confidence >= 0.7) return 'ÉLEVÉ';
+    if (confidence >= 0.5) return 'MOYEN';
+    if (confidence >= 0.3) return 'FAIBLE';
+    return 'TRÈS FAIBLE';
 }
 
 /**
@@ -241,8 +244,8 @@ function getConfidenceLevel(confidence) {
  * @returns {number} - Variance
  */
 function calculateVariance(scores) {
-  const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
-  return scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length;
+    const mean = scores.reduce((a, b) => a + b, 0) / scores.length;
+    return scores.reduce((a, b) => a + Math.pow(b - mean, 2), 0) / scores.length;
 }
 
 /**
@@ -252,8 +255,8 @@ function calculateVariance(scores) {
  * @returns {Object} - Recommandations d'apprentissage
  */
 async function generateLearningRecommendations(projet, evaluations) {
-  try {
-    const prompt = `
+    try {
+        const prompt = `
       Basé sur ce projet et ses évaluations :
       Projet : ${projet.titre}
       Compétences : ${projet.skills.join(', ')}
@@ -266,25 +269,25 @@ async function generateLearningRecommendations(projet, evaluations) {
       4. Prochaines étapes pour l'amélioration
     `;
 
-    const response = await client.post('/chat/completions', {
-      model: CONFIG.MODEL,
-      messages: [{ role: 'utilisateur', content: prompt }],
-      max_tokens: CONFIG.MAX_TOKENS,
-      temperature: CONFIG.TEMPERATURE
-    });
+        const response = await client.post('/chat/completions', {
+            model: CONFIG.MODEL,
+            messages: [{ role: 'utilisateur', content: prompt }],
+            max_tokens: CONFIG.MAX_TOKENS,
+            temperature: CONFIG.TEMPERATURE,
+        });
 
-    if (!response.data?.choices?.[0]?.message?.content) {
-      throw new Error('Réponse API invalide');
+        if (!response.data?.choices?.[0]?.message?.content) {
+            throw new Error('Réponse API invalide');
+        }
+
+        return {
+            recommendations: response.data.choices[0].message.content,
+            priorite: calculatePriority(projet, evaluations),
+        };
+    } catch (error) {
+        logger.error('Erreur lors de la génération des recommandations:', error);
+        throw new Error('Impossible de générer les recommandations pour le moment.');
     }
-
-    return {
-      recommendations: response.data.choices[0].message.content,
-      priorite: calculatePriority(projet, evaluations)
-    };
-  } catch (error) {
-    logger.error('Erreur lors de la génération des recommandations:', error);
-    throw new Error('Impossible de générer les recommandations pour le moment.');
-  }
 }
 
 /**
@@ -294,10 +297,11 @@ async function generateLearningRecommendations(projet, evaluations) {
  * @returns {string} - Niveau de priorité
  */
 function calculatePriority(projet, evaluations) {
-  const averageScore = evaluations.reduce((sum, eval) => sum + eval.score, 0) / evaluations.length;
-  if (averageScore < 10) return 'HAUTE';
-  if (averageScore < 15) return 'MOYENNE';
-  return 'BASSE';
+    const averageScore =
+        evaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / evaluations.length;
+    if (averageScore < 10) return 'HAUTE';
+    if (averageScore < 15) return 'MOYENNE';
+    return 'BASSE';
 }
 
 /**
@@ -332,11 +336,11 @@ function extraireJSONDepuisReponse(reponse) {
 
         throw new Error('Aucun JSON trouve dans la reponse');
     } catch (erreur) {
-        logger.error('echec d\'extraction JSON', {
+        logger.error("echec d'extraction JSON", {
             error: erreur.message,
-            responsePreview: reponse.substring(0, 300)
+            responsePreview: reponse.substring(0, 300),
         });
-        throw new Error('Impossible d\'extraire le JSON de la reponse IA');
+        throw new Error("Impossible d'extraire le JSON de la reponse IA");
     }
 }
 
@@ -346,9 +350,9 @@ function extraireJSONDepuisReponse(reponse) {
  * @returns {Promise<any>} - Objet JS resultant
  */
 async function traiterReponseIA(prompt) {
-    logger.info('Traitement d\'une requete IA', {
+    logger.info("Traitement d'une requete IA", {
         promptLength: prompt.length,
-        model: CONFIG.MODEL
+        model: CONFIG.MODEL,
     });
 
     try {
@@ -356,7 +360,7 @@ async function traiterReponseIA(prompt) {
             model: CONFIG.MODEL,
             messages: [{ role: 'utilisateur', content: prompt }],
             max_tokens: CONFIG.MAX_TOKENS,
-            temperature: CONFIG.TEMPERATURE
+            temperature: CONFIG.TEMPERATURE,
         });
 
         if (!response.data?.choices?.[0]?.message?.content) {
@@ -368,7 +372,7 @@ async function traiterReponseIA(prompt) {
         try {
             return validerReponseJSON(reponse);
         } catch (erreur) {
-            logger.warn('⚠️ Tentative d\'extraction JSON depuis la reponse IA');
+            logger.warn("⚠️ Tentative d'extraction JSON depuis la reponse IA");
             return extraireJSONDepuisReponse(reponse);
         }
     } catch (error) {
@@ -385,69 +389,65 @@ async function traiterReponseIA(prompt) {
 async function analyserProjet(donnees) {
     try {
         logger.info('Analyse de projet en cours', {
-            dataSize: JSON.stringify(donnees).length
+            dataSize: JSON.stringify(donnees).length,
         });
 
         // En mode test, retourner des données de test
         return {
             analyse: {
-                complexite: "MOYENNE",
-                dureeEstimee: "3 mois",
-                risques: ["Délais serrés", "Dépendances techniques"],
-                points_forts: [
-                    "Équipe expérimentée",
-                    "Technologies modernes",
-                    "Objectifs clairs"
-                ],
+                complexite: 'MOYENNE',
+                dureeEstimee: '3 mois',
+                risques: ['Délais serrés', 'Dépendances techniques'],
+                points_forts: ['Équipe expérimentée', 'Technologies modernes', 'Objectifs clairs'],
                 recommandations: [
-                    "Mettre en place des tests automatisés",
-                    "Planifier des revues de code régulières",
-                    "Documenter les choix techniques"
-                ]
+                    'Mettre en place des tests automatisés',
+                    'Planifier des revues de code régulières',
+                    'Documenter les choix techniques',
+                ],
             },
             competences: {
-                requises: ["JavaScript", "Node.js", "React", "MongoDB"],
-                recommandees: ["TypeScript", "Jest", "Docker"],
-                niveau: "INTERMEDIAIRE"
+                requises: ['JavaScript', 'Node.js', 'React', 'MongoDB'],
+                recommandees: ['TypeScript', 'Jest', 'Docker'],
+                niveau: 'INTERMEDIAIRE',
             },
             planning: {
                 phases: [
                     {
-                        nom: "Conception",
-                        duree: "2 semaines",
-                        livrables: ["Documentation technique", "Maquettes"]
+                        nom: 'Conception',
+                        duree: '2 semaines',
+                        livrables: ['Documentation technique', 'Maquettes'],
                     },
                     {
-                        nom: "Développement",
-                        duree: "8 semaines",
-                        livrables: ["MVP", "Tests unitaires"]
+                        nom: 'Développement',
+                        duree: '8 semaines',
+                        livrables: ['MVP', 'Tests unitaires'],
                     },
                     {
-                        nom: "Tests",
-                        duree: "2 semaines",
-                        livrables: ["Rapport de tests", "Corrections de bugs"]
-                    }
+                        nom: 'Tests',
+                        duree: '2 semaines',
+                        livrables: ['Rapport de tests', 'Corrections de bugs'],
+                    },
                 ],
                 jalons: [
                     {
-                        nom: "Validation conception",
-                        date: "2025-06-15"
+                        nom: 'Validation conception',
+                        date: '2025-06-15',
                     },
                     {
-                        nom: "Revue MVP",
-                        date: "2025-07-30"
+                        nom: 'Revue MVP',
+                        date: '2025-07-30',
                     },
                     {
-                        nom: "Livraison finale",
-                        date: "2025-08-15"
-                    }
-                ]
-            }
+                        nom: 'Livraison finale',
+                        date: '2025-08-15',
+                    },
+                ],
+            },
         };
-  } catch (error) {
-        logger.error('echec de l\'analyse du projet:', error);
+    } catch (error) {
+        logger.error("echec de l'analyse du projet:", error);
         throw error;
-  }
+    }
 }
 
 /**
@@ -472,27 +472,23 @@ async function suiviProgression(taches) {
     }
 
     // Calculer les statistiques
-    const terminees = taches.filter(t =>
-        t.statut === 'terminee' ||
-      t.statut === 'complete' ||
-      t.statut === 'Termine'
+    const terminees = taches.filter(
+        t => t.statut === 'terminee' || t.statut === 'complete' || t.statut === 'Termine'
     ).length;
 
-    const enCours = taches.filter(t =>
-        t.statut === 'en cours' ||
-      t.statut === 'En cours' ||
-      t.statut === 'En attente'
+    const enCours = taches.filter(
+        t => t.statut === 'en cours' || t.statut === 'En cours' || t.statut === 'En attente'
     ).length;
 
     const total = taches.length;
     const pourcentage = Math.round((terminees / total) * 100);
 
-  return {
+    return {
         totalTaches: total,
         tachesTerminees: terminees,
         tachesEnCours: enCours,
         pourcentageProgression: pourcentage,
-  };
+    };
 }
 
 /**
@@ -524,14 +520,14 @@ async function predirePerformance(historique) {
     const tendance = moyenneSeconde < moyennePremiere ? 'amelioration' : 'deterioration';
     const tauxVariation = Math.abs((moyenneSeconde - moyennePremiere) / moyennePremiere) * 100;
 
-  return {
+    return {
         tempsMoyenRealisation: tempsMoyen.toFixed(2),
         ecartType: ecartType.toFixed(2),
         tendance,
         tauxVariation: tauxVariation.toFixed(1) + '%',
         estimation: `${tempsMoyen.toFixed(1)} ± ${ecartType.toFixed(1)} heures`,
-        prediction: `Temps estime pour la prochaine tâche: ${tempsMoyen.toFixed(2)} heures avec tendance à l'${tendance}.`
-  };
+        prediction: `Temps estime pour la prochaine tâche: ${tempsMoyen.toFixed(2)} heures avec tendance à l'${tendance}.`,
+    };
 }
 
 /**
@@ -546,12 +542,12 @@ async function genererPlanning(taches) {
     }
 
     // Verifier que chaque tâche a priorite et duree
-    const tachesInvalides = taches.filter(t =>
-        typeof t.priorite === 'undefined' || typeof t.duree === 'undefined'
+    const tachesInvalides = taches.filter(
+        t => typeof t.priorite === 'undefined' || typeof t.duree === 'undefined'
     );
 
     if (tachesInvalides.length > 0) {
-        throw new Error('Certaines tâches n\'ont pas de priorite ou de duree definie.');
+        throw new Error("Certaines tâches n'ont pas de priorite ou de duree definie.");
     }
 
     // Tri par priorite decroissante (plus la priorite est elevee, plus tôt la tâche est planifiee)
@@ -567,7 +563,7 @@ async function genererPlanning(taches) {
         return {
             ...tache,
             debut,
-            fin
+            fin,
         };
     });
 
@@ -623,7 +619,7 @@ async function creerEquipes(membres) {
 async function associerTuteurs(membres) {
     // Validation
     if (!Array.isArray(membres) || membres.length === 0) {
-        throw new Error('Liste de membres vide. Impossible d\'associer les tuteurs.');
+        throw new Error("Liste de membres vide. Impossible d'associer les tuteurs.");
     }
 
     // Utilisation de l'IA pour associer tuteurs et equipes
@@ -703,26 +699,26 @@ module.exports = {
     // Core AI functions
     genererTexte,
     analyserProjet,
-    
+
     // Team and tutor management
     creerEquipes,
     associerTuteurs,
-    
+
     // Progress tracking and analytics
     suiviProgression,
     predirePerformance,
     genererPlanning,
-    
+
     // Learning and recommendations
     recommanderApprentissage,
     generateAIAnalysis,
-    
+
     // Helper functions
     validerReponseJSON,
     extraireJSONDepuisReponse,
     traiterReponseIA,
-    
+
     // Backward compatibility aliases
     generateLearningRecommendations: recommanderApprentissage,
-    predictPerformance: predirePerformance
+    predictPerformance: predirePerformance,
 };

@@ -37,12 +37,12 @@ function mapEvaluationMongoVersGraphQL(doc) {
             evaluateur: doc.evaluateurId,
             dateEvaluation: doc.dateEvaluation,
             creeLe: doc.creeLe,
-            majLe: doc.majLe
+            majLe: doc.majLe,
         };
     } catch (error) {
         logger.error('Error mapping evaluation:', {
             error: error.message,
-            docId: doc?._id
+            docId: doc?._id,
         });
         return null;
     }
@@ -86,12 +86,7 @@ const Query = {
         try {
             // Validate projet ID
             if (!mongoose.Types.ObjectId.isValid(projetId)) {
-                throw new AppError(
-                    'Invalid projet ID',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
+                throw new AppError('Invalid projet ID', 400, ERROR_CODES.BAD_REQUEST, true);
             }
 
             const evaluations = await Evaluation.find({ projetId: projetId });
@@ -101,7 +96,7 @@ const Query = {
                     moyenneScore: 0,
                     scoreMax: 0,
                     scoreMin: 0,
-                    totalEvaluations: 0
+                    totalEvaluations: 0,
                 };
             }
 
@@ -115,7 +110,7 @@ const Query = {
                 moyenneScore,
                 scoreMax,
                 scoreMin,
-                totalEvaluations
+                totalEvaluations,
             };
         } catch (error) {
             if (error instanceof AppError) throw error;
@@ -124,7 +119,7 @@ const Query = {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId,
-                projetId
+                projetId,
             });
 
             throw new AppError(
@@ -134,7 +129,7 @@ const Query = {
                 false
             );
         }
-    }
+    },
 };
 
 const Mutation = {
@@ -144,7 +139,7 @@ const Mutation = {
             const evaluation = new Evaluation({
                 ...input,
                 evaluateurId: context.utilisateur?._id,
-                dateEvaluation: new Date()
+                dateEvaluation: new Date(),
             });
             await evaluation.save();
             return mapEvaluationMongoVersGraphQL(evaluation);
@@ -180,11 +175,11 @@ const Mutation = {
             logger.error('Error deleting evaluation:', error);
             throw new Error('Failed to delete evaluation');
         }
-    }
+    },
 };
 
 const EvaluationResolver = {
-    id: (parent) => parent._id.toString(),
+    id: parent => parent._id.toString(),
     projet: async (parent, _, context) => {
         try {
             if (!parent.projetId) return null;
@@ -198,18 +193,20 @@ const EvaluationResolver = {
     evaluateur: async (parent, _, context) => {
         try {
             if (!parent.evaluateurId) return null;
-            const utilisateur = await context.loaders.utilisateurLoader.load(parent.evaluateurId.toString());
+            const utilisateur = await context.loaders.utilisateurLoader.load(
+                parent.evaluateurId.toString()
+            );
             return utilisateur;
         } catch (error) {
             logger.error(`Error loading evaluator for evaluation ${parent.id}:`, error);
             return null;
         }
-    }
+    },
 };
 
 module.exports = {
     Query,
     Mutation,
     EvaluationResolver,
-    mapEvaluationMongoVersGraphQL
-}; 
+    mapEvaluationMongoVersGraphQL,
+};

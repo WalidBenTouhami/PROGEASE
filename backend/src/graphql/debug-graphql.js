@@ -18,7 +18,7 @@ const colors = {
     yellow: '\x1b[33m',
     blue: '\x1b[34m',
     gray: '\x1b[90m',
-    cyan: '\x1b[36m'
+    cyan: '\x1b[36m',
 };
 
 // Fonction d'aide pour les textes colores
@@ -29,7 +29,7 @@ function colorize(text, color) {
 // Interface readline
 const rl = readline.createInterface({
     input: process.stdin,
-    output: process.stdout
+    output: process.stdout,
 });
 
 // Requetes preconfigurees
@@ -126,7 +126,7 @@ const presetQueries = {
             statut
             estEnRetard
         }
-    }`
+    }`,
 };
 
 // Afficher la banniere
@@ -135,7 +135,7 @@ function showBanner() {
     console.log('║               PROGEASE - Console GraphQL Debug               ║');
     console.log('╟──────────────────────────────────────────────────────────────╢');
     console.log('║ Entrez votre requete GraphQL ou tapez:                       ║');
-    console.log('║  .help    pour afficher l\'aide                               ║');
+    console.log("║  .help    pour afficher l'aide                               ║");
     console.log('║  .exit    pour quitter                                       ║');
     console.log('║  .preset  pour utiliser une requete predefinie               ║');
     console.log('╚══════════════════════════════════════════════════════════════╝');
@@ -148,20 +148,32 @@ function showHelp() {
     console.log(colorize('  .help   - Affiche cette aide', 'gray'));
     console.log(colorize('  .exit   - Quitte la console', 'gray'));
     console.log(colorize('  .preset - Affiche les requetes preconfigurees', 'gray'));
-    console.log(colorize('  .clear  - Efface l\'ecran', 'gray'));
+    console.log(colorize("  .clear  - Efface l'ecran", 'gray'));
 
     console.log(colorize('\nExemples de requetes:', 'yellow'));
     console.log(colorize('  query { healthCheck { status timestamp } }', 'gray'));
-    console.log(colorize('  query { projets(page: 1, limit: 10) { items { _id titre } } }', 'gray'));
+    console.log(
+        colorize('  query { projets(page: 1, limit: 10) { items { _id titre } } }', 'gray')
+    );
     console.log(colorize('  query { projet(id: "1") { titre livrables { intitule } } }', 'gray'));
 
     console.log(colorize('\nExemple avec variables:', 'yellow'));
-    console.log(colorize(`  {
+    console.log(
+        colorize(
+            `  {
     "query": "query GetProjet($id: ID!) { projet(id: $id) { _id titre livrables { intitule } } }",
     "variables": { "id": "1" }
-  }`, 'gray'));
+  }`,
+            'gray'
+        )
+    );
 
-    console.log(colorize('\nNote: Pour envoyer une requete avec variables, utilisez un objet JSON complet', 'blue'));
+    console.log(
+        colorize(
+            '\nNote: Pour envoyer une requete avec variables, utilisez un objet JSON complet',
+            'blue'
+        )
+    );
     console.log();
 }
 
@@ -197,14 +209,13 @@ async function executeQuery(input) {
         const response = await axios.post(GRAPHQL_URL, requestBody, {
             headers: {
                 'Content-Type': 'application/json',
-                'X-utilisateur': 'WalidBenTouhami'
+                'X-utilisateur': 'WalidBenTouhami',
             },
-            timeout: 5000
+            timeout: 5000,
         });
 
         console.log(colorize('\n✅ Resultat:', 'green'));
         console.log(JSON.stringify(response.data, null, 2));
-
     } catch (err) {
         console.log(colorize('\n❌ Erreur:', 'red'));
 
@@ -225,7 +236,7 @@ function startConsole() {
     rl.setPrompt(colorize('GraphQL> ', 'cyan'));
     rl.prompt();
 
-    rl.on('line', async (line) => {
+    rl.on('line', async line => {
         const input = line.trim();
 
         if (input === '.help') {
@@ -244,7 +255,12 @@ function startConsole() {
             if (presetQueries[presetName]) {
                 await executeQuery(presetQueries[presetName]);
             } else {
-                console.log(colorize(`Preset "${presetName}" non trouve. Utilisez .preset pour voir les options disponibles.`, 'red'));
+                console.log(
+                    colorize(
+                        `Preset "${presetName}" non trouve. Utilisez .preset pour voir les options disponibles.`,
+                        'red'
+                    )
+                );
             }
         } else if (input) {
             await executeQuery(input);
@@ -258,7 +274,11 @@ function startConsole() {
 async function checkServerAvailability() {
     try {
         console.log(colorize('🔄 Verification de la connexion au serveur GraphQL...', 'blue'));
-        await axios.post(GRAPHQL_URL, { query: '{ __schema { queryType { name } } }' }, { timeout: 3000 });
+        await axios.post(
+            GRAPHQL_URL,
+            { query: '{ __schema { queryType { name } } }' },
+            { timeout: 3000 }
+        );
         console.log(colorize('✅ Serveur GraphQL accessible\n', 'green'));
         return true;
     } catch (err) {
@@ -266,14 +286,14 @@ async function checkServerAvailability() {
         if (err.response) {
             console.log(colorize(`   Code d'erreur: ${err.response.status}`, 'gray'));
         } else if (err.code === 'ECONNREFUSED') {
-            console.log(colorize('   Le serveur n\'est pas en cours d\'execution', 'gray'));
+            console.log(colorize("   Le serveur n'est pas en cours d'execution", 'gray'));
         } else {
             console.log(colorize(`   ${err.message}`, 'gray'));
         }
 
         console.log(colorize('\nVoulez-vous continuer quand meme? (o/N)', 'yellow'));
-        return new Promise((resolve) => {
-            rl.question('', (answer) => {
+        return new Promise(resolve => {
+            rl.question('', answer => {
                 resolve(answer.toLowerCase() === 'o');
             });
         });

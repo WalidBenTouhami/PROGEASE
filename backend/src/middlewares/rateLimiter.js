@@ -13,13 +13,13 @@ const rateLimiter = ({ windowMs = 15 * 60 * 1000, max = 100 } = {}) => {
         max,
         message: {
             success: false,
-            message: 'Trop de requêtes, veuillez réessayer plus tard.'
+            message: 'Trop de requêtes, veuillez réessayer plus tard.',
         },
         standardHeaders: true,
-        legacyHeaders: false
+        legacyHeaders: false,
     });
 };
 
 module.exports = {
-    rateLimiter
-}; 
+    rateLimiter,
+};

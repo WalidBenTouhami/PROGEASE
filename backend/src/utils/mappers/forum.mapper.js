@@ -15,13 +15,7 @@ const Forum = require('../forum.class');
 function mapperMongoVersForum(doc) {
     if (!doc) return null;
 
-    const forum = new Forum(
-        doc._id,
-        doc.titre,
-        doc.contenu,
-        doc.categorie,
-        doc.auteur
-    );
+    const forum = new Forum(doc._id, doc.titre, doc.contenu, doc.categorie, doc.auteur);
 
     forum.reponses = doc.reponses || [];
     forum.vues = doc.vues || 0;
@@ -49,7 +43,7 @@ function mapperForumVersMongo(forum) {
         votes: forum.votes,
         estResolu: forum.estResolu,
         creeLe: forum.creeLe,
-        majLe: forum.majLe
+        majLe: forum.majLe,
     };
 }
 
@@ -70,7 +64,7 @@ function mapperMongoVersAPI(doc) {
             id: doc.auteur._id.toString(),
             nom: doc.auteur.nom,
             prenom: doc.auteur.prenom,
-            avatar: doc.auteur.avatar
+            avatar: doc.auteur.avatar,
         },
         reponses: (doc.reponses || []).map(reponse => ({
             id: reponse._id.toString(),
@@ -79,32 +73,33 @@ function mapperMongoVersAPI(doc) {
                 id: reponse.auteur._id.toString(),
                 nom: reponse.auteur.nom,
                 prenom: reponse.auteur.prenom,
-                avatar: reponse.auteur.avatar
+                avatar: reponse.auteur.avatar,
             },
             estSolution: reponse.estSolution || false,
             votes: {
                 positifs: reponse.votes?.positifs?.length || 0,
                 negatifs: reponse.votes?.negatifs?.length || 0,
-                score: (reponse.votes?.positifs?.length || 0) - (reponse.votes?.negatifs?.length || 0)
+                score:
+                    (reponse.votes?.positifs?.length || 0) - (reponse.votes?.negatifs?.length || 0),
             },
             creeLe: reponse.creeLe,
-            majLe: reponse.majLe
+            majLe: reponse.majLe,
         })),
         vues: doc.vues || 0,
         votes: {
             positifs: doc.votes?.positifs?.length || 0,
             negatifs: doc.votes?.negatifs?.length || 0,
-            score: (doc.votes?.positifs?.length || 0) - (doc.votes?.negatifs?.length || 0)
+            score: (doc.votes?.positifs?.length || 0) - (doc.votes?.negatifs?.length || 0),
         },
         estResolu: doc.estResolu || false,
         creeLe: doc.creeLe,
         majLe: doc.majLe,
         stats: {
             nombreReponses: doc.reponses?.length || 0,
-            derniereMaj: doc.reponses?.length ? 
-                Math.max(...doc.reponses.map(r => new Date(r.majLe).getTime())) : 
-                new Date(doc.majLe).getTime()
-        }
+            derniereMaj: doc.reponses?.length
+                ? Math.max(...doc.reponses.map(r => new Date(r.majLe).getTime()))
+                : new Date(doc.majLe).getTime(),
+        },
     };
 }
 
@@ -129,19 +124,19 @@ function mapperMongoVersGraphQL(doc) {
             estSolution: reponse.estSolution || false,
             votes: {
                 positifs: reponse.votes?.positifs || [],
-                negatifs: reponse.votes?.negatifs || []
+                negatifs: reponse.votes?.negatifs || [],
             },
             creeLe: reponse.creeLe,
-            majLe: reponse.majLe
+            majLe: reponse.majLe,
         })),
         vues: doc.vues || 0,
         votes: {
             positifs: doc.votes?.positifs || [],
-            negatifs: doc.votes?.negatifs || []
+            negatifs: doc.votes?.negatifs || [],
         },
         estResolu: doc.estResolu || false,
         creeLe: doc.creeLe,
-        majLe: doc.majLe
+        majLe: doc.majLe,
     };
 }
 
@@ -149,5 +144,5 @@ module.exports = {
     mapperMongoVersForum,
     mapperForumVersMongo,
     mapperMongoVersAPI,
-    mapperMongoVersGraphQL
-}; 
+    mapperMongoVersGraphQL,
+};

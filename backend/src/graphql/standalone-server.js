@@ -20,10 +20,10 @@ async function createStandaloneServer(app, httpServer, schema) {
         const server = new ApolloServer({
             schema,
             plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
-            formatError: (error) => {
+            formatError: error => {
                 logger.error('GraphQL Error:', error);
                 return error;
-            }
+            },
         });
 
         await server.start();
@@ -33,8 +33,8 @@ async function createStandaloneServer(app, httpServer, schema) {
             expressMiddleware(server, {
                 context: async ({ req }) => ({
                     currentutilisateur: req.currentutilisateur,
-                    timestamp: req.timestamp
-                })
+                    timestamp: req.timestamp,
+                }),
             })
         );
 
@@ -48,5 +48,5 @@ async function createStandaloneServer(app, httpServer, schema) {
 }
 
 module.exports = {
-    createStandaloneServer
+    createStandaloneServer,
 };

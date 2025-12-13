@@ -26,7 +26,7 @@ async function createTestData() {
             competences: ['Test', 'Newman', 'API'],
             dateDebut: new Date(),
             dateFin: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            statut: Enum.StatutProjet.EN_COURS
+            statut: Enum.StatutProjet.EN_COURS,
         });
 
         await projet.save();
@@ -38,7 +38,7 @@ async function createTestData() {
             description: 'Livrable cree pour les tests automatises',
             dateLimite: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
             projetId: TEST_PROJET_ID,
-            statut: Enum.StatutLivrable.EN_ATTENTE
+            statut: Enum.StatutLivrable.EN_ATTENTE,
         });
 
         await livrable.save();
@@ -58,5 +58,5 @@ async function createTestData() {
 module.exports = {
     TEST_PROJET_ID,
     TEST_LIVRABLE_ID,
-    createTestData
+    createTestData,
 };
