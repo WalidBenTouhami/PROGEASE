@@ -12,7 +12,6 @@
   - `npm test` - Runs all tests (backend + frontend)
   - `npm run test:backend` - Runs backend tests only
   - `npm run test:frontend` - Runs frontend tests only
-  - `npm run test:all` - Runs all tests (backend + frontend)
 
 #### 2. Angular Version Mismatch
 - **Issue**: Root package.json had Angular 18.2.0 while frontend/package.json had Angular 17.3.0
@@ -63,6 +62,13 @@
 5. **Update TypeScript** (if needed):
    - Angular 18 requires TypeScript ~5.2.2 or higher
    - Current version in frontend: `~5.2.2` ✓ (already compatible)
+
+6. **Apollo Angular v7 Breaking Changes**:
+   - Apollo Angular v7 introduces breaking changes from v6
+   - Review and update GraphQL query implementations
+   - Check cache management configuration
+   - Verify subscription handling works correctly
+   - Refer to [Apollo Angular v7 Migration Guide](https://www.apollographql.com/docs/angular/)
 
 ### Additional Notes
 
