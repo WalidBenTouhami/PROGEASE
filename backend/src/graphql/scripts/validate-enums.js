@@ -24,7 +24,7 @@ function extractEnum(name, content) {
 // Extraire toutes les enumerations du schema
 const schemaEnums = {
     StatutProjet: extractEnum('StatutProjet', schemaContent),
-    StatutLivrable: extractEnum('StatutLivrable', schemaContent)
+    StatutLivrable: extractEnum('StatutLivrable', schemaContent),
 };
 
 // Verifier la correspondance
@@ -38,7 +38,9 @@ function checkSync(schemaValues, constantValues, name) {
         console.error(`❌ ${name}: Les enumerations ne sont pas synchronisees!`);
 
         if (missingInSchema.length) {
-            console.error(`   Valeurs manquantes dans schema.graphql: ${missingInSchema.join(', ')}`);
+            console.error(
+                `   Valeurs manquantes dans schema.graphql: ${missingInSchema.join(', ')}`
+            );
         }
 
         if (missingInConst.length) {
@@ -52,7 +54,9 @@ function checkSync(schemaValues, constantValues, name) {
     const schemaOrder = schemaValues.join(',');
     const constOrder = constKeys.join(',');
     if (schemaOrder !== constOrder) {
-        console.warn(`⚠️ ${name}: L'ordre des enumerations differe entre le schema et les constantes`);
+        console.warn(
+            `⚠️ ${name}: L'ordre des enumerations differe entre le schema et les constantes`
+        );
         console.warn('   Schema  :', schemaOrder);
         console.warn('   Constantes:', constOrder);
     }
@@ -64,7 +68,7 @@ function checkSync(schemaValues, constantValues, name) {
 // Verifier toutes les enumerations
 const enumResults = {
     projet: checkSync(schemaEnums.StatutProjet, Enum.StatutProjet, 'StatutProjet'),
-    livrable: checkSync(schemaEnums.StatutLivrable, Enum.StatutLivrable, 'StatutLivrable')
+    livrable: checkSync(schemaEnums.StatutLivrable, Enum.StatutLivrable, 'StatutLivrable'),
 };
 
 // Verifier les references aux enumerations dans les types
@@ -74,7 +78,7 @@ const typeFields = {
     ProjetInput: ['statut: StatutProjet'],
     LivrableInput: ['statut: StatutLivrable'],
     ProjetUpdateInput: ['statut: StatutProjet'],
-    LivrableUpdateInput: ['statut: StatutLivrable']
+    LivrableUpdateInput: ['statut: StatutLivrable'],
 };
 
 Object.entries(typeFields).forEach(([type, fields]) => {

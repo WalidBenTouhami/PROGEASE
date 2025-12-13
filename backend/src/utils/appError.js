@@ -37,8 +37,8 @@ class AppError extends Error {
             ...(Object.keys(this.details).length > 0 && { details: this.details }),
             ...(process.env.NODE_ENV === 'development' && {
                 stack: this.stack,
-                timestamp: this.timestamp
-            })
+                timestamp: this.timestamp,
+            }),
         };
     }
 
@@ -98,4 +98,4 @@ class AppError extends Error {
     }
 }
 
-module.exports = { AppError }; 
+module.exports = { AppError };

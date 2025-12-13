@@ -15,7 +15,7 @@ const resolvers = {
             if (recherche) {
                 query.$or = [
                     { titre: { $regex: recherche, $options: 'i' } },
-                    { description: { $regex: recherche, $options: 'i' } }
+                    { description: { $regex: recherche, $options: 'i' } },
                 ];
             }
 
@@ -30,7 +30,7 @@ const resolvers = {
                 certifications,
                 total,
                 page,
-                pages: Math.ceil(total / limit)
+                pages: Math.ceil(total / limit),
             };
         }),
 
@@ -70,12 +70,15 @@ const resolvers = {
                 throw new UserInputError('Certification obtenue non trouvée');
             }
 
-            if (certificationObtenu.utilisateur.toString() !== utilisateur.id && utilisateur.role !== 'ADMIN') {
+            if (
+                certificationObtenu.utilisateur.toString() !== utilisateur.id &&
+                utilisateur.role !== 'ADMIN'
+            ) {
                 throw new AuthenticationError('Non autorisé à voir cette certification');
             }
 
             return certificationObtenu;
-        })
+        }),
     },
 
     Mutation: {
@@ -139,12 +142,12 @@ const resolvers = {
             }
 
             if (!certification.estActif) {
-                throw new UserInputError('Cette certification n\'est plus active');
+                throw new UserInputError("Cette certification n'est plus active");
             }
 
             const certificationExistante = await CertificationObtenu.findOne({
                 certification: id,
-                utilisateur: utilisateur.id
+                utilisateur: utilisateur.id,
             });
 
             if (certificationExistante) {
@@ -154,111 +157,130 @@ const resolvers = {
             const certificationObtenu = await CertificationObtenu.create({
                 certification: id,
                 utilisateur: utilisateur.id,
-                statut: Enums.StatutCertification.EN_COURS
+                statut: Enums.StatutCertification.EN_COURS,
             });
 
             return certificationObtenu.populate('certification');
         }),
 
-        terminerFormationCertification: catchAsync(async (_, { id, formationId, note }, { utilisateur }) => {
-            if (!utilisateur) {
-                throw new AuthenticationError('Non authentifié');
+        terminerFormationCertification: catchAsync(
+            async (_, { id, formationId, note }, { utilisateur }) => {
+                if (!utilisateur) {
+                    throw new AuthenticationError('Non authentifié');
+                }
+
+                const certificationObtenu = await CertificationObtenu.findById(id);
+                if (!certificationObtenu) {
+                    throw new UserInputError('Certification obtenue non trouvée');
+                }
+
+                if (certificationObtenu.utilisateur.toString() !== utilisateur.id) {
+                    throw new AuthenticationError('Non autorisé');
+                }
+
+                const certification = await Certification.findById(
+                    certificationObtenu.certification
+                );
+                const formationRequise = certification.conditions.formationsRequises.find(
+                    f => f.formation.toString() === formationId
+                );
+
+                if (!formationRequise) {
+                    throw new UserInputError(
+                        "Cette formation n'est pas requise pour cette certification"
+                    );
+                }
+
+                if (note < formationRequise.noteMinimale) {
+                    throw new UserInputError(
+                        `Note insuffisante. Note minimale requise: ${formationRequise.noteMinimale}`
+                    );
+                }
+
+                const formationTerminee = {
+                    formation: formationId,
+                    dateCompletion: new Date(),
+                    note,
+                };
+
+                certificationObtenu.formationsTerminees.push(formationTerminee);
+                await certificationObtenu.save();
+
+                return certificationObtenu
+                    .populate('certification')
+                    .populate('formationsTerminees.formation');
             }
+        ),
 
-            const certificationObtenu = await CertificationObtenu.findById(id);
-            if (!certificationObtenu) {
-                throw new UserInputError('Certification obtenue non trouvée');
+        terminerQuizFinalCertification: catchAsync(
+            async (_, { id, resultatId }, { utilisateur }) => {
+                if (!utilisateur) {
+                    throw new AuthenticationError('Non authentifié');
+                }
+
+                const certificationObtenu = await CertificationObtenu.findById(id);
+                if (!certificationObtenu) {
+                    throw new UserInputError('Certification obtenue non trouvée');
+                }
+
+                if (certificationObtenu.utilisateur.toString() !== utilisateur.id) {
+                    throw new AuthenticationError('Non autorisé');
+                }
+
+                const certification = await Certification.findById(
+                    certificationObtenu.certification
+                );
+                if (!certification.conditions.quizFinal) {
+                    throw new UserInputError('Cette certification ne nécessite pas de quiz final');
+                }
+
+                certificationObtenu.quizFinalResultat = resultatId;
+                await certificationObtenu.save();
+
+                return certificationObtenu.populate('certification').populate('quizFinalResultat');
             }
+        ),
 
-            if (certificationObtenu.utilisateur.toString() !== utilisateur.id) {
-                throw new AuthenticationError('Non autorisé');
+        terminerProjetFinalCertification: catchAsync(
+            async (_, { id, projetId }, { utilisateur }) => {
+                if (!utilisateur) {
+                    throw new AuthenticationError('Non authentifié');
+                }
+
+                const certificationObtenu = await CertificationObtenu.findById(id);
+                if (!certificationObtenu) {
+                    throw new UserInputError('Certification obtenue non trouvée');
+                }
+
+                if (certificationObtenu.utilisateur.toString() !== utilisateur.id) {
+                    throw new AuthenticationError('Non autorisé');
+                }
+
+                const certification = await Certification.findById(
+                    certificationObtenu.certification
+                );
+                if (!certification.conditions.projetFinal) {
+                    throw new UserInputError(
+                        'Cette certification ne nécessite pas de projet final'
+                    );
+                }
+
+                certificationObtenu.projetFinalResultat = projetId;
+                await certificationObtenu.save();
+
+                return certificationObtenu
+                    .populate('certification')
+                    .populate('projetFinalResultat');
             }
-
-            const certification = await Certification.findById(certificationObtenu.certification);
-            const formationRequise = certification.conditions.formationsRequises.find(
-                f => f.formation.toString() === formationId
-            );
-
-            if (!formationRequise) {
-                throw new UserInputError('Cette formation n\'est pas requise pour cette certification');
-            }
-
-            if (note < formationRequise.noteMinimale) {
-                throw new UserInputError(`Note insuffisante. Note minimale requise: ${formationRequise.noteMinimale}`);
-            }
-
-            const formationTerminee = {
-                formation: formationId,
-                dateCompletion: new Date(),
-                note
-            };
-
-            certificationObtenu.formationsTerminees.push(formationTerminee);
-            await certificationObtenu.save();
-
-            return certificationObtenu.populate('certification')
-                .populate('formationsTerminees.formation');
-        }),
-
-        terminerQuizFinalCertification: catchAsync(async (_, { id, resultatId }, { utilisateur }) => {
-            if (!utilisateur) {
-                throw new AuthenticationError('Non authentifié');
-            }
-
-            const certificationObtenu = await CertificationObtenu.findById(id);
-            if (!certificationObtenu) {
-                throw new UserInputError('Certification obtenue non trouvée');
-            }
-
-            if (certificationObtenu.utilisateur.toString() !== utilisateur.id) {
-                throw new AuthenticationError('Non autorisé');
-            }
-
-            const certification = await Certification.findById(certificationObtenu.certification);
-            if (!certification.conditions.quizFinal) {
-                throw new UserInputError('Cette certification ne nécessite pas de quiz final');
-            }
-
-            certificationObtenu.quizFinalResultat = resultatId;
-            await certificationObtenu.save();
-
-            return certificationObtenu.populate('certification')
-                .populate('quizFinalResultat');
-        }),
-
-        terminerProjetFinalCertification: catchAsync(async (_, { id, projetId }, { utilisateur }) => {
-            if (!utilisateur) {
-                throw new AuthenticationError('Non authentifié');
-            }
-
-            const certificationObtenu = await CertificationObtenu.findById(id);
-            if (!certificationObtenu) {
-                throw new UserInputError('Certification obtenue non trouvée');
-            }
-
-            if (certificationObtenu.utilisateur.toString() !== utilisateur.id) {
-                throw new AuthenticationError('Non autorisé');
-            }
-
-            const certification = await Certification.findById(certificationObtenu.certification);
-            if (!certification.conditions.projetFinal) {
-                throw new UserInputError('Cette certification ne nécessite pas de projet final');
-            }
-
-            certificationObtenu.projetFinalResultat = projetId;
-            await certificationObtenu.save();
-
-            return certificationObtenu.populate('certification')
-                .populate('projetFinalResultat');
-        }),
+        ),
 
         validerCertification: catchAsync(async (_, { id }, { utilisateur }) => {
             if (!utilisateur || utilisateur.role !== 'ADMIN') {
                 throw new AuthenticationError('Non autorisé');
             }
 
-            const certificationObtenu = await CertificationObtenu.findById(id)
-                .populate('certification');
+            const certificationObtenu =
+                await CertificationObtenu.findById(id).populate('certification');
             if (!certificationObtenu) {
                 throw new UserInputError('Certification obtenue non trouvée');
             }
@@ -269,28 +291,31 @@ const resolvers = {
             // Vérifier les formations requises
             const formationsRequises = conditions.formationsRequises || [];
             const formationsTerminees = certificationObtenu.formationsTerminees || [];
-            
+
             if (formationsRequises.length > 0) {
                 const toutesFormationsTerminees = formationsRequises.every(req =>
-                    formationsTerminees.some(term => 
-                        term.formation.toString() === req.formation.toString() &&
-                        term.note >= req.noteMinimale
+                    formationsTerminees.some(
+                        term =>
+                            term.formation.toString() === req.formation.toString() &&
+                            term.note >= req.noteMinimale
                     )
                 );
 
                 if (!toutesFormationsTerminees) {
-                    throw new UserInputError('Toutes les formations requises n\'ont pas été terminées avec succès');
+                    throw new UserInputError(
+                        "Toutes les formations requises n'ont pas été terminées avec succès"
+                    );
                 }
             }
 
             // Vérifier le quiz final si requis
             if (conditions.quizFinal && !certificationObtenu.quizFinalResultat) {
-                throw new UserInputError('Le quiz final n\'a pas été complété');
+                throw new UserInputError("Le quiz final n'a pas été complété");
             }
 
             // Vérifier le projet final si requis
             if (conditions.projetFinal && !certificationObtenu.projetFinalResultat) {
-                throw new UserInputError('Le projet final n\'a pas été complété');
+                throw new UserInputError("Le projet final n'a pas été complété");
             }
 
             // Valider la certification
@@ -302,39 +327,43 @@ const resolvers = {
 
             await certificationObtenu.save();
 
-            return certificationObtenu.populate('certification')
+            return certificationObtenu
+                .populate('certification')
                 .populate('formationsTerminees.formation')
                 .populate('quizFinalResultat')
                 .populate('projetFinalResultat');
-        })
+        }),
     },
 
     Certification: {
-        conditions: async (parent) => {
-            return parent.populate('conditions.formationsRequises.formation')
+        conditions: async parent => {
+            return parent
+                .populate('conditions.formationsRequises.formation')
                 .populate('conditions.quizFinal')
                 .populate('conditions.projetFinal')
                 .then(c => c.conditions);
-        }
+        },
     },
 
     CertificationObtenu: {
-        certification: async (parent) => {
+        certification: async parent => {
             return parent.populate('certification').then(co => co.certification);
         },
-        utilisateur: async (parent) => {
+        utilisateur: async parent => {
             return parent.populate('utilisateur').then(co => co.utilisateur);
         },
-        formationsTerminees: async (parent) => {
-            return parent.populate('formationsTerminees.formation').then(co => co.formationsTerminees);
+        formationsTerminees: async parent => {
+            return parent
+                .populate('formationsTerminees.formation')
+                .then(co => co.formationsTerminees);
         },
-        quizFinalResultat: async (parent) => {
+        quizFinalResultat: async parent => {
             return parent.populate('quizFinalResultat').then(co => co.quizFinalResultat);
         },
-        projetFinalResultat: async (parent) => {
+        projetFinalResultat: async parent => {
             return parent.populate('projetFinalResultat').then(co => co.projetFinalResultat);
-        }
-    }
+        },
+    },
 };
 
-module.exports = resolvers; 
+module.exports = resolvers;

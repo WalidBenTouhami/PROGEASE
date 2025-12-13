@@ -12,7 +12,9 @@ async function creerLivrable(data) {
         const livrable = new Livrable(data);
         return await livrable.save();
     } catch (error) {
-        logger.error(`Erreur lors de la création du livrable: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la création du livrable: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -24,13 +26,7 @@ async function creerLivrable(data) {
  */
 async function recupererTousLivrables(options = {}) {
     try {
-        const {
-            page = 1,
-            limit = 20,
-            statut,
-            projetId,
-            tri = '-creeLe'
-        } = options;
+        const { page = 1, limit = 20, statut, projetId, tri = '-creeLe' } = options;
 
         const query = {};
         if (statut) query.statut = statut;
@@ -43,7 +39,7 @@ async function recupererTousLivrables(options = {}) {
                 .skip((Number(page) - 1) * Number(limit))
                 .populate('projetId', 'titre description')
                 .lean(),
-            Livrable.countDocuments(query)
+            Livrable.countDocuments(query),
         ]);
 
         return {
@@ -52,16 +48,18 @@ async function recupererTousLivrables(options = {}) {
                 page: Number(page),
                 limite: Number(limit),
                 total,
-                pages: Math.ceil(total / Number(limit))
-            }
+                pages: Math.ceil(total / Number(limit)),
+            },
         };
     } catch (error) {
-        logger.error(`Erreur lors de la récupération des livrables: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la récupération des livrables: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
 
 module.exports = {
     creerLivrable,
-    recupererTousLivrables
-}; 
+    recupererTousLivrables,
+};

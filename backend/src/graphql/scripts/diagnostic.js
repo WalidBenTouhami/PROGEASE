@@ -26,7 +26,7 @@ function checkFile(filePath, relativePath) {
 }
 
 // Verification de l'environnement
-console.log('[1] Verification de l\'environnement...');
+console.log("[1] Verification de l'environnement...");
 console.log(`NODE_ENV: ${process.env.NODE_ENV || 'non defini'}`);
 console.log(`Systeme: ${os.type()} ${os.release()}`);
 console.log(`Node.js: ${process.version}`);
@@ -43,7 +43,7 @@ const criticalFiles = [
     'src/models/projet.model.js',
     'src/models/livrable.model.js',
     'src/controllers/projet.controller.js',
-    'src/controllers/livrable.controller.js'
+    'src/controllers/livrable.controller.js',
 ];
 
 criticalFiles.forEach(file => checkFile(file, file));
@@ -51,13 +51,7 @@ console.log('');
 
 // Verification des configurations
 console.log('[3] Verification des configurations...');
-const envVars = [
-    'NODE_ENV',
-    'PORT',
-    'MONGODB_URI',
-    'JWT_SECRET',
-    'DEEPSEEK_API_KEY'
-];
+const envVars = ['NODE_ENV', 'PORT', 'MONGODB_URI', 'JWT_SECRET', 'DEEPSEEK_API_KEY'];
 
 envVars.forEach(envVar => {
     console.log(`${envVar}: ${process.env[envVar] ? '✅ Defini' : '❌ Non defini'}`);
@@ -72,7 +66,8 @@ console.log(`URI MongoDB: ${mongoUri ? '✅ Definie' : '❌ Non definie'}`);
 if (mongoUri) {
     try {
         const mongoose = require('mongoose');
-        mongoose.connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
+        mongoose
+            .connect(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true })
             .then(() => {
                 console.log('✅ Connexion à MongoDB reussie');
                 mongoose.connection.close();
@@ -99,7 +94,7 @@ const criticalPackages = [
     'node-cache',
     'yup',
     'express-rate-limit',
-    'helmet'
+    'helmet',
 ];
 
 criticalPackages.forEach(packageName => {

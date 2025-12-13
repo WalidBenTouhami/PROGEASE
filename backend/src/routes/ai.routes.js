@@ -44,8 +44,8 @@ router.get('/health', (req, res) => {
             status: 'ok',
             service: 'ai-api',
             timestamp: new Date().toISOString(),
-            model: 'deepseek-test'
-        }
+            model: 'deepseek-test',
+        },
     });
 });
 

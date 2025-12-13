@@ -16,10 +16,14 @@ function formatProjetResponse(projet) {
             titre: projet.titre || '',
             description: projet.description || '',
             equipe: Array.isArray(projet.equipe)
-                ? projet.equipe.map(membre => typeof membre === 'object' ? membre : membre?.toString())
+                ? projet.equipe.map(membre =>
+                      typeof membre === 'object' ? membre : membre?.toString()
+                  )
                 : [],
             tuteur: projet.tuteur
-                ? (typeof projet.tuteur === 'object' ? projet.tuteur : projet.tuteur.toString())
+                ? typeof projet.tuteur === 'object'
+                    ? projet.tuteur
+                    : projet.tuteur.toString()
                 : null,
             competences: Array.isArray(projet.competences) ? projet.competences : [],
             dateDebut: projet.dateDebut,
@@ -27,13 +31,14 @@ function formatProjetResponse(projet) {
             statut: projet.statut || 'Brouillon',
             livrables: Array.isArray(projet.livrables)
                 ? projet.livrables.map(livrable =>
-                    typeof livrable === 'object'
-                        ? formatLivrableResponse(livrable)
-                        : livrable?.toString())
+                      typeof livrable === 'object'
+                          ? formatLivrableResponse(livrable)
+                          : livrable?.toString()
+                  )
                 : [],
             creeLe: projet.creeLe,
             majLe: projet.majLe,
-            progression: projet.progression || 0
+            progression: projet.progression || 0,
         };
 
         // Calcul dynamique de progression si non fourni et dates disponibles
@@ -53,12 +58,14 @@ function formatProjetResponse(projet) {
 
         return formatte;
     } catch (error) {
-        logger.error(`Erreur lors du formatage du projet: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors du formatage du projet: ${error.message}`, {
+            stack: error.stack,
+        });
         // Fallback minimal en cas d'erreur
         return {
             id: projet._id?.toString(),
             titre: projet.titre || 'Sans titre',
-            statut: projet.statut || 'Inconnu'
+            statut: projet.statut || 'Inconnu',
         };
     }
 }
@@ -83,15 +90,17 @@ function formatLivrableResponse(livrable) {
             projetId: livrable.projetId?.toString() || '',
             creeLe: livrable.creeLe,
             majLe: livrable.majLe,
-            estEnRetard: estLivrableEnRetard(livrable)
+            estEnRetard: estLivrableEnRetard(livrable),
         };
     } catch (error) {
-        logger.error(`Erreur lors du formatage du livrable: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors du formatage du livrable: ${error.message}`, {
+            stack: error.stack,
+        });
         // Fallback minimal en cas d'erreur
         return {
             id: livrable._id?.toString(),
             nom: livrable.nom || 'Sans nom',
-            statut: livrable.statut || 'Inconnu'
+            statut: livrable.statut || 'Inconnu',
         };
     }
 }
@@ -132,7 +141,7 @@ function formatDate(date, format = 'court') {
                 month: 'long',
                 day: 'numeric',
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
             });
         } else {
             return dateObj.toISOString();
@@ -149,7 +158,7 @@ function formatDate(date, format = 'court') {
  * @returns {string} - Duree formatee
  */
 function formatDureeLisible(jours) {
-    if (jours === 0) return 'Aujourd\'hui';
+    if (jours === 0) return "Aujourd'hui";
     if (jours === 1) return 'Demain';
     if (jours === -1) return 'Hier';
 
@@ -179,5 +188,5 @@ module.exports = {
     formatLivrableResponse,
     formatDate,
     formatDureeLisible,
-    estLivrableEnRetard
+    estLivrableEnRetard,
 };

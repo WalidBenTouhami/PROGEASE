@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { 
+const {
     validerInscription,
     validerConnexion,
     validerMiseAJourProfil,
@@ -9,79 +9,61 @@ const {
     verifierRole,
     verifierProprietaire,
     verifierEmailUnique,
-    limiterTentativesConnexion
+    limiterTentativesConnexion,
 } = require('../middlewares/utilisateur.middleware');
 const UtilisateurController = require('../controllers/utilisateur.controller');
 
 // Routes publiques
-router.post('/inscription', 
-    validerInscription, 
-    UtilisateurController.inscription
-);
+router.post('/inscription', validerInscription, UtilisateurController.inscription);
 
-router.post('/connexion', 
+router.post(
+    '/connexion',
     limiterTentativesConnexion,
-    validerConnexion, 
+    validerConnexion,
     UtilisateurController.connexion
 );
 
-router.post('/mot-de-passe-oublie', 
-    UtilisateurController.motDePasseOublie
-);
+router.post('/mot-de-passe-oublie', UtilisateurController.motDePasseOublie);
 
-router.post('/reinitialiser-mot-de-passe/:token', 
-    UtilisateurController.reinitialiserMotDePasse
-);
+router.post('/reinitialiser-mot-de-passe/:token', UtilisateurController.reinitialiserMotDePasse);
 
 // Routes protégées nécessitant authentification
 router.use(verifierToken);
 
 // Gestion du profil utilisateur
-router.get('/profil', 
-    UtilisateurController.getProfil
-);
+router.get('/profil', UtilisateurController.getProfil);
 
-router.put('/profil', 
-    validerMiseAJourProfil, 
-    verifierEmailUnique, 
+router.put(
+    '/profil',
+    validerMiseAJourProfil,
+    verifierEmailUnique,
     UtilisateurController.mettreAJourProfil
 );
 
-router.put('/changer-mot-de-passe', 
-    validerChangementMotDePasse, 
+router.put(
+    '/changer-mot-de-passe',
+    validerChangementMotDePasse,
     UtilisateurController.changerMotDePasse
 );
 
 // Routes administratives
-router.get('/', 
-    verifierRole('ADMIN'), 
-    UtilisateurController.getAllUtilisateurs
-);
+router.get('/', verifierRole('ADMIN'), UtilisateurController.getAllUtilisateurs);
 
-router.get('/:id', 
-    verifierRole('ADMIN'), 
-    UtilisateurController.getUtilisateurById
-);
+router.get('/:id', verifierRole('ADMIN'), UtilisateurController.getUtilisateurById);
 
-router.put('/:id', 
-    verifierRole('ADMIN'), 
-    validerMiseAJourProfil, 
-    verifierEmailUnique, 
+router.put(
+    '/:id',
+    verifierRole('ADMIN'),
+    validerMiseAJourProfil,
+    verifierEmailUnique,
     UtilisateurController.mettreAJourUtilisateur
 );
 
-router.delete('/:id', 
-    verifierRole('ADMIN'), 
-    UtilisateurController.supprimerUtilisateur
-);
+router.delete('/:id', verifierRole('ADMIN'), UtilisateurController.supprimerUtilisateur);
 
 // Gestion des sessions
-router.post('/deconnexion', 
-    UtilisateurController.deconnexion
-);
+router.post('/deconnexion', UtilisateurController.deconnexion);
 
-router.post('/rafraichir-token', 
-    UtilisateurController.rafraichirToken
-);
+router.post('/rafraichir-token', UtilisateurController.rafraichirToken);
 
 module.exports = router;

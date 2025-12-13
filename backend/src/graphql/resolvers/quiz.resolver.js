@@ -4,8 +4,7 @@ const { AuthenticationError, UserInputError } = require('apollo-server-express')
 module.exports = {
     Query: {
         quiz: async (_, { id }) => {
-            const quiz = await Quiz.findById(id)
-                .populate('auteur', 'nom prenom email');
+            const quiz = await Quiz.findById(id).populate('auteur', 'nom prenom email');
             if (!quiz) {
                 throw new UserInputError('Quiz non trouvé');
             }
@@ -20,14 +19,14 @@ module.exports = {
                 categorie,
                 niveau,
                 auteur,
-                tri = 'recent'
+                tri = 'recent',
             } = input;
 
             const query = {};
             if (recherche) {
                 query.$or = [
                     { titre: { $regex: recherche, $options: 'i' } },
-                    { description: { $regex: recherche, $options: 'i' } }
+                    { description: { $regex: recherche, $options: 'i' } },
                 ];
             }
             if (categorie) query.categorie = categorie;
@@ -59,9 +58,9 @@ module.exports = {
                 quiz,
                 page,
                 totalPages,
-                total
+                total,
             };
-        }
+        },
     },
 
     Mutation: {
@@ -72,7 +71,7 @@ module.exports = {
 
             const quiz = new Quiz({
                 ...input,
-                auteur: utilisateur.id
+                auteur: utilisateur.id,
             });
 
             await quiz.save();
@@ -90,7 +89,7 @@ module.exports = {
             }
 
             if (quiz.auteur.toString() !== utilisateur.id && utilisateur.role !== 'ADMIN') {
-                throw new AuthenticationError('Vous n\'êtes pas autorisé à modifier ce quiz');
+                throw new AuthenticationError("Vous n'êtes pas autorisé à modifier ce quiz");
             }
 
             Object.assign(quiz, input);
@@ -109,7 +108,7 @@ module.exports = {
             }
 
             if (quiz.auteur.toString() !== utilisateur.id && utilisateur.role !== 'ADMIN') {
-                throw new AuthenticationError('Vous n\'êtes pas autorisé à supprimer ce quiz');
+                throw new AuthenticationError("Vous n'êtes pas autorisé à supprimer ce quiz");
             }
 
             await quiz.remove();
@@ -118,7 +117,9 @@ module.exports = {
 
         soumettreReponses: async (_, { quizId, reponses }, { utilisateur }) => {
             if (!utilisateur) {
-                throw new AuthenticationError('Vous devez être connecté pour soumettre des réponses');
+                throw new AuthenticationError(
+                    'Vous devez être connecté pour soumettre des réponses'
+                );
             }
 
             const quiz = await Quiz.findById(quizId);
@@ -143,7 +144,7 @@ module.exports = {
                     reponseUtilisateur,
                     reponseCorrecte: question.reponseCorrecte,
                     estCorrecte,
-                    points: estCorrecte ? question.points : 0
+                    points: estCorrecte ? question.points : 0,
                 };
             });
 
@@ -152,15 +153,17 @@ module.exports = {
 
             // Mettre à jour les statistiques du quiz
             quiz.nombreParticipations += 1;
-            quiz.scoreMoyen = ((quiz.scoreMoyen * (quiz.nombreParticipations - 1)) + pourcentage) / quiz.nombreParticipations;
+            quiz.scoreMoyen =
+                (quiz.scoreMoyen * (quiz.nombreParticipations - 1) + pourcentage) /
+                quiz.nombreParticipations;
             await quiz.save();
 
             return {
                 score,
                 scoreMaximum,
                 pourcentage,
-                resultatsDetailles
+                resultatsDetailles,
             };
-        }
-    }
-}; 
+        },
+    },
+};

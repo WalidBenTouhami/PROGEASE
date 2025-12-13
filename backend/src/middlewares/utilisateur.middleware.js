@@ -13,7 +13,12 @@ const rateLimit = require('express-rate-limit');
 const { ValidationError } = require('./errorHandlers');
 const logger = require('../utils/logger');
 const config = require('../config');
-const { validateInscriptionData, validateConnexionData, validateMiseAJourProfilData, validateChangementMotDePasseData } = require('../validations/utilisateur.validation');
+const {
+    validateInscriptionData,
+    validateConnexionData,
+    validateMiseAJourProfilData,
+    validateChangementMotDePasseData,
+} = require('../validations/utilisateur.validation');
 const Utilisateur = require('../models/utilisateur.model');
 const { AppError } = require('../utils/appError');
 
@@ -25,8 +30,8 @@ const limiterTentativesConnexion = rateLimit({
     max: 5, // 5 tentatives maximum
     message: {
         succes: false,
-        message: 'Trop de tentatives de connexion. Veuillez réessayer dans 15 minutes.'
-    }
+        message: 'Trop de tentatives de connexion. Veuillez réessayer dans 15 minutes.',
+    },
 });
 
 /**
@@ -36,7 +41,7 @@ const validerInscription = async (req, res, next) => {
     try {
         const { email, motDePasse, nom, prenom } = req.body;
         const validationResult = validateInscriptionData({ email, motDePasse, nom, prenom });
-        
+
         if (!validationResult.succes) {
             return res.status(400).json(validationResult);
         }
@@ -46,14 +51,14 @@ const validerInscription = async (req, res, next) => {
         if (emailExistant) {
             return res.status(400).json({
                 succes: false,
-                message: 'Cet email est déjà utilisé'
+                message: 'Cet email est déjà utilisé',
             });
         }
 
         next();
     } catch (erreur) {
-        logger.error('Erreur de validation d\'inscription:', erreur);
-        next(new AppError('Erreur lors de la validation des données d\'inscription', 500));
+        logger.error("Erreur de validation d'inscription:", erreur);
+        next(new AppError("Erreur lors de la validation des données d'inscription", 500));
     }
 };
 
@@ -64,7 +69,7 @@ const validerConnexion = async (req, res, next) => {
     try {
         const { email, motDePasse } = req.body;
         const validationResult = validateConnexionData({ email, motDePasse });
-        
+
         if (!validationResult.succes) {
             return res.status(400).json(validationResult);
         }
@@ -83,7 +88,7 @@ const validerMiseAJourProfil = async (req, res, next) => {
     try {
         const { nom, prenom, email } = req.body;
         const validationResult = validateMiseAJourProfilData({ nom, prenom, email });
-        
+
         if (!validationResult.succes) {
             return res.status(400).json(validationResult);
         }
@@ -101,8 +106,11 @@ const validerMiseAJourProfil = async (req, res, next) => {
 const validerChangementMotDePasse = async (req, res, next) => {
     try {
         const { ancienMotDePasse, nouveauMotDePasse } = req.body;
-        const validationResult = validateChangementMotDePasseData({ ancienMotDePasse, nouveauMotDePasse });
-        
+        const validationResult = validateChangementMotDePasseData({
+            ancienMotDePasse,
+            nouveauMotDePasse,
+        });
+
         if (!validationResult.succes) {
             return res.status(400).json(validationResult);
         }
@@ -124,7 +132,7 @@ const verifierToken = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({
                 succes: false,
-                message: 'Token d\'authentification manquant'
+                message: "Token d'authentification manquant",
             });
         }
 
@@ -134,14 +142,14 @@ const verifierToken = async (req, res, next) => {
         if (!utilisateur) {
             return res.status(401).json({
                 succes: false,
-                message: 'Utilisateur non trouvé'
+                message: 'Utilisateur non trouvé',
             });
         }
 
         if (!utilisateur.actif) {
             return res.status(401).json({
                 succes: false,
-                message: 'Compte désactivé'
+                message: 'Compte désactivé',
             });
         }
 
@@ -151,7 +159,7 @@ const verifierToken = async (req, res, next) => {
         logger.error('Erreur de vérification du token:', erreur);
         return res.status(401).json({
             succes: false,
-            message: 'Token invalide ou expiré'
+            message: 'Token invalide ou expiré',
         });
     }
 };
@@ -159,7 +167,7 @@ const verifierToken = async (req, res, next) => {
 /**
  * Middleware pour vérifier les rôles
  */
-const verifierRole = (roles) => {
+const verifierRole = roles => {
     return (req, res, next) => {
         if (!Array.isArray(roles)) {
             roles = [roles];
@@ -168,7 +176,7 @@ const verifierRole = (roles) => {
         if (!roles.includes(req.utilisateur.role)) {
             return res.status(403).json({
                 succes: false,
-                message: 'Accès non autorisé: rôle insuffisant'
+                message: 'Accès non autorisé: rôle insuffisant',
             });
         }
         next();
@@ -178,22 +186,25 @@ const verifierRole = (roles) => {
 /**
  * Middleware de vérification de propriété
  */
-const verifierProprietaire = (model) => {
+const verifierProprietaire = model => {
     return async (req, res, next) => {
         try {
             const ressource = await model.findById(req.params.id);
-            
+
             if (!ressource) {
                 return res.status(404).json({
                     succes: false,
-                    message: 'Ressource non trouvée'
+                    message: 'Ressource non trouvée',
                 });
             }
 
-            if (ressource.utilisateur.toString() !== req.utilisateur.id && req.utilisateur.role !== 'ADMIN') {
+            if (
+                ressource.utilisateur.toString() !== req.utilisateur.id &&
+                req.utilisateur.role !== 'ADMIN'
+            ) {
                 return res.status(403).json({
                     succes: false,
-                    message: 'Accès non autorisé: vous n\'êtes pas propriétaire de cette ressource'
+                    message: "Accès non autorisé: vous n'êtes pas propriétaire de cette ressource",
                 });
             }
 
@@ -201,7 +212,7 @@ const verifierProprietaire = (model) => {
             next();
         } catch (erreur) {
             logger.error('Erreur lors de la vérification du propriétaire:', erreur);
-            next(new AppError('Erreur lors de la vérification des droits d\'accès', 500));
+            next(new AppError("Erreur lors de la vérification des droits d'accès", 500));
         }
     };
 };
@@ -212,22 +223,22 @@ const verifierProprietaire = (model) => {
 const verifierEmailUnique = async (req, res, next) => {
     try {
         const { email } = req.body;
-        const utilisateurExistant = await Utilisateur.findOne({ 
-            email, 
-            _id: { $ne: req.utilisateur.id } 
+        const utilisateurExistant = await Utilisateur.findOne({
+            email,
+            _id: { $ne: req.utilisateur.id },
         });
 
         if (utilisateurExistant) {
             return res.status(400).json({
                 succes: false,
-                message: 'Cet email est déjà utilisé par un autre utilisateur'
+                message: 'Cet email est déjà utilisé par un autre utilisateur',
             });
         }
 
         next();
     } catch (erreur) {
-        logger.error('Erreur lors de la vérification de l\'email:', erreur);
-        next(new AppError('Erreur lors de la vérification de l\'unicité de l\'email', 500));
+        logger.error("Erreur lors de la vérification de l'email:", erreur);
+        next(new AppError("Erreur lors de la vérification de l'unicité de l'email", 500));
     }
 };
 
@@ -240,5 +251,5 @@ module.exports = {
     verifierToken,
     verifierRole,
     verifierProprietaire,
-    verifierEmailUnique
-}; 
+    verifierEmailUnique,
+};

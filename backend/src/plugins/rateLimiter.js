@@ -39,8 +39,10 @@ function cleanupExpiredEntries(map, windowMs) {
 function GraphQLRateLimiterPlugin(options = {}) {
     const windowMs = options.windowMs || 15 * 60 * 1000; // 15 minutes par defaut
     const max = options.max || 100; // 100 requetes par defaut
-    const keyGenerator = options.keyGenerator ||
-        (requestContext => requestContext.request.http.headers.get('x-forwarded-for') ||
+    const keyGenerator =
+        options.keyGenerator ||
+        (requestContext =>
+            requestContext.request.http.headers.get('x-forwarded-for') ||
             requestContext.contextValue?.ip ||
             'anonymous');
     const skip = options.skip || (() => false);
@@ -63,7 +65,7 @@ function GraphQLRateLimiterPlugin(options = {}) {
             const current = requestMap.get(key) || {
                 count: 0,
                 timestamp: now,
-                firstRequest: now
+                firstRequest: now,
             };
 
             // Reinitialiser le compteur si la fenetre de temps est depassee
@@ -93,7 +95,7 @@ function GraphQLRateLimiterPlugin(options = {}) {
 
             // Permettre à la requete de continuer normalement
             return {};
-        }
+        },
     };
 }
 

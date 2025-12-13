@@ -2,19 +2,23 @@ const Projet = require('../models/projet.model');
 const Livrable = require('../models/livrable.model');
 const Evaluation = require('../models/evaluation.model');
 const Utilisateur = require('../models/utilisateur.model');
-const { generateAIAnalysis, predictPerformance, generateLearningRecommendations } = require('../services/ai.service');
+const {
+    generateAIAnalysis,
+    predictPerformance,
+    generateLearningRecommendations,
+} = require('../services/ai.service');
 const { GraphQLScalarType, Kind } = require('graphql');
 const aiResolver = require('./resolvers/ai.resolver');
 const projetResolver = require('./resolvers/projet.resolver');
 const livrableResolver = require('./resolvers/livrable.resolver');
 const evaluationResolver = require('./resolvers/evaluation.resolver');
 
-const transformId = (obj) => {
+const transformId = obj => {
     if (!obj) return null;
     const transformed = obj.toObject ? obj.toObject() : { ...obj };
     return {
         ...transformed,
-        id: transformed._id.toString()
+        id: transformed._id.toString(),
     };
 };
 
@@ -44,23 +48,23 @@ const resolvers = {
             status: 'ok',
             timestamp: new Date().toISOString(),
             version: '2.0.0',
-            environment: process.env.NODE_ENV
+            environment: process.env.NODE_ENV,
         }),
         ...aiResolver.Query,
         ...projetResolver.Query,
         ...livrableResolver.Query,
-        ...evaluationResolver.Query
+        ...evaluationResolver.Query,
     },
     Mutation: {
         ...aiResolver.Mutation,
         ...projetResolver.Mutation,
         ...livrableResolver.Mutation,
-        ...evaluationResolver.Mutation
+        ...evaluationResolver.Mutation,
     },
     // Type resolvers
     Projet: {
-        ...projetResolver.Projet
-    }
+        ...projetResolver.Projet,
+    },
 };
 
 module.exports = { resolvers };

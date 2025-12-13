@@ -40,7 +40,7 @@ const typeDefs = [
     livrableTypeDefs,
     formationTypeDefs,
     certificationTypeDefs,
-    quizTypeDefs
+    quizTypeDefs,
 ];
 
 // Fusionner tous les resolvers
@@ -57,7 +57,7 @@ const resolvers = merge(
 // Créer le schema exécutable
 const schema = makeExecutableSchema({
     typeDefs,
-    resolvers
+    resolvers,
 });
 
 module.exports = schema;

@@ -21,14 +21,14 @@ if (!GITHUB_TOKEN) {
 const client = axios.create({
     timeout: 10000, // 10s timeout
     headers: {
-        'utilisateur-Agent': 'progease-app/2.0'
-    }
+        'utilisateur-Agent': 'progease-app/2.0',
+    },
 });
 
 // Configuration
 const CONFIG = {
     RETRY_LIMIT: 3,
-    RETRY_DELAY: 1000
+    RETRY_DELAY: 1000,
 };
 
 /**
@@ -36,7 +36,7 @@ const CONFIG = {
  * @param {number} ms - Delai en millisecondes
  * @returns {Promise<void>}
  */
-const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Vérifie si un dépôt GitHub existe
@@ -49,7 +49,7 @@ async function checkGithubRepoExists(url) {
             // En mode test, on considère que certaines URLs sont valides
             const validTestUrls = [
                 'https://github.com/WalidBenTouhami/PROGEASE',
-                'https://github.com/test/valid-repo'
+                'https://github.com/test/valid-repo',
             ];
             return validTestUrls.includes(url);
         }
@@ -65,9 +65,9 @@ async function checkGithubRepoExists(url) {
         // Appel à l'API GitHub
         const response = await axios.get(`https://api.github.com/repos/${owner}/${repo}`, {
             headers: {
-                'Authorization': `token ${GITHUB_TOKEN}`,
-                'Accept': 'application/vnd.github.v3+json'
-            }
+                Authorization: `token ${GITHUB_TOKEN}`,
+                Accept: 'application/vnd.github.v3+json',
+            },
         });
 
         return response.status === 200;
@@ -75,7 +75,7 @@ async function checkGithubRepoExists(url) {
         if (error.response && error.response.status === 404) {
             return false;
         }
-        
+
         if (error.response && error.response.status === 401) {
             logger.warn('⚠️ Token GitHub invalide ou manquant');
             return false;
@@ -105,7 +105,7 @@ async function getGithubRepoBranches(url) {
 
     // Preparer les headers
     const headers = {
-        'utilisateur-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0',
     };
 
     if (GITHUB_TOKEN) {
@@ -146,7 +146,7 @@ async function getGithubRepoCommits(url, limit = 5) {
 
     // Preparer les headers
     const headers = {
-        'utilisateur-Agent': 'progease-app/2.0'
+        'utilisateur-Agent': 'progease-app/2.0',
     };
 
     if (GITHUB_TOKEN) {
@@ -161,7 +161,7 @@ async function getGithubRepoCommits(url, limit = 5) {
                 sha: commit.sha,
                 date: commit.commit.author.date,
                 message: commit.commit.message,
-                author: commit.commit.author.name
+                author: commit.commit.author.name,
             }));
         }
 
@@ -175,5 +175,5 @@ async function getGithubRepoCommits(url, limit = 5) {
 module.exports = {
     checkGithubRepoExists,
     getGithubRepoBranches,
-    getGithubRepoCommits
+    getGithubRepoCommits,
 };

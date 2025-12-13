@@ -170,7 +170,7 @@ class Utilisateur {
             creeLe: this.creeLe,
             majLe: this.majLe,
             tentativesConnexion: this.tentativesConnexion,
-            verrouilleJusqua: this.verrouilleJusqua
+            verrouilleJusqua: this.verrouilleJusqua,
         };
     }
 
@@ -180,21 +180,19 @@ class Utilisateur {
      * @returns {Utilisateur} - Instance de la classe Utilisateur
      */
     static fromJSON(data) {
-        const utilisateur = new Utilisateur(
-            data.id,
-            data.nom,
-            data.prenom,
-            data.email,
-            data.roles
-        );
+        const utilisateur = new Utilisateur(data.id, data.nom, data.prenom, data.email, data.roles);
         utilisateur.statut = data.statut;
-        utilisateur.dernierConnexion = data.dernierConnexion ? new Date(data.dernierConnexion) : null;
+        utilisateur.dernierConnexion = data.dernierConnexion
+            ? new Date(data.dernierConnexion)
+            : null;
         utilisateur.creeLe = new Date(data.creeLe);
         utilisateur.majLe = new Date(data.majLe);
         utilisateur.tentativesConnexion = data.tentativesConnexion;
-        utilisateur.verrouilleJusqua = data.verrouilleJusqua ? new Date(data.verrouilleJusqua) : null;
+        utilisateur.verrouilleJusqua = data.verrouilleJusqua
+            ? new Date(data.verrouilleJusqua)
+            : null;
         return utilisateur;
     }
 }
 
-module.exports = Utilisateur; 
+module.exports = Utilisateur;

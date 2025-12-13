@@ -12,13 +12,15 @@ async function creerFormation(data) {
         const formation = new Formation({
             ...data,
             creeLe: new Date(),
-            majLe: new Date()
+            majLe: new Date(),
         });
 
         const formationSauvegardee = await formation.save();
         return formatFormationResponse(formationSauvegardee);
     } catch (error) {
-        logger.error(`Erreur lors de la création de la formation: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la création de la formation: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -37,14 +39,14 @@ async function recupererFormations(options = {}) {
             categorie,
             niveau,
             auteur,
-            tri = 'recent'
+            tri = 'recent',
         } = options;
 
         const query = {};
         if (recherche) {
             query.$or = [
                 { titre: { $regex: recherche, $options: 'i' } },
-                { description: { $regex: recherche, $options: 'i' } }
+                { description: { $regex: recherche, $options: 'i' } },
             ];
         }
         if (categorie) query.categorie = categorie;
@@ -58,7 +60,7 @@ async function recupererFormations(options = {}) {
                 sort = { creeLe: -1 };
                 break;
             case 'populaire':
-                nombreInscrits: -1;
+                -1;
                 break;
             case 'note':
                 sort = { noteMoyenne: -1 };
@@ -74,17 +76,19 @@ async function recupererFormations(options = {}) {
                 .skip(skip)
                 .limit(limite)
                 .lean(),
-            Formation.countDocuments(query)
+            Formation.countDocuments(query),
         ]);
 
         return {
             formations: formations.map(formatFormationResponse),
             page,
             totalPages: Math.ceil(total / limite),
-            total
+            total,
         };
     } catch (error) {
-        logger.error(`Erreur lors de la récupération des formations: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la récupération des formations: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -108,7 +112,9 @@ async function recupererFormationParId(id) {
 
         return formatFormationResponse(formation);
     } catch (error) {
-        logger.error(`Erreur lors de la récupération de la formation: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la récupération de la formation: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -125,13 +131,13 @@ async function mettreAJourFormation(id, data) {
             id,
             {
                 ...data,
-                majLe: new Date()
+                majLe: new Date(),
             },
             { new: true, runValidators: true }
         )
-        .populate('auteur', 'nom prenom avatar')
-        .populate('modules.quiz')
-        .populate('modules.ressources');
+            .populate('auteur', 'nom prenom avatar')
+            .populate('modules.quiz')
+            .populate('modules.ressources');
 
         if (!formation) {
             throw new Error('Formation non trouvée');
@@ -139,7 +145,9 @@ async function mettreAJourFormation(id, data) {
 
         return formatFormationResponse(formation);
     } catch (error) {
-        logger.error(`Erreur lors de la mise à jour de la formation: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la mise à jour de la formation: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -157,7 +165,9 @@ async function supprimerFormation(id) {
         }
         return true;
     } catch (error) {
-        logger.error(`Erreur lors de la suppression de la formation: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la suppression de la formation: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -186,7 +196,9 @@ async function inscrireUtilisateur(formationId, utilisateurId) {
         await formation.save();
         return formatFormationResponse(formation);
     } catch (error) {
-        logger.error(`Erreur lors de l'inscription à la formation: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de l'inscription à la formation: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -215,7 +227,9 @@ async function desinscrireUtilisateur(formationId, utilisateurId) {
         await formation.save();
         return formatFormationResponse(formation);
     } catch (error) {
-        logger.error(`Erreur lors de la désinscription de la formation: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la désinscription de la formation: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -249,11 +263,12 @@ async function ajouterNote(formationId, utilisateurId, note) {
                 valeur: note.valeur,
                 commentaire: note.commentaire,
                 creeLe: new Date(),
-                majLe: new Date()
+                majLe: new Date(),
             });
         }
 
-        formation.noteMoyenne = formation.notes.reduce((acc, n) => acc + n.valeur, 0) / formation.notes.length;
+        formation.noteMoyenne =
+            formation.notes.reduce((acc, n) => acc + n.valeur, 0) / formation.notes.length;
         formation.majLe = new Date();
 
         await formation.save();
@@ -282,12 +297,14 @@ async function mettreAJourProgression(formationId, utilisateurId, progression) {
             throw new Error('Utilisateur non inscrit');
         }
 
-        const progressionExistante = formation.progressions.find(p => p.utilisateur.toString() === utilisateurId);
+        const progressionExistante = formation.progressions.find(
+            p => p.utilisateur.toString() === utilisateurId
+        );
         if (progressionExistante) {
             progressionExistante.modulesCompletes = progression.modulesCompletes;
             progressionExistante.quizCompletes = progression.quizCompletes;
             progressionExistante.ressourcesConsultees = progression.ressourcesConsultees;
-            progressionExistante.pourcentageCompletion = 
+            progressionExistante.pourcentageCompletion =
                 (progression.modulesCompletes.length / formation.modules.length) * 100;
             progressionExistante.majLe = new Date();
         } else {
@@ -299,7 +316,7 @@ async function mettreAJourProgression(formationId, utilisateurId, progression) {
                 pourcentageCompletion:
                     (progression.modulesCompletes.length / formation.modules.length) * 100,
                 creeLe: new Date(),
-                majLe: new Date()
+                majLe: new Date(),
             });
         }
 
@@ -308,7 +325,9 @@ async function mettreAJourProgression(formationId, utilisateurId, progression) {
         await formation.save();
         return formatFormationResponse(formation);
     } catch (error) {
-        logger.error(`Erreur lors de la mise à jour de la progression: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la mise à jour de la progression: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -322,5 +341,5 @@ module.exports = {
     inscrireUtilisateur,
     desinscrireUtilisateur,
     ajouterNote,
-    mettreAJourProgression
-}; 
+    mettreAJourProgression,
+};

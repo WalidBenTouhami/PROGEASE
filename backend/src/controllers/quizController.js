@@ -7,13 +7,14 @@ const mongoose = require('mongoose');
  */
 exports.creerQuiz = async (req, res) => {
     try {
-        const { titre, description, formationId, moduleId, questions, noteMinimale, dureeEstimee } = req.body;
+        const { titre, description, formationId, moduleId, questions, noteMinimale, dureeEstimee } =
+            req.body;
 
         // Validation des données
         if (!titre || !description || !formationId || !questions || !questions.length) {
             return res.status(400).json({
                 success: false,
-                message: 'Données invalides pour la création du quiz'
+                message: 'Données invalides pour la création du quiz',
             });
         }
 
@@ -25,7 +26,7 @@ exports.creerQuiz = async (req, res) => {
             auteur: req.utilisateur.id,
             questions,
             noteMinimale: noteMinimale || 60,
-            dureeEstimee: dureeEstimee || 30
+            dureeEstimee: dureeEstimee || 30,
         });
 
         await quiz.save();
@@ -34,20 +35,20 @@ exports.creerQuiz = async (req, res) => {
             quizId: quiz._id,
             formationId,
             moduleId,
-            auteur: req.utilisateur.id
+            auteur: req.utilisateur.id,
         });
 
         res.status(201).json({
             success: true,
             message: 'Quiz créé avec succès',
-            data: quiz
+            data: quiz,
         });
     } catch (error) {
         logger.error('Erreur lors de la création du quiz:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la création du quiz',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -81,16 +82,16 @@ exports.recupererQuiz = async (req, res) => {
                     total,
                     pages: Math.ceil(total / limit),
                     page: parseInt(page),
-                    limit: parseInt(limit)
-                }
-            }
+                    limit: parseInt(limit),
+                },
+            },
         });
     } catch (error) {
         logger.error('Erreur lors de la récupération des quiz:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération des quiz',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -107,21 +108,21 @@ exports.recupererQuizParId = async (req, res) => {
         if (!quiz) {
             return res.status(404).json({
                 success: false,
-                message: 'Quiz non trouvé'
+                message: 'Quiz non trouvé',
             });
         }
 
         res.status(200).json({
             success: true,
             message: 'Quiz récupéré avec succès',
-            data: quiz
+            data: quiz,
         });
     } catch (error) {
         logger.error('Erreur lors de la récupération du quiz:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération du quiz',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -139,20 +140,20 @@ exports.soumettreQuiz = async (req, res) => {
         if (!quiz) {
             return res.status(404).json({
                 success: false,
-                message: 'Quiz non trouvé'
+                message: 'Quiz non trouvé',
             });
         }
 
         // Vérifier le nombre de tentatives
         const tentatives = await QuizResultat.countDocuments({
             quiz: quizId,
-            utilisateur: utilisateurId
+            utilisateur: utilisateurId,
         });
 
         if (tentatives >= quiz.tentativesMax) {
             return res.status(400).json({
                 success: false,
-                message: 'Nombre maximum de tentatives atteint'
+                message: 'Nombre maximum de tentatives atteint',
             });
         }
 
@@ -164,8 +165,9 @@ exports.soumettreQuiz = async (req, res) => {
             let points = 0;
 
             if (question.type === 'TEXTE_LIBRE') {
-                estCorrecte = question.options.some(opt => 
-                    opt.texte.toLowerCase().trim() === reponseUtilisateur?.toLowerCase().trim()
+                estCorrecte = question.options.some(
+                    opt =>
+                        opt.texte.toLowerCase().trim() === reponseUtilisateur?.toLowerCase().trim()
                 );
             } else {
                 estCorrecte = question.options
@@ -182,7 +184,7 @@ exports.soumettreQuiz = async (req, res) => {
                 question: question._id,
                 reponsesDonnees: reponseUtilisateur,
                 estCorrecte,
-                points
+                points,
             };
         });
 
@@ -200,7 +202,7 @@ exports.soumettreQuiz = async (req, res) => {
             tempsPasseEnSecondes: req.body.tempsPasseEnSecondes || 0,
             numeroTentative: tentatives + 1,
             dateDebut: req.body.dateDebut,
-            dateFin: new Date()
+            dateFin: new Date(),
         });
 
         await resultat.save();
@@ -209,7 +211,7 @@ exports.soumettreQuiz = async (req, res) => {
             quizId,
             utilisateurId,
             score: pourcentage,
-            estReussi
+            estReussi,
         });
 
         res.status(200).json({
@@ -219,15 +221,15 @@ exports.soumettreQuiz = async (req, res) => {
                 score: pourcentage,
                 estReussi,
                 reponses: reponsesEvaluees,
-                tentativesRestantes: quiz.tentativesMax - (tentatives + 1)
-            }
+                tentativesRestantes: quiz.tentativesMax - (tentatives + 1),
+            },
         });
     } catch (error) {
         logger.error('Erreur lors de la soumission du quiz:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la soumission du quiz',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -252,10 +254,10 @@ exports.recupererStatistiques = async (req, res) => {
                     _id: '$reponses.question',
                     totalTentatives: { $sum: 1 },
                     reussites: {
-                        $sum: { $cond: ['$reponses.estCorrecte', 1, 0] }
-                    }
-                }
-            }
+                        $sum: { $cond: ['$reponses.estCorrecte', 1, 0] },
+                    },
+                },
+            },
         ]);
 
         res.status(200).json({
@@ -266,15 +268,15 @@ exports.recupererStatistiques = async (req, res) => {
                 nombreReussites,
                 tauxReussite: (nombreReussites / nombreTentatives) * 100,
                 moyenneNotes,
-                questionStats
-            }
+                questionStats,
+            },
         });
     } catch (error) {
         logger.error('Erreur lors de la récupération des statistiques:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération des statistiques',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -284,5 +286,5 @@ module.exports = {
     recupererQuiz,
     recupererQuizParId,
     soumettreQuiz,
-    recupererStatistiques
+    recupererStatistiques,
 };

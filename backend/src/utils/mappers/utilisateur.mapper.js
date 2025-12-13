@@ -15,13 +15,7 @@ const Utilisateur = require('../utilisateur.class');
 function mapperMongoVersUtilisateur(doc) {
     if (!doc) return null;
 
-    const utilisateur = new Utilisateur(
-        doc._id,
-        doc.nom,
-        doc.prenom,
-        doc.email,
-        doc.roles
-    );
+    const utilisateur = new Utilisateur(doc._id, doc.nom, doc.prenom, doc.email, doc.roles);
 
     utilisateur.telephone = doc.telephone;
     utilisateur.dateNaissance = doc.dateNaissance;
@@ -57,7 +51,7 @@ function mapperUtilisateurVersMongo(utilisateur) {
         creeLe: utilisateur.creeLe,
         majLe: utilisateur.majLe,
         tentativesConnexion: utilisateur.tentativesConnexion,
-        verrouilleJusqua: utilisateur.verrouilleJusqua
+        verrouilleJusqua: utilisateur.verrouilleJusqua,
     };
 }
 
@@ -87,8 +81,8 @@ function mapperMongoVersAPI(doc) {
             estActif: doc.statut === 'ACTIF',
             estVerrouille: doc.verrouilleJusqua && new Date() < new Date(doc.verrouilleJusqua),
             tentativesConnexion: doc.tentativesConnexion || 0,
-            verrouilleJusqua: doc.verrouilleJusqua ? doc.verrouilleJusqua.toISOString() : null
-        }
+            verrouilleJusqua: doc.verrouilleJusqua ? doc.verrouilleJusqua.toISOString() : null,
+        },
     };
 }
 
@@ -113,7 +107,7 @@ function mapperMongoVersGraphQL(doc) {
         statut: doc.statut || 'ACTIF',
         dernierConnexion: doc.dernierConnexion ? doc.dernierConnexion.toISOString() : null,
         creeLe: doc.creeLe ? doc.creeLe.toISOString() : null,
-        majLe: doc.majLe ? doc.majLe.toISOString() : null
+        majLe: doc.majLe ? doc.majLe.toISOString() : null,
     };
 }
 
@@ -121,5 +115,5 @@ module.exports = {
     mapperMongoVersUtilisateur,
     mapperUtilisateurVersMongo,
     mapperMongoVersAPI,
-    mapperMongoVersGraphQL
-}; 
+    mapperMongoVersGraphQL,
+};

@@ -12,17 +12,17 @@ const createApolloServer = () => {
                 // Add any context properties here
             };
         },
-        formatError: (error) => {
+        formatError: error => {
             // Remove internal server error details from production
             if (process.env.NODE_ENV === 'production') {
                 return {
                     message: 'Internal server error',
-                    path: error.path
+                    path: error.path,
                 };
             }
             return error;
-        }
+        },
     });
 };
 
-module.exports = { createApolloServer }; 
+module.exports = { createApolloServer };
