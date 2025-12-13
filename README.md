@@ -19,6 +19,31 @@
   - Génération de recommandations
   - Évaluation des livrables
   - Rapports d'avancement
+- Formation intelligente d'équipes
+  - Optimisation basée sur les compétences
+  - Équilibrage des niveaux d'expérience
+  - Respect des préférences de collaboration
+- Association intelligente tuteurs-projets
+  - Matching basé sur les compétences
+  - Équilibrage de la charge des tuteurs
+  - Compatibilité thématique
+- Analyse prédictive de performance
+  - Prédiction des résultats
+  - Identification des risques
+  - Tendances de progression
+- Suivi automatisé de progression
+  - Calcul automatique du pourcentage d'avancement
+  - Statistiques en temps réel
+  - Alertes sur les retards
+- Ressources d'apprentissage personnalisées
+  - Recommandations de cours en ligne
+  - Suggestions de livres et projets pratiques
+  - Communautés d'apprentissage
+- Planification automatisée et rappels
+  - Génération automatique de planning
+  - Rappels intelligents pour les échéances
+  - Détection de conflits d'horaires
+  - Planification de réunions et soutenances
 
 ### Gestion des Sessions
 - Authentification sécurisée
@@ -47,6 +72,62 @@ cp .env.example .env
 
 # Démarrage du serveur de développement
 npm run dev
+```
+
+## API REST
+
+### Endpoints IA
+
+```bash
+# Formation d'équipes intelligente
+POST /api/ai/form-teams
+Body: { membres: [{ id, nom, competences, ... }] }
+
+# Association de tuteurs
+POST /api/ai/match-tutors
+Body: { membres: [{ id, role, competences, ... }] }
+
+# Recommandations d'apprentissage
+POST /api/ai/learning-resources
+Body: { competences: ["JavaScript", "React", ...] }
+
+# Suivi de progression
+POST /api/ai/track-progress
+Body: { taches: [{ titre, statut, ... }] }
+
+# Prédiction de performance
+POST /api/ai/predict-performance/:projetId
+Body: { historique: [...] }
+
+# Génération de planning
+POST /api/ai/generate-schedule
+Body: { taches: [...], dateDebut, dateFin }
+
+# Analyse de projet
+POST /api/ai/analyze
+Body: { projetId, contenu, type }
+```
+
+### Endpoints Planification
+
+```bash
+# Génération de rappels
+GET /api/scheduling/reminders/:projetId
+
+# Planification d'événements
+POST /api/scheduling/events/:projetId
+Body: { type: "REUNION", frequence: "HEBDOMADAIRE" }
+
+# Envoi de notifications
+POST /api/scheduling/notifications
+Body: { rappels: [...] }
+
+# Détection de conflits
+POST /api/scheduling/conflicts
+Body: { evenements: [...] }
+
+# Planning complet
+GET /api/scheduling/complete/:projetId
 ```
 
 ## Tests

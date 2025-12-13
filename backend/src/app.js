@@ -159,6 +159,30 @@ const creerApplication = async () => {
         cors: false,
     });
 
+    // Routes REST API
+    const aiRoutes = require('./routes/ai.routes');
+    const schedulingRoutes = require('./routes/scheduling.routes');
+    
+    app.use('/api/ai', aiRoutes);
+    app.use('/api/scheduling', schedulingRoutes);
+
+    // Route de santé de l'API
+    app.get('/api/health', (req, res) => {
+        res.status(200).json({
+            success: true,
+            message: 'API is healthy',
+            data: {
+                status: 'ok',
+                timestamp: new Date().toISOString(),
+                services: {
+                    graphql: 'operational',
+                    ai: 'operational',
+                    scheduling: 'operational'
+                }
+            }
+        });
+    });
+
     // Gestion des erreurs
     app.use(gestionnaireErreurs);
 

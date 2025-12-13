@@ -1,0 +1,204 @@
+<div class="container mx-auto p-6">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Planification Automatisée et Rappels</h1>
+
+    <!-- Configuration -->
+    <div class="mb-8 bg-gray-50 p-4 rounded-lg">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">Configuration</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Fréquence des événements</label>
+          <select 
+            [(ngModel)]="frequence"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option *ngFor="let opt of frequenceOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Type d'événement</label>
+          <select 
+            [(ngModel)]="typeEvenement"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          >
+            <option *ngFor="let opt of typeOptions" [value]="opt.value">{{ opt.label }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <button 
+        (click)="chargerPlanningComplet()"
+        [disabled]="loading"
+        class="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400"
+      >
+        🔄 Charger Planning Complet
+      </button>
+      <button 
+        (click)="genererRappels()"
+        [disabled]="loading"
+        class="px-4 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:bg-gray-400"
+      >
+        🔔 Générer Rappels
+      </button>
+      <button 
+        (click)="planifierEvenements()"
+        [disabled]="loading"
+        class="px-4 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:bg-gray-400"
+      >
+        📅 Planifier Événements
+      </button>
+      <button 
+        (click)="exporterPlanning()"
+        [disabled]="!rappels.length && !evenements.length"
+        class="px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition disabled:bg-gray-400"
+      >
+        💾 Exporter
+      </button>
+    </div>
+
+    <!-- Statistiques -->
+    <div *ngIf="statistiques && Object.keys(statistiques).length > 0" class="mb-8">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">Statistiques</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <h3 class="text-sm font-medium text-blue-700 mb-1">Rappels</h3>
+          <p class="text-2xl font-bold text-blue-900">{{ statistiques.rappels?.total || 0 }}</p>
+          <p class="text-xs text-blue-600">dont {{ statistiques.rappels?.urgents || 0 }} urgents</p>
+        </div>
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+          <h3 class="text-sm font-medium text-green-700 mb-1">Événements</h3>
+          <p class="text-2xl font-bold text-green-900">{{ statistiques.evenements?.total || 0 }}</p>
+          <p class="text-xs text-green-600">{{ statistiques.evenements?.reunions || 0 }} réunions</p>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+          <h3 class="text-sm font-medium text-red-700 mb-1">Conflits</h3>
+          <p class="text-2xl font-bold text-red-900">{{ statistiques.conflits?.total || 0 }}</p>
+          <p class="text-xs text-red-600">dont {{ statistiques.conflits?.graves || 0 }} graves</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rappels -->
+    <div *ngIf="rappels.length > 0" class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-700">Rappels ({{ rappels.length }})</h2>
+        <button 
+          (click)="envoyerNotifications()"
+          class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+        >
+          📧 Envoyer Notifications
+        </button>
+      </div>
+      <div class="space-y-3">
+        <div 
+          *ngFor="let rappel of rappels"
+          [ngClass]="getPrioriteClass(rappel.priorite)"
+          class="border-l-4 p-4 rounded-r-lg"
+        >
+          <div class="flex justify-between items-start">
+            <div>
+              <h3 class="font-semibold">{{ rappel.titre }}</h3>
+              <p class="text-sm mt-1">{{ rappel.message }}</p>
+              <p class="text-xs mt-2 opacity-75">
+                🕐 {{ rappel.dateRappel | date:'short' }} | 
+                👥 {{ rappel.destinataires.length }} destinataire(s)
+              </p>
+            </div>
+            <span class="px-2 py-1 text-xs font-semibold rounded-full bg-white">
+              {{ rappel.type }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Événements -->
+    <div *ngIf="evenements.length > 0" class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-gray-700">Événements Planifiés ({{ evenements.length }})</h2>
+        <button 
+          (click)="detecterConflits()"
+          class="px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
+        >
+          ⚠️ Détecter Conflits
+        </button>
+      </div>
+      <div class="space-y-3">
+        <div 
+          *ngFor="let evt of evenements"
+          class="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-200 p-4 rounded-lg"
+        >
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <h3 class="font-semibold text-gray-800">{{ evt.titre }}</h3>
+              <p class="text-sm text-gray-600 mt-1">{{ evt.description }}</p>
+            </div>
+            <span 
+              class="px-3 py-1 text-xs font-semibold rounded-full"
+              [ngClass]="{
+                'bg-blue-200 text-blue-800': evt.type === 'REUNION',
+                'bg-green-200 text-green-800': evt.type === 'REVUE',
+                'bg-red-200 text-red-800': evt.type === 'SOUTENANCE'
+              }"
+            >
+              {{ evt.type }}
+            </span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
+            <div>📅 {{ evt.date | date:'short' }}</div>
+            <div>⏱️ {{ evt.duree }} minutes</div>
+            <div>📍 {{ evt.lieu }}</div>
+            <div>👥 {{ evt.participants.length }} participant(s)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conflits -->
+    <div *ngIf="conflits.length > 0" class="mb-8">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">⚠️ Conflits Détectés ({{ conflits.length }})</h2>
+      <div class="space-y-3">
+        <div 
+          *ngFor="let conflit of conflits"
+          [ngClass]="getGraviteClass(conflit.gravite)"
+          class="border-l-4 border-red-500 p-4 rounded-r-lg"
+        >
+          <h3 class="font-semibold mb-2">{{ conflit.type }}</h3>
+          <div class="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p class="font-medium">Événement 1:</p>
+              <p>{{ conflit.evenement1.titre }}</p>
+              <p class="text-xs">{{ conflit.evenement1.date | date:'short' }}</p>
+            </div>
+            <div>
+              <p class="font-medium">Événement 2:</p>
+              <p>{{ conflit.evenement2.titre }}</p>
+              <p class="text-xs">{{ conflit.evenement2.date | date:'short' }}</p>
+            </div>
+          </div>
+          <p class="text-xs mt-2">
+            Participants communs: {{ conflit.participantsCommuns.join(', ') }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Message si aucune donnée -->
+    <div 
+      *ngIf="!loading && rappels.length === 0 && evenements.length === 0"
+      class="text-center py-12 text-gray-500"
+    >
+      <p class="text-lg">Aucune donnée disponible</p>
+      <p class="text-sm">Utilisez les boutons ci-dessus pour générer un planning</p>
+    </div>
+
+    <!-- Loader -->
+    <div *ngIf="loading" class="text-center py-12">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+      <p class="text-gray-600 mt-4">Chargement en cours...</p>
+    </div>
+  </div>
+</div>

@@ -727,4 +727,30 @@ const mockAIService = {
 };
 
 // Export all functions
-module.exports = mockAIService;
+module.exports = {
+    // Core AI functions
+    genererTexte,
+    analyserProjet,
+    
+    // Team and tutor management
+    creerEquipes,
+    associerTuteurs,
+    
+    // Progress tracking and analytics
+    suiviProgression,
+    predirePerformance,
+    genererPlanning,
+    
+    // Learning and recommendations
+    recommanderApprentissage,
+    generateAIAnalysis,
+    
+    // Helper functions
+    validerReponseJSON,
+    extraireJSONDepuisReponse,
+    traiterReponseIA,
+    
+    // Backward compatibility aliases
+    generateLearningRecommendations: recommanderApprentissage,
+    predictPerformance: predirePerformance
+};
