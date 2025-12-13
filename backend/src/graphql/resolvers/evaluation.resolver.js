@@ -164,7 +164,7 @@ const Mutation = {
         try {
             const evaluation = await Evaluation.findByIdAndDelete(id);
             if (!evaluation) throw new Error('Evaluation not found');
-            return mapEvaluationMongoVersGraphQL(evaluation);
+            return true;
         } catch (error) {
             logger.error('Error deleting evaluation:', error);
             throw new Error('Failed to delete evaluation');
