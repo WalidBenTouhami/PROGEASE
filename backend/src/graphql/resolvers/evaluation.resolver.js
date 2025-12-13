@@ -7,9 +7,12 @@
 
 'use strict';
 
+const mongoose = require('mongoose');
 const Evaluation = require('../../models/evaluation.model');
 const logger = require('../../utils/logger');
 const { mapProjetMongoVersGraphQL } = require('./projet.resolver');
+const { checkAuthorization } = require('../../utils/auth.utils');
+const { AppError, ERROR_CODES } = require('../../middlewares/errorHandlers');
 
 /**
  * Transforme un document MongoDB Evaluation en type GraphQL
@@ -198,6 +201,5 @@ const EvaluationResolver = {
 module.exports = {
     Query,
     Mutation,
-    EvaluationResolver,
-    mapEvaluationMongoVersGraphQL,
+    Evaluation: EvaluationResolver,
 };
