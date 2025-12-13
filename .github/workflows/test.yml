@@ -24,6 +24,9 @@ jobs:
         cache: 'npm'
     
     - name: Install dependencies
+      env:
+        MONGOMS_DISABLE_POSTINSTALL: 1
+        MONGOMS_SKIP_DOWNLOAD: 1
       run: |
         cd frontend
         npm ci
