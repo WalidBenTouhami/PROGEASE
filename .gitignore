@@ -61,3 +61,9 @@ todo
 
 # Ignorer tous les repertoires node_modules
 
+# Log files
+*.log
+logs/
+backend/logs/
+frontend/logs/
+

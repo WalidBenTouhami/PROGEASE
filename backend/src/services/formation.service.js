@@ -60,7 +60,7 @@ async function recupererFormations(options = {}) {
             sort = { creeLe: -1 };
             break;
         case 'populaire':
-            -1;
+            sort = { nombreParticipations: -1 };
             break;
         case 'note':
             sort = { noteMoyenne: -1 };
