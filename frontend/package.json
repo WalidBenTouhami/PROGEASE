@@ -22,7 +22,7 @@
     "clean": "rimraf dist",
     "codegen": "graphql-codegen",
     "lint": "ng lint",
-    "format:check": "echo 'No format check configured for frontend'"
+    "format:check": "exit 0"
   },
   "private": true,
   "dependencies": {
