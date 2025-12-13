@@ -99,7 +99,7 @@ jobs:
 
       # Upload des rapports de couverture
       - name: Upload coverage reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: coverage-reports
           path: |
@@ -125,13 +125,13 @@ jobs:
 
       # Upload des artefacts
       - name: Upload API docs artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: api-docs
           path: backend/docs/
 
       - name: Upload test reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-reports
           path: backend/reports/

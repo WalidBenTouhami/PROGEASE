@@ -16,7 +16,13 @@ jest.mock('axios', () => {
     };
 });
 
-const { analyserProjet, suiviProgression } = require('../../src/services/ai.service');
+const { 
+    analyserProjet, 
+    suiviProgression,
+    creerEquipes,
+    associerTuteurs,
+    recommanderApprentissage
+} = require('../../src/services/ai.service');
 const axios = require('axios');
 
 jest.setTimeout(60000); // Augmenter le délai global pour tous les tests
@@ -99,6 +105,136 @@ describe('AIService', () => {
             expect(progression).toBeDefined();
             expect(progression.totalTaches).toBe(0);
             expect(progression.pourcentageProgression).toBe(0);
+        }, 30000);
+    });
+
+    describe('creerEquipes', () => {
+        beforeEach(() => {
+            mockAxiosPost.mockResolvedValue({
+                data: {
+                    choices: [{
+                        message: {
+                            content: JSON.stringify({
+                                equipes: [
+                                    {
+                                        id: 'equipe1',
+                                        membres: ['user1', 'user2'],
+                                        competencesPrincipales: ['JavaScript', 'React'],
+                                        forceEstimee: 8.5
+                                    }
+                                ]
+                            })
+                        }
+                    }]
+                }
+            });
+        });
+
+        it('devrait former des équipes à partir d\'une liste de membres', async () => {
+            const membres = [
+                { id: 'user1', nom: 'Alice', competences: ['JavaScript', 'React'] },
+                { id: 'user2', nom: 'Bob', competences: ['Python', 'Django'] },
+                { id: 'user3', nom: 'Charlie', competences: ['JavaScript', 'Node.js'] }
+            ];
+
+            const result = await creerEquipes(membres);
+            expect(result).toBeDefined();
+            expect(result.equipes).toBeDefined();
+            expect(Array.isArray(result.equipes)).toBe(true);
+            expect(mockAxiosPost).toHaveBeenCalled();
+        }, 30000);
+
+        it('devrait rejeter si la liste de membres est vide', async () => {
+            await expect(creerEquipes([])).rejects.toThrow('Liste de membres vide');
+        }, 30000);
+
+        it('devrait rejeter si le paramètre n\'est pas un tableau', async () => {
+            await expect(creerEquipes(null)).rejects.toThrow('Liste de membres vide');
+            await expect(creerEquipes('invalid')).rejects.toThrow('Liste de membres vide');
+        }, 30000);
+    });
+
+    describe('associerTuteurs', () => {
+        beforeEach(() => {
+            mockAxiosPost.mockResolvedValue({
+                data: {
+                    choices: [{
+                        message: {
+                            content: JSON.stringify({
+                                associations: [
+                                    {
+                                        equipe: 'equipe1',
+                                        tuteur: 'tuteur1',
+                                        raisonAssociation: 'Expertise en développement web',
+                                        scoreCompatibilite: 0.85
+                                    }
+                                ]
+                            })
+                        }
+                    }]
+                }
+            });
+        });
+
+        it('devrait associer des tuteurs aux équipes', async () => {
+            const membres = [
+                { id: 'tuteur1', role: 'TUTEUR', competences: ['JavaScript', 'React'] },
+                { id: 'equipe1', role: 'EQUIPE', competences: ['JavaScript'] }
+            ];
+
+            const result = await associerTuteurs(membres);
+            expect(result).toBeDefined();
+            expect(result.associations).toBeDefined();
+            expect(Array.isArray(result.associations)).toBe(true);
+            expect(mockAxiosPost).toHaveBeenCalled();
+        }, 30000);
+
+        it('devrait rejeter si la liste est vide', async () => {
+            await expect(associerTuteurs([])).rejects.toThrow('Liste de membres vide');
+        }, 30000);
+    });
+
+    describe('recommanderApprentissage', () => {
+        beforeEach(() => {
+            mockAxiosPost.mockResolvedValue({
+                data: {
+                    choices: [{
+                        message: {
+                            content: JSON.stringify({
+                                recommandations: [
+                                    {
+                                        competence: 'JavaScript',
+                                        ressources: {
+                                            cours: { titre: 'JavaScript Avancé', lien: 'https://example.com' },
+                                            livre: { titre: 'You Don\'t Know JS', auteur: 'Kyle Simpson' },
+                                            projet: { titre: 'Todo App', description: 'Application de gestion de tâches' },
+                                            communaute: { nom: 'r/javascript', lien: 'https://reddit.com/r/javascript' }
+                                        }
+                                    }
+                                ]
+                            })
+                        }
+                    }]
+                }
+            });
+        });
+
+        it('devrait recommander des ressources d\'apprentissage', async () => {
+            const competences = ['JavaScript', 'React', 'Node.js'];
+
+            const result = await recommanderApprentissage(competences);
+            expect(result).toBeDefined();
+            expect(result.recommandations).toBeDefined();
+            expect(Array.isArray(result.recommandations)).toBe(true);
+            expect(mockAxiosPost).toHaveBeenCalled();
+        }, 30000);
+
+        it('devrait rejeter si la liste de compétences est vide', async () => {
+            await expect(recommanderApprentissage([])).rejects.toThrow('Liste de competences vide');
+        }, 30000);
+
+        it('devrait rejeter si le paramètre n\'est pas un tableau', async () => {
+            await expect(recommanderApprentissage(null)).rejects.toThrow('Liste de competences vide');
         }, 30000);
     });
 }); 

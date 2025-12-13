@@ -18,7 +18,7 @@ app.use(express.json());
 
 const certificatRoutes = require('./backend/src/routes/certificationRoutes'); // Routes pour les certificats
 const formationRoutes = require('./backend/src/routes/formationRoutes'); // Routes pour les formations
-const utilisateurRoutes = require('./routes/utilisateurRoutes.js');  
+const utilisateurRoutes = require('./backend/src/routes/utilisateur.routes.js');  
 const quizRoute = require('./backend/src/routes/quizRoutes'); // Routes pour les quiz
 
 
