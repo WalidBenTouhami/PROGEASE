@@ -4,8 +4,8 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
 import { CommonModule } from '@angular/common';
 import { LivrableListComponent } from './livrable-list.component';
-import { LivrableService } from '../../core/services/livrable.service';
-import { Livrable, StatutLivrable } from '../../core/models/livrable.model';
+import { LivrableService } from '../../../core/services/livrable.service';
+import { Livrable, StatutLivrable, TypeLivrable } from '../../../core/models/livrable.model';
 import { of, throwError } from 'rxjs';
 
 describe('LivrableListComponent', () => {
@@ -18,27 +18,29 @@ describe('LivrableListComponent', () => {
       _id: '1',
       intitule: 'Test 1',
       description: 'Description test 1',
-      dateLimite: new Date('2024-06-30'),
+      type: TypeLivrable.DOCUMENT,
+      dateLimite: '2024-06-30',
       projetId: 'projet1',
       statut: StatutLivrable.EN_COURS,
-      creeLe: new Date(),
-      majLe: new Date()
+      creeLe: '2024-01-01',
+      majLe: '2024-01-01'
     },
     {
       _id: '2',
       intitule: 'Test 2',
       description: 'Description test 2',
-      dateLimite: new Date('2024-07-31'),
+      type: TypeLivrable.DOCUMENT,
+      dateLimite: '2024-07-31',
       projetId: 'projet1',
       statut: StatutLivrable.TERMINE,
-      creeLe: new Date(),
-      majLe: new Date()
+      creeLe: '2024-01-01',
+      majLe: '2024-01-01'
     }
   ];
 
   beforeEach(async () => {
-    const spy = jasmine.createSpyObj('LivrableService', ['recupererLivrablesParProjet']);
-    spy.recupererLivrablesParProjet.and.returnValue(of(mockLivrables));
+    const spy = jasmine.createSpyObj('LivrableService', ['getLivrables']);
+    spy.getLivrables.and.returnValue(of(mockLivrables));
 
     await TestBed.configureTestingModule({
       imports: [
@@ -71,36 +73,19 @@ describe('LivrableListComponent', () => {
     component.ngOnInit();
     tick();
 
-    expect(livrableService.recupererLivrablesParProjet).toHaveBeenCalledWith('projet1');
-    expect(component.livrables.length).toBe(2);
-    expect(component.chargement).toBeFalse();
+    expect(livrableService.getLivrables).toHaveBeenCalled();
+    expect(component.dataSource.data.length).toBe(2);
   }));
 
   it('should handle error when loading livrables', fakeAsync(() => {
-    livrableService.recupererLivrablesParProjet.and.returnValue(
+    livrableService.getLivrables.and.returnValue(
       throwError(() => new Error('Test error'))
     );
 
     component.ngOnInit();
     tick();
 
-    expect(component.erreur).toBeTruthy();
-    expect(component.chargement).toBeFalse();
+    // Error is logged to console, component continues to work
+    expect(component.dataSource.data.length).toBe(0);
   }));
-
-  it('should check status correctly', () => {
-    expect(component.isEnAttente(StatutLivrable.EN_ATTENTE)).toBeTrue();
-    expect(component.isEnRetard(StatutLivrable.EN_RETARD)).toBeTrue();
-    expect(component.isTermine(StatutLivrable.TERMINE)).toBeTrue();
-    expect(component.isStatus(StatutLivrable.EN_COURS, StatutLivrable.EN_COURS)).toBeTrue();
-  });
-
-  it('should unsubscribe on destroy', () => {
-    const subscription = component['subscription'];
-    spyOn(subscription!, 'unsubscribe');
-
-    component.ngOnDestroy();
-
-    expect(subscription?.unsubscribe).toHaveBeenCalled();
-  });
 });

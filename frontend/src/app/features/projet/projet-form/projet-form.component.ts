@@ -70,12 +70,12 @@ export class ProjetFormComponent implements OnInit {
       const projet: Projet = this.projetForm.value;
 
       if (this.isEditing && this.projetId) {
-        this.projetService.mettreAJourProjet(this.projetId, projet).subscribe({
+        this.projetService.updateProjet(this.projetId, projet).subscribe({
           next: () => this.router.navigate(['/projets']),
           error: () => this.erreur = 'Erreur lors de la sauvegarde du projet.'
         });
       } else {
-        this.projetService.creerProjet(projet).subscribe({
+        this.projetService.createProjet(projet).subscribe({
           next: () => this.router.navigate(['/projets']),
           error: () => this.erreur = 'Erreur lors de la sauvegarde du projet.'
         });
@@ -98,7 +98,7 @@ export class ProjetFormComponent implements OnInit {
   }
 
   private chargerProjet(id: string): void {
-    this.projetService.recupererProjetParId(id).subscribe({
+    this.projetService.getProjet(id).subscribe({
       next: (projet: Projet) => {
         this.projetForm.patchValue({
           titre: projet.titre,
