@@ -12,7 +12,7 @@ const Evaluation = require('../../models/evaluation.model');
 const logger = require('../../utils/logger');
 const { checkAuthorization } = require('../../utils/auth.utils');
 const { AppError } = require('../../middlewares/errorHandlers');
-const { ERROR_CODES } = require('../../../config/constants');
+const { ERROR_CODES } = require('../../config/constants');
 
 /**
  * Transforme un document MongoDB Evaluation en type GraphQL
@@ -94,11 +94,11 @@ const Query = {
                 };
             }
 
-            const scores = evaluations.map(e => e.score);
-            const totalEvaluations = scores.length;
-            const moyenneScore = scores.reduce((a, b) => a + b, 0) / totalEvaluations;
-            const scoreMax = Math.max(...scores);
-            const scoreMin = Math.min(...scores);
+            const notes = evaluations.map(e => e.note);
+            const totalEvaluations = notes.length;
+            const moyenneScore = notes.reduce((a, b) => a + b, 0) / totalEvaluations;
+            const scoreMax = Math.max(...notes);
+            const scoreMin = Math.min(...notes);
 
             return {
                 moyenneScore,

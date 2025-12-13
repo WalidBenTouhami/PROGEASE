@@ -2,7 +2,7 @@
  * Schéma GraphQL pour les évaluations
  *
  * @module graphql/schemas/evaluation
- * @created 2025-05-31
+ * @created 2024-12-13
  */
 
 'use strict';
