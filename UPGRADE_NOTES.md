@@ -1,5 +1,22 @@
 # Upgrade Notes
 
+## December 2024 - CI/CD Firewall Fix
+
+### Fixed Issues
+
+#### MongoDB Memory Server Firewall Blocking
+- **Issue**: `mongodb-memory-server` package attempts to download MongoDB binaries from `fastdl.mongodb.org` during postinstall, which is blocked by GitHub Actions firewall
+- **Fix**: Added environment variables to skip binary download in CI/CD environments
+  - `MONGOMS_DISABLE_POSTINSTALL=1` - Disables the postinstall script
+  - `MONGOMS_SKIP_DOWNLOAD=1` - Skips the binary download
+- **Files Modified**:
+  - `.github/workflows/ci.yml` - Added env vars to install steps
+  - `.github/workflows/test.yml` - Added env vars to install steps
+  - `backend/.mongodb-memory-server.config.json` - Added configuration file
+  - `env.example` - Added documentation for the environment variables
+- **Action Required**: None - CI/CD will now work without firewall issues
+- **Note**: The CI/CD workflows already use a real MongoDB service (mongo:5.0), so mongodb-memory-server binaries are not needed during npm install
+
 ## December 2024 - Dependency Updates
 
 ### Fixed Issues

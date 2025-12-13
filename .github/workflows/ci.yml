@@ -44,11 +44,17 @@ jobs:
 
       # Installation des dépendances
       - name: Install backend dependencies
+        env:
+          MONGOMS_DISABLE_POSTINSTALL: 1
+          MONGOMS_SKIP_DOWNLOAD: 1
         run: |
           cd backend
           npm ci
 
       - name: Install frontend dependencies
+        env:
+          MONGOMS_DISABLE_POSTINSTALL: 1
+          MONGOMS_SKIP_DOWNLOAD: 1
         run: |
           cd frontend
           npm ci
