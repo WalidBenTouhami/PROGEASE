@@ -479,9 +479,10 @@ suite
         console.log(String(event.target));
     })
     .on('complete', function() {
-        // All tests should complete > 10,000 ops/sec
+        // All tests should complete reasonably fast (> 1,000 ops/sec)
+        // This ensures no exponential backtracking is occurring
         this.forEach((bench) => {
-            expect(bench.hz).toBeGreaterThan(10000);
+            expect(bench.hz).toBeGreaterThan(1000);
         });
     })
     .run();
@@ -608,11 +609,11 @@ The PR addresses important security concerns, but the email regex vulnerability 
 
 ## 📚 Additional Resources
 
-- [OWASP ReDoS Guide](https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS)
+- [OWASP ReDoS Guide](https://cheatsheetseries.owasp.org/cheatsheets/Regular_Expression_Security_Cheat_Sheet.html)
 - [safe-regex npm package](https://www.npmjs.com/package/safe-regex)
 - [redos-detector](https://www.npmjs.com/package/redos-detector)
-- [RFC 5322 (Email Validation)](https://tools.ietf.org/html/rfc5322)
-- [RFC 3986 (URI Specification)](https://tools.ietf.org/html/rfc3986)
+- [RFC 5322 (Email Validation)](https://datatracker.ietf.org/doc/html/rfc5322)
+- [RFC 3986 (URI Specification)](https://datatracker.ietf.org/doc/html/rfc3986)
 
 ---
 
