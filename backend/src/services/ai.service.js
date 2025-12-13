@@ -698,34 +698,29 @@ async function recommanderApprentissage(competences) {
     return await traiterReponseIA(prompt);
 }
 
-// Mock AI service implementation
-const mockAIService = {
-    generateRecommendations: async (projet) => {
-        logger.debug('Generating mock recommendations for projet:', projet._id);
-        return {
-            text: 'Based on the projet progress and evaluations, here are some recommendations:\n' +
-                  '1. Focus on improving code quality and documentation\n' +
-                  '2. Consider implementing automated tests\n' +
-                  '3. Regular code reviews would be beneficial',
-            score: 0.85,
-            confidence: 0.9
-        };
-    },
-
-    generateLearningRecommendations: async (projet) => {
-        logger.debug('Generating mock learning recommendations for projet:', projet._id);
-        return 'To improve your learning outcomes:\n' +
-               '1. Review the fundamentals of software architecture\n' +
-               '2. Practice test-driven development\n' +
-               '3. Study design patterns applicable to your projet';
-    },
-
-    predictPerformance: async (projet) => {
-        logger.debug('Predicting mock performance for projet:', projet._id);
-        // Return a score between 0 and 1
-        return 0.75;
-    }
-};
-
 // Export all functions
-module.exports = mockAIService;
+module.exports = {
+    // Core AI functions
+    genererTexte,
+    analyserProjet,
+    
+    // Team and tutor management
+    creerEquipes,
+    associerTuteurs,
+    
+    // Progress tracking and analytics
+    suiviProgression,
+    predirePerformance,
+    genererPlanning,
+    
+    // Learning and recommendations
+    recommanderApprentissage,
+    generateAIAnalysis,
+    generateLearningRecommendations,
+    predictPerformance,
+    
+    // Helper functions
+    validerReponseJSON,
+    extraireJSONDepuisReponse,
+    traiterReponseIA
+};

@@ -35,6 +35,42 @@ router.post('/evaluate-livrable/:livrableId', aiController.evaluerLivrable);
  */
 router.get('/progress-report/:projetId', aiController.genererRapportAvancement);
 
+/**
+ * @route POST /api/ai/form-teams
+ * @desc Forme des équipes optimisées avec l'IA
+ */
+router.post('/form-teams', aiController.formerEquipes);
+
+/**
+ * @route POST /api/ai/match-tutors
+ * @desc Associe intelligemment tuteurs et projets
+ */
+router.post('/match-tutors', aiController.associerTuteurs);
+
+/**
+ * @route POST /api/ai/learning-resources
+ * @desc Recommande des ressources d'apprentissage personnalisées
+ */
+router.post('/learning-resources', aiController.recommanderRessources);
+
+/**
+ * @route POST /api/ai/predict-performance
+ * @desc Prédit la performance d'un projet
+ */
+router.post('/predict-performance/:projetId', aiController.predirePerformance);
+
+/**
+ * @route POST /api/ai/track-progress
+ * @desc Suit automatiquement la progression
+ */
+router.post('/track-progress', aiController.suivreProgression);
+
+/**
+ * @route POST /api/ai/generate-schedule
+ * @desc Génère un planning intelligent
+ */
+router.post('/generate-schedule', aiController.genererPlanning);
+
 // Route health
 router.get('/health', (req, res) => {
     res.status(200).json({
@@ -44,7 +80,15 @@ router.get('/health', (req, res) => {
             status: 'ok',
             service: 'ai-api',
             timestamp: new Date().toISOString(),
-            model: 'deepseek-test'
+            model: 'deepseek-test',
+            features: [
+                'Smart Team Formation',
+                'Intelligent Tutor Matching',
+                'Predictive Performance Analytics',
+                'Automated Progress Tracking',
+                'Personalized Learning Resources',
+                'Automated Scheduling'
+            ]
         }
     });
 });
