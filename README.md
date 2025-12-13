@@ -1245,7 +1245,7 @@ npm audit --production
 
 ### Signalement de Vulnérabilités
 
-Si vous découvrez une vulnérabilité de sécurité, veuillez **NE PAS** ouvrir une issue publique. Envoyez un email à: **security@progease.com** (ou utilisez GitHub Security Advisory)
+Si vous découvrez une vulnérabilité de sécurité, veuillez **NE PAS** ouvrir une issue publique. Utilisez la fonctionnalité [GitHub Security Advisory](https://github.com/WalidBenTouhami/PROGEASE/security/advisories) pour signaler de manière privée et responsable.
 
 ---
 
@@ -1590,9 +1590,9 @@ Voir le fichier [LICENSE](./LICENSE) pour plus de détails.
 
 ### 💬 Questions & Discussions
 
-- **GitHub Issues**: Pour les bugs et demandes de fonctionnalités
-- **GitHub Discussions**: Pour les questions générales et discussions
-- **Email**: contact@progease.com (remplacer par votre email)
+- **GitHub Issues**: Pour les bugs et demandes de fonctionnalités - [Ouvrir une issue](https://github.com/WalidBenTouhami/PROGEASE/issues)
+- **GitHub Discussions**: Pour les questions générales et discussions - [Démarrer une discussion](https://github.com/WalidBenTouhami/PROGEASE/discussions)
+- **Email**: Pour les questions privées ou les partenariats, contactez les mainteneurs via GitHub
 
 ### 📚 Documentation Complète
 
