@@ -8,8 +8,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
-import { ProjetService } from '../../core/services/projet.service';
-import { Projet, StatutProjet } from '../../core/models/projet.model';
+import { ProjetService } from '../../../core/services/projet.service';
+import { Projet, StatutProjet } from '../../../core/models/projet.model';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -99,7 +99,7 @@ export class ProjetFormComponent implements OnInit {
 
   private chargerProjet(id: string): void {
     this.projetService.recupererProjetParId(id).subscribe({
-      next: (projet) => {
+      next: (projet: Projet) => {
         this.projetForm.patchValue({
           titre: projet.titre,
           description: projet.description,

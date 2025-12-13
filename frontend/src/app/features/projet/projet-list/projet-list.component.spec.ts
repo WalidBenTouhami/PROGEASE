@@ -12,10 +12,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ProjetListComponent } from './projet-list.component';
-import { ProjetService } from '../../core/services/projet.service';
+import { ProjetService } from '../../../core/services/projet.service';
 import { of, throwError, timer } from 'rxjs';
 import { delay, take, map } from 'rxjs/operators';
-import { Projet, StatutProjet } from '../../core/models/projet.model';
+import { Projet, StatutProjet } from '../../../core/models/projet.model';
 
 describe('ProjetListComponent', () => {
   let component: ProjetListComponent;
@@ -27,8 +27,8 @@ describe('ProjetListComponent', () => {
       _id: '1',
       titre: 'Projet Test 1',
       description: 'Description test 1',
-      dateDebut: new Date('2024-01-01'),
-      dateFin: new Date('2024-12-31'),
+      dateDebut: '2024-01-01',
+      dateFin: '2024-12-31',
       statut: StatutProjet.EN_COURS,
       equipe: ['utilisateur1'],
       competences: ['Angular'],
@@ -38,8 +38,8 @@ describe('ProjetListComponent', () => {
       _id: '2',
       titre: 'Projet Test 2',
       description: 'Description test 2',
-      dateDebut: new Date('2024-02-01'),
-      dateFin: new Date('2024-11-30'),
+      dateDebut: '2024-02-01',
+      dateFin: '2024-11-30',
       statut: StatutProjet.TERMINE,
       equipe: ['utilisateur2'],
       competences: ['Node.js'],
@@ -48,8 +48,8 @@ describe('ProjetListComponent', () => {
   ];
 
   beforeEach(() => {
-    const projetServiceSpy = jasmine.createSpyObj('ProjetService', ['recupererProjets']);
-    projetServiceSpy.recupererProjets.and.returnValue(of(mockProjets));
+    const projetServiceSpy = jasmine.createSpyObj('ProjetService', ['getProjets']);
+    projetServiceSpy.getProjets.and.returnValue(of(mockProjets));
 
     TestBed.configureTestingModule({
       imports: [
@@ -84,12 +84,12 @@ describe('ProjetListComponent', () => {
   it('should load projets on init', fakeAsync(() => {
     component.ngOnInit();
     tick();
-    expect(projetService.recupererProjets).toHaveBeenCalled();
+    expect(projetService.getProjets).toHaveBeenCalled();
     expect(component.projets.length).toBe(2);
   }));
 
   it('should handle error when loading projets', fakeAsync(() => {
-    projetService.recupererProjets.and.returnValue(
+    projetService.getProjets.and.returnValue(
       throwError(() => new Error('Erreur test'))
     );
 
@@ -114,7 +114,7 @@ describe('ProjetListComponent', () => {
   });
 
   it('should handle empty projets list', fakeAsync(() => {
-    projetService.recupererProjets.and.returnValue(of([]));
+    projetService.getProjets.and.returnValue(of([]));
     component.ngOnInit();
     tick();
     expect(component.projets.length).toBe(0);
@@ -132,8 +132,8 @@ describe('ProjetListComponent Performance', () => {
       _id: i.toString(),
       titre: `Projet Test ${i}`,
       description: `Description test ${i}`,
-      dateDebut: new Date('2024-01-01'),
-      dateFin: new Date('2024-12-31'),
+      dateDebut: '2024-01-01',
+      dateFin: '2024-12-31',
       statut: StatutProjet.EN_COURS,
       equipe: ['utilisateur1'],
       competences: ['Angular'],
@@ -142,8 +142,8 @@ describe('ProjetListComponent Performance', () => {
   };
 
   beforeEach(async () => {
-    const spy = jasmine.createSpyObj('ProjetService', ['recupererProjets']);
-    spy.recupererProjets.and.returnValue(of(generateMockProjets(100)));
+    const spy = jasmine.createSpyObj('ProjetService', ['getProjets']);
+    spy.getProjets.and.returnValue(of(generateMockProjets(100)));
 
     await TestBed.configureTestingModule({
       imports: [
@@ -177,7 +177,7 @@ describe('ProjetListComponent Performance', () => {
 
   it('should load 1000 projects within 1 second', fakeAsync(() => {
     const startTime = performance.now();
-    projetService.recupererProjets.and.returnValue(of(generateMockProjets(1000)));
+    projetService.getProjets.and.returnValue(of(generateMockProjets(1000)));
 
     component.ngOnInit();
     tick();
@@ -219,7 +219,7 @@ describe('ProjetListComponent Performance', () => {
 
   it('should handle concurrent data loading and filtering', fakeAsync(() => {
     const mockProjets = generateMockProjets(500);
-    projetService.recupererProjets.and.returnValue(of(mockProjets).pipe(delay(100)));
+    projetService.getProjets.and.returnValue(of(mockProjets).pipe(delay(100)));
 
     component.ngOnInit();
     component.filtrerProjets('Test');
@@ -234,7 +234,7 @@ describe('ProjetListComponent Performance', () => {
     let updateCount = 0;
     const mockProjets = generateMockProjets(100);
 
-    projetService.recupererProjets.and.returnValue(
+    projetService.getProjets.and.returnValue(
       timer(0, 1000).pipe(
         take(updates),
         delay(100),
@@ -258,7 +258,7 @@ describe('ProjetListComponent Performance', () => {
 
   it('should optimize memory usage with large datasets', fakeAsync(() => {
     const largeMockProjets = generateMockProjets(5000);
-    projetService.recupererProjets.and.returnValue(of(largeMockProjets));
+    projetService.getProjets.and.returnValue(of(largeMockProjets));
 
     const initialMemory = (performance as any).memory?.usedJSHeapSize;
     component.ngOnInit();

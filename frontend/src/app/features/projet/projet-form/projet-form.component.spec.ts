@@ -10,10 +10,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ProjetFormComponent } from './projet-form.component';
-import { ProjetService } from '../../core/services/projet.service';
+import { ProjetService } from '../../../core/services/projet.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { StatutProjet } from '../../core/models/projet.model';
+import { StatutProjet } from '../../../core/models/projet.model';
 
 describe('ProjetFormComponent', () => {
   let component: ProjetFormComponent;

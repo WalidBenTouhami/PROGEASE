@@ -13,9 +13,7 @@ registerLocaleData(localeFr);
 Sentry.init({
   dsn: environment.sentry.dsn,
   integrations: [
-    Sentry.browserTracingIntegration({
-      tracePropagationTargets: ['localhost', environment.apiUrl],
-    }),
+    Sentry.browserTracingIntegration(),
   ],
   tracesSampleRate: isDevMode() ? 1.0 : 0.2,
   environment: environment.production ? 'production' : 'development',

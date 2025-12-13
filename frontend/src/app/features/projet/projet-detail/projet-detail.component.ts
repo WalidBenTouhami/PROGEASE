@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Projet } from '../../core/models/projet.model';
-import { Livrable } from '../../core/models/livrable.model';
+import { Projet } from '../../../core/models/projet.model';
+import { Livrable } from '../../../core/models/livrable.model';
 
 @Component({
   selector: 'app-projet-detail',

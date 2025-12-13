@@ -87,6 +87,8 @@ export class ProjetListComponent implements OnInit {
   dataSource: MatTableDataSource<Projet>;
   projets: Projet[] = [];
   projetsFiltres: Projet[] = [];
+  erreur = '';
+  chargement = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -100,6 +102,7 @@ export class ProjetListComponent implements OnInit {
   }
 
   loadProjets() {
+    this.chargement = true;
     this.projetService.getProjets().subscribe({
       next: (projets: Projet[]) => {
         this.projets = projets;
@@ -107,8 +110,11 @@ export class ProjetListComponent implements OnInit {
         this.dataSource.data = projets;
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
+        this.chargement = false;
       },
       error: (err) => {
+        this.erreur = 'Une erreur est survenue lors du chargement des projets.';
+        this.chargement = false;
         console.error('Error loading projets:', err);
       }
     });
