@@ -145,7 +145,7 @@ function injectEnumsInSchema(schemaPath) {
             return schemaTemplate.replace('# ENUM_DEFINITIONS', `# ENUM_DEFINITIONS\n${enums}`);
         } else {
             console.warn(
-                "Le marqueur '# ENUM_DEFINITIONS' n'a pas ete trouve dans le schema template."
+                'Le marqueur \'# ENUM_DEFINITIONS\' n\'a pas ete trouve dans le schema template.'
             );
             // Ajouter apres les directives
             const parts = schemaTemplate.split('\n\n');

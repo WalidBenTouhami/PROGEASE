@@ -7,7 +7,6 @@ const {
     validerChangementMotDePasse,
     verifierToken,
     verifierRole,
-    verifierProprietaire,
     verifierEmailUnique,
     limiterTentativesConnexion,
 } = require('../middlewares/utilisateur.middleware');

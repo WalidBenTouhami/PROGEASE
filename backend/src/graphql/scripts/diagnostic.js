@@ -26,7 +26,7 @@ function checkFile(filePath, relativePath) {
 }
 
 // Verification de l'environnement
-console.log("[1] Verification de l'environnement...");
+console.log('[1] Verification de l\'environnement...');
 console.log(`NODE_ENV: ${process.env.NODE_ENV || 'non defini'}`);
 console.log(`Systeme: ${os.type()} ${os.release()}`);
 console.log(`Node.js: ${process.version}`);

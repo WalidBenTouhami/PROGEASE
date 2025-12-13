@@ -59,7 +59,7 @@ const restreindreA = (...roles) => {
     return (req, res, next) => {
         if (!roles.includes(req.utilisateur.role)) {
             return next(
-                new AppError("Vous n'avez pas la permission d'effectuer cette action.", 403)
+                new AppError('Vous n\'avez pas la permission d\'effectuer cette action.', 403)
             );
         }
         next();

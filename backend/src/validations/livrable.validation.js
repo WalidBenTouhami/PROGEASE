@@ -17,20 +17,20 @@ const livrableSchema = yup.object().shape({
 
     projetId: yup
         .string()
-        .required("L'ID du projet est requis.")
+        .required('L\'ID du projet est requis.')
         .matches(/^[0-9a-fA-F]{24}$/, 'ID de projet invalide.'),
 
     dateLimite: yup
         .date()
         .required('La date limite est requise.')
-        .min(new Date(), "La date limite doit être ultérieure à aujourd'hui."),
+        .min(new Date(), 'La date limite doit être ultérieure à aujourd\'hui.'),
 
     statut: yup
         .string()
         .required('Le statut est requis.')
         .oneOf(Object.values(Enums.StatutLivrable), 'Statut invalide.'),
 
-    urlLivrable: yup.string().nullable().url("L'URL du livrable doit être valide."),
+    urlLivrable: yup.string().nullable().url('L\'URL du livrable doit être valide.'),
 });
 
 // Middleware de validation des donnees de livrable

@@ -1,6 +1,5 @@
 // src/models/Formation.js
 const mongoose = require('mongoose');
-const Quiz = require('./Quiz'); // Assurez-vous que le chemin est correct
 
 const formationSchema = new mongoose.Schema({
     titre: { type: String, required: true },

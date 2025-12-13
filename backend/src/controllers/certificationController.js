@@ -39,14 +39,14 @@ const createCertificat = async (req, res) => {
         const { utilisateurId, formationsRequises, titre, description, dureeValidite } = req.body;
 
         // Validation pour eviter les injections NoSQL sur l'identifiant utilisateur
-        if (typeof utilisateurId !== "string") {
-            return res.status(400).json({ error: "Identifiant utilisateur invalide" });
+        if (typeof utilisateurId !== 'string') {
+            return res.status(400).json({ error: 'Identifiant utilisateur invalide' });
         }
 
         // Verifiez que l'utilisateur a reussi tous les quiz pour les formations requises
         const estEligible = await checkQuizReussis(utilisateurId, formationsRequises);
         if (!estEligible) {
-            return res.status(403).json({ error: "L'utilisateur n'a pas rempli les conditions." });
+            return res.status(403).json({ error: 'L\'utilisateur n\'a pas rempli les conditions.' });
         }
 
         // Creer un nouveau certificat si l'utilisateur est eligible
@@ -80,7 +80,7 @@ const genererCertificat = async (req, res) => {
         // Verifiez si l'utilisateur a reussi tous les quiz pour les formations requises
         const estEligible = await checkQuizReussis(utilisateurId, formationsRequises);
         if (!estEligible) {
-            return res.status(403).json({ error: "L'utilisateur n'a pas rempli les conditions." });
+            return res.status(403).json({ error: 'L\'utilisateur n\'a pas rempli les conditions.' });
         }
 
         // Creer un nouveau certificat si l'utilisateur est eligible
@@ -128,7 +128,7 @@ const addutilisateurToFormation = async (req, res) => {
 
         if (utilisateur.role !== 'student') {
             return res.status(400).json({
-                error: "Seuls les etudiants peuvent s'inscrire à une formation.",
+                error: 'Seuls les etudiants peuvent s\'inscrire à une formation.',
             });
         }
 

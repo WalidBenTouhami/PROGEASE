@@ -9,7 +9,7 @@ module.exports = {
             answer: 'JSON.parse()',
         },
         {
-            question: "Quelle est la portee d'une variable declaree avec `let` ?",
+            question: 'Quelle est la portee d\'une variable declaree avec `let` ?',
             options: ['Globale', 'Fonction', 'Bloc'],
             answer: 'Bloc',
         },
@@ -34,22 +34,22 @@ module.exports = {
             answer: '() => {}',
         },
         {
-            question: "Quelle methode permet d'ajouter un element à la fin d'un tableau ?",
+            question: 'Quelle methode permet d\'ajouter un element à la fin d\'un tableau ?',
             options: ['push()', 'pop()', 'shift()'],
             answer: 'push()',
         },
         {
-            question: "Qu'est-ce que `NaN` signifie ?",
+            question: 'Qu\'est-ce que `NaN` signifie ?',
             options: ['Null and Nothing', 'Not a Number', 'No actual Name'],
             answer: 'Not a Number',
         },
         {
             question: 'Comment verifier si une variable est un tableau ?',
-            options: ["typeof x === 'array'", 'x instanceof Array', 'Array.isArray(x)'],
+            options: ['typeof x === \'array\'', 'x instanceof Array', 'Array.isArray(x)'],
             answer: 'Array.isArray(x)',
         },
         {
-            question: "Quelle boucle s'utilise pour parcourir les cles d'un objet ?",
+            question: 'Quelle boucle s\'utilise pour parcourir les cles d\'un objet ?',
             options: ['for...of', 'for...in', 'forEach'],
             answer: 'for...in',
         },

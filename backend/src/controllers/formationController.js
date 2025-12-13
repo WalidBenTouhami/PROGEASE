@@ -72,7 +72,7 @@ const addutilisateurToFormation = async (req, res) => {
 
         if (utilisateur.role !== 'student') {
             return res.status(400).json({
-                error: "Seuls les étudiants peuvent s'inscrire à une formation.",
+                error: 'Seuls les étudiants peuvent s\'inscrire à une formation.',
             });
         }
 
@@ -144,7 +144,7 @@ const genererCertificat = async (req, res) => {
 
         const estEligible = await checkQuizReussis(utilisateurId, formationsRequises);
         if (!estEligible) {
-            return res.status(403).json({ error: "L'utilisateur n'a pas rempli les conditions." });
+            return res.status(403).json({ error: 'L\'utilisateur n\'a pas rempli les conditions.' });
         }
 
         const nouveauCertificat = await Certificat.create({

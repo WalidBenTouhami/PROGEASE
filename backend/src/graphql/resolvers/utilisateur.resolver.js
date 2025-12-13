@@ -62,7 +62,7 @@ const resolvers = {
 
                 return mapUtilisateurMongoVersGraphQL(utilisateur);
             } catch (error) {
-                logger.error("Erreur lors de la récupération de l'utilisateur:", error);
+                logger.error('Erreur lors de la récupération de l\'utilisateur:', error);
                 throw handleMongooseError(error);
             }
         },

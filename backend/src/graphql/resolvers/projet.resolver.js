@@ -289,7 +289,7 @@ const Mutation = {
         }
 
         if (projet.equipe.includes(utilisateurId)) {
-            throw new UserInputError("L'utilisateur est déjà membre du projet");
+            throw new UserInputError('L\'utilisateur est déjà membre du projet');
         }
 
         projet.equipe.push(utilisateurId);
@@ -313,7 +313,7 @@ const Mutation = {
         }
 
         if (!projet.equipe.includes(utilisateurId)) {
-            throw new UserInputError("L'utilisateur n'est pas membre du projet");
+            throw new UserInputError('L\'utilisateur n\'est pas membre du projet');
         }
 
         projet.equipe = projet.equipe.filter(id => id.toString() !== utilisateurId);

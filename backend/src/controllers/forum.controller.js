@@ -176,10 +176,10 @@ exports.ajouterReponse = async (req, res) => {
             data: sujet.reponses[sujet.reponses.length - 1],
         });
     } catch (error) {
-        logger.error("Erreur lors de l'ajout de la réponse:", error);
+        logger.error('Erreur lors de l\'ajout de la réponse:', error);
         res.status(500).json({
             success: false,
-            message: "Erreur lors de l'ajout de la réponse",
+            message: 'Erreur lors de l\'ajout de la réponse',
         });
     }
 };
@@ -484,10 +484,10 @@ exports.recupererSujetsParUtilisateur = async (req, res) => {
             },
         });
     } catch (error) {
-        logger.error("Erreur lors de la récupération des sujets de l'utilisateur:", error);
+        logger.error('Erreur lors de la récupération des sujets de l\'utilisateur:', error);
         res.status(500).json({
             success: false,
-            message: "Erreur lors de la récupération des sujets de l'utilisateur",
+            message: 'Erreur lors de la récupération des sujets de l\'utilisateur',
         });
     }
 };

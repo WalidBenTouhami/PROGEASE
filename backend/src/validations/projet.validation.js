@@ -86,7 +86,7 @@ const projetSchema = yup.object().shape({
     equipe: yup
         .array()
         .of(yup.string().matches(/^[0-9a-fA-F]{24}$/, 'ID utilisateur invalide'))
-        .min(1, "L'équipe doit contenir au moins un membre"),
+        .min(1, 'L\'équipe doit contenir au moins un membre'),
     taches: yup.array().of(tacheSchema).default([]),
     signalements: yup.array().of(signalementSchema).default([]),
     progression: yup

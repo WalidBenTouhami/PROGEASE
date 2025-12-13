@@ -5,9 +5,9 @@ const { Schema } = mongoose;
 const optionSchema = new Schema({
     texte: {
         type: String,
-        required: [true, "Le texte de l'option est requis"],
+        required: [true, 'Le texte de l\'option est requis'],
         trim: true,
-        minlength: [1, "L'option doit contenir au moins 1 caractère"],
+        minlength: [1, 'L\'option doit contenir au moins 1 caractère'],
     },
     estCorrecte: {
         type: Boolean,
@@ -79,7 +79,7 @@ const quizSchema = new Schema(
         auteur: {
             type: Schema.Types.ObjectId,
             ref: 'Utilisateur',
-            required: [true, "L'auteur est requis"],
+            required: [true, 'L\'auteur est requis'],
         },
         dureeEstimee: {
             type: Number,

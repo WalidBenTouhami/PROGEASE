@@ -157,7 +157,7 @@ const resolvers = {
             }
 
             if (!formation.estPublie) {
-                throw new UserInputError("Cette formation n'est pas encore publiée");
+                throw new UserInputError('Cette formation n\'est pas encore publiée');
             }
 
             const dejaInscrit = formation.participants.some(
@@ -198,7 +198,7 @@ const resolvers = {
             );
 
             if (participantIndex === -1) {
-                throw new UserInputError("Vous n'êtes pas inscrit à cette formation");
+                throw new UserInputError('Vous n\'êtes pas inscrit à cette formation');
             }
 
             formation.participants.splice(participantIndex, 1);
@@ -265,7 +265,7 @@ const resolvers = {
             );
 
             if (!participant) {
-                throw new UserInputError("Vous n'êtes pas inscrit à cette formation");
+                throw new UserInputError('Vous n\'êtes pas inscrit à cette formation');
             }
 
             const module = formation.modules.id(moduleId);

@@ -1,11 +1,7 @@
 const Utilisateur = require('../models/utilisateur.model');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const logger = require('../utils/logger');
-const { JWT_SECRET } = require('../../config/constants');
-const { formatUtilisateurResponse } = require('../utils/formatters');
 const { AppError } = require('../utils/appError');
-const { MessagesErreur, StatutHttp, Enums } = require('../../config/constants');
+const { MessagesErreur, StatutHttp } = require('../../config/constants');
 
 class UtilisateurService {
     // Créer un nouvel utilisateur

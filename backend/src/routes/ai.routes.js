@@ -1,8 +1,6 @@
 // src/routes/ai.routes.js
 const express = require('express');
 const router = express.Router();
-const logger = require('../utils/logger');
-const aiService = require('../services/ai.service');
 const aiController = require('../controllers/ai.controller');
 const { rateLimiter } = require('../middlewares/rateLimiter');
 const {

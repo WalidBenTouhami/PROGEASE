@@ -43,7 +43,7 @@ const Query = {
         try {
             // Logique pour générer des recommandations AI
             return {
-                recommendations: "Recommandations générées par l'IA...",
+                recommendations: 'Recommandations générées par l\'IA...',
                 score: 0.85,
                 confidence: 0.9,
                 metadata: {
@@ -73,8 +73,8 @@ const Query = {
                 ],
             };
         } catch (error) {
-            logger.error("Erreur lors de l'analyse des risques:", error);
-            throw new Error("Impossible d'analyser les risques du projet");
+            logger.error('Erreur lors de l\'analyse des risques:', error);
+            throw new Error('Impossible d\'analyser les risques du projet');
         }
     },
 };
@@ -93,7 +93,7 @@ const Mutation = {
     generateLearningRecommendations: async (_, { projetId }, { models }) => {
         try {
             // Logique pour générer des recommandations d'apprentissage
-            return "Recommandations d'apprentissage générées...";
+            return 'Recommandations d\'apprentissage générées...';
         } catch (error) {
             logger.error('Erreur lors de la génération des recommandations:', error);
             throw new Error('Impossible de générer les recommandations');

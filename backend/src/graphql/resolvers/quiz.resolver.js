@@ -38,14 +38,14 @@ module.exports = {
 
             let sort = {};
             switch (tri) {
-                case 'populaire':
-                    sort = { nombreParticipations: -1 };
-                    break;
-                case 'difficulte':
-                    sort = { niveau: 1 };
-                    break;
-                default:
-                    sort = { creeLe: -1 };
+            case 'populaire':
+                sort = { nombreParticipations: -1 };
+                break;
+            case 'difficulte':
+                sort = { niveau: 1 };
+                break;
+            default:
+                sort = { creeLe: -1 };
             }
 
             const quiz = await Quiz.find(query)
@@ -89,7 +89,7 @@ module.exports = {
             }
 
             if (quiz.auteur.toString() !== utilisateur.id && utilisateur.role !== 'ADMIN') {
-                throw new AuthenticationError("Vous n'êtes pas autorisé à modifier ce quiz");
+                throw new AuthenticationError('Vous n\'êtes pas autorisé à modifier ce quiz');
             }
 
             Object.assign(quiz, input);
@@ -108,7 +108,7 @@ module.exports = {
             }
 
             if (quiz.auteur.toString() !== utilisateur.id && utilisateur.role !== 'ADMIN') {
-                throw new AuthenticationError("Vous n'êtes pas autorisé à supprimer ce quiz");
+                throw new AuthenticationError('Vous n\'êtes pas autorisé à supprimer ce quiz');
             }
 
             await quiz.remove();

@@ -57,8 +57,8 @@ const validerInscription = async (req, res, next) => {
 
         next();
     } catch (erreur) {
-        logger.error("Erreur de validation d'inscription:", erreur);
-        next(new AppError("Erreur lors de la validation des données d'inscription", 500));
+        logger.error('Erreur de validation d\'inscription:', erreur);
+        next(new AppError('Erreur lors de la validation des données d\'inscription', 500));
     }
 };
 
@@ -132,7 +132,7 @@ const verifierToken = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({
                 succes: false,
-                message: "Token d'authentification manquant",
+                message: 'Token d\'authentification manquant',
             });
         }
 
@@ -204,7 +204,7 @@ const verifierProprietaire = model => {
             ) {
                 return res.status(403).json({
                     succes: false,
-                    message: "Accès non autorisé: vous n'êtes pas propriétaire de cette ressource",
+                    message: 'Accès non autorisé: vous n\'êtes pas propriétaire de cette ressource',
                 });
             }
 
@@ -212,7 +212,7 @@ const verifierProprietaire = model => {
             next();
         } catch (erreur) {
             logger.error('Erreur lors de la vérification du propriétaire:', erreur);
-            next(new AppError("Erreur lors de la vérification des droits d'accès", 500));
+            next(new AppError('Erreur lors de la vérification des droits d\'accès', 500));
         }
     };
 };
@@ -237,8 +237,8 @@ const verifierEmailUnique = async (req, res, next) => {
 
         next();
     } catch (erreur) {
-        logger.error("Erreur lors de la vérification de l'email:", erreur);
-        next(new AppError("Erreur lors de la vérification de l'unicité de l'email", 500));
+        logger.error('Erreur lors de la vérification de l\'email:', erreur);
+        next(new AppError('Erreur lors de la vérification de l\'unicité de l\'email', 500));
     }
 };
 

@@ -96,7 +96,7 @@ const checkProjetPermissions = async (req, res, next) => {
 
         // Sinon, refutilisateur l'acces
         throw new ValidationError(
-            "Vous n'avez pas les autorisations necessaires pour cette operation",
+            'Vous n\'avez pas les autorisations necessaires pour cette operation',
             403
         );
     } catch (error) {

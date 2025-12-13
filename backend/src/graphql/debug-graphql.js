@@ -135,7 +135,7 @@ function showBanner() {
     console.log('║               PROGEASE - Console GraphQL Debug               ║');
     console.log('╟──────────────────────────────────────────────────────────────╢');
     console.log('║ Entrez votre requete GraphQL ou tapez:                       ║');
-    console.log("║  .help    pour afficher l'aide                               ║");
+    console.log('║  .help    pour afficher l\'aide                               ║');
     console.log('║  .exit    pour quitter                                       ║');
     console.log('║  .preset  pour utiliser une requete predefinie               ║');
     console.log('╚══════════════════════════════════════════════════════════════╝');
@@ -148,7 +148,7 @@ function showHelp() {
     console.log(colorize('  .help   - Affiche cette aide', 'gray'));
     console.log(colorize('  .exit   - Quitte la console', 'gray'));
     console.log(colorize('  .preset - Affiche les requetes preconfigurees', 'gray'));
-    console.log(colorize("  .clear  - Efface l'ecran", 'gray'));
+    console.log(colorize('  .clear  - Efface l\'ecran', 'gray'));
 
     console.log(colorize('\nExemples de requetes:', 'yellow'));
     console.log(colorize('  query { healthCheck { status timestamp } }', 'gray'));
@@ -286,7 +286,7 @@ async function checkServerAvailability() {
         if (err.response) {
             console.log(colorize(`   Code d'erreur: ${err.response.status}`, 'gray'));
         } else if (err.code === 'ECONNREFUSED') {
-            console.log(colorize("   Le serveur n'est pas en cours d'execution", 'gray'));
+            console.log(colorize('   Le serveur n\'est pas en cours d\'execution', 'gray'));
         } else {
             console.log(colorize(`   ${err.message}`, 'gray'));
         }

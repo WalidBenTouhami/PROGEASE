@@ -15,7 +15,7 @@ const ressourceSchema = yup.object().shape({
         .required('Le type de ressource est requis.')
         .oneOf(['VIDEO', 'DOCUMENT', 'LIEN', 'CODE'], 'Type de ressource invalide.'),
 
-    url: yup.string().required("L'URL de la ressource est requise.").url("L'URL doit être valide."),
+    url: yup.string().required('L\'URL de la ressource est requise.').url('L\'URL doit être valide.'),
 
     description: yup.string().max(500, 'La description ne peut pas dépasser 500 caractères.'),
 
@@ -44,20 +44,20 @@ const moduleSchema = yup.object().shape({
 
     ordre: yup
         .number()
-        .required("L'ordre du module est requis.")
-        .min(1, "L'ordre doit être au moins 1."),
+        .required('L\'ordre du module est requis.')
+        .min(1, 'L\'ordre doit être au moins 1.'),
 
     duree: yup
         .number()
         .required('La durée du module est requise.')
-        .min(5, "La durée doit être d'au moins 5 minutes.")
+        .min(5, 'La durée doit être d\'au moins 5 minutes.')
         .max(480, 'La durée ne peut pas dépasser 480 minutes.'),
 
     quiz: yup.array().of(
         yup
             .string()
-            .required("L'ID du quiz est requis.")
-            .test('is-mongodb-id', "L'ID du quiz est invalide.", value =>
+            .required('L\'ID du quiz est requis.')
+            .test('is-mongodb-id', 'L\'ID du quiz est invalide.', value =>
                 mongoose.Types.ObjectId.isValid(value)
             )
     ),
@@ -98,7 +98,7 @@ const creationFormationSchema = yup.object().shape({
     duree: yup
         .number()
         .required('La durée de la formation est requise.')
-        .min(30, "La durée doit être d'au moins 30 minutes.")
+        .min(30, 'La durée doit être d\'au moins 30 minutes.')
         .max(4800, 'La durée ne peut pas dépasser 4800 minutes.'),
 
     prerequis: yup
@@ -129,8 +129,8 @@ const creationFormationSchema = yup.object().shape({
 
     auteur: yup
         .string()
-        .required("L'auteur de la formation est requis.")
-        .test('is-mongodb-id', "L'ID de l'auteur est invalide.", value =>
+        .required('L\'auteur de la formation est requis.')
+        .test('is-mongodb-id', 'L\'ID de l\'auteur est invalide.', value =>
             mongoose.Types.ObjectId.isValid(value)
         ),
 
@@ -174,7 +174,7 @@ const miseAJourFormationSchema = yup.object().shape({
 
     duree: yup
         .number()
-        .min(30, "La durée doit être d'au moins 30 minutes.")
+        .min(30, 'La durée doit être d\'au moins 30 minutes.')
         .max(4800, 'La durée ne peut pas dépasser 4800 minutes.'),
 
     prerequis: yup
@@ -232,8 +232,8 @@ const progressionSchema = yup.object().shape({
     modulesCompletes: yup.array().of(
         yup
             .string()
-            .required("L'ID du module est requis.")
-            .test('is-mongodb-id', "L'ID du module est invalide.", value =>
+            .required('L\'ID du module est requis.')
+            .test('is-mongodb-id', 'L\'ID du module est invalide.', value =>
                 mongoose.Types.ObjectId.isValid(value)
             )
     ),
@@ -241,8 +241,8 @@ const progressionSchema = yup.object().shape({
     quizCompletes: yup.array().of(
         yup
             .string()
-            .required("L'ID du quiz est requis.")
-            .test('is-mongodb-id', "L'ID du quiz est invalide.", value =>
+            .required('L\'ID du quiz est requis.')
+            .test('is-mongodb-id', 'L\'ID du quiz est invalide.', value =>
                 mongoose.Types.ObjectId.isValid(value)
             )
     ),
@@ -250,8 +250,8 @@ const progressionSchema = yup.object().shape({
     ressourcesConsultees: yup.array().of(
         yup
             .string()
-            .required("L'ID de la ressource est requis.")
-            .test('is-mongodb-id', "L'ID de la ressource est invalide.", value =>
+            .required('L\'ID de la ressource est requis.')
+            .test('is-mongodb-id', 'L\'ID de la ressource est invalide.', value =>
                 mongoose.Types.ObjectId.isValid(value)
             )
     ),

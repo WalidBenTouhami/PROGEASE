@@ -123,7 +123,7 @@ class Quiz {
                 tauxReussite:
                     this.nombreParticipations > 0
                         ? (this.participations.filter(p => p.resultatsDetailles[index].estCorrecte)
-                              .length /
+                            .length /
                               this.nombreParticipations) *
                           100
                         : 0,

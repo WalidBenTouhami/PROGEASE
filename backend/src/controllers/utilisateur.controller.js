@@ -1,13 +1,8 @@
 // backend/src/controllers/utilisateur.controller.js
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
-const config = require('../config');
 const Utilisateur = require('../models/utilisateur.model');
 const logger = require('../utils/logger');
 const utilisateurService = require('../services/utilisateur.service');
-const { AppError } = require('../utils/appError');
-const { catchAsync } = require('../utils/catchAsync');
 const { genererToken } = require('../utils/jwt');
 
 class UtilisateurController {
@@ -106,10 +101,10 @@ class UtilisateurController {
                 },
             });
         } catch (error) {
-            logger.error("Erreur lors de l'inscription:", error);
+            logger.error('Erreur lors de l\'inscription:', error);
             res.status(500).json({
                 success: false,
-                message: "Erreur lors de l'inscription",
+                message: 'Erreur lors de l\'inscription',
             });
         }
     }
@@ -364,72 +359,10 @@ class UtilisateurController {
                 utilisateur,
             });
         } catch (error) {
-            logger.error("Erreur lors de la récupération de l'utilisateur:", error);
+            logger.error('Erreur lors de la récupération de l\'utilisateur:', error);
             res.status(500).json({
                 success: false,
-                message: "Erreur lors de la récupération de l'utilisateur",
-            });
-        }
-    }
-
-    // Mettre à jour un utilisateur (admin)
-    static async mettreAJourUtilisateur(req, res) {
-        try {
-            const { nom, prenom, email, role } = req.body;
-            const utilisateur = await Utilisateur.findById(req.params.id);
-
-            if (!utilisateur) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Utilisateur non trouvé',
-                });
-            }
-
-            utilisateur.nom = nom || utilisateur.nom;
-            utilisateur.prenom = prenom || utilisateur.prenom;
-            utilisateur.email = email || utilisateur.email;
-            if (role) utilisateur.role = role;
-
-            await utilisateur.save();
-
-            res.json({
-                success: true,
-                utilisateur: {
-                    id: utilisateur._id,
-                    email: utilisateur.email,
-                    nom: utilisateur.nom,
-                    prenom: utilisateur.prenom,
-                    role: utilisateur.role,
-                },
-            });
-        } catch (error) {
-            logger.error("Erreur lors de la mise à jour de l'utilisateur:", error);
-            res.status(500).json({
-                success: false,
-                message: "Erreur lors de la mise à jour de l'utilisateur",
-            });
-        }
-    }
-
-    // Supprimer un utilisateur (admin)
-    static async supprimerUtilisateur(req, res) {
-        try {
-            const utilisateur = await Utilisateur.findByIdAndDelete(req.params.id);
-            if (!utilisateur) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Utilisateur non trouvé',
-                });
-            }
-            res.json({
-                success: true,
-                message: 'Utilisateur supprimé avec succès',
-            });
-        } catch (error) {
-            logger.error("Erreur lors de la suppression de l'utilisateur:", error);
-            res.status(500).json({
-                success: false,
-                message: "Erreur lors de la suppression de l'utilisateur",
+                message: 'Erreur lors de la récupération de l\'utilisateur',
             });
         }
     }

@@ -88,7 +88,7 @@ const validateLivrableBody = (req, res, next) => {
 
         if (!projetId) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                erreur: "L'ID du projet est requis.",
+                erreur: 'L\'ID du projet est requis.',
             });
         }
 

@@ -87,14 +87,14 @@ const estAuteurSujet = async (req, res, next) => {
         if (sujet.auteur.toString() !== req.utilisateur.id) {
             return res.status(403).json({
                 success: false,
-                message: "Accès non autorisé - Vous n'êtes pas l'auteur de ce sujet",
+                message: 'Accès non autorisé - Vous n\'êtes pas l\'auteur de ce sujet',
             });
         }
 
         req.sujet = sujet;
         next();
     } catch (error) {
-        logger.error("Erreur lors de la vérification de l'auteur du sujet:", error);
+        logger.error('Erreur lors de la vérification de l\'auteur du sujet:', error);
         next(error);
     }
 };
@@ -126,7 +126,7 @@ const estAuteurReponse = async (req, res, next) => {
         if (reponse.auteur.toString() !== req.utilisateur.id) {
             return res.status(403).json({
                 success: false,
-                message: "Accès non autorisé - Vous n'êtes pas l'auteur de cette réponse",
+                message: 'Accès non autorisé - Vous n\'êtes pas l\'auteur de cette réponse',
             });
         }
 
@@ -134,7 +134,7 @@ const estAuteurReponse = async (req, res, next) => {
         req.reponse = reponse;
         next();
     } catch (error) {
-        logger.error("Erreur lors de la vérification de l'auteur de la réponse:", error);
+        logger.error('Erreur lors de la vérification de l\'auteur de la réponse:', error);
         next(error);
     }
 };
@@ -154,43 +154,43 @@ const checkForumPermissions = action => async (req, res, next) => {
 
         // Vérifier les permissions selon l'action
         switch (action) {
-            case 'create':
-                // Tout utilisateur authentifié peut créer
-                break;
-            case 'update':
-            case 'delete':
-                // Vérifier si l'utilisateur est l'auteur ou un administrateur
-                const sujet = await Sujet.findById(req.params.sujetId);
-                if (!sujet) {
-                    return res.status(404).json({
-                        success: false,
-                        message: 'Sujet non trouvé',
-                    });
-                }
-                if (
-                    sujet.auteur.toString() !== utilisateur.id &&
-                    !utilisateur.roles.includes('ADMIN')
-                ) {
-                    return res.status(403).json({
-                        success: false,
-                        message: 'Accès non autorisé',
-                    });
-                }
-                break;
-            case 'moderate':
-                // Seuls les modérateurs et administrateurs peuvent modérer
-                if (!utilisateur.roles.some(role => ['ADMIN', 'MODERATEUR'].includes(role))) {
-                    return res.status(403).json({
-                        success: false,
-                        message: 'Accès non autorisé - Droits de modération requis',
-                    });
-                }
-                break;
-            default:
-                return res.status(400).json({
+        case 'create':
+            // Tout utilisateur authentifié peut créer
+            break;
+        case 'update':
+        case 'delete':
+            // Vérifier si l'utilisateur est l'auteur ou un administrateur
+            const sujet = await Sujet.findById(req.params.sujetId);
+            if (!sujet) {
+                return res.status(404).json({
                     success: false,
-                    message: 'Action non reconnue',
+                    message: 'Sujet non trouvé',
                 });
+            }
+            if (
+                sujet.auteur.toString() !== utilisateur.id &&
+                    !utilisateur.roles.includes('ADMIN')
+            ) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Accès non autorisé',
+                });
+            }
+            break;
+        case 'moderate':
+            // Seuls les modérateurs et administrateurs peuvent modérer
+            if (!utilisateur.roles.some(role => ['ADMIN', 'MODERATEUR'].includes(role))) {
+                return res.status(403).json({
+                    success: false,
+                    message: 'Accès non autorisé - Droits de modération requis',
+                });
+            }
+            break;
+        default:
+            return res.status(400).json({
+                success: false,
+                message: 'Action non reconnue',
+            });
         }
 
         next();
