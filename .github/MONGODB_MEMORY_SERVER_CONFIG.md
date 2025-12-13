@@ -16,11 +16,11 @@ We've configured the project to skip MongoDB Memory Server binary downloads in C
 ### 1. NPM Configuration Files (`.npmrc`)
 
 To prevent firewall blocks globally, we've added `.npmrc` files that set the environment variables for all npm operations:
-- `.npmrc` (root) - Global configuration for all packages
-- `backend/.npmrc` - Backend-specific configuration
-- `frontend/.npmrc` - Frontend configuration (with legacy-peer-deps)
+- `.npmrc` (root) - Global configuration for all packages (includes MONGOMS settings and legacy-peer-deps)
+- `backend/.npmrc` - Backend-specific configuration with MONGOMS settings to prevent mongodb-memory-server downloads
+- `frontend/.npmrc` - Frontend configuration (only contains legacy-peer-deps for Angular compatibility)
 
-These files ensure that mongodb-memory-server never attempts to download binaries during npm install, preventing firewall blocks from occurring.
+The root and backend .npmrc files ensure that mongodb-memory-server never attempts to download binaries during npm install, preventing firewall blocks from occurring.
 
 ### 2. GitHub Workflows (`.github/workflows/`)
 
