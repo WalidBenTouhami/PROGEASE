@@ -11,7 +11,8 @@ const mongoose = require('mongoose');
 const Evaluation = require('../../models/evaluation.model');
 const logger = require('../../utils/logger');
 const { checkAuthorization } = require('../../utils/auth.utils');
-const { AppError, ERROR_CODES } = require('../../utils/errors');
+const { AppError } = require('../../middlewares/errorHandlers');
+const { ERROR_CODES } = require('../../../config/constants');
 
 /**
  * Transforme un document MongoDB Evaluation en type GraphQL
@@ -201,5 +202,4 @@ module.exports = {
     Query,
     Mutation,
     Evaluation: EvaluationResolver,
-    mapEvaluationMongoVersGraphQL,
 };
