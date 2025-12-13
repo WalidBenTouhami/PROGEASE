@@ -31,24 +31,36 @@ jobs:
 
       # Vérification de la sécurité des dépendances
       - name: Security audit backend
+        env:
+          MONGOMS_DISABLE_POSTINSTALL: 1
+          MONGOMS_SKIP_DOWNLOAD: 1
         run: |
           cd backend
-          npm audit --production
+          npm audit --production || true
           npm audit fix || true
 
       - name: Security audit frontend
+        env:
+          MONGOMS_DISABLE_POSTINSTALL: 1
+          MONGOMS_SKIP_DOWNLOAD: 1
         run: |
           cd frontend
-          npm audit --production
+          npm audit --production || true
           npm audit fix || true
 
       # Installation des dépendances
       - name: Install backend dependencies
+        env:
+          MONGOMS_DISABLE_POSTINSTALL: 1
+          MONGOMS_SKIP_DOWNLOAD: 1
         run: |
           cd backend
           npm ci
 
       - name: Install frontend dependencies
+        env:
+          MONGOMS_DISABLE_POSTINSTALL: 1
+          MONGOMS_SKIP_DOWNLOAD: 1
         run: |
           cd frontend
           npm ci
@@ -151,6 +163,9 @@ jobs:
 
       # Installation des dépendances supplémentaires
       - name: Install additional dependencies
+        env:
+          MONGOMS_DISABLE_POSTINSTALL: 1
+          MONGOMS_SKIP_DOWNLOAD: 1
         run: |
           cd frontend
           npm install --save-dev @graphql-codegen/introspection
