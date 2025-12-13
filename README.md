@@ -62,16 +62,69 @@
 
 ## Installation
 
+### Prérequis
+
+- **Node.js**: >=18.0.0 (backend), >=20.0.0 (frontend)
+- **npm**: >=10.0.0
+- **MongoDB**: 5.0+
+- **Python**: 3.6+ (pour le script d'installation automatique)
+
+### Méthode 1: Script Python (Recommandé)
+
 ```bash
-# Installation des dépendances
+# Installation automatique de toutes les dépendances
+python3 install_all.py
+
+# Options disponibles:
+python3 install_all.py --clean           # Nettoyer node_modules avant installation
+python3 install_all.py --backend-only    # Installer uniquement le backend
+python3 install_all.py --frontend-only   # Installer uniquement le frontend
+python3 install_all.py --help            # Afficher l'aide
+```
+
+### Méthode 2: Script npm
+
+```bash
+# Installation de toutes les dépendances (root, backend, frontend)
+npm run install-all
+
+# Nettoyage complet
+npm run clean
+```
+
+### Méthode 3: Installation manuelle
+
+```bash
+# Installation des dépendances root
 npm install
 
-# Configuration de l'environnement
-cp .env.example .env
-# Éditer .env avec vos configurations
+# Installation des dépendances backend
+cd backend && npm install
 
-# Démarrage du serveur de développement
-npm run dev
+# Installation des dépendances frontend
+# Note: --legacy-peer-deps est configuré dans frontend/.npmrc mais peut être spécifié explicitement
+cd ../frontend && npm install
+```
+
+### Configuration de l'environnement
+
+```bash
+# Copier le fichier d'exemple
+cp env.example .env
+
+# Éditer .env avec vos configurations
+# (MongoDB URI, JWT secrets, etc.)
+```
+
+### Démarrage du serveur de développement
+
+```bash
+# Démarrer backend et frontend simultanément
+npm start
+
+# Ou séparément:
+cd backend && npm run dev      # Backend seulement
+cd frontend && npm start        # Frontend seulement
 ```
 
 ## API REST
