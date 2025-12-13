@@ -7,9 +7,11 @@
 
 'use strict';
 
+const mongoose = require('mongoose');
 const Evaluation = require('../../models/evaluation.model');
 const logger = require('../../utils/logger');
-const { mapProjetMongoVersGraphQL } = require('./projet.resolver');
+const { checkAuthorization } = require('../../utils/auth.utils');
+const { AppError, ERROR_CODES } = require('../../utils/errors');
 
 /**
  * Transforme un document MongoDB Evaluation en type GraphQL
@@ -161,7 +163,7 @@ const Mutation = {
         try {
             const evaluation = await Evaluation.findByIdAndDelete(id);
             if (!evaluation) throw new Error('Evaluation not found');
-            return mapEvaluationMongoVersGraphQL(evaluation);
+            return true;
         } catch (error) {
             logger.error('Error deleting evaluation:', error);
             throw new Error('Failed to delete evaluation');
@@ -198,6 +200,6 @@ const EvaluationResolver = {
 module.exports = {
     Query,
     Mutation,
-    EvaluationResolver,
+    Evaluation: EvaluationResolver,
     mapEvaluationMongoVersGraphQL,
 };

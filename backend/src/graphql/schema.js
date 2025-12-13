@@ -20,6 +20,7 @@ const baseTypeDefs = gql`
 const utilisateurTypeDefs = require('./schemas/utilisateur.schema');
 const projetTypeDefs = require('./schemas/projet.schema');
 const livrableTypeDefs = require('./schemas/livrable.schema');
+const evaluationTypeDefs = require('./schemas/evaluation.schema');
 const formationTypeDefs = require('./schemas/formation.schema');
 const certificationTypeDefs = require('./schemas/certification.schema');
 const quizTypeDefs = require('./schemas/quiz.schema');
@@ -28,6 +29,7 @@ const quizTypeDefs = require('./schemas/quiz.schema');
 const utilisateurResolvers = require('./resolvers/utilisateur.resolver');
 const projetResolvers = require('./resolvers/projet.resolver');
 const livrableResolvers = require('./resolvers/livrable.resolver');
+const evaluationResolvers = require('./resolvers/evaluation.resolver');
 const formationResolvers = require('./resolvers/formation.resolver');
 const certificationResolvers = require('./resolvers/certification.resolver');
 const quizResolvers = require('./resolvers/quiz.resolver');
@@ -38,6 +40,7 @@ const typeDefs = [
     utilisateurTypeDefs,
     projetTypeDefs,
     livrableTypeDefs,
+    evaluationTypeDefs,
     formationTypeDefs,
     certificationTypeDefs,
     quizTypeDefs,
@@ -49,6 +52,7 @@ const resolvers = merge(
     utilisateurResolvers,
     projetResolvers,
     livrableResolvers,
+    evaluationResolvers,
     formationResolvers,
     certificationResolvers,
     quizResolvers
