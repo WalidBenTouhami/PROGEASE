@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { rateLimiter } = require('../middlewares/rateLimiter');
 
 // Importation des fonctions du contrôleur formationController
 const {
@@ -9,6 +10,9 @@ const {
     addModuleToFormation, // Ajouter un module à une formation
     getFormationById,
 } = require('../controllers/formationController'); // Verifiez que le chemin d'importation est correct
+
+// Apply rate limiting to all formation routes
+router.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 // Definition des routes pour les formations
 router.post('/', createFormation); // Route pour creer une formation

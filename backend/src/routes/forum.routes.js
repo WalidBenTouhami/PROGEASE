@@ -8,6 +8,10 @@ const {
     validerCreationReponse,
 } = require('../middleware/forum.middleware');
 const forumController = require('../controllers/forum.controller');
+const { rateLimiter } = require('../middlewares/rateLimiter');
+
+// Apply rate limiting to forum routes
+router.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 // Routes pour les sujets
 router.get('/sujets', forumController.recupererSujets);

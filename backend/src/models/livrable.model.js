@@ -60,7 +60,12 @@ const livrableSchema = new Schema(
             trim: true,
             validate: {
                 validator: function (v) {
-                    return !v || /^(https?:\/\/)([\da-z.-]+)\.([a-z.]{2,6})([/\w.-]*)*\/?$/.test(v);
+                    return (
+                        !v ||
+                        /^https?:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,6})(\/[^\s]*)?$/.test(
+                            v
+                        )
+                    );
                 },
                 message: props => `${props.value} n'est pas une URL valide!`,
             },
