@@ -6,12 +6,10 @@ const config = require('../config');
  * @param {Object} utilisateur - L'utilisateur pour lequel générer le token
  * @returns {string} Le token JWT
  */
-const genererToken = (utilisateur) => {
-    return jwt.sign(
-        { id: utilisateur._id },
-        config.jwt.secret,
-        { expiresIn: config.jwt.expiresIn }
-    );
+const genererToken = utilisateur => {
+    return jwt.sign({ id: utilisateur._id }, config.jwt.secret, {
+        expiresIn: config.jwt.expiresIn,
+    });
 };
 
 /**
@@ -19,7 +17,7 @@ const genererToken = (utilisateur) => {
  * @param {string} token - Le token à vérifier
  * @returns {Object} Les données décodées du token
  */
-const verifierToken = (token) => {
+const verifierToken = token => {
     try {
         return jwt.verify(token, config.jwt.secret);
     } catch (error) {
@@ -29,5 +27,5 @@ const verifierToken = (token) => {
 
 module.exports = {
     genererToken,
-    verifierToken
-}; 
+    verifierToken,
+};

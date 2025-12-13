@@ -1,252 +1,252 @@
 {
-  "info": {
-    "_postman_id": "ce6e3176-800e-47f8-8cb5-20f7101145de",
-    "name": "PROGEASE API Tests",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "description": "Collection de tests pour l'API PROGEASE - 2025-05-28"
-  },
-  "item": [
-    {
-      "name": "1. Tests de Santé",
-      "item": [
-        {
-          "name": "Vérifier l'état du serveur",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query { healthCheck { status timestamp version message } }\"\n}"
-            },
-            "url": "{{graphqlEndpoint}}"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Server is healthy\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data.healthCheck.status).to.equal(\"OK\");",
-                  "});"
-                ]
-              }
-            }
-          ]
-        }
-      ]
+    "info": {
+        "_postman_id": "ce6e3176-800e-47f8-8cb5-20f7101145de",
+        "name": "PROGEASE API Tests",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "description": "Collection de tests pour l'API PROGEASE - 2025-05-28"
     },
-    {
-      "name": "2. Tests des Projets",
-      "item": [
+    "item": [
         {
-          "name": "Lister les projets",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query($page: Int, $limit: Int) { projets(page: $page, limit: $limit) { items { _id titre statut progression } pagination { total pages } } }\",\n  \"variables\": {\n    \"page\": 1,\n    \"limit\": 10\n  }\n}"
-            },
-            "url": "{{graphqlEndpoint}}"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has projets\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data.projets.items).to.be.an('array');",
-                  "});"
-                ]
-              }
-            }
-          ]
+            "name": "1. Tests de Santé",
+            "item": [
+                {
+                    "name": "Vérifier l'état du serveur",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"query\": \"query { healthCheck { status timestamp version message } }\"\n}"
+                        },
+                        "url": "{{graphqlEndpoint}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Server is healthy\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.healthCheck.status).to.equal(\"OK\");",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
         },
         {
-          "name": "Créer un projet",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation($input: ProjetInput!) { creerProjet(input: $input) { _id titre statut } }\",\n  \"variables\": {\n    \"input\": {\n      \"titre\": \"Nouveau Projet Test\",\n      \"description\": \"Description du projet de test\",\n      \"dateDebut\": \"2025-06-01\",\n      \"dateFin\": \"2025-12-31\",\n      \"competences\": [\"JavaScript\", \"React\"],\n      \"statut\": \"BROUILLON\"\n    }\n  }\n}"
-            },
-            "url": "{{graphqlEndpoint}}"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Projet is created\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data.creerProjet._id).to.exist;",
-                  "    pm.environment.set(\"projetId\", jsonData.data.creerProjet._id);",
-                  "});"
-                ]
-              }
-            }
-          ]
+            "name": "2. Tests des Projets",
+            "item": [
+                {
+                    "name": "Lister les projets",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"query\": \"query($page: Int, $limit: Int) { projets(page: $page, limit: $limit) { items { _id titre statut progression } pagination { total pages } } }\",\n  \"variables\": {\n    \"page\": 1,\n    \"limit\": 10\n  }\n}"
+                        },
+                        "url": "{{graphqlEndpoint}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has projets\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.projets.items).to.be.an('array');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Créer un projet",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"query\": \"mutation($input: ProjetInput!) { creerProjet(input: $input) { _id titre statut } }\",\n  \"variables\": {\n    \"input\": {\n      \"titre\": \"Nouveau Projet Test\",\n      \"description\": \"Description du projet de test\",\n      \"dateDebut\": \"2025-06-01\",\n      \"dateFin\": \"2025-12-31\",\n      \"competences\": [\"JavaScript\", \"React\"],\n      \"statut\": \"BROUILLON\"\n    }\n  }\n}"
+                        },
+                        "url": "{{graphqlEndpoint}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Projet is created\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.creerProjet._id).to.exist;",
+                                    "    pm.environment.set(\"projetId\", jsonData.data.creerProjet._id);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Analyser les risques",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"query\": \"query($projetId: ID!) { analyserRisquesProjet(projetId: $projetId) { retard progression livrables equipe niveauRisque recommandations } }\",\n  \"variables\": {\n    \"projetId\": \"{{projetId}}\"\n  }\n}"
+                        },
+                        "url": "{{graphqlEndpoint}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Risk analysis is complete\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.analyserRisquesProjet.niveauRisque).to.exist;",
+                                    "    pm.expect(jsonData.data.analyserRisquesProjet.recommandations).to.be.an('array');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
         },
         {
-          "name": "Analyser les risques",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query($projetId: ID!) { analyserRisquesProjet(projetId: $projetId) { retard progression livrables equipe niveauRisque recommandations } }\",\n  \"variables\": {\n    \"projetId\": \"{{projetId}}\"\n  }\n}"
-            },
-            "url": "{{graphqlEndpoint}}"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Risk analysis is complete\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data.analyserRisquesProjet.niveauRisque).to.exist;",
-                  "    pm.expect(jsonData.data.analyserRisquesProjet.recommandations).to.be.an('array');",
-                  "});"
-                ]
-              }
-            }
-          ]
+            "name": "3. Tests des Livrables",
+            "item": [
+                {
+                    "name": "Lister les livrables",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"query\": \"query($page: Int, $limit: Int) { livrables(page: $page, limit: $limit) { items { _id intitule statut } pagination { total pages } } }\",\n  \"variables\": {\n    \"page\": 1,\n    \"limit\": 10\n  }\n}"
+                        },
+                        "url": "{{graphqlEndpoint}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Response has livrables\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.livrables.items).to.be.an('array');",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Créer un livrable",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"query\": \"mutation($input: LivrableInput!) { creerLivrable(input: $input) { _id intitule statut } }\",\n  \"variables\": {\n    \"input\": {\n      \"intitule\": \"Nouveau Livrable Test\",\n      \"description\": \"Description du livrable de test\",\n      \"dateLimite\": \"2025-08-31\",\n      \"projetId\": \"{{projetId}}\",\n      \"statut\": \"EN_ATTENTE\"\n    }\n  }\n}"
+                        },
+                        "url": "{{graphqlEndpoint}}"
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "type": "text/javascript",
+                                "exec": [
+                                    "pm.test(\"Status code is 200\", function () {",
+                                    "    pm.response.to.have.status(200);",
+                                    "});",
+                                    "",
+                                    "pm.test(\"Livrable is created\", function () {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.expect(jsonData.data.creerLivrable._id).to.exist;",
+                                    "    pm.environment.set(\"livrableId\", jsonData.data.creerLivrable._id);",
+                                    "});"
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
         }
-      ]
-    },
-    {
-      "name": "3. Tests des Livrables",
-      "item": [
+    ],
+    "event": [
         {
-          "name": "Lister les livrables",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"query($page: Int, $limit: Int) { livrables(page: $page, limit: $limit) { items { _id intitule statut } pagination { total pages } } }\",\n  \"variables\": {\n    \"page\": 1,\n    \"limit\": 10\n  }\n}"
-            },
-            "url": "{{graphqlEndpoint}}"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
+            "listen": "prerequest",
+            "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Response has livrables\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data.livrables.items).to.be.an('array');",
-                  "});"
+                    "// Code commun à exécuter avant chaque requête",
+                    "if (!pm.environment.get(\"authToken\")) {",
+                    "    console.log(\"Attention: Token d'authentification non défini\");",
+                    "}"
                 ]
-              }
             }
-          ]
-        },
-        {
-          "name": "Créer un livrable",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"query\": \"mutation($input: LivrableInput!) { creerLivrable(input: $input) { _id intitule statut } }\",\n  \"variables\": {\n    \"input\": {\n      \"intitule\": \"Nouveau Livrable Test\",\n      \"description\": \"Description du livrable de test\",\n      \"dateLimite\": \"2025-08-31\",\n      \"projetId\": \"{{projetId}}\",\n      \"statut\": \"EN_ATTENTE\"\n    }\n  }\n}"
-            },
-            "url": "{{graphqlEndpoint}}"
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "    pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "pm.test(\"Livrable is created\", function () {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.expect(jsonData.data.creerLivrable._id).to.exist;",
-                  "    pm.environment.set(\"livrableId\", jsonData.data.creerLivrable._id);",
-                  "});"
-                ]
-              }
-            }
-          ]
         }
-      ]
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          "// Code commun à exécuter avant chaque requête",
-          "if (!pm.environment.get(\"authToken\")) {",
-          "    console.log(\"Attention: Token d'authentification non défini\");",
-          "}"
-        ]
-      }
-    }
-  ]
+    ]
 }

@@ -29,7 +29,7 @@ class Quiz {
     ajouterQuestion(question) {
         this.questions.push({
             ...question,
-            points: question.points || 1
+            points: question.points || 1,
         });
         this.majLe = new Date();
     }
@@ -54,7 +54,7 @@ class Quiz {
             this.questions[index] = {
                 ...this.questions[index],
                 ...donnees,
-                points: donnees.points || this.questions[index].points || 1
+                points: donnees.points || this.questions[index].points || 1,
             };
             this.majLe = new Date();
         }
@@ -102,19 +102,32 @@ class Quiz {
             nombreParticipations: this.nombreParticipations,
             scoreMoyen: this.scoreMoyen,
             scoreMaximum,
-            tauxReussite: this.nombreParticipations > 0 ? 
-                (this.participations.filter(p => p.score >= scoreMaximum * 0.7).length / this.nombreParticipations) * 100 : 0,
+            tauxReussite:
+                this.nombreParticipations > 0
+                    ? (this.participations.filter(p => p.score >= scoreMaximum * 0.7).length /
+                          this.nombreParticipations) *
+                      100
+                    : 0,
             repartitionScores: {
                 excellent: this.participations.filter(p => p.score >= scoreMaximum * 0.9).length,
-                bon: this.participations.filter(p => p.score >= scoreMaximum * 0.7 && p.score < scoreMaximum * 0.9).length,
-                moyen: this.participations.filter(p => p.score >= scoreMaximum * 0.5 && p.score < scoreMaximum * 0.7).length,
-                faible: this.participations.filter(p => p.score < scoreMaximum * 0.5).length
+                bon: this.participations.filter(
+                    p => p.score >= scoreMaximum * 0.7 && p.score < scoreMaximum * 0.9
+                ).length,
+                moyen: this.participations.filter(
+                    p => p.score >= scoreMaximum * 0.5 && p.score < scoreMaximum * 0.7
+                ).length,
+                faible: this.participations.filter(p => p.score < scoreMaximum * 0.5).length,
             },
             questionsStats: this.questions.map((question, index) => ({
                 texte: question.texte,
-                tauxReussite: this.nombreParticipations > 0 ?
-                    (this.participations.filter(p => p.resultatsDetailles[index].estCorrecte).length / this.nombreParticipations) * 100 : 0
-            }))
+                tauxReussite:
+                    this.nombreParticipations > 0
+                        ? (this.participations.filter(p => p.resultatsDetailles[index].estCorrecte)
+                              .length /
+                              this.nombreParticipations) *
+                          100
+                        : 0,
+            })),
         };
 
         return stats;
@@ -155,7 +168,9 @@ class Quiz {
      * @returns {boolean} - True si le quiz est accessible
      */
     estAccessible(utilisateurId, roles) {
-        return this.estPublic || this.auteur.toString() === utilisateurId || roles.includes('ADMIN');
+        return (
+            this.estPublic || this.auteur.toString() === utilisateurId || roles.includes('ADMIN')
+        );
     }
 
     /**
@@ -179,7 +194,7 @@ class Quiz {
             scoreTotal: this.scoreTotal,
             scoreMoyen: this.scoreMoyen,
             creeLe: this.creeLe,
-            majLe: this.majLe
+            majLe: this.majLe,
         };
     }
 
@@ -211,4 +226,4 @@ class Quiz {
     }
 }
 
-module.exports = Quiz; 
+module.exports = Quiz;

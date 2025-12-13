@@ -1,9 +1,9 @@
 /**
-     * Resolvers GraphQL pour les fonctionnalites d'intelligence artificielle
-     *
-     * @module graphql/resolvers/ai
-     * @created 2025-05-28 par WalidBenTouhami
-     */
+ * Resolvers GraphQL pour les fonctionnalites d'intelligence artificielle
+ *
+ * @module graphql/resolvers/ai
+ * @created 2025-05-28 par WalidBenTouhami
+ */
 
 'use strict';
 
@@ -16,23 +16,23 @@ const { checkAuthorization } = require('../../utils/auth.utils');
 
 // Implementation temporaire des methodes manquantes du service
 const mockAIService = {
-    generateRecommendations: async (projet) => {
+    generateRecommendations: async projet => {
         return {
             text: [`Recommandation pour projet ${projet._id}`],
             score: 0.85,
-            confidence: 0.9
+            confidence: 0.9,
         };
     },
-    generateLearningRecommendations: async (projet) => {
+    generateLearningRecommendations: async projet => {
         return [`Recommandation d'apprentissage pour projet ${projet._id}`];
     },
-    predictPerformance: async (projet) => {
+    predictPerformance: async projet => {
         return {
             score: 0.75,
             confidence: 0.8,
-            factors: ['Progression', 'Qualité des livrables']
+            factors: ['Progression', 'Qualité des livrables'],
         };
-    }
+    },
 };
 
 // Use the imported aiService instead of undefined AIService
@@ -47,10 +47,10 @@ const Query = {
                 score: 0.85,
                 confidence: 0.9,
                 metadata: {
-                    modelUsed: "GPT-3",
+                    modelUsed: 'GPT-3',
                     timestamp: new Date(),
-                    processingTime: 1.2
-                }
+                    processingTime: 1.2,
+                },
             };
         } catch (error) {
             logger.error('Erreur lors de la génération des recommandations AI:', error);
@@ -68,15 +68,15 @@ const Query = {
                 equipe: true,
                 niveauRisque: 2,
                 recommandations: [
-                    "Maintenir le rythme actuel",
-                    "Prévoir une revue de code hebdomadaire"
-                ]
+                    'Maintenir le rythme actuel',
+                    'Prévoir une revue de code hebdomadaire',
+                ],
             };
         } catch (error) {
-            logger.error('Erreur lors de l\'analyse des risques:', error);
-            throw new Error('Impossible d\'analyser les risques du projet');
+            logger.error("Erreur lors de l'analyse des risques:", error);
+            throw new Error("Impossible d'analyser les risques du projet");
         }
-    }
+    },
 };
 
 const Mutation = {
@@ -98,10 +98,10 @@ const Mutation = {
             logger.error('Erreur lors de la génération des recommandations:', error);
             throw new Error('Impossible de générer les recommandations');
         }
-    }
+    },
 };
 
 module.exports = {
     Query,
-    Mutation
+    Mutation,
 };

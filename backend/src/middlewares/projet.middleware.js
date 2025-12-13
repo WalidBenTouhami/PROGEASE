@@ -18,7 +18,7 @@ const logger = require('../utils/logger');
  * @param {Object} res - Objet reponse Express
  * @param {Function} next - Fonction next
  */
-const validateProjet = (schema) => async (req, res, next) => {
+const validateProjet = schema => async (req, res, next) => {
     try {
         // Valider les donnees avec le schema Yup fourni
         await schema.validate(req.body, {
@@ -27,8 +27,8 @@ const validateProjet = (schema) => async (req, res, next) => {
             context: {
                 utilisateur: req.utilisateur,
                 operation: req.method === 'POST' ? 'create' : 'update',
-                projetId: req.params.id
-            }
+                projetId: req.params.id,
+            },
         });
 
         // Validation reussie
@@ -38,21 +38,18 @@ const validateProjet = (schema) => async (req, res, next) => {
         const errors = error.inner.map(err => ({
             field: err.path,
             message: err.message,
-            type: err.type
+            type: err.type,
         }));
 
         // Journaliser l'erreur
         logger.warn('Validation du projet echouee', {
             path: req.path,
             method: req.method,
-            errors
+            errors,
         });
 
         // Creer une erreur de validation standardisee
-        const validationError = new ValidationError(
-            'Validation du projet echouee',
-            errors
-        );
+        const validationError = new ValidationError('Validation du projet echouee', errors);
 
         // Passer l'erreur au gestionnaire central
         next(validationError);
@@ -99,7 +96,7 @@ const checkProjetPermissions = async (req, res, next) => {
 
         // Sinon, refutilisateur l'acces
         throw new ValidationError(
-            'Vous n\'avez pas les autorisations necessaires pour cette operation',
+            "Vous n'avez pas les autorisations necessaires pour cette operation",
             403
         );
     } catch (error) {
@@ -109,5 +106,5 @@ const checkProjetPermissions = async (req, res, next) => {
 
 module.exports = {
     validateProjet,
-    checkProjetPermissions
+    checkProjetPermissions,
 };

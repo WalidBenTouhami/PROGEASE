@@ -24,10 +24,10 @@ const loadEnv = () => {
 
     // Fichiers de configuration à charger en ordre de priorite croissante
     const envFiles = [
-        '.env',                     // Fichier de base
-        `.env.${nodeEnv}`,          // Specifique à l'environnement
-        `.env.${nodeEnv}.local`,    // Specifique à l'environnement et la machine
-        '.env.local'                // Surcharges locales
+        '.env', // Fichier de base
+        `.env.${nodeEnv}`, // Specifique à l'environnement
+        `.env.${nodeEnv}.local`, // Specifique à l'environnement et la machine
+        '.env.local', // Surcharges locales
     ];
 
     // Charger les fichiers s'ils existent
@@ -48,18 +48,11 @@ const loadEnv = () => {
  * @throws {Error} Si une variable d'environnement requise est manquante
  */
 const validateEnv = () => {
-    const requiredVars = [
-        'MONGODB_URI',
-        'PORT',
-        'NODE_ENV'
-    ];
+    const requiredVars = ['MONGODB_URI', 'PORT', 'NODE_ENV'];
 
     // Variables requises seulement en production
     if (process.env.NODE_ENV === ENV.PROD) {
-        requiredVars.push(
-            'JWT_SECRET',
-            'API_RATE_LIMIT'
-        );
+        requiredVars.push('JWT_SECRET', 'API_RATE_LIMIT');
     }
 
     const missingVars = requiredVars.filter(varName => !process.env[varName]);
@@ -84,7 +77,7 @@ const getSafeEnv = () => {
         'API_KEY',
         'PASSWORD',
         'SECRET',
-        'TOKEN'
+        'TOKEN',
     ];
 
     // Filtrer les variables sensibles
@@ -101,5 +94,5 @@ const getSafeEnv = () => {
 
 module.exports = {
     loadEnv,
-    getSafeEnv
+    getSafeEnv,
 };

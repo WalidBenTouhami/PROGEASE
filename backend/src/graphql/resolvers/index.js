@@ -14,17 +14,17 @@ module.exports = {
             status: 'ok',
             timestamp: new Date().toISOString(),
             version: '2.0.0',
-            environment: process.env.NODE_ENV
+            environment: process.env.NODE_ENV,
         }),
         ...aiResolvers.Query,
         ...projetResolvers.Query,
-        ...livrableResolvers.Query
+        ...livrableResolvers.Query,
     },
     Mutation: {
         ...aiResolvers.Mutation,
         ...projetResolvers.Mutation,
-        ...livrableResolvers.Mutation
+        ...livrableResolvers.Mutation,
     },
     Projet: projetResolvers.Types || {},
-    Livrable: livrableResolvers.Types || {}
+    Livrable: livrableResolvers.Types || {},
 };

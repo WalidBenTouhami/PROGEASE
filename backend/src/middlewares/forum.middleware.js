@@ -10,7 +10,12 @@
 
 const { ValidationError } = require('./errorHandlers');
 const logger = require('../utils/logger');
-const { validateSujetData, validateReponseData, validateVoteData, validateId } = require('../validations/forum.validation');
+const {
+    validateSujetData,
+    validateReponseData,
+    validateVoteData,
+    validateId,
+} = require('../validations/forum.validation');
 const { Sujet } = require('../models/forum.model');
 
 /**
@@ -24,7 +29,7 @@ const validateSujet = async (req, res, next) => {
         logger.warn('Validation du sujet échouée', {
             path: req.path,
             method: req.method,
-            errors: error.details
+            errors: error.details,
         });
         next(new ValidationError('Validation du sujet échouée', error.details));
     }
@@ -41,7 +46,7 @@ const validateReponse = async (req, res, next) => {
         logger.warn('Validation de la réponse échouée', {
             path: req.path,
             method: req.method,
-            errors: error.details
+            errors: error.details,
         });
         next(new ValidationError('Validation de la réponse échouée', error.details));
     }
@@ -58,7 +63,7 @@ const validateVote = async (req, res, next) => {
         logger.warn('Validation du vote échouée', {
             path: req.path,
             method: req.method,
-            errors: error.details
+            errors: error.details,
         });
         next(new ValidationError('Validation du vote échouée', error.details));
     }
@@ -75,21 +80,21 @@ const estAuteurSujet = async (req, res, next) => {
         if (!sujet) {
             return res.status(404).json({
                 success: false,
-                message: 'Sujet non trouvé'
+                message: 'Sujet non trouvé',
             });
         }
 
         if (sujet.auteur.toString() !== req.utilisateur.id) {
             return res.status(403).json({
                 success: false,
-                message: 'Accès non autorisé - Vous n\'êtes pas l\'auteur de ce sujet'
+                message: "Accès non autorisé - Vous n'êtes pas l'auteur de ce sujet",
             });
         }
 
         req.sujet = sujet;
         next();
     } catch (error) {
-        logger.error('Erreur lors de la vérification de l\'auteur du sujet:', error);
+        logger.error("Erreur lors de la vérification de l'auteur du sujet:", error);
         next(error);
     }
 };
@@ -106,7 +111,7 @@ const estAuteurReponse = async (req, res, next) => {
         if (!sujet) {
             return res.status(404).json({
                 success: false,
-                message: 'Sujet non trouvé'
+                message: 'Sujet non trouvé',
             });
         }
 
@@ -114,14 +119,14 @@ const estAuteurReponse = async (req, res, next) => {
         if (!reponse) {
             return res.status(404).json({
                 success: false,
-                message: 'Réponse non trouvée'
+                message: 'Réponse non trouvée',
             });
         }
 
         if (reponse.auteur.toString() !== req.utilisateur.id) {
             return res.status(403).json({
                 success: false,
-                message: 'Accès non autorisé - Vous n\'êtes pas l\'auteur de cette réponse'
+                message: "Accès non autorisé - Vous n'êtes pas l'auteur de cette réponse",
             });
         }
 
@@ -129,7 +134,7 @@ const estAuteurReponse = async (req, res, next) => {
         req.reponse = reponse;
         next();
     } catch (error) {
-        logger.error('Erreur lors de la vérification de l\'auteur de la réponse:', error);
+        logger.error("Erreur lors de la vérification de l'auteur de la réponse:", error);
         next(error);
     }
 };
@@ -137,13 +142,13 @@ const estAuteurReponse = async (req, res, next) => {
 /**
  * Middleware pour vérifier les permissions sur le forum
  */
-const checkForumPermissions = (action) => async (req, res, next) => {
+const checkForumPermissions = action => async (req, res, next) => {
     try {
         const utilisateur = req.utilisateur;
         if (!utilisateur) {
             return res.status(401).json({
                 success: false,
-                message: 'Authentification requise'
+                message: 'Authentification requise',
             });
         }
 
@@ -159,13 +164,16 @@ const checkForumPermissions = (action) => async (req, res, next) => {
                 if (!sujet) {
                     return res.status(404).json({
                         success: false,
-                        message: 'Sujet non trouvé'
+                        message: 'Sujet non trouvé',
                     });
                 }
-                if (sujet.auteur.toString() !== utilisateur.id && !utilisateur.roles.includes('ADMIN')) {
+                if (
+                    sujet.auteur.toString() !== utilisateur.id &&
+                    !utilisateur.roles.includes('ADMIN')
+                ) {
                     return res.status(403).json({
                         success: false,
-                        message: 'Accès non autorisé'
+                        message: 'Accès non autorisé',
                     });
                 }
                 break;
@@ -174,14 +182,14 @@ const checkForumPermissions = (action) => async (req, res, next) => {
                 if (!utilisateur.roles.some(role => ['ADMIN', 'MODERATEUR'].includes(role))) {
                     return res.status(403).json({
                         success: false,
-                        message: 'Accès non autorisé - Droits de modération requis'
+                        message: 'Accès non autorisé - Droits de modération requis',
                     });
                 }
                 break;
             default:
                 return res.status(400).json({
                     success: false,
-                    message: 'Action non reconnue'
+                    message: 'Action non reconnue',
                 });
         }
 
@@ -198,5 +206,5 @@ module.exports = {
     validateVote,
     estAuteurSujet,
     estAuteurReponse,
-    checkForumPermissions
-}; 
+    checkForumPermissions,
+};

@@ -14,7 +14,8 @@ function mapperLivrable(doc) {
         _id: doc._id.toString(),
         intitule: doc.intitule,
         description: doc.description,
-        dateEcheance: doc.dateLimite instanceof Date ? doc.dateLimite.toISOString() : doc.dateLimite,
+        dateEcheance:
+            doc.dateLimite instanceof Date ? doc.dateLimite.toISOString() : doc.dateLimite,
         statut: doc.statut,
         projetId: doc.projetId ? doc.projetId.toString() : null,
         creeLe: doc.creeLe instanceof Date ? doc.creeLe.toISOString() : doc.creeLe,
@@ -44,7 +45,7 @@ function mapperProjet(doc) {
         progression: doc.progression || 0,
         creeLe: doc.creeLe instanceof Date ? doc.creeLe.toISOString() : doc.creeLe,
         majLe: doc.majLe instanceof Date ? doc.majLe.toISOString() : doc.majLe,
-        duree: doc.duree
+        duree: doc.duree,
     };
 }
 
@@ -59,7 +60,7 @@ function mapperLivrableInput(input) {
         description: input.description,
         dateLimite: input.dateEcheance ? new Date(input.dateEcheance) : new Date(),
         projetId: input.projetId,
-        statut: input.statut || 'en_attente'
+        statut: input.statut || 'en_attente',
     };
 }
 
@@ -78,7 +79,7 @@ function mapperProjetInput(input) {
         dateDebut: input.dateDebut ? new Date(input.dateDebut) : new Date(),
         dateFin: input.dateFin ? new Date(input.dateFin) : null,
         statut: input.statut || 'Brouillon',
-        progression: input.progression || 0
+        progression: input.progression || 0,
     };
 }
 
@@ -86,5 +87,5 @@ module.exports = {
     mapperLivrable,
     mapperProjet,
     mapperLivrableInput,
-    mapperProjetInput
+    mapperProjetInput,
 };

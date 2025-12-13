@@ -45,7 +45,7 @@ function mapProjetMongoVersGraphQL(doc) {
         moyenneEvaluations: doc.moyenneEvaluations || 0,
         performancePredite: doc.performancePredite || 0,
         creeLe: doc.creeLe,
-        majLe: doc.majLe
+        majLe: doc.majLe,
     };
 }
 
@@ -82,7 +82,7 @@ const Query = {
             projets,
             total,
             page,
-            pages: Math.ceil(total / limit)
+            pages: Math.ceil(total / limit),
         };
     }),
 
@@ -114,12 +114,7 @@ const Query = {
                 .populate('equipe', 'nom prenom email');
 
             if (!projet) {
-                throw new AppError(
-                    'Projet not found',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
+                throw new AppError('Projet not found', 404, ERROR_CODES.NOT_FOUND, true);
             }
 
             // Risk analysis based on multiple factors
@@ -127,7 +122,7 @@ const Query = {
                 retard: projet.estEnRetard,
                 progression: projet.progression < 50 && projet.dateFin < new Date(),
                 livrables: projet.livrablesComplets.some(l => l.estEnRetard()),
-                equipe: projet.equipe.length < 2
+                equipe: projet.equipe.length < 2,
             };
 
             const niveauRisque = Object.values(risques).filter(Boolean).length;
@@ -149,7 +144,7 @@ const Query = {
             return {
                 ...risques,
                 niveauRisque,
-                recommandations
+                recommandations,
             };
         } catch (error) {
             if (error instanceof AppError) throw error;
@@ -158,7 +153,7 @@ const Query = {
                 error: error.message,
                 stack: error.stack,
                 requestId: context.requestId,
-                projetId
+                projetId,
             });
 
             throw new AppError(
@@ -214,7 +209,7 @@ const Query = {
             .populate('tuteur')
             .populate('livrables')
             .sort({ creeLe: -1 });
-    })
+    }),
 };
 
 const Mutation = {
@@ -238,7 +233,7 @@ const Mutation = {
             progression: 0,
             createur: utilisateur._id,
             creeLe: new Date(),
-            majLe: new Date()
+            majLe: new Date(),
         });
 
         return projet.populate('equipe').populate('tuteur');
@@ -294,7 +289,7 @@ const Mutation = {
         }
 
         if (projet.equipe.includes(utilisateurId)) {
-            throw new UserInputError('L\'utilisateur est déjà membre du projet');
+            throw new UserInputError("L'utilisateur est déjà membre du projet");
         }
 
         projet.equipe.push(utilisateurId);
@@ -318,7 +313,7 @@ const Mutation = {
         }
 
         if (!projet.equipe.includes(utilisateurId)) {
-            throw new UserInputError('L\'utilisateur n\'est pas membre du projet');
+            throw new UserInputError("L'utilisateur n'est pas membre du projet");
         }
 
         projet.equipe = projet.equipe.filter(id => id.toString() !== utilisateurId);
@@ -345,18 +340,18 @@ const Mutation = {
         await projet.save();
 
         return projet.populate('equipe').populate('tuteur');
-    })
+    }),
 };
 
 // Resolvers pour les champs complexes du type Projet
 const ProjetResolver = {
-    equipe: async (parent) => {
+    equipe: async parent => {
         return parent.populate('equipe').then(p => p.equipe);
     },
-    tuteur: async (parent) => {
+    tuteur: async parent => {
         return parent.populate('tuteur').then(p => p.tuteur);
     },
-    livrables: async (parent) => {
+    livrables: async parent => {
         return parent.populate('livrables').then(p => p.livrables);
     },
     evaluations: async (parent, _, context) => {
@@ -370,11 +365,11 @@ const ProjetResolver = {
             logger.error(`Error loading evaluations for projet ${parent.id}:`, error);
             return [];
         }
-    }
+    },
 };
 
 module.exports = {
     Query,
     Mutation,
-    Projet: ProjetResolver
+    Projet: ProjetResolver,
 };

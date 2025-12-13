@@ -21,7 +21,13 @@ const mkdir = util.promisify(fs.mkdir);
 
 const GRAPHQL_URL = process.env.GRAPHQL_URL || 'http://localhost:5000/graphql';
 const TESTS_DIR = path.join(__dirname, '..', 'tests', 'graphql');
-const POSTMAN_COLLECTION_PATH = path.join(__dirname, '..', 'tests', 'postman', 'PROGEASE.postman_collection.json');
+const POSTMAN_COLLECTION_PATH = path.join(
+    __dirname,
+    '..',
+    'tests',
+    'postman',
+    'PROGEASE.postman_collection.json'
+);
 
 // Configuration
 const config = {
@@ -36,17 +42,17 @@ const config = {
         // Chemins de sortie pour les tests generes
         output: {
             newman: path.join(__dirname, '..', 'tests', 'postman'),
-            graphql: path.join(__dirname, '..', 'tests', 'graphql')
-        }
+            graphql: path.join(__dirname, '..', 'tests', 'graphql'),
+        },
     },
     // Metadonnees
     metadata: {
         author: 'WalidBenTouhami',
         date: '2025-05-27 19:27:50',
-        version: '1.0.0'
+        version: '1.0.0',
     },
     // URL de base pour les tests API
-    baseUrl: 'http://localhost:5000'
+    baseUrl: 'http://localhost:5000',
 };
 
 // Structure pour stocker les informations extraites
@@ -55,7 +61,7 @@ const projetStructure = {
     endpoints: [],
     graphqlTypes: [],
     graphqlQueries: [],
-    graphqlMutations: []
+    graphqlMutations: [],
 };
 
 /**
@@ -93,9 +99,7 @@ async function analyzeGraphQL() {
     console.log('Analyse des definitions GraphQL...');
 
     // Chercher les fichiers GraphQL dans differents endroits possibles
-    const gqlFolders = [
-        path.join(__dirname, '..', 'src'),
-    ];
+    const gqlFolders = [path.join(__dirname, '..', 'src')];
 
     let gqlFiles = [];
     for (const folder of gqlFolders) {
@@ -121,14 +125,14 @@ async function analyzeGraphQL() {
                 while ((fieldMatch = fieldRegex.exec(typeContent)) !== null) {
                     fields.push({
                         name: fieldMatch[1],
-                        type: fieldMatch[2]
+                        type: fieldMatch[2],
                     });
                 }
 
                 projetStructure.graphqlTypes.push({
                     name: typeName,
                     fields: fields,
-                    file: path.relative(path.join(__dirname, '..'), file)
+                    file: path.relative(path.join(__dirname, '..'), file),
                 });
             }
 
@@ -145,7 +149,7 @@ async function analyzeGraphQL() {
                     projetStructure.graphqlQueries.push({
                         name: queryFieldMatch[1],
                         returnType: queryFieldMatch[2],
-                        file: path.relative(path.join(__dirname, '..'), file)
+                        file: path.relative(path.join(__dirname, '..'), file),
                     });
                 }
             }
@@ -163,7 +167,7 @@ async function analyzeGraphQL() {
                     projetStructure.graphqlMutations.push({
                         name: mutationFieldMatch[1],
                         returnType: mutationFieldMatch[2],
-                        file: path.relative(path.join(__dirname, '..'), file)
+                        file: path.relative(path.join(__dirname, '..'), file),
                     });
                 }
             }
@@ -184,8 +188,12 @@ async function generateGraphQLTests() {
     console.log('[NINJA] Introspecting GraphQL schema...');
     const schema = await introspectGraphQLSchema();
     const queries = schema.types.find(t => t.name === schema.queryType.name).fields;
-    const mutations = schema.mutationType ? schema.types.find(t => t.name === schema.mutationType.name).fields : [];
-    const inputTypes = Object.fromEntries(schema.types.filter(t => t.kind === 'INPUT_OBJECT').map(t => [t.name, t]));
+    const mutations = schema.mutationType
+        ? schema.types.find(t => t.name === schema.mutationType.name).fields
+        : [];
+    const inputTypes = Object.fromEntries(
+        schema.types.filter(t => t.kind === 'INPUT_OBJECT').map(t => [t.name, t])
+    );
 
     await mkdir(TESTS_DIR, { recursive: true });
     const testFiles = [];
@@ -194,14 +202,20 @@ async function generateGraphQLTests() {
     for (const field of queries) {
         const { query, variables } = buildQueryOrMutationWithVars(field, 'query', inputTypes);
         const filePath = path.join(TESTS_DIR, `${field.name}.graphql`);
-        await writeFile(filePath, `# Auto-generated test for query ${field.name}\n${query}\n\n# Variables:\n# ${JSON.stringify(variables, null, 2)}\n`);
+        await writeFile(
+            filePath,
+            `# Auto-generated test for query ${field.name}\n${query}\n\n# Variables:\n# ${JSON.stringify(variables, null, 2)}\n`
+        );
         testFiles.push(filePath);
     }
     // Generate mutations
     for (const field of mutations) {
         const { query, variables } = buildQueryOrMutationWithVars(field, 'mutation', inputTypes);
         const filePath = path.join(TESTS_DIR, `${field.name}.graphql`);
-        await writeFile(filePath, `# Auto-generated test for mutation ${field.name}\n${query}\n\n# Variables:\n# ${JSON.stringify(variables, null, 2)}\n`);
+        await writeFile(
+            filePath,
+            `# Auto-generated test for mutation ${field.name}\n${query}\n\n# Variables:\n# ${JSON.stringify(variables, null, 2)}\n`
+        );
         testFiles.push(filePath);
     }
     console.log(`[NINJA] Generated ${testFiles.length} GraphQL test files in ${TESTS_DIR}`);
@@ -212,29 +226,29 @@ async function generateGraphQLTests() {
  */
 function getGraphqlMockValue(type) {
     switch (type.toLowerCase()) {
-    case 'string':
-        return '"Exemple de texte"';
-    case 'int':
-    case 'integer':
-    case 'number':
-        return '42';
-    case 'float':
-        return '3.14';
-    case 'boolean':
-        return 'true';
-    case 'id':
-        return '"5f8f8f8f8f8f8f8f8f8f8f8f"';
-    case 'date':
-    case 'datetime':
-        return `"${new Date().toISOString()}"`;
-    case '[string]':
-        return '["item1", "item2"]';
-    case '[int]':
-    case '[integer]':
-    case '[number]':
-        return '[1, 2, 3]';
-    default:
-        return '"valeur"';
+        case 'string':
+            return '"Exemple de texte"';
+        case 'int':
+        case 'integer':
+        case 'number':
+            return '42';
+        case 'float':
+            return '3.14';
+        case 'boolean':
+            return 'true';
+        case 'id':
+            return '"5f8f8f8f8f8f8f8f8f8f8f8f"';
+        case 'date':
+        case 'datetime':
+            return `"${new Date().toISOString()}"`;
+        case '[string]':
+            return '["item1", "item2"]';
+        case '[int]':
+        case '[integer]':
+        case '[number]':
+            return '[1, 2, 3]';
+        default:
+            return '"valeur"';
     }
 }
 
@@ -303,10 +317,10 @@ async function introspectGraphQLSchema() {
                     }
                 }
             }
-        }`
+        }`,
     };
     const res = await axios.post(GRAPHQL_URL, introspectionQuery, {
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
     });
     return res.data.data.__schema;
 }
@@ -337,7 +351,9 @@ function buildQueryOrMutation(field, type, inputTypes) {
 async function validateGraphQLTests() {
     console.log('[NINJA] Validating GraphQL test files against live schema...');
     const schema = await introspectGraphQLSchema();
-    const queryFields = schema.types.find(t => t.name === schema.queryType.name).fields.map(f => f.name);
+    const queryFields = schema.types
+        .find(t => t.name === schema.queryType.name)
+        .fields.map(f => f.name);
     const mutationFields = schema.mutationType
         ? schema.types.find(t => t.name === schema.mutationType.name).fields.map(f => f.name)
         : [];
@@ -348,7 +364,9 @@ async function validateGraphQLTests() {
         if (!file.endsWith('.graphql')) continue;
         const name = file.replace('.graphql', '');
         if (!validFields.has(name)) {
-            console.warn(`[NINJA] Test file ${file} does not match any field in schema. Consider removing.`);
+            console.warn(
+                `[NINJA] Test file ${file} does not match any field in schema. Consider removing.`
+            );
             valid = false;
         }
     }
@@ -366,7 +384,7 @@ async function extractExpressRoutes() {
             // Route registered directly on the app
             routes.push({
                 method: Object.keys(middleware.route.methods)[0].toUpperCase(),
-                path: middleware.route.path
+                path: middleware.route.path,
             });
         } else if (middleware.name === 'router' && middleware.handle.stack) {
             // Router middleware
@@ -374,7 +392,7 @@ async function extractExpressRoutes() {
                 if (handler.route) {
                     routes.push({
                         method: Object.keys(handler.route.methods)[0].toUpperCase(),
-                        path: handler.route.path
+                        path: handler.route.path,
                     });
                 }
             });
@@ -441,7 +459,7 @@ function buildQueryOrMutationWithVars(field, type, inputTypes) {
     }
     return {
         query: `${type} ${field.name}${argStr} {\n  ${field.name}${callStr} {\n    __typename\n  }\n}`,
-        variables
+        variables,
     };
 }
 
@@ -466,10 +484,10 @@ async function generateRestTests() {
     const collection = {
         info: {
             name: 'PROGEASE API Tests (Auto-generated)',
-            schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json'
+            schema: 'https://schema.getpostman.com/json/collection/v2.1.0/collection.json',
         },
         item: [],
-        variable: [{ key: 'baseUrl', value: 'http://localhost:5000', type: 'string' }]
+        variable: [{ key: 'baseUrl', value: 'http://localhost:5000', type: 'string' }],
     };
     // Try to require models for mock data
     const models = {};
@@ -490,8 +508,8 @@ async function generateRestTests() {
             request: {
                 method: route.method,
                 header: [{ key: 'Content-Type', value: 'application/json' }],
-                url: `{{baseUrl}}${route.path}`
-            }
+                url: `{{baseUrl}}${route.path}`,
+            },
         };
         // If POST/PUT/PATCH, add mock body
         if (['POST', 'PUT', 'PATCH'].includes(route.method)) {
@@ -501,7 +519,7 @@ async function generateRestTests() {
             if (model) {
                 item.request.body = {
                     mode: 'raw',
-                    raw: JSON.stringify(generateRestMockData(model), null, 2)
+                    raw: JSON.stringify(generateRestMockData(model), null, 2),
                 };
             }
         }
@@ -509,7 +527,9 @@ async function generateRestTests() {
     }
     await mkdir(path.dirname(POSTMAN_COLLECTION_PATH), { recursive: true });
     await writeFile(POSTMAN_COLLECTION_PATH, JSON.stringify(collection, null, 2), 'utf8');
-    console.log(`[NINJA] Generated Postman collection with ${routes.length} endpoints at ${POSTMAN_COLLECTION_PATH}`);
+    console.log(
+        `[NINJA] Generated Postman collection with ${routes.length} endpoints at ${POSTMAN_COLLECTION_PATH}`
+    );
 }
 
 // [NINJA DOCS] Auto-generate API documentation from schema and route definitions
@@ -521,7 +541,8 @@ async function generateApiDocs() {
     let md = '# GraphQL API Documentation\n\n';
     md += '## Types\n';
     for (const type of schema.types) {
-        if (type.name.startsWith('__') || ['Query', 'Mutation', 'Subscription'].includes(type.name)) continue;
+        if (type.name.startsWith('__') || ['Query', 'Mutation', 'Subscription'].includes(type.name))
+            continue;
         md += `### ${type.name}\n`;
         if (type.fields) {
             md += '| Field | Type |\n|---|---|\n';

@@ -25,14 +25,14 @@ exports.recupererSujets = async (req, res) => {
                 sujets,
                 page,
                 totalPages: Math.ceil(total / limite),
-                total
-            }
+                total,
+            },
         });
     } catch (error) {
         logger.error('Erreur lors de la récupération des sujets:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la récupération des sujets'
+            message: 'Erreur lors de la récupération des sujets',
         });
     }
 };
@@ -50,7 +50,7 @@ exports.recupererSujetParId = async (req, res) => {
         if (!sujet) {
             return res.status(404).json({
                 success: false,
-                message: 'Sujet non trouvé'
+                message: 'Sujet non trouvé',
             });
         }
 
@@ -59,13 +59,13 @@ exports.recupererSujetParId = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            data: sujet
+            data: sujet,
         });
     } catch (error) {
         logger.error('Erreur lors de la récupération du sujet:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la récupération du sujet'
+            message: 'Erreur lors de la récupération du sujet',
         });
     }
 };
@@ -77,7 +77,7 @@ exports.creerSujet = async (req, res) => {
     try {
         const sujet = new Sujet({
             ...req.body,
-            auteur: req.utilisateur.id
+            auteur: req.utilisateur.id,
         });
 
         await sujet.save();
@@ -85,13 +85,13 @@ exports.creerSujet = async (req, res) => {
         res.status(201).json({
             success: true,
             message: 'Sujet créé avec succès',
-            data: sujet
+            data: sujet,
         });
     } catch (error) {
         logger.error('Erreur lors de la création du sujet:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la création du sujet'
+            message: 'Erreur lors de la création du sujet',
         });
     }
 };
@@ -109,8 +109,8 @@ exports.modifierSujet = async (req, res) => {
                     contenu: req.body.contenu,
                     categorie: req.body.categorie,
                     tags: req.body.tags,
-                    majLe: new Date()
-                }
+                    majLe: new Date(),
+                },
             },
             { new: true }
         );
@@ -118,13 +118,13 @@ exports.modifierSujet = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Sujet modifié avec succès',
-            data: sujet
+            data: sujet,
         });
     } catch (error) {
         logger.error('Erreur lors de la modification du sujet:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la modification du sujet'
+            message: 'Erreur lors de la modification du sujet',
         });
     }
 };
@@ -138,13 +138,13 @@ exports.supprimerSujet = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Sujet supprimé avec succès'
+            message: 'Sujet supprimé avec succès',
         });
     } catch (error) {
         logger.error('Erreur lors de la suppression du sujet:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la suppression du sujet'
+            message: 'Erreur lors de la suppression du sujet',
         });
     }
 };
@@ -159,13 +159,13 @@ exports.ajouterReponse = async (req, res) => {
         if (!sujet) {
             return res.status(404).json({
                 success: false,
-                message: 'Sujet non trouvé'
+                message: 'Sujet non trouvé',
             });
         }
 
         sujet.reponses.push({
             contenu: req.body.contenu,
-            auteur: req.utilisateur.id
+            auteur: req.utilisateur.id,
         });
 
         await sujet.save();
@@ -173,13 +173,13 @@ exports.ajouterReponse = async (req, res) => {
         res.status(201).json({
             success: true,
             message: 'Réponse ajoutée avec succès',
-            data: sujet.reponses[sujet.reponses.length - 1]
+            data: sujet.reponses[sujet.reponses.length - 1],
         });
     } catch (error) {
-        logger.error('Erreur lors de l\'ajout de la réponse:', error);
+        logger.error("Erreur lors de l'ajout de la réponse:", error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de l\'ajout de la réponse'
+            message: "Erreur lors de l'ajout de la réponse",
         });
     }
 };
@@ -200,13 +200,13 @@ exports.modifierReponse = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Réponse modifiée avec succès',
-            data: reponse
+            data: reponse,
         });
     } catch (error) {
         logger.error('Erreur lors de la modification de la réponse:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la modification de la réponse'
+            message: 'Erreur lors de la modification de la réponse',
         });
     }
 };
@@ -222,13 +222,13 @@ exports.supprimerReponse = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Réponse supprimée avec succès'
+            message: 'Réponse supprimée avec succès',
         });
     } catch (error) {
         logger.error('Erreur lors de la suppression de la réponse:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la suppression de la réponse'
+            message: 'Erreur lors de la suppression de la réponse',
         });
     }
 };
@@ -244,7 +244,7 @@ exports.voterSujet = async (req, res) => {
         if (!sujet) {
             return res.status(404).json({
                 success: false,
-                message: 'Sujet non trouvé'
+                message: 'Sujet non trouvé',
             });
         }
 
@@ -274,13 +274,13 @@ exports.voterSujet = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Vote enregistré avec succès',
-            data: sujet.votes
+            data: sujet.votes,
         });
     } catch (error) {
         logger.error('Erreur lors du vote sur le sujet:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors du vote sur le sujet'
+            message: 'Erreur lors du vote sur le sujet',
         });
     }
 };
@@ -297,7 +297,7 @@ exports.voterReponse = async (req, res) => {
         if (!reponse) {
             return res.status(404).json({
                 success: false,
-                message: 'Réponse non trouvée'
+                message: 'Réponse non trouvée',
             });
         }
 
@@ -327,13 +327,13 @@ exports.voterReponse = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Vote enregistré avec succès',
-            data: reponse.votes
+            data: reponse.votes,
         });
     } catch (error) {
         logger.error('Erreur lors du vote sur la réponse:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors du vote sur la réponse'
+            message: 'Erreur lors du vote sur la réponse',
         });
     }
 };
@@ -349,7 +349,7 @@ exports.marquerCommeSolution = async (req, res) => {
         if (!reponse) {
             return res.status(404).json({
                 success: false,
-                message: 'Réponse non trouvée'
+                message: 'Réponse non trouvée',
             });
         }
 
@@ -367,13 +367,13 @@ exports.marquerCommeSolution = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Réponse marquée comme solution',
-            data: reponse
+            data: reponse,
         });
     } catch (error) {
         logger.error('Erreur lors du marquage de la solution:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors du marquage de la solution'
+            message: 'Erreur lors du marquage de la solution',
         });
     }
 };
@@ -406,14 +406,14 @@ exports.rechercherSujets = async (req, res) => {
                 sujets,
                 page,
                 totalPages: Math.ceil(total / limite),
-                total
-            }
+                total,
+            },
         });
     } catch (error) {
         logger.error('Erreur lors de la recherche des sujets:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la recherche des sujets'
+            message: 'Erreur lors de la recherche des sujets',
         });
     }
 };
@@ -443,14 +443,14 @@ exports.recupererSujetsParCategorie = async (req, res) => {
                 sujets,
                 page,
                 totalPages: Math.ceil(total / limite),
-                total
-            }
+                total,
+            },
         });
     } catch (error) {
         logger.error('Erreur lors de la récupération des sujets par catégorie:', error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la récupération des sujets par catégorie'
+            message: 'Erreur lors de la récupération des sujets par catégorie',
         });
     }
 };
@@ -480,14 +480,14 @@ exports.recupererSujetsParUtilisateur = async (req, res) => {
                 sujets,
                 page,
                 totalPages: Math.ceil(total / limite),
-                total
-            }
+                total,
+            },
         });
     } catch (error) {
-        logger.error('Erreur lors de la récupération des sujets de l\'utilisateur:', error);
+        logger.error("Erreur lors de la récupération des sujets de l'utilisateur:", error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de la récupération des sujets de l\'utilisateur'
+            message: "Erreur lors de la récupération des sujets de l'utilisateur",
         });
     }
-}; 
+};

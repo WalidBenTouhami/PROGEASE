@@ -56,7 +56,7 @@ function mapperQuizVersMongo(quiz) {
             options: q.options,
             reponseCorrecte: q.reponseCorrecte,
             points: q.points || 1,
-            explication: q.explication
+            explication: q.explication,
         })),
         auteur: quiz.auteur,
         estPublic: quiz.estPublic,
@@ -66,7 +66,7 @@ function mapperQuizVersMongo(quiz) {
         scoreTotal: quiz.scoreTotal,
         scoreMoyen: quiz.scoreMoyen,
         creeLe: quiz.creeLe,
-        majLe: quiz.majLe
+        majLe: quiz.majLe,
     };
 }
 
@@ -91,7 +91,7 @@ function mapperMongoVersAPI(doc) {
             type: q.type,
             options: q.options,
             points: q.points || 1,
-            explication: q.explication
+            explication: q.explication,
         })),
         auteur: doc.auteur,
         estPublic: doc.estPublic,
@@ -99,11 +99,15 @@ function mapperMongoVersAPI(doc) {
         stats: {
             nombreParticipations: doc.nombreParticipations || 0,
             scoreMoyen: doc.scoreMoyen || 0,
-            tauxReussite: doc.nombreParticipations > 0 ?
-                (doc.participations.filter(p => p.score >= doc.scoreMaximum * 0.7).length / doc.nombreParticipations) * 100 : 0
+            tauxReussite:
+                doc.nombreParticipations > 0
+                    ? (doc.participations.filter(p => p.score >= doc.scoreMaximum * 0.7).length /
+                          doc.nombreParticipations) *
+                      100
+                    : 0,
         },
         creeLe: doc.creeLe.toISOString(),
-        majLe: doc.majLe.toISOString()
+        majLe: doc.majLe.toISOString(),
     };
 }
 
@@ -128,7 +132,7 @@ function mapperMongoVersGraphQL(doc) {
             type: q.type,
             options: q.options || [],
             points: q.points || 1,
-            explication: q.explication || ''
+            explication: q.explication || '',
         })),
         auteur: doc.auteur,
         estPublic: doc.estPublic || false,
@@ -136,7 +140,7 @@ function mapperMongoVersGraphQL(doc) {
         nombreParticipations: doc.nombreParticipations || 0,
         scoreMoyen: doc.scoreMoyen || 0,
         creeLe: doc.creeLe ? doc.creeLe.toISOString() : null,
-        majLe: doc.majLe ? doc.majLe.toISOString() : null
+        majLe: doc.majLe ? doc.majLe.toISOString() : null,
     };
 }
 
@@ -144,5 +148,5 @@ module.exports = {
     mapperMongoVersQuiz,
     mapperQuizVersMongo,
     mapperMongoVersAPI,
-    mapperMongoVersGraphQL
-}; 
+    mapperMongoVersGraphQL,
+};

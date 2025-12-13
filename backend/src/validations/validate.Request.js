@@ -1,10 +1,10 @@
-const validateRequest = (schema) => async (req, res, next) => {
+const validateRequest = schema => async (req, res, next) => {
     try {
         const validatedBody = await schema.validate(req.body, {
             abortEarly: false,
-            stripUnknown: true
+            stripUnknown: true,
         });
-        
+
         // Replace request body with validated data
         req.body = validatedBody;
         next();
@@ -13,7 +13,7 @@ const validateRequest = (schema) => async (req, res, next) => {
             return res.status(400).json({
                 status: 'error',
                 message: 'Validation failed',
-                errors: error.errors
+                errors: error.errors,
             });
         }
         next(error);
@@ -21,5 +21,5 @@ const validateRequest = (schema) => async (req, res, next) => {
 };
 
 module.exports = {
-    validateRequest
-}; 
+    validateRequest,
+};

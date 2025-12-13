@@ -7,25 +7,25 @@ const logger = require('../utils/logger');
  */
 const handleValidationErrors = (req, res, next) => {
     const errors = validationResult(req);
-    
+
     if (!errors.isEmpty()) {
         logger.warn('Erreur de validation', {
             errors: errors.array(),
             path: req.path,
-            method: req.method
+            method: req.method,
         });
-        
+
         return res.status(400).json({
             success: false,
             message: 'Erreur de validation',
             errors: errors.array().map(err => ({
                 field: err.param,
                 message: err.msg,
-                value: err.value
-            }))
+                value: err.value,
+            })),
         });
     }
-    
+
     next();
 };
 
@@ -36,10 +36,7 @@ const validateTeamFormation = [
     body('membres')
         .isArray({ min: 1 })
         .withMessage('La liste des membres doit être un tableau non vide'),
-    body('membres.*.id')
-        .optional()
-        .isString()
-        .withMessage('L\'ID du membre doit être une chaîne'),
+    body('membres.*.id').optional().isString().withMessage("L'ID du membre doit être une chaîne"),
     body('membres.*.nom')
         .optional()
         .isString()
@@ -50,7 +47,7 @@ const validateTeamFormation = [
         .optional()
         .isArray()
         .withMessage('Les compétences doivent être un tableau'),
-    handleValidationErrors
+    handleValidationErrors,
 ];
 
 /**
@@ -60,15 +57,12 @@ const validateTutorMatching = [
     body('membres')
         .isArray({ min: 1 })
         .withMessage('La liste des membres doit être un tableau non vide'),
-    body('membres.*.id')
-        .optional()
-        .isString()
-        .withMessage('L\'ID du membre doit être une chaîne'),
+    body('membres.*.id').optional().isString().withMessage("L'ID du membre doit être une chaîne"),
     body('membres.*.role')
         .optional()
         .isIn(['TUTEUR', 'ETUDIANT', 'EQUIPE'])
         .withMessage('Le rôle doit être TUTEUR, ETUDIANT ou EQUIPE'),
-    handleValidationErrors
+    handleValidationErrors,
 ];
 
 /**
@@ -83,16 +77,14 @@ const validateLearningResources = [
         .trim()
         .isLength({ min: 2, max: 50 })
         .withMessage('Chaque compétence doit contenir entre 2 et 50 caractères'),
-    handleValidationErrors
+    handleValidationErrors,
 ];
 
 /**
  * Validations pour l'endpoint de suivi de progression
  */
 const validateProgressTracking = [
-    body('taches')
-        .isArray()
-        .withMessage('La liste des tâches doit être un tableau'),
+    body('taches').isArray().withMessage('La liste des tâches doit être un tableau'),
     body('taches.*.titre')
         .optional()
         .isString()
@@ -101,9 +93,20 @@ const validateProgressTracking = [
         .withMessage('Le titre doit contenir entre 2 et 200 caractères'),
     body('taches.*.statut')
         .optional()
-        .isIn(['A_FAIRE', 'EN_COURS', 'TERMINEE', 'BLOQUEE', 'terminee', 'complete', 'Termine', 'en cours', 'En cours', 'En attente'])
+        .isIn([
+            'A_FAIRE',
+            'EN_COURS',
+            'TERMINEE',
+            'BLOQUEE',
+            'terminee',
+            'complete',
+            'Termine',
+            'en cours',
+            'En cours',
+            'En attente',
+        ])
         .withMessage('Statut de tâche invalide'),
-    handleValidationErrors
+    handleValidationErrors,
 ];
 
 /**
@@ -113,9 +116,7 @@ const validateScheduleGeneration = [
     body('taches')
         .isArray({ min: 1 })
         .withMessage('La liste des tâches doit être un tableau non vide'),
-    body('dateDebut')
-        .isISO8601()
-        .withMessage('La date de début doit être au format ISO 8601'),
+    body('dateDebut').isISO8601().withMessage('La date de début doit être au format ISO 8601'),
     body('dateFin')
         .isISO8601()
         .withMessage('La date de fin doit être au format ISO 8601')
@@ -125,16 +126,14 @@ const validateScheduleGeneration = [
             }
             return true;
         }),
-    handleValidationErrors
+    handleValidationErrors,
 ];
 
 /**
  * Validations pour l'endpoint de planification d'événements
  */
 const validateEventScheduling = [
-    param('projetId')
-        .isMongoId()
-        .withMessage('ID de projet invalide'),
+    param('projetId').isMongoId().withMessage('ID de projet invalide'),
     body('type')
         .optional()
         .isIn(['REUNION', 'REVUE', 'SOUTENANCE'])
@@ -143,7 +142,7 @@ const validateEventScheduling = [
         .optional()
         .isIn(['QUOTIDIEN', 'HEBDOMADAIRE', 'BIHEBDOMADAIRE', 'MENSUEL'])
         .withMessage('La fréquence doit être QUOTIDIEN, HEBDOMADAIRE, BIHEBDOMADAIRE ou MENSUEL'),
-    handleValidationErrors
+    handleValidationErrors,
 ];
 
 /**
@@ -153,13 +152,11 @@ const validateConflictDetection = [
     body('evenements')
         .isArray({ min: 2 })
         .withMessage('Au moins 2 événements sont nécessaires pour détecter les conflits'),
-    body('evenements.*.date')
-        .isISO8601()
-        .withMessage('La date doit être au format ISO 8601'),
+    body('evenements.*.date').isISO8601().withMessage('La date doit être au format ISO 8601'),
     body('evenements.*.duree')
         .isInt({ min: 1, max: 1440 })
         .withMessage('La durée doit être entre 1 et 1440 minutes'),
-    handleValidationErrors
+    handleValidationErrors,
 ];
 
 /**
@@ -179,44 +176,36 @@ const validateNotifications = [
         .trim()
         .isLength({ min: 5, max: 200 })
         .withMessage('Le titre doit contenir entre 5 et 200 caractères'),
-    handleValidationErrors
+    handleValidationErrors,
 ];
 
 /**
  * Validations pour l'endpoint d'analyse de projet
  */
 const validateProjectAnalysis = [
-    body('projetId')
-        .isMongoId()
-        .withMessage('ID de projet invalide'),
-    body('contenu')
-        .isObject()
-        .withMessage('Le contenu doit être un objet'),
+    body('projetId').isMongoId().withMessage('ID de projet invalide'),
+    body('contenu').isObject().withMessage('Le contenu doit être un objet'),
     body('type')
         .optional()
         .isIn(['GENERAL', 'TECHNIQUE', 'RISQUES', 'QUALITE'])
-        .withMessage('Type d\'analyse invalide'),
-    handleValidationErrors
+        .withMessage("Type d'analyse invalide"),
+    handleValidationErrors,
 ];
 
 /**
  * Validations génériques pour les paramètres de projet
  */
 const validateProjetId = [
-    param('projetId')
-        .isMongoId()
-        .withMessage('ID de projet invalide'),
-    handleValidationErrors
+    param('projetId').isMongoId().withMessage('ID de projet invalide'),
+    handleValidationErrors,
 ];
 
 /**
  * Validations génériques pour les paramètres de livrable
  */
 const validateLivrableId = [
-    param('livrableId')
-        .isMongoId()
-        .withMessage('ID de livrable invalide'),
-    handleValidationErrors
+    param('livrableId').isMongoId().withMessage('ID de livrable invalide'),
+    handleValidationErrors,
 ];
 
 module.exports = {
@@ -231,5 +220,5 @@ module.exports = {
     validateNotifications,
     validateProjectAnalysis,
     validateProjetId,
-    validateLivrableId
+    validateLivrableId,
 };

@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { rateLimiter } = require('../middlewares/rateLimiter');
-const { 
+const {
     validerInscription,
     validerConnexion,
     validerMiseAJourProfil,
@@ -10,29 +10,33 @@ const {
     verifierRole,
     verifierProprietaire,
     verifierEmailUnique,
-    limiterTentativesConnexion
+    limiterTentativesConnexion,
 } = require('../middlewares/utilisateur.middleware');
 const UtilisateurController = require('../controllers/utilisateur.controller');
 
 // Routes publiques
-router.post('/inscription', 
+router.post(
+    '/inscription',
     rateLimiter({ windowMs: 60000, max: 10 }),
-    validerInscription, 
+    validerInscription,
     UtilisateurController.inscription
 );
 
-router.post('/connexion', 
+router.post(
+    '/connexion',
     limiterTentativesConnexion,
-    validerConnexion, 
+    validerConnexion,
     UtilisateurController.connexion
 );
 
-router.post('/mot-de-passe-oublie', 
+router.post(
+    '/mot-de-passe-oublie',
     rateLimiter({ windowMs: 60000, max: 5 }),
     UtilisateurController.motDePasseOublie
 );
 
-router.post('/reinitialiser-mot-de-passe/:token', 
+router.post(
+    '/reinitialiser-mot-de-passe/:token',
     rateLimiter({ windowMs: 60000, max: 10 }),
     UtilisateurController.reinitialiserMotDePasse
 );
@@ -41,58 +45,63 @@ router.post('/reinitialiser-mot-de-passe/:token',
 router.use(verifierToken);
 
 // Gestion du profil utilisateur
-router.get('/profil', 
-    rateLimiter({ windowMs: 60000, max: 50 }),
-    UtilisateurController.getProfil
-);
+router.get('/profil', rateLimiter({ windowMs: 60000, max: 50 }), UtilisateurController.getProfil);
 
-router.put('/profil', 
+router.put(
+    '/profil',
     rateLimiter({ windowMs: 60000, max: 20 }),
-    validerMiseAJourProfil, 
-    verifierEmailUnique, 
+    validerMiseAJourProfil,
+    verifierEmailUnique,
     UtilisateurController.mettreAJourProfil
 );
 
-router.put('/changer-mot-de-passe', 
+router.put(
+    '/changer-mot-de-passe',
     rateLimiter({ windowMs: 60000, max: 10 }),
-    validerChangementMotDePasse, 
+    validerChangementMotDePasse,
     UtilisateurController.changerMotDePasse
 );
 
 // Routes administratives
-router.get('/', 
+router.get(
+    '/',
     rateLimiter({ windowMs: 60000, max: 50 }),
-    verifierRole('ADMIN'), 
+    verifierRole('ADMIN'),
     UtilisateurController.getAllUtilisateurs
 );
 
-router.get('/:id', 
+router.get(
+    '/:id',
     rateLimiter({ windowMs: 60000, max: 50 }),
-    verifierRole('ADMIN'), 
+    verifierRole('ADMIN'),
     UtilisateurController.getUtilisateurById
 );
 
-router.put('/:id', 
+router.put(
+    '/:id',
     rateLimiter({ windowMs: 60000, max: 30 }),
-    verifierRole('ADMIN'), 
-    validerMiseAJourProfil, 
-    verifierEmailUnique, 
+    verifierRole('ADMIN'),
+    validerMiseAJourProfil,
+    verifierEmailUnique,
     UtilisateurController.mettreAJourUtilisateur
 );
 
-router.delete('/:id', 
+router.delete(
+    '/:id',
     rateLimiter({ windowMs: 60000, max: 20 }),
-    verifierRole('ADMIN'), 
+    verifierRole('ADMIN'),
     UtilisateurController.supprimerUtilisateur
 );
 
 // Gestion des sessions
-router.post('/deconnexion', 
+router.post(
+    '/deconnexion',
     rateLimiter({ windowMs: 60000, max: 30 }),
     UtilisateurController.deconnexion
 );
 
-router.post('/rafraichir-token', 
+router.post(
+    '/rafraichir-token',
     rateLimiter({ windowMs: 60000, max: 20 }),
     UtilisateurController.rafraichirToken
 );

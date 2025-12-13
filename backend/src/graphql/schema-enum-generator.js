@@ -5,11 +5,7 @@
 
 const fs = require('fs');
 require('path');
-const {
-    STATUTS_PROJET,
-    STATUTS_LIVRABLE,
-    DESCRIPTIONS_ENUM
-} = require('../../config/constants');
+const { STATUTS_PROJET, STATUTS_LIVRABLE, DESCRIPTIONS_ENUM } = require('../../config/constants');
 
 /**
  * Extraction centralisee des informations de constantes avec gestion d'erreurs
@@ -22,7 +18,7 @@ function getConstants() {
             EN_COURS: 'EN_COURS',
             TERMINE: 'TERMINE',
             ARCHIVE: 'ARCHIVE',
-            ANNULE: 'ANNULE'
+            ANNULE: 'ANNULE',
         };
 
         const defaultStatutsLivrable = {
@@ -33,30 +29,36 @@ function getConstants() {
             REJETE: 'REJETE',
             EN_RETARD: 'EN_RETARD',
             TERMINE: 'TERMINE',
-            PLANIFIE: 'PLANIFIE'
+            PLANIFIE: 'PLANIFIE',
         };
 
         // Utiliser des conditions sans throw
-        const statutsProjet = (!STATUTS_PROJET || Object.keys(STATUTS_PROJET).length === 0)
-            ? defaultStatutsProjet
-            : STATUTS_PROJET;
+        const statutsProjet =
+            !STATUTS_PROJET || Object.keys(STATUTS_PROJET).length === 0
+                ? defaultStatutsProjet
+                : STATUTS_PROJET;
 
-        const statutsLivrable = (!STATUTS_LIVRABLE || Object.keys(STATUTS_LIVRABLE).length === 0)
-            ? defaultStatutsLivrable
-            : STATUTS_LIVRABLE;
+        const statutsLivrable =
+            !STATUTS_LIVRABLE || Object.keys(STATUTS_LIVRABLE).length === 0
+                ? defaultStatutsLivrable
+                : STATUTS_LIVRABLE;
 
         // Ajouter des logs d'avertissement si necessaire
         if (!STATUTS_PROJET || Object.keys(STATUTS_PROJET).length === 0) {
-            console.warn('STATUTS_PROJET est vide ou non defini, utilisation des valeurs par defaut');
+            console.warn(
+                'STATUTS_PROJET est vide ou non defini, utilisation des valeurs par defaut'
+            );
         }
         if (!STATUTS_LIVRABLE || Object.keys(STATUTS_LIVRABLE).length === 0) {
-            console.warn('STATUTS_LIVRABLE est vide ou non defini, utilisation des valeurs par defaut');
+            console.warn(
+                'STATUTS_LIVRABLE est vide ou non defini, utilisation des valeurs par defaut'
+            );
         }
 
         return {
             STATUTS_PROJET: statutsProjet,
             STATUTS_LIVRABLE: statutsLivrable,
-            DESCRIPTIONS_ENUM: DESCRIPTIONS_ENUM || {}
+            DESCRIPTIONS_ENUM: DESCRIPTIONS_ENUM || {},
         };
     } catch (error) {
         console.error(`Erreur lors du chargement des constantes: ${error.message}`);
@@ -68,7 +70,7 @@ function getConstants() {
                 EN_COURS: 'EN_COURS',
                 TERMINE: 'TERMINE',
                 ARCHIVE: 'ARCHIVE',
-                ANNULE: 'ANNULE'
+                ANNULE: 'ANNULE',
             },
             STATUTS_LIVRABLE: {
                 EN_ATTENTE: 'EN_ATTENTE',
@@ -78,9 +80,9 @@ function getConstants() {
                 REJETE: 'REJETE',
                 EN_RETARD: 'EN_RETARD',
                 TERMINE: 'TERMINE',
-                PLANIFIE: 'PLANIFIE'
+                PLANIFIE: 'PLANIFIE',
             },
-            DESCRIPTIONS_ENUM: {}
+            DESCRIPTIONS_ENUM: {},
         };
     }
 }
@@ -140,12 +142,11 @@ function injectEnumsInSchema(schemaPath) {
 
         // Remplacer les balises de commentaire par les enumerations generees
         if (schemaTemplate.includes('# ENUM_DEFINITIONS')) {
-            return schemaTemplate.replace(
-                '# ENUM_DEFINITIONS',
-                `# ENUM_DEFINITIONS\n${enums}`
-            );
+            return schemaTemplate.replace('# ENUM_DEFINITIONS', `# ENUM_DEFINITIONS\n${enums}`);
         } else {
-            console.warn('Le marqueur \'# ENUM_DEFINITIONS\' n\'a pas ete trouve dans le schema template.');
+            console.warn(
+                "Le marqueur '# ENUM_DEFINITIONS' n'a pas ete trouve dans le schema template."
+            );
             // Ajouter apres les directives
             const parts = schemaTemplate.split('\n\n');
             const directives = parts[0];
@@ -174,7 +175,9 @@ function generateSchemaFile(inputPath, outputPath) {
 
         // Verification
         if (!schema.includes('enum StatutProjet') || !schema.includes('enum StatutLivrable')) {
-            console.warn('ATTENTION: Les enumerations StatutProjet et/ou StatutLivrable ne semblent pas etre presentes dans le schema genere.');
+            console.warn(
+                'ATTENTION: Les enumerations StatutProjet et/ou StatutLivrable ne semblent pas etre presentes dans le schema genere.'
+            );
         }
 
         fs.writeFileSync(outputPath, schema, 'utf-8');
@@ -191,5 +194,5 @@ module.exports = {
     generateEnumDefinition,
     generateAllEnums,
     injectEnumsInSchema,
-    generateSchemaFile
+    generateSchemaFile,
 };

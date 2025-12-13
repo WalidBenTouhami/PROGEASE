@@ -19,7 +19,7 @@ exports.recupererProjets = async (req, res) => {
             dateFinMax,
             tuteurId,
             membreEquipe,
-            competence
+            competence,
         } = req.query;
 
         const filter = {};
@@ -31,13 +31,14 @@ exports.recupererProjets = async (req, res) => {
         if (recherche) {
             filter.$or = [
                 { titre: { $regex: recherche, $options: 'i' } },
-                { description: { $regex: recherche, $options: 'i' } }
+                { description: { $regex: recherche, $options: 'i' } },
             ];
         }
         if (dateDebutMin) filter.dateDebut = { $gte: new Date(dateDebutMin) };
         if (dateFinMax) filter.dateFin = { $lte: new Date(dateFinMax) };
         if (tuteurId && mongoose.Types.ObjectId.isValid(tuteurId)) filter.tuteur = tuteurId;
-        if (membreEquipe && mongoose.Types.ObjectId.isValid(membreEquipe)) filter.equipe = membreEquipe;
+        if (membreEquipe && mongoose.Types.ObjectId.isValid(membreEquipe))
+            filter.equipe = membreEquipe;
         if (competence) filter.competences = competence;
 
         const projets = await Projet.find(filter)
@@ -58,16 +59,16 @@ exports.recupererProjets = async (req, res) => {
                     page: parseInt(page),
                     limit: parseInt(limit),
                     hasNextPage: parseInt(page) < Math.ceil(total / limit),
-                    hasPreviousPage: parseInt(page) > 1
-                }
-            }
+                    hasPreviousPage: parseInt(page) > 1,
+                },
+            },
         });
     } catch (error) {
         logger.error('Erreur lors de la recuperation des projets:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la recuperation des projets',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -79,28 +80,27 @@ exports.recupererProjetParId = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const projet = await Projet.findById(id)
-            .populate('livrablesComplets');
+        const projet = await Projet.findById(id).populate('livrablesComplets');
 
         if (!projet) {
             return res.status(404).json({
                 success: false,
                 message: `Projet avec l'ID ${id} non trouve`,
-                error: `Projet avec l'ID ${id} non trouve`
+                error: `Projet avec l'ID ${id} non trouve`,
             });
         }
 
         res.status(200).json({
             success: true,
             message: 'Projet recupere avec succes',
-            data: projet
+            data: projet,
         });
     } catch (error) {
         logger.error(`Erreur lors de la recuperation du projet ${req.params.id}:`, error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la recuperation du projet',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -118,24 +118,27 @@ exports.creerProjet = async (req, res) => {
             progression: 0,
             creeLe: new Date(),
             majLe: new Date(),
-            createur: req.utilisateur ? req.utilisateur.id : undefined
+            createur: req.utilisateur ? req.utilisateur.id : undefined,
         });
 
         await nouveauProjet.save();
 
-        logger.monitoring('Projet cree', { projetId: nouveauProjet._id, utilisateur: req.utilisateur?.id });
+        logger.monitoring('Projet cree', {
+            projetId: nouveauProjet._id,
+            utilisateur: req.utilisateur?.id,
+        });
 
         res.status(201).json({
             success: true,
             message: 'Projet cree avec succes',
-            data: nouveauProjet
+            data: nouveauProjet,
         });
     } catch (error) {
         logger.error('Erreur lors de la creation du projet:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la creation du projet',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -148,18 +151,18 @@ exports.mettreAJourProjet = async (req, res) => {
         const { id } = req.params;
         const updateData = {
             ...req.body,
-            majLe: new Date()
+            majLe: new Date(),
         };
 
         // Conversion des dates si présentes
         if (updateData.dateDebut) updateData.dateDebut = new Date(updateData.dateDebut);
         if (updateData.dateFin) updateData.dateFin = new Date(updateData.dateFin);
 
-        const projetMisAJour = await Projet.findByIdAndUpdate(
-            id,
-            updateData,
-            { new: true, runValidators: true }
-        ).populate('tuteur', 'nom prenom email')
+        const projetMisAJour = await Projet.findByIdAndUpdate(id, updateData, {
+            new: true,
+            runValidators: true,
+        })
+            .populate('tuteur', 'nom prenom email')
             .populate('equipe', 'nom prenom email')
             .populate('livrablesComplets');
 
@@ -167,7 +170,7 @@ exports.mettreAJourProjet = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: `Projet avec l'ID ${id} non trouve`,
-                error: `Projet avec l'ID ${id} non trouve`
+                error: `Projet avec l'ID ${id} non trouve`,
             });
         }
 
@@ -182,14 +185,14 @@ exports.mettreAJourProjet = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Projet mis à jour avec succes',
-            data: projetMisAJour
+            data: projetMisAJour,
         });
     } catch (error) {
         logger.error(`Erreur lors de la mise à jour du projet ${req.params.id}:`, error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la mise à jour du projet',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -210,7 +213,7 @@ exports.supprimerProjet = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: `Projet avec l'ID ${id} non trouve`,
-                error: `Projet avec l'ID ${id} non trouve`
+                error: `Projet avec l'ID ${id} non trouve`,
             });
         }
 
@@ -219,14 +222,14 @@ exports.supprimerProjet = async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Projet et ses livrables supprimes avec succes',
-            data: projetSupprime
+            data: projetSupprime,
         });
     } catch (error) {
         logger.error(`Erreur lors de la suppression du projet ${req.params.id}:`, error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la suppression du projet',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -246,7 +249,7 @@ exports.analyserRisques = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: 'Projet non trouve',
-                error: 'Projet non trouve'
+                error: 'Projet non trouve',
             });
         }
 
@@ -255,7 +258,7 @@ exports.analyserRisques = async (req, res) => {
             retard: projet.estEnRetard,
             progression: projet.progression < 50 && projet.dateFin < new Date(),
             livrables: projet.livrablesComplets.some(l => l.estEnRetard()),
-            equipe: projet.equipe.length < 2
+            equipe: projet.equipe.length < 2,
         };
 
         const niveauRisque = Object.values(risques).filter(Boolean).length;
@@ -266,15 +269,15 @@ exports.analyserRisques = async (req, res) => {
             data: {
                 risques,
                 niveauRisque,
-                recommandations: genererRecommandations(risques)
-            }
+                recommandations: genererRecommandations(risques),
+            },
         });
     } catch (error) {
-        logger.error('Erreur lors de l\'analyse des risques:', error);
+        logger.error("Erreur lors de l'analyse des risques:", error);
         res.status(500).json({
             success: false,
-            message: 'Erreur lors de l\'analyse des risques',
-            error: error.message
+            message: "Erreur lors de l'analyse des risques",
+            error: error.message,
         });
     }
 };
@@ -295,7 +298,7 @@ function genererRecommandations(risques) {
         recommandations.push('Organiser une réunion de suivi des livrables en retard');
     }
     if (risques.equipe) {
-        recommandations.push('Renforcer l\'équipe projet');
+        recommandations.push("Renforcer l'équipe projet");
     }
 
     return recommandations;
@@ -324,17 +327,17 @@ exports.obtenirStatistiques = async (req, res) => {
                     total: { $sum: 1 },
                     enCours: {
                         $sum: {
-                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.EN_COURS] }, 1, 0]
-                        }
+                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.EN_COURS] }, 1, 0],
+                        },
                     },
                     termines: {
                         $sum: {
-                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.TERMINE] }, 1, 0]
-                        }
+                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.TERMINE] }, 1, 0],
+                        },
                     },
-                    progressionMoyenne: { $avg: '$progression' }
-                }
-            }
+                    progressionMoyenne: { $avg: '$progression' },
+                },
+            },
         ]);
 
         // Statistiques par catégorie
@@ -347,17 +350,17 @@ exports.obtenirStatistiques = async (req, res) => {
                     total: { $sum: 1 },
                     enCours: {
                         $sum: {
-                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.EN_COURS] }, 1, 0]
-                        }
+                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.EN_COURS] }, 1, 0],
+                        },
                     },
                     termines: {
                         $sum: {
-                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.TERMINE] }, 1, 0]
-                        }
+                            $cond: [{ $eq: ['$statut', Enums.StatutProjet.TERMINE] }, 1, 0],
+                        },
                     },
-                    progressionMoyenne: { $avg: '$progression' }
-                }
-            }
+                    progressionMoyenne: { $avg: '$progression' },
+                },
+            },
         ]);
 
         // Statistiques globales
@@ -375,16 +378,16 @@ exports.obtenirStatistiques = async (req, res) => {
                                     $and: [
                                         { $eq: ['$statut', Enums.StatutProjet.EN_COURS] },
                                         { $lt: ['$progression', 100] },
-                                        { $lt: [new Date(), '$dateFin'] }
-                                    ]
+                                        { $lt: [new Date(), '$dateFin'] },
+                                    ],
                                 },
                                 1,
-                                0
-                            ]
-                        }
-                    }
-                }
-            }
+                                0,
+                            ],
+                        },
+                    },
+                },
+            },
         ]);
 
         res.status(200).json({
@@ -396,16 +399,16 @@ exports.obtenirStatistiques = async (req, res) => {
                 globales: statsGlobales[0] || {
                     totalProjets: 0,
                     progressionMoyenne: 0,
-                    projetsEnRetard: 0
-                }
-            }
+                    projetsEnRetard: 0,
+                },
+            },
         });
     } catch (error) {
         logger.error('Erreur lors de la récupération des statistiques des projets:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors de la récupération des statistiques des projets',
-            error: error.message
+            error: error.message,
         });
     }
 };
@@ -422,7 +425,7 @@ exports.signalerProbleme = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: 'Projet non trouvé',
-                error: 'Projet non trouvé'
+                error: 'Projet non trouvé',
             });
         }
 
@@ -433,7 +436,7 @@ exports.signalerProbleme = async (req, res) => {
                 return res.status(404).json({
                     success: false,
                     message: 'Tâche non trouvée',
-                    error: 'Tâche non trouvée'
+                    error: 'Tâche non trouvée',
                 });
             }
         }
@@ -446,7 +449,7 @@ exports.signalerProbleme = async (req, res) => {
             tacheId,
             signalePar: req.utilisateur ? req.utilisateur.id : undefined,
             dateSignalement: new Date(),
-            statut: 'OUVERT'
+            statut: 'OUVERT',
         };
 
         // Ajouter le signalement au projet
@@ -465,20 +468,20 @@ exports.signalerProbleme = async (req, res) => {
             tacheId,
             type,
             priorite,
-            utilisateur: req.utilisateur?.id
+            utilisateur: req.utilisateur?.id,
         });
 
         res.status(201).json({
             success: true,
             message: 'Problème signalé avec succès',
-            data: signalement
+            data: signalement,
         });
     } catch (error) {
         logger.error('Erreur lors du signalement du problème:', error);
         res.status(500).json({
             success: false,
             message: 'Erreur lors du signalement du problème',
-            error: error.message
+            error: error.message,
         });
     }
 };

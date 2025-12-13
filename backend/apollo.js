@@ -3,7 +3,9 @@
 const { ApolloServer } = require('@apollo/server');
 const { expressMiddleware } = require('@apollo/server/express4');
 const { ApolloServerPluginLandingPageDisabled } = require('@apollo/server/plugin/disabled');
-const { ApolloServerPluginLandingPageLocalDefault } = require('@apollo/server/plugin/landingPage/default');
+const {
+    ApolloServerPluginLandingPageLocalDefault,
+} = require('@apollo/server/plugin/landingPage/default');
 const { ApolloServerPluginDrainHttpServer } = require('@apollo/server/plugin/drainHttpServer');
 const { typeDefs } = require('./src/graphql/schema');
 const logger = require('./src/utils/logger');
@@ -24,7 +26,7 @@ async function createApolloServer(httpServer = null, options = {}) {
         // Page d'accueil GraphQL differente selon l'environnement
         process.env.NODE_ENV === 'production'
             ? ApolloServerPluginLandingPageDisabled()
-            : ApolloServerPluginLandingPageLocalDefault({ footer: false })
+            : ApolloServerPluginLandingPageLocalDefault({ footer: false }),
     ];
 
     // Ajout des plugins personnalises
@@ -47,7 +49,7 @@ async function createApolloServer(httpServer = null, options = {}) {
                 path: formattedError.path,
                 code: formattedError.extensions?.code,
                 errorType: formattedError.extensions?.errorType,
-                originalError: error.originalError
+                originalError: error.originalError,
             });
 
             const baseError = {
@@ -68,10 +70,11 @@ async function createApolloServer(httpServer = null, options = {}) {
             // En developpement, ajouter la stacktrace
             return {
                 ...baseError,
-                stacktrace: error.originalError?.stack || formattedError.extensions?.exception?.stacktrace
+                stacktrace:
+                    error.originalError?.stack || formattedError.extensions?.exception?.stacktrace,
             };
         },
-        ...options
+        ...options,
     });
 
     await server.start();
@@ -102,24 +105,24 @@ function createApolloMiddleware(server, options = {}) {
                 res,
 
                 // Ajout d'un timestamp pour calculer la duree d'execution
-                requestStartTime: Date.now()
+                requestStartTime: Date.now(),
             };
 
             // Fusionner avec le contexte personnalise
             return {
                 ...context,
-                ...(options.context ?
-                    (typeof options.context === 'function' ?
-                        await options.context({ req, res }) :
-                        options.context) :
-                    {})
+                ...(options.context
+                    ? typeof options.context === 'function'
+                        ? await options.context({ req, res })
+                        : options.context
+                    : {}),
             };
-        }
+        },
     });
 }
 
 // Ces fonctions sont utilisees dans "standalone server.js".
 module.exports = {
     createApolloServer,
-    createApolloMiddleware
+    createApolloMiddleware,
 };

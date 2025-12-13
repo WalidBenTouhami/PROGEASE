@@ -12,33 +12,33 @@ const aiController = {
             if (!projetId || !contenu) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Les données du projet sont requises'
+                    message: 'Les données du projet sont requises',
                 });
             }
 
             const analyse = await aiService.analyserProjet({
                 projetId,
                 contenu,
-                type: type || 'GENERAL'
+                type: type || 'GENERAL',
             });
 
             logger.info('Analyse IA effectuée', {
                 projetId,
                 type,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Analyse générée avec succès',
-                data: analyse
+                data: analyse,
             });
         } catch (error) {
-            logger.error('Erreur lors de l\'analyse du projet:', error);
+            logger.error("Erreur lors de l'analyse du projet:", error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur interne lors de l\'analyse',
-                error: error.message
+                message: "Erreur interne lors de l'analyse",
+                error: error.message,
             });
         }
     },
@@ -53,20 +53,20 @@ const aiController = {
 
             logger.info('Recommandations IA générées', {
                 projetId,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Recommandations générées avec succès',
-                data: recommandations
+                data: recommandations,
             });
         } catch (error) {
             logger.error('Erreur lors de la génération des recommandations:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur interne lors de la génération des recommandations',
-                error: error.message
+                error: error.message,
             });
         }
     },
@@ -81,20 +81,20 @@ const aiController = {
 
             logger.info('Analyse des livrables effectuée', {
                 projetId,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Analyse des livrables effectuée avec succès',
-                data: analyse
+                data: analyse,
             });
         } catch (error) {
-            logger.error('Erreur lors de l\'analyse des livrables:', error);
+            logger.error("Erreur lors de l'analyse des livrables:", error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur interne lors de l\'analyse des livrables',
-                error: error.message
+                message: "Erreur interne lors de l'analyse des livrables",
+                error: error.message,
             });
         }
     },
@@ -109,20 +109,20 @@ const aiController = {
 
             logger.info('Évaluation IA du livrable effectuée', {
                 livrableId,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Évaluation du livrable effectuée avec succès',
-                data: evaluation
+                data: evaluation,
             });
         } catch (error) {
-            logger.error('Erreur lors de l\'évaluation du livrable:', error);
+            logger.error("Erreur lors de l'évaluation du livrable:", error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur interne lors de l\'évaluation du livrable',
-                error: error.message
+                message: "Erreur interne lors de l'évaluation du livrable",
+                error: error.message,
             });
         }
     },
@@ -134,26 +134,26 @@ const aiController = {
         try {
             const { projetId } = req.params;
             const { format = 'PDF' } = req.query;
-            
+
             const rapport = await aiService.genererRapportAvancement(projetId, format);
 
-            logger.info('Rapport d\'avancement généré', {
+            logger.info("Rapport d'avancement généré", {
                 projetId,
                 format,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
-                message: 'Rapport d\'avancement généré avec succès',
-                data: rapport
+                message: "Rapport d'avancement généré avec succès",
+                data: rapport,
             });
         } catch (error) {
             logger.error('Erreur lors de la génération du rapport:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur interne lors de la génération du rapport',
-                error: error.message
+                error: error.message,
             });
         }
     },
@@ -168,7 +168,7 @@ const aiController = {
             if (!membres || !Array.isArray(membres) || membres.length === 0) {
                 return res.status(400).json({
                     success: false,
-                    message: 'La liste des membres est requise et doit être non vide'
+                    message: 'La liste des membres est requise et doit être non vide',
                 });
             }
 
@@ -176,20 +176,20 @@ const aiController = {
 
             logger.info('Équipes formées avec IA', {
                 nombreMembres: membres.length,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Équipes formées avec succès',
-                data: equipes
+                data: equipes,
             });
         } catch (error) {
             logger.error('Erreur lors de la formation des équipes:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur interne lors de la formation des équipes',
-                error: error.message
+                error: error.message,
             });
         }
     },
@@ -204,7 +204,7 @@ const aiController = {
             if (!membres || !Array.isArray(membres) || membres.length === 0) {
                 return res.status(400).json({
                     success: false,
-                    message: 'La liste des membres et tuteurs est requise'
+                    message: 'La liste des membres et tuteurs est requise',
                 });
             }
 
@@ -212,20 +212,20 @@ const aiController = {
 
             logger.info('Tuteurs associés avec IA', {
                 nombreMembres: membres.length,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Tuteurs associés avec succès',
-                data: associations
+                data: associations,
             });
         } catch (error) {
-            logger.error('Erreur lors de l\'association des tuteurs:', error);
+            logger.error("Erreur lors de l'association des tuteurs:", error);
             res.status(500).json({
                 success: false,
-                message: 'Erreur interne lors de l\'association des tuteurs',
-                error: error.message
+                message: "Erreur interne lors de l'association des tuteurs",
+                error: error.message,
             });
         }
     },
@@ -240,28 +240,28 @@ const aiController = {
             if (!competences || !Array.isArray(competences) || competences.length === 0) {
                 return res.status(400).json({
                     success: false,
-                    message: 'La liste des compétences est requise'
+                    message: 'La liste des compétences est requise',
                 });
             }
 
             const recommandations = await aiService.recommanderApprentissage(competences);
 
-            logger.info('Ressources d\'apprentissage recommandées', {
+            logger.info("Ressources d'apprentissage recommandées", {
                 nombreCompetences: competences.length,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Ressources recommandées avec succès',
-                data: recommandations
+                data: recommandations,
             });
         } catch (error) {
             logger.error('Erreur lors de la recommandation de ressources:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur interne lors de la recommandation de ressources',
-                error: error.message
+                error: error.message,
             });
         }
     },
@@ -278,20 +278,20 @@ const aiController = {
 
             logger.info('Performance prédite avec IA', {
                 projetId,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Performance prédite avec succès',
-                data: prediction
+                data: prediction,
             });
         } catch (error) {
             logger.error('Erreur lors de la prédiction de performance:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur interne lors de la prédiction de performance',
-                error: error.message
+                error: error.message,
             });
         }
     },
@@ -306,7 +306,7 @@ const aiController = {
             if (!taches || !Array.isArray(taches)) {
                 return res.status(400).json({
                     success: false,
-                    message: 'La liste des tâches est requise'
+                    message: 'La liste des tâches est requise',
                 });
             }
 
@@ -314,20 +314,20 @@ const aiController = {
 
             logger.info('Progression calculée automatiquement', {
                 nombreTaches: taches.length,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Progression calculée avec succès',
-                data: progression
+                data: progression,
             });
         } catch (error) {
             logger.error('Erreur lors du suivi de progression:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur interne lors du suivi de progression',
-                error: error.message
+                error: error.message,
             });
         }
     },
@@ -342,7 +342,7 @@ const aiController = {
             if (!taches || !Array.isArray(taches) || !dateDebut || !dateFin) {
                 return res.status(400).json({
                     success: false,
-                    message: 'Les tâches, date de début et date de fin sont requises'
+                    message: 'Les tâches, date de début et date de fin sont requises',
                 });
             }
 
@@ -350,23 +350,23 @@ const aiController = {
 
             logger.info('Planning généré avec IA', {
                 nombreTaches: taches.length,
-                utilisateur: req.utilisateur?.id
+                utilisateur: req.utilisateur?.id,
             });
 
             res.status(200).json({
                 success: true,
                 message: 'Planning généré avec succès',
-                data: planning
+                data: planning,
             });
         } catch (error) {
             logger.error('Erreur lors de la génération du planning:', error);
             res.status(500).json({
                 success: false,
                 message: 'Erreur interne lors de la génération du planning',
-                error: error.message
+                error: error.message,
             });
         }
-    }
+    },
 };
 
-module.exports = aiController; 
+module.exports = aiController;

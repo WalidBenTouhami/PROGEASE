@@ -1,80 +1,79 @@
 {
-  "database": {
-    "host": "localhost",
-    "port": 27017,
-    "name": "progease",
-    "options": {
-      "retryWrites": true,
-      "w": "majority",
-      "maxPoolSize": 10,
-      "minPoolSize": 2
-    }
-  },
-  "collections": {
-    "projets": {
-      "indexes": [
-        { "titre": 1 },
-        { "statut": 1 },
-        { "dateDebut": 1 },
-        { "dateFin": 1 },
-        { "tuteur": 1 },
-        { "equipe": 1 }
-      ],
-      "validations": {
-        "titre": { "type": "string", "required": true },
-        "description": { "type": "string", "required": true },
-        "statut": { "enum": ["BROUILLON", "EN_COURS", "TERMINE", "ARCHIVE", "EN_RETARD", "A_VENIR"] }
-      }
+    "database": {
+        "host": "localhost",
+        "port": 27017,
+        "name": "progease",
+        "options": {
+            "retryWrites": true,
+            "w": "majority",
+            "maxPoolSize": 10,
+            "minPoolSize": 2
+        }
     },
-    "livrables": {
-      "indexes": [
-        { "intitule": 1 },
-        { "statut": 1 },
-        { "dateLimite": 1 },
-        { "projetId": 1 }
-      ],
-      "validations": {
-        "intitule": { "type": "string", "required": true },
-        "description": { "type": "string", "required": true },
-        "statut": { "enum": ["EN_ATTENTE", "EN_COURS", "EN_RETARD", "TERMINE", "VALIDE", "REJETE"] }
-      }
-    }
-  },
-  "projets": [
-    {
-      "id": "1",
-      "title": "Gestion des Tâches",
-      "description": "Application pour gerer les tâches d'une equipe.",
-      "status": "draft"
-    }
-  ],
-  "utilisateurs": [
-    {
-      "id": "645aef123456789012345678",
-      "name": "John Doe",
-      "role": "student"
-    }
-  ],
-  "env": {
-    "development": {
-      "PORT": 3000,
-      "CORS_ORIGINS": ["http://localhost:3000"],
-      "LOG_LEVEL": "debug"
+    "collections": {
+        "projets": {
+            "indexes": [
+                { "titre": 1 },
+                { "statut": 1 },
+                { "dateDebut": 1 },
+                { "dateFin": 1 },
+                { "tuteur": 1 },
+                { "equipe": 1 }
+            ],
+            "validations": {
+                "titre": { "type": "string", "required": true },
+                "description": { "type": "string", "required": true },
+                "statut": {
+                    "enum": ["BROUILLON", "EN_COURS", "TERMINE", "ARCHIVE", "EN_RETARD", "A_VENIR"]
+                }
+            }
+        },
+        "livrables": {
+            "indexes": [{ "intitule": 1 }, { "statut": 1 }, { "dateLimite": 1 }, { "projetId": 1 }],
+            "validations": {
+                "intitule": { "type": "string", "required": true },
+                "description": { "type": "string", "required": true },
+                "statut": {
+                    "enum": ["EN_ATTENTE", "EN_COURS", "EN_RETARD", "TERMINE", "VALIDE", "REJETE"]
+                }
+            }
+        }
     },
-    "test": {
-      "PORT": 3001,
-      "CORS_ORIGINS": ["http://localhost:3000"],
-      "LOG_LEVEL": "debug"
-    },
-    "staging": {
-      "PORT": 3000,
-      "CORS_ORIGINS": ["https://staging.progease.com"],
-      "LOG_LEVEL": "info"
-    },
-    "production": {
-      "PORT": 3000,
-      "CORS_ORIGINS": ["https://progease.com"],
-      "LOG_LEVEL": "warn"
+    "projets": [
+        {
+            "id": "1",
+            "title": "Gestion des Tâches",
+            "description": "Application pour gerer les tâches d'une equipe.",
+            "status": "draft"
+        }
+    ],
+    "utilisateurs": [
+        {
+            "id": "645aef123456789012345678",
+            "name": "John Doe",
+            "role": "student"
+        }
+    ],
+    "env": {
+        "development": {
+            "PORT": 3000,
+            "CORS_ORIGINS": ["http://localhost:3000"],
+            "LOG_LEVEL": "debug"
+        },
+        "test": {
+            "PORT": 3001,
+            "CORS_ORIGINS": ["http://localhost:3000"],
+            "LOG_LEVEL": "debug"
+        },
+        "staging": {
+            "PORT": 3000,
+            "CORS_ORIGINS": ["https://staging.progease.com"],
+            "LOG_LEVEL": "info"
+        },
+        "production": {
+            "PORT": 3000,
+            "CORS_ORIGINS": ["https://progease.com"],
+            "LOG_LEVEL": "warn"
+        }
     }
-  }
 }

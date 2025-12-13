@@ -13,7 +13,9 @@ async function creerSujet(data) {
         const sujetSauvegarde = await sujet.save();
         return formatForumResponse(sujetSauvegarde);
     } catch (error) {
-        logger.error(`Erreur lors de la création du sujet: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la création du sujet: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -31,7 +33,7 @@ async function recupererSujets(options = {}) {
         recherche,
         auteur,
         estResolu,
-        tri = 'recent'
+        tri = 'recent',
     } = options;
 
     try {
@@ -66,17 +68,19 @@ async function recupererSujets(options = {}) {
                 .limit(limite)
                 .populate('auteur', 'nom prenom avatar')
                 .lean(),
-            Sujet.countDocuments(query)
+            Sujet.countDocuments(query),
         ]);
 
         return {
             sujets,
             page,
             totalPages: Math.ceil(total / limite),
-            total
+            total,
         };
     } catch (error) {
-        logger.error(`Erreur lors de la récupération des sujets: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la récupération des sujets: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -102,7 +106,9 @@ async function recupererSujetParId(id) {
 
         return sujet;
     } catch (error) {
-        logger.error(`Erreur lors de la récupération du sujet: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la récupération du sujet: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -127,7 +133,9 @@ async function mettreAJourSujet(id, data) {
 
         return sujet;
     } catch (error) {
-        logger.error(`Erreur lors de la mise à jour du sujet: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la mise à jour du sujet: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -145,7 +153,9 @@ async function supprimerSujet(id) {
         }
         return true;
     } catch (error) {
-        logger.error(`Erreur lors de la suppression du sujet: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de la suppression du sujet: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -168,7 +178,9 @@ async function ajouterReponse(sujetId, data) {
 
         return sujet.reponses[sujet.reponses.length - 1];
     } catch (error) {
-        logger.error(`Erreur lors de l'ajout de la réponse: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors de l'ajout de la réponse: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -202,7 +214,9 @@ async function marquerCommeSolution(sujetId, reponseId) {
 
         return sujet;
     } catch (error) {
-        logger.error(`Erreur lors du marquage de la solution: ${error.message}`, { stack: error.stack });
+        logger.error(`Erreur lors du marquage de la solution: ${error.message}`, {
+            stack: error.stack,
+        });
         throw error;
     }
 }
@@ -214,5 +228,5 @@ module.exports = {
     mettreAJourSujet,
     supprimerSujet,
     ajouterReponse,
-    marquerCommeSolution
-}; 
+    marquerCommeSolution,
+};

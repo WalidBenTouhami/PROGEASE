@@ -9,7 +9,7 @@ const Enums = {
         EN_COURS: 'EN_COURS',
         EN_REVISION: 'EN_REVISION',
         TERMINE: 'TERMINE',
-        ANNULE: 'ANNULE'
+        ANNULE: 'ANNULE',
     },
 
     TypeLivrable: {
@@ -17,7 +17,7 @@ const Enums = {
         CODE: 'CODE',
         PRESENTATION: 'PRESENTATION',
         RAPPORT: 'RAPPORT',
-        AUTRE: 'AUTRE'
+        AUTRE: 'AUTRE',
     },
 
     StatutLivrable: {
@@ -25,29 +25,29 @@ const Enums = {
         EN_COURS: 'EN_COURS',
         EN_REVISION: 'EN_REVISION',
         VALIDE: 'VALIDE',
-        REJETE: 'REJETE'
+        REJETE: 'REJETE',
     },
 
     TypeFormation: {
         VIDEO: 'VIDEO',
         PRESENTIEL: 'PRESENTIEL',
         HYBRIDE: 'HYBRIDE',
-        AUTO_FORMATION: 'AUTO_FORMATION'
+        AUTO_FORMATION: 'AUTO_FORMATION',
     },
 
     NiveauFormation: {
         DEBUTANT: 'DEBUTANT',
         INTERMEDIAIRE: 'INTERMEDIAIRE',
         AVANCE: 'AVANCE',
-        EXPERT: 'EXPERT'
+        EXPERT: 'EXPERT',
     },
 
     StatutCertification: {
         EN_COURS: 'EN_COURS',
         VALIDE: 'VALIDE',
         EXPIRED: 'EXPIRED',
-        REVOQUE: 'REVOQUE'
-    }
+        REVOQUE: 'REVOQUE',
+    },
 };
 
 const MessagesErreur = {
@@ -56,18 +56,18 @@ const MessagesErreur = {
         NON_AUTORISE: 'Non autorisé',
         TOKEN_INVALIDE: 'Token invalide',
         TOKEN_EXPIRE: 'Token expiré',
-        COMPTE_DESACTIVE: 'Compte désactivé'
+        COMPTE_DESACTIVE: 'Compte désactivé',
     },
     VALIDATION: {
         CHAMPS_REQUIS: 'Tous les champs sont requis',
         FORMAT_INVALIDE: 'Format invalide',
-        VALEUR_INVALIDE: 'Valeur invalide'
+        VALEUR_INVALIDE: 'Valeur invalide',
     },
     RESSOURCE: {
         NON_TROUVE: 'Ressource non trouvée',
         DEJA_EXISTE: 'Cette ressource existe déjà',
-        SUPPRESSION_IMPOSSIBLE: 'Impossible de supprimer cette ressource'
-    }
+        SUPPRESSION_IMPOSSIBLE: 'Impossible de supprimer cette ressource',
+    },
 };
 
 const StatutHttp = {
@@ -78,11 +78,11 @@ const StatutHttp = {
     FORBIDDEN: 403,
     NOT_FOUND: 404,
     CONFLICT: 409,
-    INTERNAL_SERVER_ERROR: 500
+    INTERNAL_SERVER_ERROR: 500,
 };
 
 module.exports = {
     Enums,
     MessagesErreur,
-    StatutHttp
-}; 
+    StatutHttp,
+};

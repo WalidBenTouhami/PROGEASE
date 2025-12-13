@@ -8,9 +8,9 @@ const logger = require('./logger');
 
 // Cache en memoire par defaut
 const memoryCache = new NodeCache({
-    stdTTL: 600,  // 10 minutes par defaut
-    checkperiod: 120,  // Verification toutes les 2 minutes
-    useClones: false
+    stdTTL: 600, // 10 minutes par defaut
+    checkperiod: 120, // Verification toutes les 2 minutes
+    useClones: false,
 });
 
 // Interface commune pour differents types de cache
@@ -106,7 +106,7 @@ class Cache {
         return {
             hits: this.provider.getStats().hits,
             misses: this.provider.getStats().misses,
-            keys: this.provider.keys().length
+            keys: this.provider.keys().length,
         };
     }
 }

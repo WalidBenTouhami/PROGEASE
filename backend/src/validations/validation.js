@@ -13,7 +13,7 @@ const validateProjetId = (req, res, next) => {
     const id = req.params.id;
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            erreur: ErrorMessages.GENERAL.INVALID_ID
+            erreur: ErrorMessages.GENERAL.INVALID_ID,
         });
     }
     next();
@@ -35,13 +35,13 @@ const validateProjetBody = (req, res, next) => {
 
         if (!titre) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                erreur: 'Le titre du projet est requis.'
+                erreur: 'Le titre du projet est requis.',
             });
         }
 
         if (!description) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                erreur: 'La description du projet est requise.'
+                erreur: 'La description du projet est requise.',
             });
         }
     }
@@ -49,7 +49,7 @@ const validateProjetBody = (req, res, next) => {
     // Pour une mise à jour, au moins un champ doit etre present
     if (!isCreation && Object.keys(req.body).length === 0) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            erreur: 'Aucune donnee fournie pour la mise à jour.'
+            erreur: 'Aucune donnee fournie pour la mise à jour.',
         });
     }
 
@@ -66,7 +66,7 @@ const validateLivrableId = (req, res, next) => {
     const id = req.params.livrableId;
     if (id && !mongoose.Types.ObjectId.isValid(id)) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            erreur: ErrorMessages.GENERAL.INVALID_ID
+            erreur: ErrorMessages.GENERAL.INVALID_ID,
         });
     }
     next();
@@ -88,25 +88,25 @@ const validateLivrableBody = (req, res, next) => {
 
         if (!projetId) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                erreur: 'L\'ID du projet est requis.'
+                erreur: "L'ID du projet est requis.",
             });
         }
 
         if (!mongoose.Types.ObjectId.isValid(projetId)) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                erreur: 'ID de projet invalide.'
+                erreur: 'ID de projet invalide.',
             });
         }
 
         if (!nom) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                erreur: 'Le nom du livrable est requis.'
+                erreur: 'Le nom du livrable est requis.',
             });
         }
 
         if (!description) {
             return res.status(HttpStatus.BAD_REQUEST).json({
-                erreur: 'La description du livrable est requise.'
+                erreur: 'La description du livrable est requise.',
             });
         }
     }
@@ -114,7 +114,7 @@ const validateLivrableBody = (req, res, next) => {
     // Pour une mise à jour, au moins un champ doit etre present
     if (!isCreation && Object.keys(req.body).length === 0) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            erreur: 'Aucune donnee fournie pour la mise à jour.'
+            erreur: 'Aucune donnee fournie pour la mise à jour.',
         });
     }
 
@@ -131,7 +131,7 @@ const validateResults = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(HttpStatus.BAD_REQUEST).json({
-            erreurs: errors.array()
+            erreurs: errors.array(),
         });
     }
     next();
@@ -142,5 +142,5 @@ module.exports = {
     validateProjetBody,
     validateLivrableId,
     validateLivrableBody,
-    validateResults
+    validateResults,
 };

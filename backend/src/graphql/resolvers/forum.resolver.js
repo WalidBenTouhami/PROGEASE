@@ -33,7 +33,7 @@ function mapSujetMongoVersGraphQL(doc) {
         estResolu: doc.estResolu || false,
         votes: {
             positifs: doc.votes?.positifs || [],
-            negatifs: doc.votes?.negatifs || []
+            negatifs: doc.votes?.negatifs || [],
         },
         reponses: (doc.reponses || []).map(reponse => ({
             id: reponse._id.toString(),
@@ -42,13 +42,13 @@ function mapSujetMongoVersGraphQL(doc) {
             estSolution: reponse.estSolution || false,
             votes: {
                 positifs: reponse.votes?.positifs || [],
-                negatifs: reponse.votes?.negatifs || []
+                negatifs: reponse.votes?.negatifs || [],
             },
             creeLe: reponse.creeLe,
-            majLe: reponse.majLe
+            majLe: reponse.majLe,
         })),
         creeLe: doc.creeLe,
-        majLe: doc.majLe
+        majLe: doc.majLe,
     };
 }
 
@@ -65,7 +65,7 @@ const Query = {
                 recherche,
                 auteur,
                 estResolu,
-                tri = 'recent'
+                tri = 'recent',
             } = input;
 
             const query = {};
@@ -99,14 +99,14 @@ const Query = {
                     .limit(limite)
                     .populate('auteur', 'nom prenom avatar')
                     .lean(),
-                Sujet.countDocuments(query)
+                Sujet.countDocuments(query),
             ]);
 
             return {
                 sujets: sujets.map(mapSujetMongoVersGraphQL),
                 page,
                 totalPages: Math.ceil(total / limite),
-                total
+                total,
             };
         } catch (error) {
             logger.error('Erreur lors de la récupération des sujets:', error);
@@ -120,12 +120,7 @@ const Query = {
     sujet: async (_, { id }, context) => {
         try {
             if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new AppError(
-                    'ID de sujet invalide',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
+                throw new AppError('ID de sujet invalide', 400, ERROR_CODES.BAD_REQUEST, true);
             }
 
             const sujet = await Sujet.findById(id)
@@ -134,12 +129,7 @@ const Query = {
                 .lean();
 
             if (!sujet) {
-                throw new AppError(
-                    'Sujet non trouvé',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
+                throw new AppError('Sujet non trouvé', 404, ERROR_CODES.NOT_FOUND, true);
             }
 
             // Incrémenter le compteur de vues
@@ -150,7 +140,7 @@ const Query = {
             logger.error('Erreur lors de la récupération du sujet:', error);
             throw handleMongooseError(error);
         }
-    }
+    },
 };
 
 const Mutation = {
@@ -164,22 +154,26 @@ const Mutation = {
             validateInput(input, {
                 titre: { required: true, type: 'string', minLength: 5 },
                 contenu: { required: true, type: 'string', minLength: 20 },
-                categorie: { required: true, type: 'string', enum: ['GENERAL', 'TECHNIQUE', 'PROJET', 'FORMATION', 'AIDE', 'AUTRE'] },
-                tags: { type: 'array', itemType: 'string' }
+                categorie: {
+                    required: true,
+                    type: 'string',
+                    enum: ['GENERAL', 'TECHNIQUE', 'PROJET', 'FORMATION', 'AIDE', 'AUTRE'],
+                },
+                tags: { type: 'array', itemType: 'string' },
             });
 
             const sujet = new Sujet({
                 ...input,
                 auteur: context.utilisateur._id,
                 creeLe: new Date(),
-                majLe: new Date()
+                majLe: new Date(),
             });
 
             const saved = await sujet.save();
 
             logger.info(`Sujet créé: ${saved._id}`, {
                 utilisateurId: context.utilisateur._id,
-                requestId: context.requestId
+                requestId: context.requestId,
             });
 
             return mapSujetMongoVersGraphQL(saved);
@@ -197,22 +191,12 @@ const Mutation = {
 
         try {
             if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new AppError(
-                    'ID de sujet invalide',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
+                throw new AppError('ID de sujet invalide', 400, ERROR_CODES.BAD_REQUEST, true);
             }
 
             const sujet = await Sujet.findById(id);
             if (!sujet) {
-                throw new AppError(
-                    'Sujet non trouvé',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
+                throw new AppError('Sujet non trouvé', 404, ERROR_CODES.NOT_FOUND, true);
             }
 
             if (sujet.auteur.toString() !== context.utilisateur._id.toString()) {
@@ -226,14 +210,13 @@ const Mutation = {
 
             const updateData = {
                 ...input,
-                majLe: new Date()
+                majLe: new Date(),
             };
 
-            const updated = await Sujet.findByIdAndUpdate(
-                id,
-                updateData,
-                { new: true, runValidators: true }
-            ).populate('auteur', 'nom prenom avatar');
+            const updated = await Sujet.findByIdAndUpdate(id, updateData, {
+                new: true,
+                runValidators: true,
+            }).populate('auteur', 'nom prenom avatar');
 
             return mapSujetMongoVersGraphQL(updated);
         } catch (error) {
@@ -250,22 +233,12 @@ const Mutation = {
 
         try {
             if (!mongoose.Types.ObjectId.isValid(id)) {
-                throw new AppError(
-                    'ID de sujet invalide',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
+                throw new AppError('ID de sujet invalide', 400, ERROR_CODES.BAD_REQUEST, true);
             }
 
             const sujet = await Sujet.findById(id);
             if (!sujet) {
-                throw new AppError(
-                    'Sujet non trouvé',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
+                throw new AppError('Sujet non trouvé', 404, ERROR_CODES.NOT_FOUND, true);
             }
 
             if (sujet.auteur.toString() !== context.utilisateur._id.toString()) {
@@ -294,33 +267,23 @@ const Mutation = {
 
         try {
             if (!mongoose.Types.ObjectId.isValid(sujetId)) {
-                throw new AppError(
-                    'ID de sujet invalide',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
+                throw new AppError('ID de sujet invalide', 400, ERROR_CODES.BAD_REQUEST, true);
             }
 
             validateInput(input, {
-                contenu: { required: true, type: 'string', minLength: 10 }
+                contenu: { required: true, type: 'string', minLength: 10 },
             });
 
             const sujet = await Sujet.findById(sujetId);
             if (!sujet) {
-                throw new AppError(
-                    'Sujet non trouvé',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
+                throw new AppError('Sujet non trouvé', 404, ERROR_CODES.NOT_FOUND, true);
             }
 
             const reponse = {
                 contenu: input.contenu,
                 auteur: context.utilisateur._id,
                 creeLe: new Date(),
-                majLe: new Date()
+                majLe: new Date(),
             };
 
             sujet.reponses.push(reponse);
@@ -329,10 +292,10 @@ const Mutation = {
             const nouvelleReponse = sujet.reponses[sujet.reponses.length - 1];
             return {
                 ...mapSujetMongoVersGraphQL(sujet),
-                reponseAjoutee: nouvelleReponse
+                reponseAjoutee: nouvelleReponse,
             };
         } catch (error) {
-            logger.error('Erreur lors de l\'ajout de la réponse:', error);
+            logger.error("Erreur lors de l'ajout de la réponse:", error);
             throw handleMongooseError(error);
         }
     },
@@ -344,23 +307,16 @@ const Mutation = {
         checkAuthorization(context, 'update', 'forum');
 
         try {
-            if (!mongoose.Types.ObjectId.isValid(sujetId) || !mongoose.Types.ObjectId.isValid(reponseId)) {
-                throw new AppError(
-                    'ID invalide',
-                    400,
-                    ERROR_CODES.BAD_REQUEST,
-                    true
-                );
+            if (
+                !mongoose.Types.ObjectId.isValid(sujetId) ||
+                !mongoose.Types.ObjectId.isValid(reponseId)
+            ) {
+                throw new AppError('ID invalide', 400, ERROR_CODES.BAD_REQUEST, true);
             }
 
             const sujet = await Sujet.findById(sujetId);
             if (!sujet) {
-                throw new AppError(
-                    'Sujet non trouvé',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
+                throw new AppError('Sujet non trouvé', 404, ERROR_CODES.NOT_FOUND, true);
             }
 
             if (sujet.auteur.toString() !== context.utilisateur._id.toString()) {
@@ -374,12 +330,7 @@ const Mutation = {
 
             const reponse = sujet.reponses.id(reponseId);
             if (!reponse) {
-                throw new AppError(
-                    'Réponse non trouvée',
-                    404,
-                    ERROR_CODES.NOT_FOUND,
-                    true
-                );
+                throw new AppError('Réponse non trouvée', 404, ERROR_CODES.NOT_FOUND, true);
             }
 
             // Retirer le statut de solution des autres réponses
@@ -396,10 +347,10 @@ const Mutation = {
             logger.error('Erreur lors du marquage de la solution:', error);
             throw handleMongooseError(error);
         }
-    }
+    },
 };
 
 module.exports = {
     Query,
-    Mutation
-}; 
+    Mutation,
+};

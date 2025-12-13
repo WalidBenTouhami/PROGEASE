@@ -19,8 +19,8 @@ router.get('/health', (req, res) => {
             status: 'ok',
             service: 'livrables-api',
             timestamp: new Date().toISOString(),
-            utilisateur: req.currentutilisateur || 'anonymous'
-        }
+            utilisateur: req.currentutilisateur || 'anonymous',
+        },
     });
 });
 
@@ -29,8 +29,9 @@ router.get('/health', (req, res) => {
  * @description Recuperer tous les livrables avec filtrage et pagination
  * @access Public
  */
-router.get('/',
-    rateLimiter({ windowMs: 60000, max: 30 }),  // max 30 requetes par minute
+router.get(
+    '/',
+    rateLimiter({ windowMs: 60000, max: 30 }), // max 30 requetes par minute
     asyncHandler(livrableController.findAll)
 );
 
@@ -39,7 +40,8 @@ router.get('/',
  * @description Creer un nouveau livrable
  * @access Public
  */
-router.post('/',
+router.post(
+    '/',
     rateLimiter({ windowMs: 60000, max: 30 }),
     validateLivrableData,
     asyncHandler(livrableController.create)
@@ -50,7 +52,8 @@ router.post('/',
  * @description Recuperer tous les livrables d'un projet
  * @access Public
  */
-router.get('/projet/:projetId',
+router.get(
+    '/projet/:projetId',
     rateLimiter({ windowMs: 60000, max: 50 }),
     validateId('projetId'),
     asyncHandler(livrableController.findByProjet)
@@ -61,7 +64,8 @@ router.get('/projet/:projetId',
  * @description Recuperer un livrable par ID
  * @access Public
  */
-router.get('/:livrableId',
+router.get(
+    '/:livrableId',
     rateLimiter({ windowMs: 60000, max: 50 }),
     validateId('livrableId'),
     asyncHandler(livrableController.findOne)
@@ -72,7 +76,8 @@ router.get('/:livrableId',
  * @description Mettre à jour un livrable
  * @access Public
  */
-router.put('/:livrableId',
+router.put(
+    '/:livrableId',
     rateLimiter({ windowMs: 60000, max: 30 }),
     validateId('livrableId'),
     validateLivrableData,
@@ -84,7 +89,8 @@ router.put('/:livrableId',
  * @description Supprimer un livrable
  * @access Public
  */
-router.delete('/:livrableId',
+router.delete(
+    '/:livrableId',
     rateLimiter({ windowMs: 60000, max: 20 }),
     validateId('livrableId'),
     asyncHandler(livrableController.delete)
