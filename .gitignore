@@ -59,5 +59,12 @@ dataSources.local.xml
 # Task management files
 todo
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
 # Ignorer tous les repertoires node_modules
 
