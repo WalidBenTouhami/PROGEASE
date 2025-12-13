@@ -153,6 +153,7 @@ npm audit --production
 1. **package.json** (root)
    - Updated Angular packages to 18.2.14
    - Updated bcryptjs to 3.0.3
+   - Updated express from 5.1.0 to 4.22.1 (aligned with backend/frontend)
    - Updated nodemailer to 7.0.11
    
 2. **backend/package.json**

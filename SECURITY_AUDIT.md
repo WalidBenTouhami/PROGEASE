@@ -162,6 +162,7 @@ This document provides a comprehensive security audit of all dependencies in the
     "@angular/platform-browser-dynamic": "^18.2.0" → "^18.2.14",
     "@angular/router": "^18.2.0" → "^18.2.14",
     "bcryptjs": "^3.0.2" → "^3.0.3",
+    "express": "^5.1.0" → "^4.22.1",  // Aligned with backend/frontend v4
     "nodemailer": "^7.0.3" → "^7.0.11"
   },
   "devDependencies": {
