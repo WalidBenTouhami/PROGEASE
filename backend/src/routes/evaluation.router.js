@@ -11,12 +11,24 @@ router.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 100 }));
 // Routes
 router.post('/', validateRequest(evaluationSchema), evaluationController.createEvaluation);
 
-router.get('/', evaluationController.getEvaluations);
-router.get('/stats', evaluationController.getEvaluationStats);
-router.get('/:id', evaluationController.getEvaluationById);
+router.get('/', rateLimiter({ windowMs: 60000, max: 50 }), evaluationController.getEvaluations);
+router.get(
+    '/stats',
+    rateLimiter({ windowMs: 60000, max: 30 }),
+    evaluationController.getEvaluationStats
+);
+router.get(
+    '/:id',
+    rateLimiter({ windowMs: 60000, max: 50 }),
+    evaluationController.getEvaluationById
+);
 
 router.put('/:id', validateRequest(evaluationSchema), evaluationController.updateEvaluation);
 
-router.delete('/:id', evaluationController.deleteEvaluation);
+router.delete(
+    '/:id',
+    rateLimiter({ windowMs: 60000, max: 20 }),
+    evaluationController.deleteEvaluation
+);
 
 module.exports = router;

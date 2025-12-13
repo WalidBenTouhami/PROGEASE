@@ -162,7 +162,7 @@ const creerApplication = async () => {
     // Routes REST API
     const aiRoutes = require('./routes/ai.routes');
     const schedulingRoutes = require('./routes/scheduling.routes');
-    
+
     app.use('/api/ai', aiRoutes);
     app.use('/api/scheduling', schedulingRoutes);
 
@@ -177,9 +177,9 @@ const creerApplication = async () => {
                 services: {
                     graphql: 'operational',
                     ai: 'operational',
-                    scheduling: 'operational'
-                }
-            }
+                    scheduling: 'operational',
+                },
+            },
         });
     });
 

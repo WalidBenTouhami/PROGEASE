@@ -21,12 +21,12 @@ logger.info('Test avec donnees complexes', {
     utilisateur: {
         id: 1,
         nom: 'Test utilisateur',
-        roles: ['admin', 'developpeur']
+        roles: ['admin', 'developpeur'],
     },
     statistiques: {
         tempsExecution: 235,
-        memoireUtilisee: '45MB'
-    }
+        memoireUtilisee: '45MB',
+    },
 });
 
 console.log('Tests de logs termines. Verifiez le dossier logs/ pour les resultats.');

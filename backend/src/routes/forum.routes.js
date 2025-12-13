@@ -64,8 +64,20 @@ router.post(
 );
 
 // Routes pour la recherche et le filtrage
-router.get('/sujets/recherche', forumController.rechercherSujets);
-router.get('/sujets/categorie/:categorie', forumController.recupererSujetsParCategorie);
-router.get('/sujets/utilisateur/:utilisateurId', forumController.recupererSujetsParUtilisateur);
+router.get(
+    '/sujets/recherche',
+    rateLimiter({ windowMs: 60000, max: 50 }),
+    forumController.rechercherSujets
+);
+router.get(
+    '/sujets/categorie/:categorie',
+    rateLimiter({ windowMs: 60000, max: 50 }),
+    forumController.recupererSujetsParCategorie
+);
+router.get(
+    '/sujets/utilisateur/:utilisateurId',
+    rateLimiter({ windowMs: 60000, max: 50 }),
+    forumController.recupererSujetsParUtilisateur
+);
 
 module.exports = router;

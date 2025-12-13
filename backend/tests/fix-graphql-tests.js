@@ -15,7 +15,7 @@ const colors = {
     yellow: '\x1b[33m',
     blue: '\x1b[34m',
     cyan: '\x1b[36m',
-    bold: '\x1b[1m'
+    bold: '\x1b[1m',
 };
 
 // Fonction d'aide pour les textes colores
@@ -69,7 +69,7 @@ const correctQueries = {
 # {
 #   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
 # }
-`
+`,
     },
     livrable: {
         all: `query GetAllLivrables {
@@ -101,7 +101,7 @@ const correctQueries = {
 # {
 #   "id": "5f8f8f8f8f8f8f8f8f8f8f8f"
 # }
-`
+`,
     },
     health: {
         all: `query GetHealth {
@@ -112,7 +112,7 @@ const correctQueries = {
     version
     uptime
   }
-}`
+}`,
     },
     paginationinfo: {
         example: `# Ce type est generalement utilise comme partie d'autres types plutôt que directement requete
@@ -132,8 +132,8 @@ query GetPaginatedResults {
       hasPreviousPage
     }
   }
-}`
-    }
+}`,
+    },
 };
 
 // Fonction principale
@@ -145,7 +145,9 @@ async function main() {
         try {
             await fs.promises.access(testsDir);
         } catch (err) {
-            console.error(colorize(`Le dossier des tests GraphQL n'existe pas: ${testsDir}`, 'red'));
+            console.error(
+                colorize(`Le dossier des tests GraphQL n'existe pas: ${testsDir}`, 'red')
+            );
             console.log(colorize('Creation du dossier...', 'yellow'));
 
             try {
@@ -167,44 +169,57 @@ async function main() {
         // 4. Add robust error handling and clear comments.
 
         // Projet
-        await createOrUpdateTestFile('projet.graphql', `# Tests GraphQL pour Projet
+        await createOrUpdateTestFile(
+            'projet.graphql',
+            `# Tests GraphQL pour Projet
 # Generes automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
 ${correctQueries.projet.all}
 
 ${correctQueries.projet.byId}
-`);
+`
+        );
 
         // Livrable
-        await createOrUpdateTestFile('livrable.graphql', `# Tests GraphQL pour Livrable
+        await createOrUpdateTestFile(
+            'livrable.graphql',
+            `# Tests GraphQL pour Livrable
 # Generes automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
 ${correctQueries.livrable.all}
 
 ${correctQueries.livrable.byId}
-`);
+`
+        );
 
         // Health
-        await createOrUpdateTestFile('health.graphql', `# Tests GraphQL pour Health
+        await createOrUpdateTestFile(
+            'health.graphql',
+            `# Tests GraphQL pour Health
 # Generes automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
 ${correctQueries.health.all}
-`);
+`
+        );
 
         // PaginationInfo
-        await createOrUpdateTestFile('paginationinfo.graphql', `# Tests GraphQL pour PaginationInfo
+        await createOrUpdateTestFile(
+            'paginationinfo.graphql',
+            `# Tests GraphQL pour PaginationInfo
 # Generes automatiquement le 2025-05-28 09:42:02
 # Auteur: WalidBenTouhami
 
 ${correctQueries.paginationinfo.example}
-`);
+`
+        );
 
         console.log(colorize('\n✅ Correction des fichiers de test terminee!', 'green'));
-        console.log(colorize('\n🧪 Vous pouvez maintenant executer: node graphql-tests.js', 'cyan'));
-
+        console.log(
+            colorize('\n🧪 Vous pouvez maintenant executer: node graphql-tests.js', 'cyan')
+        );
     } catch (err) {
         console.error(colorize('Erreur lors de la correction des tests:', 'red'), err);
     }
@@ -217,7 +232,9 @@ async function createOrUpdateTestFile(filename, content) {
         await fs.promises.writeFile(filePath, content);
         console.log(colorize(`  ✓ ${filename} cree/mis à jour avec succes`, 'green'));
     } catch (err) {
-        console.error(colorize(`  ✗ echec de la mise à jour de ${filename}: ${err.message}`, 'red'));
+        console.error(
+            colorize(`  ✗ echec de la mise à jour de ${filename}: ${err.message}`, 'red')
+        );
     }
 }
 

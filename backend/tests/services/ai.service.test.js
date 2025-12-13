@@ -11,17 +11,17 @@ jest.mock('axios', () => {
     const mockPost = jest.fn();
     return {
         create: () => ({
-            post: mockPost
-        })
+            post: mockPost,
+        }),
     };
 });
 
-const { 
-    analyserProjet, 
+const {
+    analyserProjet,
     suiviProgression,
     creerEquipes,
     associerTuteurs,
-    recommanderApprentissage
+    recommanderApprentissage,
 } = require('../../src/services/ai.service');
 const axios = require('axios');
 
@@ -40,16 +40,18 @@ describe('AIService', () => {
         // Configuration par défaut du mock axios
         mockAxiosPost.mockResolvedValue({
             data: {
-                choices: [{
-                    message: {
-                        content: JSON.stringify({
-                            status: 'success',
-                            analyse: 'Analyse du projet : Risques identifiés...',
-                            timestamp: new Date().toISOString()
-                        })
-                    }
-                }]
-            }
+                choices: [
+                    {
+                        message: {
+                            content: JSON.stringify({
+                                status: 'success',
+                                analyse: 'Analyse du projet : Risques identifiés...',
+                                timestamp: new Date().toISOString(),
+                            }),
+                        },
+                    },
+                ],
+            },
         });
     });
 
@@ -62,7 +64,7 @@ describe('AIService', () => {
                 dateFin: new Date(Date.now() + 86400000),
                 statut: 'En cours',
                 priorite: 'Haute',
-                equipe: ['membre1', 'membre2']
+                equipe: ['membre1', 'membre2'],
             };
 
             const analyse = await analyserProjet(projetData);
@@ -78,19 +80,15 @@ describe('AIService', () => {
             mockAxiosPost.mockRejectedValue(new Error('Données invalides'));
 
             // Tester avec des données invalides
-            await expect(analyserProjet(null)).rejects.toThrow('echec de l\'analyse du projet');
-            await expect(analyserProjet(undefined)).rejects.toThrow('echec de l\'analyse du projet');
-            await expect(analyserProjet({})).rejects.toThrow('echec de l\'analyse du projet');
+            await expect(analyserProjet(null)).rejects.toThrow("echec de l'analyse du projet");
+            await expect(analyserProjet(undefined)).rejects.toThrow("echec de l'analyse du projet");
+            await expect(analyserProjet({})).rejects.toThrow("echec de l'analyse du projet");
         }, 30000);
     });
 
     describe('suiviProgression', () => {
         it('devrait calculer la progression des tâches', async () => {
-            const taches = [
-                { statut: 'Termine' },
-                { statut: 'En cours' },
-                { statut: 'À faire' }
-            ];
+            const taches = [{ statut: 'Termine' }, { statut: 'En cours' }, { statut: 'À faire' }];
 
             const progression = await suiviProgression(taches);
             expect(progression).toBeDefined();
@@ -112,29 +110,31 @@ describe('AIService', () => {
         beforeEach(() => {
             mockAxiosPost.mockResolvedValue({
                 data: {
-                    choices: [{
-                        message: {
-                            content: JSON.stringify({
-                                equipes: [
-                                    {
-                                        id: 'equipe1',
-                                        membres: ['user1', 'user2'],
-                                        competencesPrincipales: ['JavaScript', 'React'],
-                                        forceEstimee: 8.5
-                                    }
-                                ]
-                            })
-                        }
-                    }]
-                }
+                    choices: [
+                        {
+                            message: {
+                                content: JSON.stringify({
+                                    equipes: [
+                                        {
+                                            id: 'equipe1',
+                                            membres: ['user1', 'user2'],
+                                            competencesPrincipales: ['JavaScript', 'React'],
+                                            forceEstimee: 8.5,
+                                        },
+                                    ],
+                                }),
+                            },
+                        },
+                    ],
+                },
             });
         });
 
-        it('devrait former des équipes à partir d\'une liste de membres', async () => {
+        it("devrait former des équipes à partir d'une liste de membres", async () => {
             const membres = [
                 { id: 'user1', nom: 'Alice', competences: ['JavaScript', 'React'] },
                 { id: 'user2', nom: 'Bob', competences: ['Python', 'Django'] },
-                { id: 'user3', nom: 'Charlie', competences: ['JavaScript', 'Node.js'] }
+                { id: 'user3', nom: 'Charlie', competences: ['JavaScript', 'Node.js'] },
             ];
 
             const result = await creerEquipes(membres);
@@ -148,7 +148,7 @@ describe('AIService', () => {
             await expect(creerEquipes([])).rejects.toThrow('Liste de membres vide');
         }, 30000);
 
-        it('devrait rejeter si le paramètre n\'est pas un tableau', async () => {
+        it("devrait rejeter si le paramètre n'est pas un tableau", async () => {
             await expect(creerEquipes(null)).rejects.toThrow('Liste de membres vide');
             await expect(creerEquipes('invalid')).rejects.toThrow('Liste de membres vide');
         }, 30000);
@@ -158,28 +158,30 @@ describe('AIService', () => {
         beforeEach(() => {
             mockAxiosPost.mockResolvedValue({
                 data: {
-                    choices: [{
-                        message: {
-                            content: JSON.stringify({
-                                associations: [
-                                    {
-                                        equipe: 'equipe1',
-                                        tuteur: 'tuteur1',
-                                        raisonAssociation: 'Expertise en développement web',
-                                        scoreCompatibilite: 0.85
-                                    }
-                                ]
-                            })
-                        }
-                    }]
-                }
+                    choices: [
+                        {
+                            message: {
+                                content: JSON.stringify({
+                                    associations: [
+                                        {
+                                            equipe: 'equipe1',
+                                            tuteur: 'tuteur1',
+                                            raisonAssociation: 'Expertise en développement web',
+                                            scoreCompatibilite: 0.85,
+                                        },
+                                    ],
+                                }),
+                            },
+                        },
+                    ],
+                },
             });
         });
 
         it('devrait associer des tuteurs aux équipes', async () => {
             const membres = [
                 { id: 'tuteur1', role: 'TUTEUR', competences: ['JavaScript', 'React'] },
-                { id: 'equipe1', role: 'EQUIPE', competences: ['JavaScript'] }
+                { id: 'equipe1', role: 'EQUIPE', competences: ['JavaScript'] },
             ];
 
             const result = await associerTuteurs(membres);
@@ -198,28 +200,42 @@ describe('AIService', () => {
         beforeEach(() => {
             mockAxiosPost.mockResolvedValue({
                 data: {
-                    choices: [{
-                        message: {
-                            content: JSON.stringify({
-                                recommandations: [
-                                    {
-                                        competence: 'JavaScript',
-                                        ressources: {
-                                            cours: { titre: 'JavaScript Avancé', lien: 'https://example.com' },
-                                            livre: { titre: 'You Don\'t Know JS', auteur: 'Kyle Simpson' },
-                                            projet: { titre: 'Todo App', description: 'Application de gestion de tâches' },
-                                            communaute: { nom: 'r/javascript', lien: 'https://reddit.com/r/javascript' }
-                                        }
-                                    }
-                                ]
-                            })
-                        }
-                    }]
-                }
+                    choices: [
+                        {
+                            message: {
+                                content: JSON.stringify({
+                                    recommandations: [
+                                        {
+                                            competence: 'JavaScript',
+                                            ressources: {
+                                                cours: {
+                                                    titre: 'JavaScript Avancé',
+                                                    lien: 'https://example.com',
+                                                },
+                                                livre: {
+                                                    titre: "You Don't Know JS",
+                                                    auteur: 'Kyle Simpson',
+                                                },
+                                                projet: {
+                                                    titre: 'Todo App',
+                                                    description: 'Application de gestion de tâches',
+                                                },
+                                                communaute: {
+                                                    nom: 'r/javascript',
+                                                    lien: 'https://reddit.com/r/javascript',
+                                                },
+                                            },
+                                        },
+                                    ],
+                                }),
+                            },
+                        },
+                    ],
+                },
             });
         });
 
-        it('devrait recommander des ressources d\'apprentissage', async () => {
+        it("devrait recommander des ressources d'apprentissage", async () => {
             const competences = ['JavaScript', 'React', 'Node.js'];
 
             const result = await recommanderApprentissage(competences);
@@ -233,8 +249,10 @@ describe('AIService', () => {
             await expect(recommanderApprentissage([])).rejects.toThrow('Liste de competences vide');
         }, 30000);
 
-        it('devrait rejeter si le paramètre n\'est pas un tableau', async () => {
-            await expect(recommanderApprentissage(null)).rejects.toThrow('Liste de competences vide');
+        it("devrait rejeter si le paramètre n'est pas un tableau", async () => {
+            await expect(recommanderApprentissage(null)).rejects.toThrow(
+                'Liste de competences vide'
+            );
         }, 30000);
     });
-}); 
+});

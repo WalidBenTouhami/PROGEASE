@@ -15,23 +15,24 @@ if (!fs.existsSync(logPath)) {
 }
 
 // Démarrer MongoDB
-const mongod = spawn('mongod', [
-    '--dbpath', dbPath,
-    '--logpath', path.join(logPath, 'mongod.log')
-], {
-    // Sous Windows, on ne peut pas utiliser --fork
-    windowsHide: true
-});
+const mongod = spawn(
+    'mongod',
+    ['--dbpath', dbPath, '--logpath', path.join(logPath, 'mongod.log')],
+    {
+        // Sous Windows, on ne peut pas utiliser --fork
+        windowsHide: true,
+    }
+);
 
-mongod.stdout.on('data', (data) => {
+mongod.stdout.on('data', data => {
     console.log(`MongoDB stdout: ${data}`);
 });
 
-mongod.stderr.on('data', (data) => {
+mongod.stderr.on('data', data => {
     console.error(`MongoDB stderr: ${data}`);
 });
 
-mongod.on('close', (code) => {
+mongod.on('close', code => {
     console.log(`MongoDB process exited with code ${code}`);
 });
 
@@ -40,4 +41,4 @@ process.on('SIGINT', () => {
     console.log('Arrêt de MongoDB...');
     mongod.kill('SIGINT');
     process.exit();
-}); 
+});

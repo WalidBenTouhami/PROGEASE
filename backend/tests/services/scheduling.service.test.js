@@ -20,8 +20,8 @@ describe('SchedulingService', () => {
                         _id: 'livrable1',
                         intitule: 'Livrable Test',
                         dateLimite: dans2Jours,
-                        statut: 'EN_COURS'
-                    }
+                        statut: 'EN_COURS',
+                    },
                 ],
                 taches: [
                     {
@@ -29,9 +29,9 @@ describe('SchedulingService', () => {
                         titre: 'Tâche Test',
                         dateFin: dans2Jours,
                         statut: 'EN_COURS',
-                        assigneA: 'user1'
-                    }
-                ]
+                        assigneA: 'user1',
+                    },
+                ],
             };
 
             const rappels = await schedulingService.genererRappels(projet);
@@ -39,17 +39,17 @@ describe('SchedulingService', () => {
             expect(rappels).toBeDefined();
             expect(Array.isArray(rappels)).toBe(true);
             expect(rappels.length).toBeGreaterThan(0);
-            
+
             // Vérifier qu'il y a un rappel pour le projet
             const rappelProjet = rappels.find(r => r.type === 'DEADLINE_PROJET');
             expect(rappelProjet).toBeDefined();
             expect(rappelProjet.titre).toContain('Projet Test');
-            
+
             // Vérifier qu'il y a un rappel pour le livrable
             const rappelLivrable = rappels.find(r => r.type === 'DEADLINE_LIVRABLE');
             expect(rappelLivrable).toBeDefined();
             expect(rappelLivrable.priorite).toBe('URGENTE');
-            
+
             // Vérifier qu'il y a un rappel pour la tâche
             const rappelTache = rappels.find(r => r.type === 'DEADLINE_TACHE');
             expect(rappelTache).toBeDefined();
@@ -65,7 +65,7 @@ describe('SchedulingService', () => {
                 dateFin: dans30Jours,
                 equipe: ['user1', 'user2'],
                 livrables: [],
-                taches: []
+                taches: [],
             };
 
             const rappels = await schedulingService.genererRappels(projet);
@@ -76,9 +76,9 @@ describe('SchedulingService', () => {
         });
 
         it('devrait rejeter si le projet est null', async () => {
-            await expect(schedulingService.genererRappels(null))
-                .rejects
-                .toThrow('Le projet est requis pour générer des rappels');
+            await expect(schedulingService.genererRappels(null)).rejects.toThrow(
+                'Le projet est requis pour générer des rappels'
+            );
         });
     });
 
@@ -93,25 +93,25 @@ describe('SchedulingService', () => {
                 dateDebut: dateDebut,
                 dateFin: dateFin,
                 equipe: ['user1', 'user2'],
-                tuteur: 'tuteur1'
+                tuteur: 'tuteur1',
             };
 
             const planning = await schedulingService.planifierEvenements({
                 projet,
                 type: 'REUNION',
-                frequence: 'HEBDOMADAIRE'
+                frequence: 'HEBDOMADAIRE',
             });
 
             expect(planning).toBeDefined();
             expect(planning.evenements).toBeDefined();
             expect(Array.isArray(planning.evenements)).toBe(true);
             expect(planning.evenements.length).toBeGreaterThan(0);
-            
+
             // Vérifier les statistiques
             expect(planning.statistiques).toBeDefined();
             expect(planning.statistiques.total).toBe(planning.evenements.length);
             expect(planning.statistiques.reunions).toBeGreaterThan(0);
-            
+
             // Vérifier qu'il y a une soutenance finale
             const soutenance = planning.evenements.find(e => e.type === 'SOUTENANCE');
             expect(soutenance).toBeDefined();
@@ -128,12 +128,12 @@ describe('SchedulingService', () => {
                 dateDebut: dateDebut,
                 dateFin: dateFin,
                 equipe: ['user1', 'user2'],
-                tuteur: 'tuteur1'
+                tuteur: 'tuteur1',
             };
 
             const planning = await schedulingService.planifierEvenements({
                 projet,
-                frequence: 'HEBDOMADAIRE'
+                frequence: 'HEBDOMADAIRE',
             });
 
             const revue = planning.evenements.find(e => e.type === 'REVUE');
@@ -145,12 +145,12 @@ describe('SchedulingService', () => {
             const projet = {
                 _id: '507f1f77bcf86cd799439011',
                 titre: 'Projet Test',
-                equipe: ['user1', 'user2']
+                equipe: ['user1', 'user2'],
             };
 
-            await expect(schedulingService.planifierEvenements({ projet }))
-                .rejects
-                .toThrow('Les dates du projet sont requises');
+            await expect(schedulingService.planifierEvenements({ projet })).rejects.toThrow(
+                'Les dates du projet sont requises'
+            );
         });
     });
 
@@ -163,8 +163,8 @@ describe('SchedulingService', () => {
                     type: 'DEADLINE_PROJET',
                     titre: 'Test Rappel',
                     dateRappel: maintenant,
-                    destinataires: ['user1', 'user2']
-                }
+                    destinataires: ['user1', 'user2'],
+                },
             ];
 
             const resultat = await schedulingService.envoyerNotifications(rappels);
@@ -184,7 +184,7 @@ describe('SchedulingService', () => {
             expect(resultat.envoyes).toBe(0);
         });
 
-        it('ne devrait pas envoyer de notifications dont la date n\'est pas encore atteinte', async () => {
+        it("ne devrait pas envoyer de notifications dont la date n'est pas encore atteinte", async () => {
             const demain = new Date(Date.now() + 24 * 60 * 60 * 1000);
             const rappels = [
                 {
@@ -192,8 +192,8 @@ describe('SchedulingService', () => {
                     type: 'DEADLINE_PROJET',
                     titre: 'Test Rappel',
                     dateRappel: demain,
-                    destinataires: ['user1']
-                }
+                    destinataires: ['user1'],
+                },
             ];
 
             const resultat = await schedulingService.envoyerNotifications(rappels);
@@ -213,14 +213,14 @@ describe('SchedulingService', () => {
                     titre: 'Réunion 1',
                     date: date1,
                     duree: 60, // 1 heure
-                    participants: ['user1', 'user2']
+                    participants: ['user1', 'user2'],
                 },
                 {
                     titre: 'Réunion 2',
                     date: date2,
                     duree: 60,
-                    participants: ['user1', 'user3']
-                }
+                    participants: ['user1', 'user3'],
+                },
             ];
 
             const conflits = schedulingService.detecterConflits(evenements);
@@ -241,14 +241,14 @@ describe('SchedulingService', () => {
                     titre: 'Réunion 1',
                     date: date1,
                     duree: 60,
-                    participants: ['user1', 'user2']
+                    participants: ['user1', 'user2'],
                 },
                 {
                     titre: 'Réunion 2',
                     date: date2,
                     duree: 60,
-                    participants: ['user1', 'user3']
-                }
+                    participants: ['user1', 'user3'],
+                },
             ];
 
             const conflits = schedulingService.detecterConflits(evenements);
@@ -263,8 +263,8 @@ describe('SchedulingService', () => {
                     titre: 'Réunion 1',
                     date: new Date(),
                     duree: 60,
-                    participants: ['user1']
-                }
+                    participants: ['user1'],
+                },
             ];
 
             const conflits = schedulingService.detecterConflits(evenements);

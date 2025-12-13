@@ -50,7 +50,9 @@ async function main() {
 
         // Utilisation du early return pattern au lieu de throw dans un bloc try
         if (!stat.isDirectory()) {
-            console.error(`❌ Erreur: Le chemin specifie (${directoryPath}) n'est pas un repertoire valide.`);
+            console.error(
+                `❌ Erreur: Le chemin specifie (${directoryPath}) n'est pas un repertoire valide.`
+            );
             return;
         }
 

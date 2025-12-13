@@ -16,7 +16,12 @@ router.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 50 }));
 router.post('/', authMiddleware, createCertificat); // Ajoutez le middleware ici
 
 // Route pour generer un certificat
-router.post('/generer', authMiddleware, genererCertificat);
+router.post(
+    '/generer',
+    rateLimiter({ windowMs: 60000, max: 10 }),
+    authMiddleware,
+    genererCertificat
+);
 
 // Verifier la validite du certificat
 router.get('/:certificatId/verifier', authMiddleware, verifierValiditeCertificat);

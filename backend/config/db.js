@@ -17,8 +17,8 @@ async function connecterBD(uri) {
         };
 
         await mongoose.connect(uri, options);
-        
-        mongoose.connection.on('error', (err) => {
+
+        mongoose.connection.on('error', err => {
             logger.error('Erreur MongoDB:', err);
         });
 
@@ -29,14 +29,13 @@ async function connecterBD(uri) {
         process.on('SIGINT', async () => {
             try {
                 await mongoose.connection.close();
-                logger.info('Connexion MongoDB fermée suite à l\'arrêt de l\'application');
+                logger.info("Connexion MongoDB fermée suite à l'arrêt de l'application");
                 process.exit(0);
             } catch (err) {
                 logger.error('Erreur lors de la fermeture de la connexion MongoDB:', err);
                 process.exit(1);
             }
         });
-
     } catch (error) {
         logger.error('Erreur de connexion à MongoDB:', error);
         throw error;
