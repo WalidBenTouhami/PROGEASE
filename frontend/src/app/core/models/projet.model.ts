@@ -18,7 +18,9 @@ export interface Membre {
 
 export interface Projet {
     _id?: string;
+    id?: string; // Alias for _id
     titre: string;
+    nom?: string; // Alias for titre for backward compatibility
     description: string;
     equipe: string[];
     tuteur?: string;

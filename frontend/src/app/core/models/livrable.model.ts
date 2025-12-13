@@ -4,7 +4,9 @@ export enum StatutLivrable {
   EN_COURS = 'EN_COURS',
   EN_REVISION = 'EN_REVISION',
   VALIDE = 'VALIDE',
-  REJETE = 'REJETE'
+  REJETE = 'REJETE',
+  TERMINE = 'TERMINE',
+  SOUMIS = 'SOUMIS'
 }
 
 export enum TypeLivrable {
@@ -17,7 +19,9 @@ export enum TypeLivrable {
 
 export interface Livrable {
   _id?: string;
+  id?: string; // Alias for _id
   intitule: string;
+  titre?: string; // Alias for intitule for backward compatibility
   description: string;
   type: TypeLivrable;
   projetId: string;

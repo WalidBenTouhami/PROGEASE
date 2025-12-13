@@ -85,6 +85,8 @@ import { ApiResponse } from '../../../core/models/api.model';
 export class ProjetListComponent implements OnInit {
   displayedColumns: string[] = ['nom', 'description', 'dateDebut', 'dateFin', 'statut', 'actions'];
   dataSource: MatTableDataSource<Projet>;
+  projets: Projet[] = [];
+  projetsFiltres: Projet[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -99,18 +101,27 @@ export class ProjetListComponent implements OnInit {
 
   loadProjets() {
     this.projetService.getProjets().subscribe({
-      next: (response: ApiResponse<Projet[]>) => {
-        if (response.success && response.data) {
-          this.dataSource.data = response.data;
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-        } else {
-          console.error('Error loading projets: No data received');
-        }
+      next: (projets: Projet[]) => {
+        this.projets = projets;
+        this.projetsFiltres = projets;
+        this.dataSource.data = projets;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
       },
       error: (err) => {
         console.error('Error loading projets:', err);
       }
     });
+  }
+
+  filtrerProjets(term: string): void {
+    if (!term) {
+      this.projetsFiltres = this.projets;
+    } else {
+      this.projetsFiltres = this.projets.filter(p =>
+        (p.titre || p.nom || '').toLowerCase().includes(term.toLowerCase()) ||
+        (p.description || '').toLowerCase().includes(term.toLowerCase())
+      );
+    }
   }
 }

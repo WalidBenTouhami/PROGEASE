@@ -2,7 +2,6 @@ import './polyfills';
 import { enableProdMode, isDevMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import * as Sentry from '@sentry/angular';
-import { BrowserTracing } from '@sentry/tracing';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { registerLocaleData } from '@angular/common';
@@ -14,9 +13,9 @@ registerLocaleData(localeFr);
 Sentry.init({
   dsn: environment.sentry.dsn,
   integrations: [
-    new BrowserTracing({
-      tracingOrigins: ['localhost', environment.apiUrl],
-    }) as any, // Type assertion to fix compatibility issue
+    Sentry.browserTracingIntegration({
+      tracePropagationTargets: ['localhost', environment.apiUrl],
+    }),
   ],
   tracesSampleRate: isDevMode() ? 1.0 : 0.2,
   environment: environment.production ? 'production' : 'development',
