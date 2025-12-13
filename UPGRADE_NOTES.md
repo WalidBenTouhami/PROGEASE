@@ -1,6 +1,6 @@
 # Upgrade Notes
 
-## December 2025 - Dependency Updates
+## December 2024 - Dependency Updates
 
 ### Fixed Issues
 
@@ -9,9 +9,9 @@
 - **Fix**: Added jest ^29.7.0 to root devDependencies
 - **Action Required**: Run `npm install` in the root directory
 - **Test Scripts Added**:
-  - `npm test` - Runs backend tests
-  - `npm run test:backend` - Runs backend tests
-  - `npm run test:frontend` - Runs frontend tests
+  - `npm test` - Runs all tests (backend + frontend)
+  - `npm run test:backend` - Runs backend tests only
+  - `npm run test:frontend` - Runs frontend tests only
   - `npm run test:all` - Runs all tests (backend + frontend)
 
 #### 2. Angular Version Mismatch
@@ -44,7 +44,7 @@
    npm install
    ```
 
-3. **Review Angular 18 Breaking Changes**: 
+3. **Review Angular 18 Breaking Changes**:
    - Check [Angular Update Guide](https://angular.dev/update-guide) for potential breaking changes
    - Review your code for deprecated APIs
    - Common breaking changes in Angular 18:
