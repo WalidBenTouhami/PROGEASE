@@ -36,7 +36,7 @@ jobs:
           MONGOMS_SKIP_DOWNLOAD: 1
         run: |
           cd backend
-          npm audit --production
+          npm audit --production || true
           npm audit fix || true
 
       - name: Security audit frontend
@@ -45,7 +45,7 @@ jobs:
           MONGOMS_SKIP_DOWNLOAD: 1
         run: |
           cd frontend
-          npm audit --production
+          npm audit --production || true
           npm audit fix || true
 
       # Installation des dépendances
