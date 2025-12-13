@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project uses `mongodb-memory-server` as a dev dependency for testing purposes. However, in CI/CD environments with firewall restrictions (such as GitHub Actions), the package's postinstall script may be blocked from downloading MongoDB binaries from `fastdl.mongodb.org`.
+This project uses `mongodb-memory-server` as a dev dependency for testing purposes. However, in CI/CD environments with firewall restrictions (such as GitHub Actions), the package's postinstall script may fail when blocked from downloading MongoDB binaries from `fastdl.mongodb.org`.
 
 ## Solution
 
