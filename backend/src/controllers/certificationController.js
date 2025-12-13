@@ -16,7 +16,7 @@ const checkQuizReussis = async (utilisateurId, formationsRequises) => {
 
             for (const quizId of quizIds) {
                 const quizResult = await QuizResult.findOne({
-                    utilisateurId: utilisateurId,
+                    utilisateurId: { $eq: utilisateurId },
                     quizId: quizId,
                 });
 
