@@ -34,38 +34,6 @@ const checkQuizReussis = async (utilisateurId, formationsRequises) => {
     }
 };
 
-/*
-const createFormation = async (req, res) => {
-  try {
-    const { utilisateurId, formationsRequises, titre, description, dureeValidite } = req.body;
-    logger.info("Corps de la requête :", req.body); // Ajoute cette ligne pour voir les donnees envoyees
-
-    // Verifie que l'utilisateur a reussi tous les quiz pour les formations requises
-    const estEligible = await checkQuizReussis(utilisateurId, formationsRequises);
-    if (!estEligible) {
-      return res.status(403).json({ error: "L'utilisateur n'a pas rempli les conditions." });
-    }
-
-    // Creer un nouveau certificat si l'utilisateur est eligible
-    const nouveauCertificat = await Certificat.create({
-      utilisateurId,
-      titre,
-      description,
-      dureeValidite,
-      conditions: { formationsRequises },
-    });
-
-    res.status(201).json({
-      message: "Certificat cree avec succès",
-      certificat: nouveauCertificat,
-    });
-  } catch (error) {
-    logger.error("Erreur serveur detaillee :", error);  // Affiche l'erreur detaillee ici
-    res.status(500).json({ error: "Erreur serveur" });
-  }
-};
-*/
-
 const createFormation = async (req, res) => {
     try {
         const nouvelleFormation = await Formation.create(req.body);
@@ -85,44 +53,10 @@ const getAllFormations = async (req, res) => {
         const formations = await Formation.find().populate('contenu.quiz');
         res.status(200).json(formations);
     } catch (error) {
-        // Loggez l'erreur pour plus de details
         logger.error('Erreur serveur lors de la recuperation des formations:', error);
         res.status(500).json({ error: 'Erreur serveur' });
     }
 };
-/*
-const addutilisateurToFormation = async (req, res) => {
-  const { formationId } = req.params;
-  const { utilisateurId } = req.body;
-
-  try {
-    const utilisateurDoc = await Utilisateur.findById(utilisateurId);
-    if (!utilisateurDoc) return res.status(404).json({ error: "Utilisateur non trouve" });
-
-    if (utilisateurDoc.role !== "student") {
-      return res.status(400).json({
-        error: "Seuls les etudiants peuvent s'inscrire à une formation.",
-      });
-    }
-
-    const formation = await Formation.findById(formationId);
-    if (!formation)
-      return res.status(404).json({ error: "Formation non trouvee" });
-
-    if (formation.utilisateursInscrits.includes(utilisateurId)) {
-      return res
-        .status(400)
-        .json({ error: "Utilisateur dejà inscrit à cette formation." });
-    }
-
-    formation.utilisateursInscrits.push(utilisateurId);
-    await formation.save();
-
-    res.status(200).json({ message: "Utilisateur inscrit avec succès", formation });
-  } catch (error) {
-    res.status(500).json({ error: "Erreur serveur" });
-  }
-};*/
 
 const addutilisateurToFormation = async (req, res) => {
     const { formationId } = req.params;
@@ -133,10 +67,10 @@ const addutilisateurToFormation = async (req, res) => {
     }
 
     try {
-        const utilisateurDoc = await Utilisateur.findById(utilisateurId);
-        if (!utilisateurDoc) return res.status(404).json({ error: 'Utilisateur non trouvé' });
+        const utilisateur = await Utilisateur.findById(utilisateurId);
+        if (!utilisateur) return res.status(404).json({ error: 'Utilisateur non trouvé' });
 
-        if (utilisateurDoc.role !== 'student') {
+        if (utilisateur.role !== 'student') {
             return res.status(400).json({
                 error: "Seuls les étudiants peuvent s'inscrire à une formation.",
             });

@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const { body } = require('express-validator');
 const yup = require('yup');
 const { MessagesErreur, StatutHttp, Enums } = require('../../config/constants');
-const Joi = require('joi');
 
 // Validation de l'ID utilisateur
 function validateId(paramName, source = 'params') {

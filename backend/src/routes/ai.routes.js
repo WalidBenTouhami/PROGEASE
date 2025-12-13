@@ -147,14 +147,6 @@ router.get('/health', (req, res) => {
             service: 'ai-api',
             timestamp: new Date().toISOString(),
             model: 'deepseek-test',
-            features: [
-                'Smart Team Formation',
-                'Intelligent Tutor Matching',
-                'Predictive Performance Analytics',
-                'Automated Progress Tracking',
-                'Personalized Learning Resources',
-                'Automated Scheduling',
-            ],
         },
     });
 });

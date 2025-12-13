@@ -10,47 +10,31 @@ const {
 const forumController = require('../controllers/forum.controller');
 const { rateLimiter } = require('../middlewares/rateLimiter');
 
+// Apply rate limiting to forum routes
+router.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 100 }));
+
 // Routes pour les sujets
-router.get('/sujets', rateLimiter({ windowMs: 60000, max: 50 }), forumController.recupererSujets);
-router.get(
-    '/sujets/:sujetId',
-    rateLimiter({ windowMs: 60000, max: 50 }),
-    forumController.recupererSujetParId
-);
-router.post(
-    '/sujets',
-    rateLimiter({ windowMs: 60000, max: 20 }),
-    verifierToken,
-    validerCreationSujet,
-    forumController.creerSujet
-);
+router.get('/sujets', forumController.recupererSujets);
+router.get('/sujets/:sujetId', forumController.recupererSujetParId);
+router.post('/sujets', verifierToken, validerCreationSujet, forumController.creerSujet);
 router.put(
     '/sujets/:sujetId',
-    rateLimiter({ windowMs: 60000, max: 30 }),
     verifierToken,
     estAuteurSujet,
     validerCreationSujet,
     forumController.modifierSujet
 );
-router.delete(
-    '/sujets/:sujetId',
-    rateLimiter({ windowMs: 60000, max: 20 }),
-    verifierToken,
-    estAuteurSujet,
-    forumController.supprimerSujet
-);
+router.delete('/sujets/:sujetId', verifierToken, estAuteurSujet, forumController.supprimerSujet);
 
 // Routes pour les réponses
 router.post(
     '/sujets/:sujetId/reponses',
-    rateLimiter({ windowMs: 60000, max: 30 }),
     verifierToken,
     validerCreationReponse,
     forumController.ajouterReponse
 );
 router.put(
     '/sujets/:sujetId/reponses/:reponseId',
-    rateLimiter({ windowMs: 60000, max: 30 }),
     verifierToken,
     estAuteurReponse,
     validerCreationReponse,
@@ -58,22 +42,15 @@ router.put(
 );
 router.delete(
     '/sujets/:sujetId/reponses/:reponseId',
-    rateLimiter({ windowMs: 60000, max: 20 }),
     verifierToken,
     estAuteurReponse,
     forumController.supprimerReponse
 );
 
 // Routes pour les votes
-router.post(
-    '/sujets/:sujetId/vote',
-    rateLimiter({ windowMs: 60000, max: 50 }),
-    verifierToken,
-    forumController.voterSujet
-);
+router.post('/sujets/:sujetId/vote', verifierToken, forumController.voterSujet);
 router.post(
     '/sujets/:sujetId/reponses/:reponseId/vote',
-    rateLimiter({ windowMs: 60000, max: 50 }),
     verifierToken,
     forumController.voterReponse
 );
@@ -81,7 +58,6 @@ router.post(
 // Route pour marquer une réponse comme solution
 router.post(
     '/sujets/:sujetId/reponses/:reponseId/solution',
-    rateLimiter({ windowMs: 60000, max: 30 }),
     verifierToken,
     estAuteurSujet,
     forumController.marquerCommeSolution

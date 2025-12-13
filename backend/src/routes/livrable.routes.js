@@ -54,7 +54,6 @@ router.post(
  */
 router.get(
     '/projet/:projetId',
-    rateLimiter({ windowMs: 60000, max: 50 }),
     validateId('projetId'),
     asyncHandler(livrableController.findByProjet)
 );
@@ -64,12 +63,7 @@ router.get(
  * @description Recuperer un livrable par ID
  * @access Public
  */
-router.get(
-    '/:livrableId',
-    rateLimiter({ windowMs: 60000, max: 50 }),
-    validateId('livrableId'),
-    asyncHandler(livrableController.findOne)
-);
+router.get('/:livrableId', validateId('livrableId'), asyncHandler(livrableController.findOne));
 
 /**
  * @route PUT /api/livrables/:livrableId
@@ -91,7 +85,7 @@ router.put(
  */
 router.delete(
     '/:livrableId',
-    rateLimiter({ windowMs: 60000, max: 20 }),
+    rateLimiter({ windowMs: 60000, max: 10 }),
     validateId('livrableId'),
     asyncHandler(livrableController.delete)
 );

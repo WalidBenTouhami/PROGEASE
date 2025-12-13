@@ -298,7 +298,7 @@ async function generateLearningRecommendations(projet, evaluations) {
  */
 function calculatePriority(projet, evaluations) {
     const averageScore =
-        evaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / evaluations.length;
+        evaluations.reduce((sum, eval) => sum + eval.score, 0) / evaluations.length;
     if (averageScore < 10) return 'HAUTE';
     if (averageScore < 15) return 'MOYENNE';
     return 'BASSE';
@@ -693,6 +693,38 @@ async function recommanderApprentissage(competences) {
 
     return await traiterReponseIA(prompt);
 }
+
+// Mock AI service implementation
+const mockAIService = {
+    generateRecommendations: async projet => {
+        logger.debug('Generating mock recommendations for projet:', projet._id);
+        return {
+            text:
+                'Based on the projet progress and evaluations, here are some recommendations:\n' +
+                '1. Focus on improving code quality and documentation\n' +
+                '2. Consider implementing automated tests\n' +
+                '3. Regular code reviews would be beneficial',
+            score: 0.85,
+            confidence: 0.9,
+        };
+    },
+
+    generateLearningRecommendations: async projet => {
+        logger.debug('Generating mock learning recommendations for projet:', projet._id);
+        return (
+            'To improve your learning outcomes:\n' +
+            '1. Review the fundamentals of software architecture\n' +
+            '2. Practice test-driven development\n' +
+            '3. Study design patterns applicable to your projet'
+        );
+    },
+
+    predictPerformance: async projet => {
+        logger.debug('Predicting mock performance for projet:', projet._id);
+        // Return a score between 0 and 1
+        return 0.75;
+    },
+};
 
 // Export all functions
 module.exports = {

@@ -5,13 +5,11 @@ const { validateRequest } = require('../middlewares/validateRequest');
 const { evaluationSchema } = require('../validations/evaluation.validation');
 const { rateLimiter } = require('../middlewares/rateLimiter');
 
+// Apply rate limiting to evaluation routes
+router.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 100 }));
+
 // Routes
-router.post(
-    '/',
-    rateLimiter({ windowMs: 60000, max: 30 }),
-    validateRequest(evaluationSchema),
-    evaluationController.createEvaluation
-);
+router.post('/', validateRequest(evaluationSchema), evaluationController.createEvaluation);
 
 router.get('/', rateLimiter({ windowMs: 60000, max: 50 }), evaluationController.getEvaluations);
 router.get(
@@ -25,12 +23,7 @@ router.get(
     evaluationController.getEvaluationById
 );
 
-router.put(
-    '/:id',
-    rateLimiter({ windowMs: 60000, max: 30 }),
-    validateRequest(evaluationSchema),
-    evaluationController.updateEvaluation
-);
+router.put('/:id', validateRequest(evaluationSchema), evaluationController.updateEvaluation);
 
 router.delete(
     '/:id',

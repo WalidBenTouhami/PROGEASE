@@ -38,6 +38,11 @@ const createCertificat = async (req, res) => {
     try {
         const { utilisateurId, formationsRequises, titre, description, dureeValidite } = req.body;
 
+        // Validation pour eviter les injections NoSQL sur l'identifiant utilisateur
+        if (typeof utilisateurId !== "string") {
+            return res.status(400).json({ error: "Identifiant utilisateur invalide" });
+        }
+
         // Verifiez que l'utilisateur a reussi tous les quiz pour les formations requises
         const estEligible = await checkQuizReussis(utilisateurId, formationsRequises);
         if (!estEligible) {
@@ -118,10 +123,10 @@ const addutilisateurToFormation = async (req, res) => {
     const { utilisateurId } = req.body;
 
     try {
-        const utilisateurDoc = await Utilisateur.findById(utilisateurId);
-        if (!utilisateurDoc) return res.status(404).json({ error: 'Utilisateur non trouve' });
+        const utilisateur = await Utilisateur.findById(utilisateurId);
+        if (!utilisateur) return res.status(404).json({ error: 'Utilisateur non trouve' });
 
-        if (utilisateurDoc.role !== 'student') {
+        if (utilisateur.role !== 'student') {
             return res.status(400).json({
                 error: "Seuls les etudiants peuvent s'inscrire à une formation.",
             });

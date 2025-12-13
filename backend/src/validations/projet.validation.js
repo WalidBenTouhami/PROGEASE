@@ -1,5 +1,4 @@
 const yup = require('yup');
-const mongoose = require('mongoose');
 const { MessagesErreur, StatutHttp, Enums } = require('../../config/constants');
 const { AppError } = require('../middlewares/errorHandlers');
 const { ERROR_CODES } = require('../../config/constants');

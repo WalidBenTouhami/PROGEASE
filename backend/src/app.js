@@ -61,9 +61,9 @@ const creerApplication = async () => {
     // Middleware de base
     app.use(
         cors({
-            origin: config.cors.origine.split(',').map(o => o.trim()),
+            origin: config.cors.origine.split(','),
             credentials: true,
-            methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+            methods: config.cors.methodes,
             allowedHeaders: [
                 'Content-Type',
                 'Authorization',

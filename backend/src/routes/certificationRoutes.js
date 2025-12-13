@@ -9,8 +9,11 @@ const {
 } = require('../controllers/certificationController');
 const { genererCertificat } = require('../controllers/formationController');
 
+// Apply rate limiting to all certification routes
+router.use(rateLimiter({ windowMs: 15 * 60 * 1000, max: 50 }));
+
 // Route pour creer un certificat
-router.post('/', rateLimiter({ windowMs: 60000, max: 20 }), authMiddleware, createCertificat); // Ajoutez le middleware ici
+router.post('/', authMiddleware, createCertificat); // Ajoutez le middleware ici
 
 // Route pour generer un certificat
 router.post(
@@ -21,12 +24,7 @@ router.post(
 );
 
 // Verifier la validite du certificat
-router.get(
-    '/:certificatId/verifier',
-    rateLimiter({ windowMs: 60000, max: 30 }),
-    authMiddleware,
-    verifierValiditeCertificat
-);
+router.get('/:certificatId/verifier', authMiddleware, verifierValiditeCertificat);
 
 // Exporter le routeur
 module.exports = router;
