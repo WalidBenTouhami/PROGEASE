@@ -123,6 +123,16 @@ This document provides a comprehensive security audit of all dependencies in the
 - **Risk**: Low (not used in production)
 - **Recommendation**: Consider alternative API testing tools or accept risk for dev environment
 
+### Production Dependencies - Deprecated Packages
+
+#### Apollo Server Packages (Backend)
+- **@apollo/server@4.12.2**: Will reach end-of-life on January 26, 2026
+- **apollo-server-express@3.13.0**: EOL as of October 22, 2024
+- **@apollo/federation@0.38.1**: EOL as of September 22, 2023
+- **Impact**: No immediate security risk, but no future updates or security patches after EOL
+- **Recommendation**: Plan migration to @apollo/server v5 and modern Apollo Federation before EOL dates
+- **Action Required**: Migration should be completed by Q4 2025 to stay supported
+
 ### Production Dependencies - Unfixable in Current Major Version
 
 #### Angular 18.2.x XSS Vulnerabilities
@@ -197,6 +207,7 @@ This document provides a comprehensive security audit of all dependencies in the
     "@angular/platform-server": "^18.2.0" → "^18.2.14",
     "@angular/router": "^18.2.0" → "^18.2.14",
     "@angular/service-worker": "^18.2.0" → "^18.2.14",
+    "@angular/ssr": "^18.2.0" → "^18.2.21",  // Note: SSR has independent release cycle
     "@ngrx/effects": "^18.0.0" → "^18.1.1",
     "@ngrx/entity": "^18.0.0" → "^18.1.1",
     "@ngrx/store": "^18.0.0" → "^18.1.1",
@@ -241,6 +252,10 @@ This document provides a comprehensive security audit of all dependencies in the
 - ✅ GitHub Advisory Database checked for specific vulnerabilities
 - ✅ Version compatibility verified
 - ✅ Dependencies installed successfully
+
+### Version Notes
+- **@angular/ssr**: Updated to 18.2.21 (latest) while other Angular packages are at 18.2.14. This is intentional as @angular/ssr has an independent release cycle and 18.2.21 is fully compatible with Angular 18.2.14.
+- **Peer dependencies**: All packages installed with `--legacy-peer-deps` flag due to peer dependency conflicts in Angular ecosystem.
 
 ### Recommended Testing
 - [ ] Backend unit tests

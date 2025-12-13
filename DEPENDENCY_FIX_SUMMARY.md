@@ -163,6 +163,7 @@ npm audit --production
    
 3. **frontend/package.json**
    - Updated Angular packages to 18.2.14
+   - Updated @angular/ssr to 18.2.21 (independent release cycle)
    - Updated @ngrx packages to 18.1.1
    - Updated apollo-angular to 7.2.1
    
@@ -233,10 +234,11 @@ Note: `--legacy-peer-deps` is required due to peer dependency conflicts in Angul
 
 ### Short-term (1-2 Months)
 1. Plan Angular upgrade to 19.2.16+ or 21.0.2+
-2. Migrate from apollo-server-express (EOL) to @apollo/server v5
-3. Review and update deprecated API usage
-4. Implement comprehensive Content Security Policy (CSP)
-5. Consider replacing xss-clean middleware (deprecated)
+2. Migrate from apollo-server-express (EOL) to @apollo/server v5 (target: Q4 2025)
+3. Upgrade @apollo/federation from v0.38.1 (EOL) to modern Federation
+4. Review and update deprecated API usage
+5. Implement comprehensive Content Security Policy (CSP)
+6. Consider replacing xss-clean middleware (deprecated)
 
 ### Long-term (Ongoing)
 1. Establish weekly dependency audit schedule
