@@ -25,10 +25,23 @@
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
 [![Maintained](https://img.shields.io/badge/Maintained-Yes-green.svg)](https://github.com/WalidBenTouhami/PROGEASE/graphs/commit-activity)
+[![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![Linter: ESLint](https://img.shields.io/badge/linter-eslint-4B32C3.svg)](https://eslint.org/)
 
 </div>
 
 ---
+
+## 📊 Aperçu des Badges
+
+Les badges ci-dessus démontrent l'engagement du projet envers la qualité, la sécurité et les meilleures pratiques :
+
+- **🔄 CI/CD** : Intégration et déploiement continus avec tests automatisés
+- **🔒 Sécurité** : Multiples couches de protection (Helmet, Rate Limiting, XSS, Input Validation)
+- **📦 Technologies** : Stack moderne et maintenu (Angular 18, Node.js, GraphQL)
+- **✅ Qualité du Code** : Linting (ESLint) et formatage automatique (Prettier)
+- **🛡️ Analyse** : Scan de sécurité automatique avec CodeQL
+- **📝 Licence** : Open source sous licence MIT
 
 ## Fonctionnalités
 
