@@ -1,9 +1,10 @@
 const Formation = require("../Formation");
 const Certificat = require("../Certification");
-const utilisateur = require("../models/utilisateur"); 
+const Utilisateur = require("../models/utilisateur"); 
 const QuizResult = require("../QuizResult");
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
+const logger = require("../utils/logger");
 
 
 
@@ -31,7 +32,7 @@ const checkQuizReussis = async (utilisateurId, formationsRequises) => {
 
     return true;
   } catch (error) {
-    console.error("Erreur lors de la verification des quiz:", error);
+    logger.error("Erreur lors de la verification des quiz:", error);
     return false;
   }
 };
@@ -40,7 +41,7 @@ const checkQuizReussis = async (utilisateurId, formationsRequises) => {
 const createFormation = async (req, res) => {
   try {
     const { utilisateurId, formationsRequises, titre, description, dureeValidite } = req.body;
-    console.log("Corps de la requête :", req.body); // Ajoute cette ligne pour voir les donnees envoyees
+    logger.info("Corps de la requête :", req.body); // Ajoute cette ligne pour voir les donnees envoyees
 
     // Verifie que l'utilisateur a reussi tous les quiz pour les formations requises
     const estEligible = await checkQuizReussis(utilisateurId, formationsRequises);
@@ -62,7 +63,7 @@ const createFormation = async (req, res) => {
       certificat: nouveauCertificat,
     });
   } catch (error) {
-    console.error("Erreur serveur detaillee :", error);  // Affiche l'erreur detaillee ici
+    logger.error("Erreur serveur detaillee :", error);  // Affiche l'erreur detaillee ici
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
@@ -76,7 +77,7 @@ const createFormation = async (req, res) => {
       formation: nouvelleFormation
     });
   } catch (error) {
-    console.error("Erreur creation formation :", error);
+    logger.error("Erreur creation formation :", error);
     res.status(500).json({ error: "Erreur serveur lors de la creation de la formation" });
   }
 };
@@ -89,7 +90,7 @@ const getAllFormations = async (req, res) => {
     res.status(200).json(formations);
   } catch (error) {
     // Loggez l'erreur pour plus de details
-    console.error("Erreur serveur lors de la recuperation des formations:", error);
+    logger.error("Erreur serveur lors de la recuperation des formations:", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
@@ -99,10 +100,10 @@ const addutilisateurToFormation = async (req, res) => {
   const { utilisateurId } = req.body;
 
   try {
-    const utilisateur = await utilisateur.findById(utilisateurId);  
-    if (!utilisateur) return res.status(404).json({ error: "Utilisateur non trouve" });
+    const utilisateurDoc = await Utilisateur.findById(utilisateurId);  
+    if (!utilisateurDoc) return res.status(404).json({ error: "Utilisateur non trouve" });
 
-    if (utilisateur.role !== "student") {
+    if (utilisateurDoc.role !== "student") {
       return res.status(400).json({
         error: "Seuls les etudiants peuvent s'inscrire à une formation.",
       });
@@ -136,10 +137,10 @@ const addutilisateurToFormation = async (req, res) => {
   }
 
   try {
-    const utilisateur = await utilisateur.findById(utilisateurId);
-    if (!utilisateur) return res.status(404).json({ error: "Utilisateur non trouvé" });
+    const utilisateurDoc = await Utilisateur.findById(utilisateurId);
+    if (!utilisateurDoc) return res.status(404).json({ error: "Utilisateur non trouvé" });
 
-    if (utilisateur.role !== "student") {
+    if (utilisateurDoc.role !== "student") {
       return res.status(400).json({
         error: "Seuls les étudiants peuvent s'inscrire à une formation.",
       });
@@ -163,7 +164,7 @@ await Formation.updateOne(
 );
     res.status(200).json({ message: "Utilisateur inscrit avec succès", formation });
   } catch (error) {
-    console.error("Erreur serveur:", error);
+    logger.error("Erreur serveur:", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
@@ -206,7 +207,7 @@ const genererCertificat = async (req, res) => {
   const { formationsRequises, titre, description, dureeValidite } = req.body;
 
   try {
-    console.log("Donnees de la requête : ", {
+    logger.info("Donnees de la requête : ", {
       utilisateurId,
       formationsRequises,
       titre,
@@ -253,7 +254,7 @@ const genererCertificat = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Erreur serveur : ", error);
+    logger.error("Erreur serveur : ", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
@@ -270,7 +271,7 @@ const getFormationById = async (req, res) => {
 
     res.status(200).json(formation);
   } catch (error) {
-    console.error("Erreur lors de la récupération de la formation :", error);
+    logger.error("Erreur lors de la récupération de la formation :", error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
