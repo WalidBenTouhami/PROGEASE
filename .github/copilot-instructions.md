@@ -6,13 +6,13 @@ PROGEASE is a project management platform with AI-powered features, built using 
 
 ### Architecture
 - **Backend**: Node.js/Express with GraphQL (Apollo Server) and REST APIs, MongoDB database
-- **Frontend**: Angular 17 with Material Design, Apollo Client for GraphQL, NgRx for state management
-- **Monorepo Structure**: Root package.json with separate backend/ and frontend/ directories
+- **Frontend**: Angular with Material Design, Apollo Client for GraphQL, NgRx for state management
+- **Monorepo Structure**: Root package.json with separate backend/ and frontend/ directories, each with their own dependencies and package.json files
 
 ## Technology Stack
 
 ### Backend
-- **Framework**: Express.js 4.18.2
+- **Framework**: Express.js ^4.18.2
 - **API**: GraphQL (Apollo Server) + REST endpoints
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: JWT tokens with bcryptjs
@@ -21,7 +21,7 @@ PROGEASE is a project management platform with AI-powered features, built using 
 - **Security**: Helmet, express-rate-limit, express-mongo-sanitize, xss-clean, hpp
 
 ### Frontend
-- **Framework**: Angular 17 with standalone components
+- **Framework**: Angular ^17.3.0 with standalone components
 - **UI Library**: Angular Material
 - **State Management**: NgRx (Store, Effects, Entity)
 - **GraphQL Client**: Apollo Angular
