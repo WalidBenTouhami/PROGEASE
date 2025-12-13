@@ -5,6 +5,9 @@ const logger = require('../utils/logger');
  * Service de planification automatisée et de rappels
  */
 
+// Constants
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
 /**
  * Génère des rappels automatiques pour les échéances de projet
  * @param {Object} projet - Objet projet avec dates et livrables
@@ -22,7 +25,7 @@ async function genererRappels(projet) {
         // Rappels pour la date de fin du projet
         if (projet.dateFin) {
             const dateFin = new Date(projet.dateFin);
-            const joursRestants = Math.ceil((dateFin - maintenant) / (1000 * 60 * 60 * 24));
+            const joursRestants = Math.ceil((dateFin - maintenant) / MS_PER_DAY);
 
             if (joursRestants > 0 && joursRestants <= 7) {
                 rappels.push({
@@ -30,7 +33,7 @@ async function genererRappels(projet) {
                     titre: `Échéance proche: ${projet.titre}`,
                     message: `Le projet "${projet.titre}" se termine dans ${joursRestants} jour(s)`,
                     priorite: joursRestants <= 3 ? 'HAUTE' : 'MOYENNE',
-                    dateRappel: new Date(dateFin.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 jours avant
+                    dateRappel: new Date(dateFin.getTime() - 3 * MS_PER_DAY), // 3 jours avant
                     destinataires: projet.equipe || []
                 });
             }
@@ -41,7 +44,7 @@ async function genererRappels(projet) {
             for (const livrable of projet.livrables) {
                 if (livrable.dateLimite && livrable.statut !== 'TERMINE') {
                     const dateLimite = new Date(livrable.dateLimite);
-                    const joursRestants = Math.ceil((dateLimite - maintenant) / (1000 * 60 * 60 * 24));
+                    const joursRestants = Math.ceil((dateLimite - maintenant) / MS_PER_DAY);
 
                     if (joursRestants > 0 && joursRestants <= 5) {
                         rappels.push({
@@ -49,7 +52,7 @@ async function genererRappels(projet) {
                             titre: `Livrable à rendre: ${livrable.intitule}`,
                             message: `Le livrable "${livrable.intitule}" doit être rendu dans ${joursRestants} jour(s)`,
                             priorite: joursRestants <= 2 ? 'URGENTE' : 'HAUTE',
-                            dateRappel: new Date(dateLimite.getTime() - 2 * 24 * 60 * 60 * 1000), // 2 jours avant
+                            dateRappel: new Date(dateLimite.getTime() - 2 * MS_PER_DAY), // 2 jours avant
                             destinataires: projet.equipe || [],
                             livrableId: livrable._id
                         });
@@ -63,7 +66,7 @@ async function genererRappels(projet) {
             for (const tache of projet.taches) {
                 if (tache.dateFin && tache.statut !== 'TERMINEE') {
                     const dateFin = new Date(tache.dateFin);
-                    const joursRestants = Math.ceil((dateFin - maintenant) / (1000 * 60 * 60 * 24));
+                    const joursRestants = Math.ceil((dateFin - maintenant) / MS_PER_DAY);
 
                     if (joursRestants > 0 && joursRestants <= 3) {
                         rappels.push({
@@ -71,7 +74,7 @@ async function genererRappels(projet) {
                             titre: `Tâche à terminer: ${tache.titre}`,
                             message: `La tâche "${tache.titre}" doit être terminée dans ${joursRestants} jour(s)`,
                             priorite: joursRestants <= 1 ? 'URGENTE' : 'MOYENNE',
-                            dateRappel: new Date(dateFin.getTime() - 1 * 24 * 60 * 60 * 1000), // 1 jour avant
+                            dateRappel: new Date(dateFin.getTime() - 1 * MS_PER_DAY), // 1 jour avant
                             destinataires: tache.assigneA ? [tache.assigneA] : projet.equipe || [],
                             tacheId: tache._id
                         });
@@ -148,7 +151,7 @@ async function planifierEvenements(params) {
         }
 
         // Ajouter des événements clés
-        const dureeProjet = Math.ceil((dateFin - dateDebut) / (1000 * 60 * 60 * 24));
+        const dureeProjet = Math.ceil((dateFin - dateDebut) / MS_PER_DAY);
         
         // Revue de mi-parcours
         if (dureeProjet >= 14) {
@@ -168,7 +171,7 @@ async function planifierEvenements(params) {
         }
 
         // Soutenance finale
-        const dateSoutenance = new Date(dateFin.getTime() - 3 * 24 * 60 * 60 * 1000); // 3 jours avant la fin
+        const dateSoutenance = new Date(dateFin.getTime() - 3 * MS_PER_DAY); // 3 jours avant la fin
         evenements.push({
             type: 'SOUTENANCE',
             titre: `Soutenance finale - ${projet.titre}`,
