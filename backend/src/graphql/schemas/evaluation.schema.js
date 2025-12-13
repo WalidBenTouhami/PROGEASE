@@ -1,27 +1,12 @@
-/**
- * Schéma GraphQL pour les évaluations
- *
- * @module graphql/schemas/evaluation
- * @created 2024-12-13
- */
-
-'use strict';
-
 const { gql } = require('apollo-server-express');
 
 const typeDefs = gql`
-    """
-    Critère d'évaluation
-    """
     type Critere {
         nom: String!
         note: Float!
         poids: Float!
     }
 
-    """
-    Type Evaluation
-    """
     type Evaluation {
         id: ID!
         projet: Projet!
@@ -34,9 +19,6 @@ const typeDefs = gql`
         majLe: DateTime!
     }
 
-    """
-    Statistiques d'évaluation pour un projet
-    """
     type EvaluationStats {
         moyenneScore: Float!
         scoreMax: Float!
@@ -44,28 +26,19 @@ const typeDefs = gql`
         totalEvaluations: Int!
     }
 
-    """
-    Input pour un critère d'évaluation
-    """
     input CritereInput {
         nom: String!
         note: Float!
         poids: Float!
     }
 
-    """
-    Input pour la création d'une évaluation
-    """
     input EvaluationInput {
         projetId: ID!
         note: Float!
         commentaire: String
-        criteres: [CritereInput!]
+        criteres: [CritereInput!]!
     }
 
-    """
-    Input pour la mise à jour d'une évaluation
-    """
     input EvaluationUpdateInput {
         note: Float
         commentaire: String
@@ -73,38 +46,16 @@ const typeDefs = gql`
     }
 
     extend type Query {
-        """
-        Récupère une évaluation par son ID
-        """
-        evaluation(id: ID!): Evaluation
-
-        """
-        Récupère toutes les évaluations, optionnellement filtrées par projet
-        """
         evaluations(projetId: ID): [Evaluation!]!
-
-        """
-        Récupère les statistiques d'évaluation pour un projet
-        """
+        evaluation(id: ID!): Evaluation
         getEvaluationStats(projetId: ID!): EvaluationStats!
     }
 
     extend type Mutation {
-        """
-        Crée une nouvelle évaluation
-        """
         creerEvaluation(input: EvaluationInput!): Evaluation!
-
-        """
-        Met à jour une évaluation
-        """
         mettreAJourEvaluation(id: ID!, input: EvaluationUpdateInput!): Evaluation!
-
-        """
-        Supprime une évaluation
-        """
         supprimerEvaluation(id: ID!): Boolean!
     }
 `;
 
-module.exports = typeDefs;
+module.exports = typeDefs; 
