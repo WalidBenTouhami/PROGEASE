@@ -102,7 +102,8 @@ npm install
 cd backend && npm install
 
 # Installation des dépendances frontend
-cd ../frontend && npm install --legacy-peer-deps
+# Note: --legacy-peer-deps est configuré dans frontend/.npmrc mais peut être spécifié explicitement
+cd ../frontend && npm install
 ```
 
 ### Configuration de l'environnement

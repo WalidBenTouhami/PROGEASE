@@ -229,7 +229,8 @@ def main():
     
     # Install frontend dependencies
     if not args.backend_only:
-        # Frontend needs --legacy-peer-deps flag
+        # Frontend needs --legacy-peer-deps flag due to apollo-cache-inmemory peer dependency conflicts
+        # Note: This is also configured in frontend/.npmrc but we pass it explicitly for clarity
         if not run_npm_install(str(frontend_dir), "Frontend", use_legacy_peer_deps=True):
             success = False
     
