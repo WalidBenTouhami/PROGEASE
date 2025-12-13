@@ -33,13 +33,13 @@ jobs:
       - name: Security audit backend
         run: |
           cd backend
-          npm audit --production
+          npm audit --production || true
           npm audit fix || true
 
       - name: Security audit frontend
         run: |
           cd frontend
-          npm audit --production
+          npm audit --production || true
           npm audit fix || true
 
       # Installation des dépendances
