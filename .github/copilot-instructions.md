@@ -236,11 +236,11 @@ cd frontend && npm run lint
 
 - **Node.js**: 
   - Backend: >=18.0.0 (LTS compatible)
-  - Frontend: >=20.0.0 (required for Angular 17 features)
+  - Frontend: >=20.0.0 (required for Angular 17.3+ features and optimal performance)
 - **npm**: >=10.0.0
 - **MongoDB**: 5.0+
 
-**Note**: The different Node.js versions reflect the specific requirements of each stack. The backend uses Node 18+ for stability, while the frontend requires Node 20+ for optimal Angular 17 performance and features.
+**Note**: The different Node.js versions reflect the specific requirements of each stack. The backend uses Node 18+ for stability, while the frontend requires Node 20+ for optimal Angular 17.3 performance and modern ECMAScript features.
 
 ## Additional Notes
 
