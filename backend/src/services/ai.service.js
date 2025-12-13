@@ -298,7 +298,7 @@ async function generateLearningRecommendations(projet, evaluations) {
  */
 function calculatePriority(projet, evaluations) {
     const averageScore =
-        evaluations.reduce((sum, eval) => sum + eval.score, 0) / evaluations.length;
+        evaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / evaluations.length;
     if (averageScore < 10) return 'HAUTE';
     if (averageScore < 15) return 'MOYENNE';
     return 'BASSE';

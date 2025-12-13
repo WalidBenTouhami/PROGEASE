@@ -42,7 +42,7 @@ const createEvaluation = async (req, res) => {
         // Update projet's average score
         const projetEvaluations = await Evaluation.find({ projetId });
         const averageScore =
-            projetEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projetEvaluations.length;
+            projetEvaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / projetEvaluations.length;
         await Projet.findByIdAndUpdate(projetId, { averageScore });
 
         res.status(201).json(evaluation);
@@ -162,7 +162,7 @@ const updateEvaluation = async (req, res) => {
         // Update projet's average score
         const projetEvaluations = await Evaluation.find({ projetId: evaluation.projetId });
         const averageScore =
-            projetEvaluations.reduce((sum, eval) => sum + eval.score, 0) / projetEvaluations.length;
+            projetEvaluations.reduce((sum, evaluation) => sum + evaluation.score, 0) / projetEvaluations.length;
         await Projet.findByIdAndUpdate(evaluation.projetId, { averageScore });
 
         res.json(evaluation);
@@ -185,7 +185,7 @@ const deleteEvaluation = async (req, res) => {
         const projetEvaluations = await Evaluation.find({ projetId: evaluation.projetId });
         const averageScore =
             projetEvaluations.length > 0
-                ? projetEvaluations.reduce((sum, eval) => sum + eval.score, 0) /
+                ? projetEvaluations.reduce((sum, evalItem) => sum + evalItem.score, 0) /
                   projetEvaluations.length
                 : 0;
         await Projet.findByIdAndUpdate(evaluation.projetId, { averageScore });
