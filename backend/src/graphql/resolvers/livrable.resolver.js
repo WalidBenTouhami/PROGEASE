@@ -116,7 +116,7 @@ const Mutation = {
     /**
      * Créer un nouveau livrable
      */
-    creerLivrable: catchAsync(async (_, { input }, { utilisateur }) => {
+    creerLivrable: catchAsync(async (_parent, { input }, { utilisateur }) => {
         if (!utilisateur) {
             throw new AuthenticationError('Non authentifié');
         }

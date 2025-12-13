@@ -7,16 +7,8 @@
 
 'use strict';
 
-const mongoose = require('mongoose');
 const Projet = require('../../models/projet.model');
 const logger = require('../../utils/logger');
-const { AppError, ERROR_CODES } = require('../../middlewares/errorHandlers');
-const { validateInput } = require('../../utils/validators');
-const { handleMongooseError } = require('../../utils/errorUtils');
-const { Enum } = require('../../../config/constants');
-const { checkAuthorization } = require('../../utils/auth.utils');
-const Livrable = require('../../models/livrable.model');
-const Evaluation = require('../../models/evaluation.model');
 const { AuthenticationError, UserInputError } = require('apollo-server-express');
 const { catchAsync } = require('../../utils/catchAsync');
 const { validerProjet } = require('../../validations/projet.validation');

@@ -7,12 +7,8 @@
 
 'use strict';
 
-const mongoose = require('mongoose');
 const logger = require('../../utils/logger');
 const aiService = require('../../services/ai.service');
-const Projet = require('../../models/projet.model');
-const { AppError, ERROR_CODES } = require('../../middlewares/errorHandlers');
-const { checkAuthorization } = require('../../utils/auth.utils');
 
 // Implementation temporaire des methodes manquantes du service
 const mockAIService = {
@@ -39,7 +35,7 @@ const mockAIService = {
 const aiServiceToUse = aiService || mockAIService;
 
 const Query = {
-    aiRecommendations: async (_, { projetId }, { models }) => {
+    aiRecommendations: async (_parent, _args, _context) => {
         try {
             // Logique pour générer des recommandations AI
             return {
@@ -58,7 +54,7 @@ const Query = {
         }
     },
 
-    analyserRisquesProjet: async (_, { projetId }, { models }) => {
+    analyserRisquesProjet: async (_parent, _args, _context) => {
         try {
             // Logique pour analyser les risques
             return {
@@ -80,7 +76,7 @@ const Query = {
 };
 
 const Mutation = {
-    predictPerformance: async (_, { projetId }, { models }) => {
+    predictPerformance: async (_parent, _args, _context) => {
         try {
             // Logique pour prédire la performance
             return 0.85;
@@ -90,7 +86,7 @@ const Mutation = {
         }
     },
 
-    generateLearningRecommendations: async (_, { projetId }, { models }) => {
+    generateLearningRecommendations: async (_parent, _args, _context) => {
         try {
             // Logique pour générer des recommandations d'apprentissage
             return 'Recommandations d\'apprentissage générées...';

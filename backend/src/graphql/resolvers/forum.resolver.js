@@ -56,7 +56,7 @@ const Query = {
     /**
      * Récupère tous les sujets avec pagination et filtres
      */
-    sujets: async (_, { input = {} }, context) => {
+    sujets: async (_parent, { input = {} }, _context) => {
         try {
             const {
                 page = 1,
