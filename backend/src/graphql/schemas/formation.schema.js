@@ -38,7 +38,7 @@ const typeDefs = gql`
         dernierAcces: DateTime
     }
 
-    type Evaluation {
+    type AvisFormation {
         utilisateur: Utilisateur!
         note: Int!
         commentaire: String
@@ -59,7 +59,7 @@ const typeDefs = gql`
         modules: [Module!]!
         formateur: Utilisateur!
         participants: [Participant!]!
-        evaluations: [Evaluation!]!
+        evaluations: [AvisFormation!]!
         noteMoyenne: Float!
         nombreParticipants: Int!
         estPublie: Boolean!

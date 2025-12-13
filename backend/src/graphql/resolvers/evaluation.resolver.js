@@ -7,9 +7,12 @@
 
 'use strict';
 
+const mongoose = require('mongoose');
 const Evaluation = require('../../models/evaluation.model');
 const logger = require('../../utils/logger');
-const { mapProjetMongoVersGraphQL } = require('./projet.resolver');
+const { checkAuthorization } = require('../../utils/auth.utils');
+const { AppError } = require('../../middlewares/errorHandlers');
+const { ERROR_CODES } = require('../../config/constants');
 
 /**
  * Transforme un document MongoDB Evaluation en type GraphQL
@@ -91,11 +94,11 @@ const Query = {
                 };
             }
 
-            const scores = evaluations.map(e => e.score);
-            const totalEvaluations = scores.length;
-            const moyenneScore = scores.reduce((a, b) => a + b, 0) / totalEvaluations;
-            const scoreMax = Math.max(...scores);
-            const scoreMin = Math.min(...scores);
+            const notes = evaluations.map(e => e.note);
+            const totalEvaluations = notes.length;
+            const moyenneScore = notes.reduce((a, b) => a + b, 0) / totalEvaluations;
+            const scoreMax = Math.max(...notes);
+            const scoreMin = Math.min(...notes);
 
             return {
                 moyenneScore,
@@ -161,7 +164,7 @@ const Mutation = {
         try {
             const evaluation = await Evaluation.findByIdAndDelete(id);
             if (!evaluation) throw new Error('Evaluation not found');
-            return mapEvaluationMongoVersGraphQL(evaluation);
+            return true;
         } catch (error) {
             logger.error('Error deleting evaluation:', error);
             throw new Error('Failed to delete evaluation');
@@ -198,6 +201,5 @@ const EvaluationResolver = {
 module.exports = {
     Query,
     Mutation,
-    EvaluationResolver,
-    mapEvaluationMongoVersGraphQL,
+    Evaluation: EvaluationResolver,
 };
