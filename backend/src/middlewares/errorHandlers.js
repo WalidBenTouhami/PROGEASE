@@ -89,16 +89,16 @@ const setupHttpErrorHandlers = (server, port) => {
         const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
 
         switch (error.code) {
-            case 'EACCES':
-                logger.error(`${bind} requires elevated privileges`);
-                process.exit(1);
-                break;
-            case 'EADDRINUSE':
-                logger.error(`${bind} is already in use`);
-                process.exit(1);
-                break;
-            default:
-                throw error;
+        case 'EACCES':
+            logger.error(`${bind} requires elevated privileges`);
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            logger.error(`${bind} is already in use`);
+            process.exit(1);
+            break;
+        default:
+            throw error;
         }
     });
 };

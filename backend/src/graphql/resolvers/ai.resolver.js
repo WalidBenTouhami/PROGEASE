@@ -7,12 +7,8 @@
 
 'use strict';
 
-const mongoose = require('mongoose');
 const logger = require('../../utils/logger');
 const aiService = require('../../services/ai.service');
-const Projet = require('../../models/projet.model');
-const { AppError, ERROR_CODES } = require('../../middlewares/errorHandlers');
-const { checkAuthorization } = require('../../utils/auth.utils');
 
 // Implementation temporaire des methodes manquantes du service
 const mockAIService = {
@@ -39,11 +35,11 @@ const mockAIService = {
 const aiServiceToUse = aiService || mockAIService;
 
 const Query = {
-    aiRecommendations: async (_, { projetId }, { models }) => {
+    aiRecommendations: async (_parent, _args, _context) => {
         try {
             // Logique pour générer des recommandations AI
             return {
-                recommendations: "Recommandations générées par l'IA...",
+                recommendations: 'Recommandations générées par l\'IA...',
                 score: 0.85,
                 confidence: 0.9,
                 metadata: {
@@ -58,7 +54,7 @@ const Query = {
         }
     },
 
-    analyserRisquesProjet: async (_, { projetId }, { models }) => {
+    analyserRisquesProjet: async (_parent, _args, _context) => {
         try {
             // Logique pour analyser les risques
             return {
@@ -73,14 +69,14 @@ const Query = {
                 ],
             };
         } catch (error) {
-            logger.error("Erreur lors de l'analyse des risques:", error);
-            throw new Error("Impossible d'analyser les risques du projet");
+            logger.error('Erreur lors de l\'analyse des risques:', error);
+            throw new Error('Impossible d\'analyser les risques du projet');
         }
     },
 };
 
 const Mutation = {
-    predictPerformance: async (_, { projetId }, { models }) => {
+    predictPerformance: async (_parent, _args, _context) => {
         try {
             // Logique pour prédire la performance
             return 0.85;
@@ -90,10 +86,10 @@ const Mutation = {
         }
     },
 
-    generateLearningRecommendations: async (_, { projetId }, { models }) => {
+    generateLearningRecommendations: async (_parent, _args, _context) => {
         try {
             // Logique pour générer des recommandations d'apprentissage
-            return "Recommandations d'apprentissage générées...";
+            return 'Recommandations d\'apprentissage générées...';
         } catch (error) {
             logger.error('Erreur lors de la génération des recommandations:', error);
             throw new Error('Impossible de générer les recommandations');

@@ -133,7 +133,7 @@ const verifierAcces = async (req, res, next) => {
         req.quiz = quiz;
         next();
     } catch (error) {
-        logger.error("Erreur lors de la vérification de l'accès:", error);
+        logger.error('Erreur lors de la vérification de l\'accès:', error);
         next(error);
     }
 };

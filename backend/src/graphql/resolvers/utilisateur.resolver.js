@@ -57,12 +57,12 @@ const resolvers = {
 
                 const utilisateur = await Utilisateur.findById(id).select('-motDePasse');
                 if (!utilisateur) {
-                    throw new AppError('Utilisateur non trouvé', ERROR_CODES.NOT_FOUND);
+                    throw new UserInputError('Utilisateur non trouvé');
                 }
 
                 return mapUtilisateurMongoVersGraphQL(utilisateur);
             } catch (error) {
-                logger.error("Erreur lors de la récupération de l'utilisateur:", error);
+                logger.error('Erreur lors de la récupération de l\'utilisateur:', error);
                 throw handleMongooseError(error);
             }
         },

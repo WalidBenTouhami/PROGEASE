@@ -22,7 +22,7 @@ const mongoose = require('mongoose');
                     process.exit(0);
                 });
             } catch (error) {
-                logger.error("Erreur lors de l'arrêt du serveur:", error);
+                logger.error('Erreur lors de l\'arrêt du serveur:', error);
                 process.exit(1);
             }
         };
@@ -47,7 +47,7 @@ const mongoose = require('mongoose');
             process.exit(1);
         });
     } catch (error) {
-        logger.error("Erreur lors du démarrage de l'application:", error);
+        logger.error('Erreur lors du démarrage de l\'application:', error);
         process.exit(1);
     }
 })();

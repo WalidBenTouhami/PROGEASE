@@ -38,11 +38,11 @@ const questionSchema = yup.object().shape({
             is: 'QCM',
             then: yup
                 .number()
-                .required("L'index de la réponse correcte est requis.")
-                .min(0, "L'index de la réponse correcte doit être positif.")
+                .required('L\'index de la réponse correcte est requis.')
+                .min(0, 'L\'index de la réponse correcte doit être positif.')
                 .test(
                     'valid-option',
-                    "L'index de la réponse correcte doit correspondre à une option existante.",
+                    'L\'index de la réponse correcte doit correspondre à une option existante.',
                     function (value) {
                         return value < this.parent.options.length;
                     }
@@ -69,7 +69,7 @@ const questionSchema = yup.object().shape({
         .max(10, 'Le nombre de points ne peut pas dépasser 10.')
         .default(1),
 
-    explication: yup.string().max(500, "L'explication ne peut pas dépasser 500 caractères."),
+    explication: yup.string().max(500, 'L\'explication ne peut pas dépasser 500 caractères.'),
 });
 
 // Schéma de validation pour la création d'un quiz
@@ -102,7 +102,7 @@ const creationQuizSchema = yup.object().shape({
     duree: yup
         .number()
         .required('La durée du quiz est requise.')
-        .min(5, "La durée doit être d'au moins 5 minutes.")
+        .min(5, 'La durée doit être d\'au moins 5 minutes.')
         .max(180, 'La durée ne peut pas dépasser 180 minutes.'),
 
     questions: yup
@@ -114,8 +114,8 @@ const creationQuizSchema = yup.object().shape({
 
     auteur: yup
         .string()
-        .required("L'auteur du quiz est requis.")
-        .test('is-mongodb-id', "L'ID de l'auteur est invalide.", value =>
+        .required('L\'auteur du quiz est requis.')
+        .test('is-mongodb-id', 'L\'ID de l\'auteur est invalide.', value =>
             mongoose.Types.ObjectId.isValid(value)
         ),
 
@@ -157,7 +157,7 @@ const miseAJourQuizSchema = yup.object().shape({
 
     duree: yup
         .number()
-        .min(5, "La durée doit être d'au moins 5 minutes.")
+        .min(5, 'La durée doit être d\'au moins 5 minutes.')
         .max(180, 'La durée ne peut pas dépasser 180 minutes.'),
 
     questions: yup
@@ -183,15 +183,15 @@ const miseAJourQuizSchema = yup.object().shape({
 const soumissionReponsesSchema = yup.object().shape({
     quizId: yup
         .string()
-        .required("L'ID du quiz est requis.")
-        .test('is-mongodb-id', "L'ID du quiz est invalide.", value =>
+        .required('L\'ID du quiz est requis.')
+        .test('is-mongodb-id', 'L\'ID du quiz est invalide.', value =>
             mongoose.Types.ObjectId.isValid(value)
         ),
 
     utilisateurId: yup
         .string()
-        .required("L'ID de l'utilisateur est requis.")
-        .test('is-mongodb-id', "L'ID de l'utilisateur est invalide.", value =>
+        .required('L\'ID de l\'utilisateur est requis.')
+        .test('is-mongodb-id', 'L\'ID de l\'utilisateur est invalide.', value =>
             mongoose.Types.ObjectId.isValid(value)
         ),
 

@@ -56,17 +56,17 @@ async function recupererFormations(options = {}) {
         const skip = (page - 1) * limite;
         let sort = {};
         switch (tri) {
-            case 'recent':
-                sort = { creeLe: -1 };
-                break;
-            case 'populaire':
-                -1;
-                break;
-            case 'note':
-                sort = { noteMoyenne: -1 };
-                break;
-            default:
-                sort = { creeLe: -1 };
+        case 'recent':
+            sort = { creeLe: -1 };
+            break;
+        case 'populaire':
+            sort = { nombreParticipations: -1 };
+            break;
+        case 'note':
+            sort = { noteMoyenne: -1 };
+            break;
+        default:
+            sort = { creeLe: -1 };
         }
 
         const [formations, total] = await Promise.all([

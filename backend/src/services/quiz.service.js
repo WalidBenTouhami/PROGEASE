@@ -56,17 +56,17 @@ async function recupererQuiz(options = {}) {
         const skip = (page - 1) * limite;
         let sort = {};
         switch (tri) {
-            case 'recent':
-                sort = { creeLe: -1 };
-                break;
-            case 'populaire':
-                sort = { nombreParticipations: -1 };
-                break;
-            case 'difficulte':
-                sort = { niveau: 1 };
-                break;
-            default:
-                sort = { creeLe: -1 };
+        case 'recent':
+            sort = { creeLe: -1 };
+            break;
+        case 'populaire':
+            sort = { nombreParticipations: -1 };
+            break;
+        case 'difficulte':
+            sort = { niveau: 1 };
+            break;
+        default:
+            sort = { creeLe: -1 };
         }
 
         const [quiz, total] = await Promise.all([
@@ -266,7 +266,7 @@ async function recupererStatistiques(id) {
                 tauxReussite:
                     nombreParticipations > 0
                         ? (participations.filter(p => p.resultatsDetailles[index].estCorrecte)
-                              .length /
+                            .length /
                               nombreParticipations) *
                           100
                         : 0,

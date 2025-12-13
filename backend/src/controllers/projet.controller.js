@@ -273,10 +273,10 @@ exports.analyserRisques = async (req, res) => {
             },
         });
     } catch (error) {
-        logger.error("Erreur lors de l'analyse des risques:", error);
+        logger.error('Erreur lors de l\'analyse des risques:', error);
         res.status(500).json({
             success: false,
-            message: "Erreur lors de l'analyse des risques",
+            message: 'Erreur lors de l\'analyse des risques',
             error: error.message,
         });
     }
@@ -298,7 +298,7 @@ function genererRecommandations(risques) {
         recommandations.push('Organiser une réunion de suivi des livrables en retard');
     }
     if (risques.equipe) {
-        recommandations.push("Renforcer l'équipe projet");
+        recommandations.push('Renforcer l\'équipe projet');
     }
 
     return recommandations;

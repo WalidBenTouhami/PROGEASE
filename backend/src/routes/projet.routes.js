@@ -4,7 +4,6 @@ const router = express.Router();
 const projetController = require('../controllers/projet.controller');
 const { validateRequest } = require('../middlewares/validateRequest');
 const {
-    validateProjetData,
     validateId,
     validateStatistiquesRequest,
     projetSchema,

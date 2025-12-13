@@ -114,14 +114,14 @@ const gestionnaireErreurs = (err, req, res, next) => {
     if (err instanceof JsonWebTokenError) {
         return res.status(401).json({
             succes: false,
-            message: "Token d'authentification invalide",
+            message: 'Token d\'authentification invalide',
         });
     }
 
     if (err instanceof TokenExpiredError) {
         return res.status(401).json({
             succes: false,
-            message: "Token d'authentification expiré",
+            message: 'Token d\'authentification expiré',
         });
     }
 

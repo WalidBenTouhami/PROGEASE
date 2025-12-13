@@ -17,8 +17,8 @@ function formatProjetResponse(projet) {
             description: projet.description || '',
             equipe: Array.isArray(projet.equipe)
                 ? projet.equipe.map(membre =>
-                      typeof membre === 'object' ? membre : membre?.toString()
-                  )
+                    typeof membre === 'object' ? membre : membre?.toString()
+                )
                 : [],
             tuteur: projet.tuteur
                 ? typeof projet.tuteur === 'object'
@@ -31,10 +31,10 @@ function formatProjetResponse(projet) {
             statut: projet.statut || 'Brouillon',
             livrables: Array.isArray(projet.livrables)
                 ? projet.livrables.map(livrable =>
-                      typeof livrable === 'object'
-                          ? formatLivrableResponse(livrable)
-                          : livrable?.toString()
-                  )
+                    typeof livrable === 'object'
+                        ? formatLivrableResponse(livrable)
+                        : livrable?.toString()
+                )
                 : [],
             creeLe: projet.creeLe,
             majLe: projet.majLe,
@@ -158,7 +158,7 @@ function formatDate(date, format = 'court') {
  * @returns {string} - Duree formatee
  */
 function formatDureeLisible(jours) {
-    if (jours === 0) return "Aujourd'hui";
+    if (jours === 0) return 'Aujourd\'hui';
     if (jours === 1) return 'Demain';
     if (jours === -1) return 'Hier';
 

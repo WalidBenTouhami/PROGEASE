@@ -7,17 +7,8 @@
 
 'use strict';
 
-const mongoose = require('mongoose');
 const Evaluation = require('../../models/evaluation.model');
-const Projet = require('../../models/projet.model');
-const Livrable = require('../../models/livrable.model');
-const Utilisateur = require('../../models/utilisateur.model');
 const logger = require('../../utils/logger');
-const { AppError, ERROR_CODES } = require('../../middlewares/errorHandlers');
-const { validateInput } = require('../../utils/validators');
-const { handleMongooseError } = require('../../utils/errorUtils');
-const { Enums } = require('../../../config/constants');
-const { checkAuthorization } = require('../../utils/auth.utils');
 const { mapProjetMongoVersGraphQL } = require('./projet.resolver');
 
 /**

@@ -6,7 +6,6 @@
 
 'use strict';
 
-const rateLimit = require('express-rate-limit');
 const { AppError } = require('../middlewares/errorHandlers');
 const logger = require('../utils/logger');
 

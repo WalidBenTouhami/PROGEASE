@@ -45,7 +45,7 @@ const sujetSchema = yup.object().shape({
 
     auteur: yup
         .string()
-        .required("L'auteur est requis.")
+        .required('L\'auteur est requis.')
         .test('is-mongo-id', 'ID auteur invalide.', val => mongoose.Types.ObjectId.isValid(val)),
 });
 

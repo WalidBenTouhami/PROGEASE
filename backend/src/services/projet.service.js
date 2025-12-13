@@ -268,19 +268,19 @@ async function analyserRisques({ projet, descriptionProjet }) {
     try {
         // Validation minimale
         if (!projet && !descriptionProjet) {
-            throw new Error("Le projet ou sa description est requis pour l'analyse des risques");
+            throw new Error('Le projet ou sa description est requis pour l\'analyse des risques');
         }
 
         // Donnees du projet pour l'analyse
         const donneeProjet = projet
             ? {
-                  titre: projet.titre,
-                  description: projet.description,
-                  dateDebut: projet.dateDebut,
-                  dateFin: projet.dateFin,
-                  competences: projet.competences,
-                  tailleEquipe: projet.equipe ? projet.equipe.length : 0,
-              }
+                titre: projet.titre,
+                description: projet.description,
+                dateDebut: projet.dateDebut,
+                dateFin: projet.dateFin,
+                competences: projet.competences,
+                tailleEquipe: projet.equipe ? projet.equipe.length : 0,
+            }
             : { description: descriptionProjet };
 
         // Simulation d'analyse des risques basée sur les données du projet
@@ -309,7 +309,7 @@ async function analyserRisques({ projet, descriptionProjet }) {
                 probabilite: 'Moyenne',
                 impact: 'Moyen',
                 mitigation:
-                    "Planifier une formation technique pour l'equipe ou obtenir une expertise externe.",
+                    'Planifier une formation technique pour l\'equipe ou obtenir une expertise externe.',
                 indicateurs: ['Difficultes techniques signalees', 'Questions frequentes'],
             },
             {
@@ -330,8 +330,8 @@ async function analyserRisques({ projet, descriptionProjet }) {
                 gravite: 'elevee',
                 probabilite: 'elevee',
                 impact: 'Fort',
-                mitigation: "Ajouter des membres à l'equipe ou ajuster la portee du projet.",
-                indicateurs: ["Membres de l'equipe surcharges", 'Retards accumules'],
+                mitigation: 'Ajouter des membres à l\'equipe ou ajuster la portee du projet.',
+                indicateurs: ['Membres de l\'equipe surcharges', 'Retards accumules'],
             });
         }
 

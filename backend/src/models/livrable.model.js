@@ -6,10 +6,10 @@ const livrableSchema = new Schema(
     {
         intitule: {
             type: String,
-            required: [true, "L'intitulé du livrable est requis."],
+            required: [true, 'L\'intitulé du livrable est requis.'],
             trim: true,
-            minlength: [5, "L'intitulé doit contenir au moins 5 caractères."],
-            maxlength: [100, "L'intitulé ne peut pas dépasser 100 caractères."],
+            minlength: [5, 'L\'intitulé doit contenir au moins 5 caractères.'],
+            maxlength: [100, 'L\'intitulé ne peut pas dépasser 100 caractères.'],
         },
         description: {
             type: String,
@@ -60,12 +60,9 @@ const livrableSchema = new Schema(
             trim: true,
             validate: {
                 validator: function (v) {
-                    return (
-                        !v ||
-                        /^https?:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,6})(\/[^\s]*)?$/.test(
-                            v
-                        )
-                    );
+                    const urlPattern =
+                        /^https?:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,6})(\/[^\s]*)?$/;
+                    return !v || urlPattern.test(v);
                 },
                 message: props => `${props.value} n'est pas une URL valide!`,
             },

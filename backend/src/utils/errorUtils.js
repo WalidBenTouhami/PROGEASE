@@ -68,7 +68,7 @@ function handleMongooseError(
     // Erreurs de timeout de connexion
     if (error.name === 'MongoTimeoutError') {
         return new AppError(
-            "Delai d'attente depasse pour la requete à la base de donnees",
+            'Delai d\'attente depasse pour la requete à la base de donnees',
             504,
             ERROR_CODES.TIMEOUT,
             false

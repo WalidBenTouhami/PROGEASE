@@ -32,7 +32,7 @@ const CONFIG = {
 
 // Verification de la presence de la cle Apollo
 if (!CONFIG.apiKey) {
-    log("APOLLO_KEY non definie dans les variables d'environnement", 'WARNING');
+    log('APOLLO_KEY non definie dans les variables d\'environnement', 'WARNING');
 }
 
 // Creer le repertoire de sortie s'il n'existe pas

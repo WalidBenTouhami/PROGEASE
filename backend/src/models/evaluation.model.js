@@ -25,12 +25,12 @@ const evaluationSchema = new Schema(
         projetId: {
             type: Schema.Types.ObjectId,
             ref: 'Projet',
-            required: [true, "L'ID du projet est requis."],
+            required: [true, 'L\'ID du projet est requis.'],
         },
         evaluateurId: {
             type: Schema.Types.ObjectId,
             ref: 'Utilisateur',
-            required: [true, "L'ID de l'évaluateur est requis."],
+            required: [true, 'L\'ID de l\'évaluateur est requis.'],
         },
         note: {
             type: Number,

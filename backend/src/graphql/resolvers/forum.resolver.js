@@ -56,7 +56,7 @@ const Query = {
     /**
      * Récupère tous les sujets avec pagination et filtres
      */
-    sujets: async (_, { input = {} }, context) => {
+    sujets: async (_parent, { input = {} }, _context) => {
         try {
             const {
                 page = 1,
@@ -79,17 +79,17 @@ const Query = {
             const skip = (page - 1) * limite;
             let sort = {};
             switch (tri) {
-                case 'recent':
-                    sort = { creeLe: -1 };
-                    break;
-                case 'populaire':
-                    sort = { vues: -1 };
-                    break;
-                case 'reponses':
-                    sort = { 'reponses.length': -1 };
-                    break;
-                default:
-                    sort = { creeLe: -1 };
+            case 'recent':
+                sort = { creeLe: -1 };
+                break;
+            case 'populaire':
+                sort = { vues: -1 };
+                break;
+            case 'reponses':
+                sort = { 'reponses.length': -1 };
+                break;
+            default:
+                sort = { creeLe: -1 };
             }
 
             const [sujets, total] = await Promise.all([
@@ -295,7 +295,7 @@ const Mutation = {
                 reponseAjoutee: nouvelleReponse,
             };
         } catch (error) {
-            logger.error("Erreur lors de l'ajout de la réponse:", error);
+            logger.error('Erreur lors de l\'ajout de la réponse:', error);
             throw handleMongooseError(error);
         }
     },

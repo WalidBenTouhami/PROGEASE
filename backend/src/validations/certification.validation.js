@@ -85,7 +85,7 @@ const certificationObtenuSchema = Joi.object({
         .required()
         .regex(/^[0-9a-fA-F]{24}$/)
         .messages({
-            'string.pattern.base': "ID d'utilisateur invalide",
+            'string.pattern.base': 'ID d\'utilisateur invalide',
         }),
 
     statut: Joi.string()

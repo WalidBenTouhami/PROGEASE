@@ -130,10 +130,10 @@ const schedulingController = {
                 data: resultat,
             });
         } catch (error) {
-            logger.error("Erreur lors de l'envoi des notifications:", error);
+            logger.error('Erreur lors de l\'envoi des notifications:', error);
             res.status(500).json({
                 success: false,
-                message: "Erreur interne lors de l'envoi des notifications",
+                message: 'Erreur interne lors de l\'envoi des notifications',
                 error: error.message,
             });
         }

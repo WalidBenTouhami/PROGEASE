@@ -6,7 +6,6 @@ const Evaluation = require('../models/evaluation.model');
 const { Enum } = require('../../config/constants');
 const logger = require('../utils/logger');
 require('dotenv').config();
-const { ObjectId } = require('mongodb');
 
 // Helpers
 function addDays(days) {

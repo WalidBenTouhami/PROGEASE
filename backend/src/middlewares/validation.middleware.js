@@ -36,7 +36,7 @@ const validateTeamFormation = [
     body('membres')
         .isArray({ min: 1 })
         .withMessage('La liste des membres doit être un tableau non vide'),
-    body('membres.*.id').optional().isString().withMessage("L'ID du membre doit être une chaîne"),
+    body('membres.*.id').optional().isString().withMessage('L\'ID du membre doit être une chaîne'),
     body('membres.*.nom')
         .optional()
         .isString()
@@ -57,7 +57,7 @@ const validateTutorMatching = [
     body('membres')
         .isArray({ min: 1 })
         .withMessage('La liste des membres doit être un tableau non vide'),
-    body('membres.*.id').optional().isString().withMessage("L'ID du membre doit être une chaîne"),
+    body('membres.*.id').optional().isString().withMessage('L\'ID du membre doit être une chaîne'),
     body('membres.*.role')
         .optional()
         .isIn(['TUTEUR', 'ETUDIANT', 'EQUIPE'])
@@ -188,7 +188,7 @@ const validateProjectAnalysis = [
     body('type')
         .optional()
         .isIn(['GENERAL', 'TECHNIQUE', 'RISQUES', 'QUALITE'])
-        .withMessage("Type d'analyse invalide"),
+        .withMessage('Type d\'analyse invalide'),
     handleValidationErrors,
 ];
 

@@ -282,9 +282,9 @@ exports.recupererStatistiques = async (req, res) => {
 };
 
 module.exports = {
-    creerQuiz,
-    recupererQuiz,
-    recupererQuizParId,
-    soumettreQuiz,
-    recupererStatistiques,
+    creerQuiz: exports.creerQuiz,
+    recupererQuiz: exports.recupererQuiz,
+    recupererQuizParId: exports.recupererQuizParId,
+    soumettreQuiz: exports.soumettreQuiz,
+    recupererStatistiques: exports.recupererStatistiques,
 };

@@ -12,7 +12,7 @@ const authMiddleware = (req, res, next) => {
                 success: false,
                 error: {
                     code: 'AUTH_HEADER_MISSING',
-                    message: "En-tête d'autorisation manquant ou invalide",
+                    message: 'En-tête d\'autorisation manquant ou invalide',
                 },
             });
         }
@@ -24,7 +24,7 @@ const authMiddleware = (req, res, next) => {
                 success: false,
                 error: {
                     code: 'TOKEN_MISSING',
-                    message: "Token d'authentification manquant",
+                    message: 'Token d\'authentification manquant',
                 },
             });
         }
@@ -69,7 +69,7 @@ const authMiddleware = (req, res, next) => {
                         success: false,
                         error: {
                             code: 'AUTH_FAILED',
-                            message: "Échec de l'authentification",
+                            message: 'Échec de l\'authentification',
                         },
                     });
                 }
@@ -109,7 +109,7 @@ const authMiddleware = (req, res, next) => {
             }
         );
     } catch (error) {
-        logger.error("Erreur dans le middleware d'authentification", {
+        logger.error('Erreur dans le middleware d\'authentification', {
             error: error.message,
             stack: error.stack,
             ip: req.ip,

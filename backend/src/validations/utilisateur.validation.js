@@ -33,9 +33,9 @@ const validateUtilisateurData = [
     body('email')
         .trim()
         .notEmpty()
-        .withMessage("L'email est requis")
+        .withMessage('L\'email est requis')
         .isEmail()
-        .withMessage("Format d'email invalide")
+        .withMessage('Format d\'email invalide')
         .normalizeEmail(),
 
     body('role')
@@ -71,9 +71,9 @@ const inscriptionSchema = yup.object().shape({
 
     email: yup
         .string()
-        .required("L'email est requis.")
-        .email("Format d'email invalide.")
-        .max(100, "L'email ne peut pas dépasser 100 caractères."),
+        .required('L\'email est requis.')
+        .email('Format d\'email invalide.')
+        .max(100, 'L\'email ne peut pas dépasser 100 caractères.'),
 
     motDePasse: yup
         .string()
@@ -111,7 +111,7 @@ const inscriptionSchema = yup.object().shape({
 
 // Schéma de validation pour la connexion
 const connexionSchema = yup.object().shape({
-    email: yup.string().required("L'email est requis.").email("Format d'email invalide."),
+    email: yup.string().required('L\'email est requis.').email('Format d\'email invalide.'),
 
     motDePasse: yup.string().required('Le mot de passe est requis.'),
 });
@@ -130,8 +130,8 @@ const miseAJourProfilSchema = yup.object().shape({
 
     email: yup
         .string()
-        .email("Format d'email invalide.")
-        .max(100, "L'email ne peut pas dépasser 100 caractères."),
+        .email('Format d\'email invalide.')
+        .max(100, 'L\'email ne peut pas dépasser 100 caractères.'),
 
     telephone: yup
         .string()
@@ -145,14 +145,14 @@ const miseAJourProfilSchema = yup.object().shape({
         .max(new Date(), 'La date de naissance ne peut pas être dans le futur.')
         .min(new Date(1900, 0, 1), 'Date de naissance invalide.'),
 
-    avatar: yup.string().url("L'URL de l'avatar doit être valide."),
+    avatar: yup.string().url('L\'URL de l\'avatar doit être valide.'),
 
     bio: yup.string().max(500, 'La bio ne peut pas dépasser 500 caractères.'),
 });
 
 // Schéma de validation pour le changement de mot de passe
 const changementMotDePasseSchema = yup.object().shape({
-    ancienMotDePasse: yup.string().required("L'ancien mot de passe est requis."),
+    ancienMotDePasse: yup.string().required('L\'ancien mot de passe est requis.'),
 
     nouveauMotDePasse: yup
         .string()
@@ -165,7 +165,7 @@ const changementMotDePasseSchema = yup.object().shape({
         )
         .notOneOf(
             [yup.ref('ancienMotDePasse')],
-            "Le nouveau mot de passe doit être différent de l'ancien."
+            'Le nouveau mot de passe doit être différent de l\'ancien.'
         ),
 
     confirmationMotDePasse: yup
@@ -261,9 +261,9 @@ const validerUtilisateur = {
         body('email')
             .trim()
             .notEmpty()
-            .withMessage("L'email est requis")
+            .withMessage('L\'email est requis')
             .isEmail()
-            .withMessage("Format d'email invalide")
+            .withMessage('Format d\'email invalide')
             .normalizeEmail(),
         body('motDePasse').notEmpty().withMessage('Le mot de passe est requis'),
     ],

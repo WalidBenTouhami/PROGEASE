@@ -114,20 +114,20 @@ async function planifierEvenements(params) {
 
         let intervalleJours;
         switch (frequence) {
-            case 'QUOTIDIEN':
-                intervalleJours = 1;
-                break;
-            case 'HEBDOMADAIRE':
-                intervalleJours = 7;
-                break;
-            case 'BIHEBDOMADAIRE':
-                intervalleJours = 14;
-                break;
-            case 'MENSUEL':
-                intervalleJours = 30;
-                break;
-            default:
-                intervalleJours = 7;
+        case 'QUOTIDIEN':
+            intervalleJours = 1;
+            break;
+        case 'HEBDOMADAIRE':
+            intervalleJours = 7;
+            break;
+        case 'BIHEBDOMADAIRE':
+            intervalleJours = 14;
+            break;
+        case 'MENSUEL':
+            intervalleJours = 30;
+            break;
+        default:
+            intervalleJours = 7;
         }
 
         const dateActuelle = new Date(dateDebut);
@@ -159,7 +159,7 @@ async function planifierEvenements(params) {
             evenements.push({
                 type: 'REVUE',
                 titre: `Revue de mi-parcours - ${projet.titre}`,
-                description: "Revue intermédiaire du projet pour évaluer l'avancement",
+                description: 'Revue intermédiaire du projet pour évaluer l\'avancement',
                 date: dateMiParcours,
                 duree: 90,
                 participants: projet.equipe || [],
@@ -251,7 +251,7 @@ async function envoyerNotifications(rappels) {
             notifications: notificationsEnvoyees,
         };
     } catch (error) {
-        logger.error("Erreur lors de l'envoi des notifications:", error);
+        logger.error('Erreur lors de l\'envoi des notifications:', error);
         throw error;
     }
 }

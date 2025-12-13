@@ -1,6 +1,5 @@
 // backend/seed.js
 require('dotenv').config();
-const mongoose = require('mongoose');
 const { MongoClient, ObjectId } = require('mongodb');
 const { Enum } = require('../../config/constants');
 const logger = require('../utils/logger');
@@ -80,7 +79,7 @@ async function seed() {
                 urlDepot: 'https://github.com/progease/reservation-salles',
             },
             {
-                titre: "Dashboard analytique d'apprentissage",
+                titre: 'Dashboard analytique d\'apprentissage',
                 description:
                     'Créer un tableau de bord pour visualiser les performances des étudiants.',
                 urlDepot: 'https://github.com/progease/dashboard-analytics',
@@ -98,7 +97,7 @@ async function seed() {
             },
             {
                 titre: 'Système de notation automatisé',
-                description: "Créer un système qui automatise l'évaluation des travaux pratiques.",
+                description: 'Créer un système qui automatise l\'évaluation des travaux pratiques.',
                 urlDepot: 'https://github.com/progease/notation-auto',
             },
             {
@@ -108,7 +107,7 @@ async function seed() {
                 urlDepot: 'https://github.com/progease/gestion-stages',
             },
             {
-                titre: "Chatbot d'assistance pédagogique",
+                titre: 'Chatbot d\'assistance pédagogique',
                 description:
                     'Concevoir un assistant conversationnel pour répondre aux questions fréquentes.',
                 urlDepot: 'https://github.com/progease/chatbot-assistant',
@@ -116,7 +115,7 @@ async function seed() {
             {
                 titre: 'Système de e-learning interactif',
                 description:
-                    "Développer une plateforme d'apprentissage avec contenu interactif et gamifié.",
+                    'Développer une plateforme d\'apprentissage avec contenu interactif et gamifié.',
                 urlDepot: 'https://github.com/progease/elearning-platform',
             },
         ];
@@ -194,7 +193,7 @@ async function seed() {
         }
 
         // Insertion des projets directement avec le driver MongoDB
-        const result = await db.collection('projets').insertMany(projetData);
+        await db.collection('projets').insertMany(projetData);
         const projets = projetData;
         logger.info(`${projets.length} projets créés avec succès`);
 
@@ -217,7 +216,7 @@ async function seed() {
             },
             {
                 intitule: 'Documentation technique',
-                description: "Documentation détaillée de l'architecture technique.",
+                description: 'Documentation détaillée de l\'architecture technique.',
                 urlDepot: 'https://docs.progease.com/tech',
             },
             {
@@ -226,18 +225,18 @@ async function seed() {
                 urlDepot: 'https://github.com/progease/tests',
             },
             {
-                intitule: "Tests d'intégration",
+                intitule: 'Tests d\'intégration',
                 description: 'Tests de bout en bout pour valider les flux utilisateurs.',
                 urlDepot: 'https://github.com/progease/e2e',
             },
             {
                 intitule: 'Rapport intermédiaire',
-                description: "Compte-rendu d'avancement à mi-parcours.",
+                description: 'Compte-rendu d\'avancement à mi-parcours.',
                 urlDepot: 'https://docs.progease.com/rapport-intermediaire',
             },
             {
                 intitule: 'Rapport final',
-                description: "Document final présentant l'ensemble du projet.",
+                description: 'Document final présentant l\'ensemble du projet.',
                 urlDepot: 'https://docs.progease.com/rapport-final',
             },
             {

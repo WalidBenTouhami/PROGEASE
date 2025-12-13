@@ -25,18 +25,7 @@ const client = axios.create({
     },
 });
 
-// Configuration
-const CONFIG = {
-    RETRY_LIMIT: 3,
-    RETRY_DELAY: 1000,
-};
 
-/**
- * Attends un delai specifie
- * @param {number} ms - Delai en millisecondes
- * @returns {Promise<void>}
- */
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 /**
  * Vérifie si un dépôt GitHub existe
@@ -55,7 +44,7 @@ async function checkGithubRepoExists(url) {
         }
 
         // Extraire le propriétaire et le nom du dépôt de l'URL
-        const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
+        const match = url.match(/github\.com\/([^/]+)\/([^/]+)/);
         if (!match) {
             throw new Error('URL GitHub invalide');
         }

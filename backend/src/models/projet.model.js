@@ -102,12 +102,9 @@ const projetSchema = new Schema(
             trim: true,
             validate: {
                 validator: function (v) {
-                    return (
-                        !v ||
-                        /^https?:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,6})(\/[^\s]*)?$/.test(
-                            v
-                        )
-                    );
+                    const urlPattern =
+                        /^https?:\/\/[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*(\.[a-zA-Z]{2,6})(\/[^\s]*)?$/;
+                    return !v || urlPattern.test(v);
                 },
                 message: props => `${props.value} n'est pas une URL valide!`,
             },
@@ -350,8 +347,8 @@ projetSchema.methods.calculerStatistiques = function () {
     stats.progressionMoyenne =
         this.taches.length > 0
             ? Math.round(
-                  this.taches.reduce((acc, t) => acc + t.progression, 0) / this.taches.length
-              )
+                this.taches.reduce((acc, t) => acc + t.progression, 0) / this.taches.length
+            )
             : 0;
 
     return stats;

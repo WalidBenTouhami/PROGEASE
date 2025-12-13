@@ -1,5 +1,4 @@
 const Livrable = require('../models/livrable.model');
-const mongoose = require('mongoose');
 const logger = require('../utils/logger');
 
 /**

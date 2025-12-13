@@ -142,7 +142,7 @@ const resolvers = {
             }
 
             if (!certification.estActif) {
-                throw new UserInputError("Cette certification n'est plus active");
+                throw new UserInputError('Cette certification n\'est plus active');
             }
 
             const certificationExistante = await CertificationObtenu.findOne({
@@ -187,7 +187,7 @@ const resolvers = {
 
                 if (!formationRequise) {
                     throw new UserInputError(
-                        "Cette formation n'est pas requise pour cette certification"
+                        'Cette formation n\'est pas requise pour cette certification'
                     );
                 }
 
@@ -303,19 +303,19 @@ const resolvers = {
 
                 if (!toutesFormationsTerminees) {
                     throw new UserInputError(
-                        "Toutes les formations requises n'ont pas été terminées avec succès"
+                        'Toutes les formations requises n\'ont pas été terminées avec succès'
                     );
                 }
             }
 
             // Vérifier le quiz final si requis
             if (conditions.quizFinal && !certificationObtenu.quizFinalResultat) {
-                throw new UserInputError("Le quiz final n'a pas été complété");
+                throw new UserInputError('Le quiz final n\'a pas été complété');
             }
 
             // Vérifier le projet final si requis
             if (conditions.projetFinal && !certificationObtenu.projetFinalResultat) {
-                throw new UserInputError("Le projet final n'a pas été complété");
+                throw new UserInputError('Le projet final n\'a pas été complété');
             }
 
             // Valider la certification
