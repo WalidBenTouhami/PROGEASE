@@ -39,6 +39,7 @@ Les badges ci-dessus démontrent l'engagement du projet envers la qualité, la s
 - **🔄 CI/CD** : Intégration et déploiement continus avec tests automatisés
 - **🔒 Sécurité** : Multiples couches de protection (Helmet, Rate Limiting, XSS, Input Validation)
 - **📦 Technologies** : Stack moderne et maintenu (Angular 18, Node.js, GraphQL)
+  - *Note: Backend nécessite Node.js ≥18.0.0, Frontend nécessite Node.js ≥20.0.0 pour les fonctionnalités Angular 17.3+*
 - **✅ Qualité du Code** : Linting (ESLint) et formatage automatique (Prettier)
 - **🛡️ Analyse** : Scan de sécurité automatique avec CodeQL
 - **📝 Licence** : Open source sous licence MIT
