@@ -98,7 +98,7 @@ export class TeamFormationComponent implements OnInit {
   }
 
   private generateId(): string {
-    return 'membre_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    return 'membre_' + Date.now() + '_' + Math.random().toString(36).substring(2, 11);
   }
 
   importerMembres(event: any): void {

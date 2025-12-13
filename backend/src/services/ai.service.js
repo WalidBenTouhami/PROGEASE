@@ -716,11 +716,13 @@ module.exports = {
     // Learning and recommendations
     recommanderApprentissage,
     generateAIAnalysis,
-    generateLearningRecommendations,
-    predictPerformance,
     
     // Helper functions
     validerReponseJSON,
     extraireJSONDepuisReponse,
-    traiterReponseIA
+    traiterReponseIA,
+    
+    // Backward compatibility aliases
+    generateLearningRecommendations: recommanderApprentissage,
+    predictPerformance: predirePerformance
 };
