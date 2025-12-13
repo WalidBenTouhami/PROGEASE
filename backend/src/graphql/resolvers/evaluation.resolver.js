@@ -94,11 +94,11 @@ const Query = {
                 };
             }
 
-            const scores = evaluations.map(e => e.score);
-            const totalEvaluations = scores.length;
-            const moyenneScore = scores.reduce((a, b) => a + b, 0) / totalEvaluations;
-            const scoreMax = Math.max(...scores);
-            const scoreMin = Math.min(...scores);
+            const notes = evaluations.map(e => e.note);
+            const totalEvaluations = notes.length;
+            const moyenneScore = notes.reduce((a, b) => a + b, 0) / totalEvaluations;
+            const scoreMax = Math.max(...notes);
+            const scoreMin = Math.min(...notes);
 
             return {
                 moyenneScore,

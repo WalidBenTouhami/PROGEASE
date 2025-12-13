@@ -1,5 +1,49 @@
 # PROGEASE - Plateforme de Gestion de Projets
 
+<!-- Badges Section -->
+<div align="center">
+
+[![CI Status](https://github.com/WalidBenTouhami/PROGEASE/workflows/PROGEASE%20CI/badge.svg)](https://github.com/WalidBenTouhami/PROGEASE/actions/workflows/ci.yml)
+[![Test Status](https://github.com/WalidBenTouhami/PROGEASE/workflows/Test/badge.svg)](https://github.com/WalidBenTouhami/PROGEASE/actions/workflows/test.yml)
+[![CodeQL](https://github.com/WalidBenTouhami/PROGEASE/workflows/CodeQL%20Advanced/badge.svg)](https://github.com/WalidBenTouhami/PROGEASE/actions/workflows/codeql.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+[![Node.js Backend](https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Node.js Frontend](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen.svg)](https://nodejs.org/)
+[![npm](https://img.shields.io/badge/npm-%3E%3D10.0.0-blue.svg)](https://www.npmjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-5.0%2B-green.svg)](https://www.mongodb.com/)
+
+[![Angular](https://img.shields.io/badge/Angular-18.2.14-red.svg)](https://angular.io/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.18.2-lightgrey.svg)](https://expressjs.com/)
+[![GraphQL](https://img.shields.io/badge/GraphQL-16.8.1-e10098.svg)](https://graphql.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4.5-blue.svg)](https://www.typescriptlang.org/)
+
+[![Security: Helmet](https://img.shields.io/badge/Security-Helmet-brightgreen.svg)](https://helmetjs.github.io/)
+[![Rate Limiting](https://img.shields.io/badge/Rate%20Limiting-Enabled-brightgreen.svg)](https://www.npmjs.com/package/express-rate-limit)
+[![Input Validation](https://img.shields.io/badge/Input%20Validation-Enabled-brightgreen.svg)](https://express-validator.github.io/)
+[![XSS Protection](https://img.shields.io/badge/XSS-Protected-brightgreen.svg)](https://www.npmjs.com/package/xss-clean)
+
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](http://makeapullrequest.com)
+[![Maintained](https://img.shields.io/badge/Maintained-Yes-green.svg)](https://github.com/WalidBenTouhami/PROGEASE/graphs/commit-activity)
+[![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://github.com/prettier/prettier)
+[![Linter: ESLint](https://img.shields.io/badge/linter-eslint-4B32C3.svg)](https://eslint.org/)
+
+</div>
+
+---
+
+## 📊 Aperçu des Badges
+
+Les badges ci-dessus démontrent l'engagement du projet envers la qualité, la sécurité et les meilleures pratiques :
+
+- **🔄 CI/CD** : Intégration et déploiement continus avec tests automatisés
+- **🔒 Sécurité** : Multiples couches de protection (Helmet, Rate Limiting, XSS, Input Validation)
+- **📦 Technologies** : Stack moderne et maintenu (Angular 18, Node.js, GraphQL)
+  - *Note: Backend nécessite Node.js ≥18.0.0 (LTS), Frontend nécessite Node.js ≥20.0.0 pour les fonctionnalités Angular 18 et performances optimales*
+- **✅ Qualité du Code** : Linting (ESLint) et formatage automatique (Prettier)
+- **🛡️ Analyse** : Scan de sécurité automatique avec CodeQL
+- **📝 Licence** : Open source sous licence MIT
+
 ## Fonctionnalités
 
 ### Administration
