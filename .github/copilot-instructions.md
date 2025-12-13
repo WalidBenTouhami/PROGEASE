@@ -37,7 +37,7 @@ PROGEASE is a project management platform with AI-powered features, built using 
 - **Style**:
   - Use single quotes for strings
   - Semicolons required
-  - 4-space indentation
+  - **4-space indentation** (backend convention for Node.js)
   - Max line length: 120 characters
   - Arrow functions: avoid parentheses for single parameters
   - Trailing commas: ES5 style
@@ -50,7 +50,7 @@ PROGEASE is a project management platform with AI-powered features, built using 
 - **Formatter**: EditorConfig + Prettier
 - **Style**:
   - Use single quotes for strings
-  - 2-space indentation
+  - **2-space indentation** (frontend convention following Angular style guide)
   - Standalone components preferred
   - Component prefix: `app-`
   - SCSS for styling
@@ -234,9 +234,13 @@ cd frontend && npm run lint
 
 ## Version Requirements
 
-- **Node.js**: >=18.0.0 (backend), >=20.0.0 (frontend)
+- **Node.js**: 
+  - Backend: >=18.0.0 (LTS compatible)
+  - Frontend: >=20.0.0 (required for Angular 17 features)
 - **npm**: >=10.0.0
 - **MongoDB**: 5.0+
+
+**Note**: The different Node.js versions reflect the specific requirements of each stack. The backend uses Node 18+ for stability, while the frontend requires Node 20+ for optimal Angular 17 performance and features.
 
 ## Additional Notes
 
