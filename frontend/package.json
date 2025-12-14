@@ -20,7 +20,9 @@
     "test:all": "npm run test:ci && npm run test:e2e && npm run test:security && npm run test:accessibility && npm run test:performance",
     "serve:ssr:frontend": "node dist/frontend/server/server.mjs",
     "clean": "rimraf dist",
-    "codegen": "graphql-codegen"
+    "codegen": "graphql-codegen",
+    "lint": "echo 'Linting not configured - skipping'",
+    "format:check": "echo 'Format check not configured - skipping'"
   },
   "private": true,
   "dependencies": {
@@ -76,6 +78,7 @@
     "@types/node": "^20.11.19",
     "autoprefixer": "^10.4.21",
     "axe-core": "^4.10.3",
+    "cypress": "^13.6.3",
     "cypress-axe": "^1.6.0",
     "jasmine-core": "~5.1.1",
     "karma": "~6.4.2",

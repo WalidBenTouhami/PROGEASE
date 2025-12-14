@@ -2,7 +2,6 @@ import './polyfills';
 import { enableProdMode, isDevMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import * as Sentry from '@sentry/angular';
-import { BrowserTracing } from '@sentry/tracing';
 import { AppModule } from './app/app.module';
 import { environment } from './environments/environment';
 import { registerLocaleData } from '@angular/common';
@@ -10,25 +9,19 @@ import localeFr from '@angular/common/locales/fr';
 
 registerLocaleData(localeFr);
 
-// Initialize Sentry for error tracking
-Sentry.init({
-  dsn: environment.sentry.dsn,
-  integrations: [
-    new BrowserTracing({
-      tracingOrigins: ['localhost', environment.apiUrl],
-    }) as any, // Type assertion to fix compatibility issue
-  ],
-  tracesSampleRate: isDevMode() ? 1.0 : 0.2,
-  environment: environment.production ? 'production' : 'development',
-  enabled: environment.production,
-  beforeSend(event) {
-    // Don't send events in development
-    if (isDevMode()) {
-      return null;
-    }
-    return event;
-  },
-});
+// Initialize Sentry for error tracking (only in production)
+if (environment.production) {
+  Sentry.init({
+    dsn: environment.sentry.dsn,
+    integrations: [
+      Sentry.browserTracingIntegration(),
+    ],
+    tracePropagationTargets: ['localhost', environment.apiUrl],
+    tracesSampleRate: 0.2,
+    environment: 'production',
+    enabled: true,
+  });
+}
 
 // Enable production mode if in production
 if (environment.production) {
