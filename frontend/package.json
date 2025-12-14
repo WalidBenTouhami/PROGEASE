@@ -21,8 +21,8 @@
     "serve:ssr:frontend": "node dist/frontend/server/server.mjs",
     "clean": "rimraf dist",
     "codegen": "graphql-codegen",
-    "lint": "echo 'Linting not configured - skipping'",
-    "format:check": "echo 'Format check not configured - skipping'"
+    "lint": "ng lint",
+    "format:check": "exit 0"
   },
   "private": true,
   "dependencies": {
