@@ -1,0 +1,116 @@
+# Configuration file for GitHub Labeler
+# Automatically labels pull requests based on changed files
+# Documentation: https://github.com/actions/labeler
+
+# Documentation
+documentation:
+  - '**/*.md'
+  - 'docs/**'
+
+# Backend changes
+backend:
+  - 'backend/**'
+  - 'app.js'
+
+# Frontend changes
+frontend:
+  - 'frontend/**'
+  - 'tailwind.config.js'
+
+# GraphQL
+graphql:
+  - 'backend/src/graphql/**'
+  - '**/graphql.config.yml'
+  - '**/codegen.yml'
+  - 'backend/apollo.js'
+
+# Database & Models
+database:
+  - 'backend/src/models/**'
+  - 'backend/src/seeders/**'
+  - '**/*.model.js'
+  - '**/mongodb*.json'
+
+# API & Routes
+api:
+  - 'backend/src/routes/**'
+  - 'backend/src/controllers/**'
+  - '**/*.routes.js'
+  - '**/*.controller.js'
+
+# Services
+services:
+  - 'backend/src/services/**'
+  - 'frontend/src/app/services/**'
+  - '**/*.service.ts'
+  - '**/*.service.js'
+
+# UI Components
+components:
+  - 'frontend/src/app/**/*.component.ts'
+  - 'frontend/src/app/**/*.component.html'
+  - 'frontend/src/app/**/*.component.scss'
+  - 'frontend/src/app/shared/**'
+
+# State Management
+state:
+  - 'frontend/src/app/store/**'
+  - '**/+state/**'
+
+# Testing
+tests:
+  - 'backend/tests/**'
+  - 'frontend/cypress/**'
+  - '**/*.spec.ts'
+  - '**/*.spec.js'
+  - '**/*.test.js'
+  - '**/*.test.ts'
+  - 'cypress.config.ts'
+
+# CI/CD & Workflows
+ci:
+  - '.github/workflows/**'
+  - '.github/*.yml'
+  - '.github/*.yaml'
+
+# Configuration
+config:
+  - '**/.eslintrc*'
+  - '**/.prettierrc*'
+  - '**/tsconfig*.json'
+  - '**/angular.json'
+  - '**/.editorconfig'
+  - '**/package.json'
+  - '**/package-lock.json'
+  - '**/.npmrc'
+
+# Security
+security:
+  - 'SECURITY*.md'
+  - 'backend/src/middleware/**'
+  - 'backend/src/middlewares/**'
+  - '**/auth*.ts'
+  - '**/auth*.js'
+
+# Dependencies
+dependencies:
+  - '**/package.json'
+  - '**/package-lock.json'
+  - 'install_all.py'
+
+# Styling
+styles:
+  - '**/*.css'
+  - '**/*.scss'
+  - '**/*.sass'
+  - 'frontend/src/styles/**'
+  - '**/tailwind.config.js'
+  - '**/postcss.config.js'
+
+# Build & Deployment
+build:
+  - '**/angular.json'
+  - '**/webpack*.js'
+  - '**/vite*.js'
+  - '**/rollup*.js'
+  - 'DEPLOYMENT_NOTES.md'
