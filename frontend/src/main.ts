@@ -9,19 +9,16 @@ import localeFr from '@angular/common/locales/fr';
 
 registerLocaleData(localeFr);
 
-// Initialize Sentry for error tracking (only in production)
-if (environment.production) {
-  Sentry.init({
-    dsn: environment.sentry.dsn,
-    integrations: [
-      Sentry.browserTracingIntegration(),
-    ],
-    tracePropagationTargets: ['localhost', environment.apiUrl],
-    tracesSampleRate: 0.2,
-    environment: 'production',
-    enabled: true,
-  });
-}
+// Initialize Sentry for error tracking
+Sentry.init({
+  dsn: environment.sentry.dsn,
+  integrations: [
+    Sentry.browserTracingIntegration(),
+  ],
+  tracesSampleRate: isDevMode() ? 1.0 : 0.2,
+  environment: environment.production ? 'production' : 'development',
+  enabled: environment.production, // Only enabled in production
+});
 
 // Enable production mode if in production
 if (environment.production) {

@@ -74,13 +74,9 @@ export class ProjetListComponent implements OnInit, OnDestroy, AfterViewInit {
   chargerProjets() {
     this.chargement = true;
     this.subscription = this.projetService.getProjets().subscribe({
-      next: (response: ApiResponse<Projet[]>) => {
-        if (response.success && response.data) {
-          this.projets = response.data;
-          this.dataSource.data = response.data;
-        } else {
-          this.erreur = "Erreur lors du chargement des projets.";
-        }
+      next: (projets: Projet[]) => {
+        this.projets = projets;
+        this.dataSource.data = projets;
         this.chargement = false;
       },
       error: (err) => {

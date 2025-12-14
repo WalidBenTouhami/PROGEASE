@@ -94,14 +94,10 @@ export class LivrableListComponent implements OnInit {
 
   loadLivrables() {
     this.livrableService.getLivrables().subscribe({
-      next: (response: ApiResponse<Livrable[]>) => {
-        if (response.success && response.data) {
-          this.dataSource.data = response.data;
-          this.dataSource.paginator = this.paginator;
-          this.dataSource.sort = this.sort;
-        } else {
-          console.error('Error loading livrables: No data received');
-        }
+      next: (livrables: Livrable[]) => {
+        this.dataSource.data = livrables;
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
       },
       error: (err) => {
         console.error('Error loading livrables:', err);

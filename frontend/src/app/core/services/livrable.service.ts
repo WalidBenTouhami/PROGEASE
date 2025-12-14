@@ -19,6 +19,10 @@ export class LivrableService {
     return this.apiService.get<Livrable>(`${this.endpoint}/${id}`);
   }
 
+  getLivrablesByProjet(projetId: string): Observable<Livrable[]> {
+    return this.apiService.get<Livrable[]>(`${this.endpoint}/projet/${projetId}`);
+  }
+
   createLivrable(livrable: Omit<Livrable, '_id' | 'creeLe' | 'majLe'>): Observable<Livrable> {
     return this.apiService.post<Livrable>(this.endpoint, livrable);
   }

@@ -8,8 +8,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
-import { ProjetService } from '../../core/services/projet.service';
-import { Projet, StatutProjet } from '../../core/models/projet.model';
+import { ProjetService } from '../../../core/services/projet.service';
+import { Projet, StatutProjet } from '../../../core/models/projet.model';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -70,12 +70,12 @@ export class ProjetFormComponent implements OnInit {
       const projet: Projet = this.projetForm.value;
 
       if (this.isEditing && this.projetId) {
-        this.projetService.mettreAJourProjet(this.projetId, projet).subscribe({
+        this.projetService.updateProjet(this.projetId, projet).subscribe({
           next: () => this.router.navigate(['/projets']),
           error: () => this.erreur = 'Erreur lors de la sauvegarde du projet.'
         });
       } else {
-        this.projetService.creerProjet(projet).subscribe({
+        this.projetService.createProjet(projet).subscribe({
           next: () => this.router.navigate(['/projets']),
           error: () => this.erreur = 'Erreur lors de la sauvegarde du projet.'
         });
@@ -98,8 +98,8 @@ export class ProjetFormComponent implements OnInit {
   }
 
   private chargerProjet(id: string): void {
-    this.projetService.recupererProjetParId(id).subscribe({
-      next: (projet) => {
+    this.projetService.getProjet(id).subscribe({
+      next: (projet: Projet) => {
         this.projetForm.patchValue({
           titre: projet.titre,
           description: projet.description,

@@ -10,10 +10,10 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ProjetFormComponent } from './projet-form.component';
-import { ProjetService } from '../../core/services/projet.service';
+import { ProjetService } from '../../../core/services/projet.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of, throwError } from 'rxjs';
-import { StatutProjet } from '../../core/models/projet.model';
+import { StatutProjet } from '../../../core/models/projet.model';
 
 describe('ProjetFormComponent', () => {
   let component: ProjetFormComponent;
@@ -34,12 +34,12 @@ describe('ProjetFormComponent', () => {
   };
 
   beforeEach(async () => {
-    const projetServiceSpy = jasmine.createSpyObj('ProjetService', ['creerProjet', 'mettreAJourProjet', 'recupererProjetParId']);
+    const projetServiceSpy = jasmine.createSpyObj('ProjetService', ['createProjet', 'updateProjet', 'getProjet']);
     const routerSpy = jasmine.createSpyObj('Router', ['navigate']);
 
-    projetServiceSpy.creerProjet.and.returnValue(of(mockProjet));
-    projetServiceSpy.mettreAJourProjet.and.returnValue(of(mockProjet));
-    projetServiceSpy.recupererProjetParId.and.returnValue(of(mockProjet));
+    projetServiceSpy.createProjet.and.returnValue(of(mockProjet));
+    projetServiceSpy.updateProjet.and.returnValue(of(mockProjet));
+    projetServiceSpy.getProjet.and.returnValue(of(mockProjet));
 
     await TestBed.configureTestingModule({
       imports: [
@@ -170,7 +170,7 @@ describe('ProjetFormComponent', () => {
       component.onSubmit();
       tick();
 
-      expect(projetService.creerProjet).toHaveBeenCalledWith(component.projetForm.value);
+      expect(projetService.createProjet).toHaveBeenCalledWith(component.projetForm.value);
       expect(router.navigate).toHaveBeenCalledWith(['/projets']);
     }));
 
@@ -180,12 +180,12 @@ describe('ProjetFormComponent', () => {
       component.onSubmit();
       tick();
 
-      expect(projetService.mettreAJourProjet).toHaveBeenCalledWith('1', component.projetForm.value);
+      expect(projetService.updateProjet).toHaveBeenCalledWith('1', component.projetForm.value);
       expect(router.navigate).toHaveBeenCalledWith(['/projets']);
     }));
 
     it('should handle submission error', fakeAsync(() => {
-      projetService.creerProjet.and.returnValue(throwError(() => new Error('Erreur test')));
+      projetService.createProjet.and.returnValue(throwError(() => new Error('Erreur test')));
       component.onSubmit();
       tick();
 

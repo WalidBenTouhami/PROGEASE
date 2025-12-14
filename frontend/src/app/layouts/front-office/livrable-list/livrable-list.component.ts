@@ -157,17 +157,12 @@ export class LivrableListComponent implements OnInit {
   loadLivrables() {
     this.chargement = true;
     this.livrableService.getLivrables().subscribe({
-      next: (response: ApiResponse<Livrable[]>) => {
-        if (response.success && response.data) {
-          this.livrables = response.data;
-          this.filterLivrables();
-        } else {
-          this.alertService.error('Erreur lors du chargement des livrables');
-          this.erreur = "Erreur lors du chargement des livrables.";
-        }
+      next: (livrables: Livrable[]) => {
+        this.livrables = livrables;
+        this.filterLivrables();
         this.chargement = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         this.alertService.error('Erreur lors du chargement des livrables');
         console.error('Error loading livrables:', error);
         this.erreur = "Erreur lors du chargement des livrables.";
@@ -179,17 +174,12 @@ export class LivrableListComponent implements OnInit {
   loadLivrablesForProject() {
     this.chargement = true;
     this.livrableService.getLivrablesByProjet(this.projetId).subscribe({
-      next: (response: ApiResponse<Livrable[]>) => {
-        if (response.success && response.data) {
-          this.livrables = response.data;
-          this.filterLivrables();
-        } else {
-          this.alertService.error('Erreur lors du chargement des livrables');
-          this.erreur = "Erreur lors du chargement des livrables.";
-        }
+      next: (livrables: Livrable[]) => {
+        this.livrables = livrables;
+        this.filterLivrables();
         this.chargement = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         this.alertService.error('Erreur lors du chargement des livrables');
         console.error('Error loading livrables:', error);
         this.erreur = "Erreur lors du chargement des livrables.";
@@ -200,7 +190,7 @@ export class LivrableListComponent implements OnInit {
 
   filterLivrables() {
     this.filteredLivrables = this.livrables
-      .filter(l => !this.searchTerm || l.titre.toLowerCase().includes(this.searchTerm.toLowerCase()))
+      .filter(l => !this.searchTerm || (l.titre || l.intitule || '').toLowerCase().includes(this.searchTerm.toLowerCase()))
       .filter(l => !this.selectedStatus || l.statut === this.selectedStatus);
   }
 
@@ -226,23 +216,20 @@ export class LivrableListComponent implements OnInit {
   }
 
   deleteLivrable(livrable: Livrable) {
-    if (!livrable.id) return;
+    const livrableId = livrable.id || livrable._id;
+    if (!livrableId) return;
 
     if (confirm('Êtes-vous sûr de vouloir supprimer ce livrable ?')) {
-      this.livrableService.deleteLivrable(livrable.id).subscribe({
-        next: (response: ApiResponse<boolean>) => {
-          if (response.success) {
-            this.alertService.success('Livrable supprimé avec succès');
-            if (this.projetId) {
-              this.loadLivrablesForProject();
-            } else {
-              this.loadLivrables();
-            }
+      this.livrableService.deleteLivrable(livrableId).subscribe({
+        next: () => {
+          this.alertService.success('Livrable supprimé avec succès');
+          if (this.projetId) {
+            this.loadLivrablesForProject();
           } else {
-            this.alertService.error('Erreur lors de la suppression du livrable');
+            this.loadLivrables();
           }
         },
-        error: (error) => {
+        error: (error: any) => {
           this.alertService.error('Erreur lors de la suppression du livrable');
           console.error('Error deleting livrable:', error);
         }
