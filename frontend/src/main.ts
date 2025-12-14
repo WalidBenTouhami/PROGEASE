@@ -17,14 +17,7 @@ Sentry.init({
   ],
   tracesSampleRate: isDevMode() ? 1.0 : 0.2,
   environment: environment.production ? 'production' : 'development',
-  enabled: environment.production,
-  beforeSend(event) {
-    // Don't send events in development
-    if (isDevMode()) {
-      return null;
-    }
-    return event;
-  },
+  enabled: environment.production, // Only enabled in production
 });
 
 // Enable production mode if in production

@@ -129,5 +129,6 @@ export class ProjetListComponent implements OnInit {
         (p.description || '').toLowerCase().includes(term.toLowerCase())
       );
     }
+    this.dataSource.data = this.projetsFiltres;
   }
 }
