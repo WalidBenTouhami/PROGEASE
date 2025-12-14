@@ -78,6 +78,7 @@
     "@types/node": "^20.11.19",
     "autoprefixer": "^10.4.21",
     "axe-core": "^4.10.3",
+    "cypress": "^13.6.3",
     "cypress-axe": "^1.6.0",
     "jasmine-core": "~5.1.1",
     "karma": "~6.4.2",
